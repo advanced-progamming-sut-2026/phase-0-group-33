@@ -1,0 +1,402 @@
+@startuml
+!theme vibrant
+skinparam class {
+  BackgroundColor<<singleton>> #FFFACD
+  BackgroundColor<<enum>> #E0FFFF
+}
+
+package "model" #F8F8F8 {
+  
+  ' Application State Singleton
+  class App <<singleton>> {
+    - currentUser : User
+    - stayLoggedIn : boolean
+    - currentGameSession : GameSession
+    - activeMiniGame : MiniGame
+    - currentMenu : String
+    --
+    + getInstance() : App
+    + login(user) : void
+    + logout() : void
+  }
+
+  ' User & Security
+  class User {
+    - username : String
+    - passwordHash : String
+    - nickname : String
+    - email : String
+    - gender : String
+    - coins : Coin
+    - diamonds : Diamond
+    - pots : Pot
+    - difficultyLevel : int = 3
+    - securityQuestion : SecurityQuestion
+    - unlockedPlants : Set<UserPlant>
+    - seenZombies : Set<ZombieType>
+    - completedLevels : List<String>
+    - highestScore : int
+    --
+    + changePassword(new, old) : boolean
+    + changeUsername(new) : boolean
+  }
+
+  class SecurityQuestion {
+    - question : String
+    - answer : String
+  }
+
+  ' Assets hierarchy
+  abstract class Asset {
+    # amount : int
+    --
+    + add(int) : void
+    + spend(int) : boolean
+    + getAmount() : int
+  }
+  class Coin extends Asset { }
+  class Diamond extends Asset { }
+  class Pot extends Asset { }
+
+  ' Plant types & upgrades
+  enum PlantType {
+    PEASHOOTER, SUNFLOWER, WALLNUT, CHERRYBOMB, SNOWPEA, ...
+  }
+  class UserPlant {
+    - plantType : PlantType
+    - upgradeLevel : int = 1
+    --
+    + getUpgradedStats() : PlantStats
+    + upgrade() : void
+  }
+
+  enum ZombieType {
+    BASIC, CONEHEAD, BUCKETHEAD, GARGANTUAR, ...
+  }
+
+  ' Chapters & Levels
+  abstract class Chapter {
+    # name : String
+    # levels : List<Level>
+    --
+    + unlockNextLevel() : void
+  }
+  class EgyptChapter extends Chapter { }
+  class FrostbiteChapter extends Chapter { }
+  class BigWaveBeachChapter extends Chapter { }
+  class DarkAgesChapter extends Chapter { }
+
+  abstract class Level {
+    # chapter : Chapter
+    # levelNumber : int
+    --
+    + start() : void
+    + checkVictoryCondition() : boolean
+  }
+  class StandardLevel extends Level { }
+  class SpecialLevel extends Level { }
+  class BossLevel extends Level { }
+
+  ' Special level variants
+  class ConveyorBeltLevel extends SpecialLevel { }
+  class LockedPlantsLevel extends SpecialLevel { }
+  class SaveOurSeedsLevel extends SpecialLevel { }
+  class TimedWarLevel extends SpecialLevel { }
+  class NightOpsLevel extends SpecialLevel { }
+  class DeadLineLevel extends SpecialLevel { }
+  class LoveYourPlantsLevel extends SpecialLevel { }
+  class PlantWhatYouGetLevel extends SpecialLevel { }
+
+  ' Game session core
+  class GameSession {
+    - grid : Grid
+    - waveManager : WaveManager
+    - sunManager : SunManager
+    - plantFoodManager : PlantFoodManager
+    - selectedPlants : List<UserPlant>
+    - tickCount : int
+    - isEnded : boolean
+    --
+    + advanceTime(ticks) : void
+    + placePlant(type, pos) : void
+    + pluckPlant(pos) : void
+    + showMap() : void
+  }
+
+  class Grid {
+    - tiles : Tile[][]
+    - rows : int
+    - cols : int
+    --
+    + getTile(x,y) : Tile
+  }
+
+  enum TerrainType {
+    NORMAL, GRAVE, ICE, WATER, LILYPAD, FROZEN, ...
+  }
+
+  class Tile {
+    - position : Point
+    - terrain : TerrainType
+    - plant : Plant (nullable)
+    - zombies : List<Zombie>
+    - hasLawnMower : boolean
+    --
+    + addPlant(Plant) : void
+    + removePlant() : void
+  }
+
+  ' Plant & Zombie hierarchies with State/Decorator
+  abstract class Plant {
+    # type : PlantType
+    # position : Point
+    # health : int
+    # currentCooldown : int
+    # state : PlantState
+    --
+    + onTick() : void
+    + applyPlantFood() : void
+  }
+  interface PlantState {
+    + onTick(Plant) : void
+    + canAttack() : boolean
+  }
+  class NormalPlantState implements PlantState { }
+  class FrozenPlantState implements PlantState { }
+  class BoostedPlantState implements PlantState { }
+  
+  class Peashooter extends Plant { }
+  class Sunflower extends Plant { }
+  class WallNut extends Plant { }
+
+  abstract class Zombie {
+    # type : ZombieType
+    # position : Point
+    # health : int
+    # speed : double
+    # state : ZombieState
+    --
+    + move() : void
+    + attack(Plant) : void
+    + takeDamage(int) : void
+  }
+  interface ZombieState {
+    + onTick(Zombie) : void
+  }
+  class NormalZombieState implements ZombieState { }
+  class ChilledZombieState implements ZombieState { }
+
+  abstract class ZombieDecorator extends Zombie {
+    # decoratedZombie : Zombie
+  }
+  class ConeArmorDecorator extends ZombieDecorator { }
+  class BucketArmorDecorator extends ZombieDecorator { }
+  class CrownArmorDecorator extends ZombieDecorator { }
+
+  class SunManager {
+    - sunAmount : int
+    - sunDropTimer : int
+    - pendingSuns : List<Sun>
+    --
+    + update(tick) : void
+  }
+  class PlantFoodManager {
+    - count : int (max 3)
+    --
+    + usePlantFood() : boolean
+  }
+  class WaveManager {
+    - currentWave : int
+    - waveDifficulty : double
+    --
+    + startNextWave() : void
+  }
+
+  ' Quests with enums
+  enum QuestType {
+    DAILY, STORY, EPIC, REPEATABLE
+  }
+  enum QuestPriority {
+    CRITICAL, HIGH, MEDIUM, LOW
+  }
+  class Quest {
+    - id : String
+    - description : String
+    - type : QuestType
+    - priority : QuestPriority
+    - goal : int
+    - progress : int
+    - reward : Asset
+    --
+    + updateProgress(event) : void
+    + isCompleted() : boolean
+  }
+
+  ' Shop (Daily Offer integrated)
+  class Shop {
+    - permanentItems : List<ShopItem>
+    - dailyOffer : ShopItem
+    --
+    + buyItem(itemId, count) : boolean
+    + refreshDaily() : void
+  }
+  class ShopItem {
+    - id : String
+    - name : String
+    - priceCoin : int
+    - priceDiamond : int
+    - isDaily : boolean
+    - maxPurchase : int
+  }
+
+  class Greenhouse {
+    - pots : Pot[][]
+    --
+    + plantPot(pos) : void
+    + collect(pos) : void
+  }
+  class Pot {
+    - state : PotState
+    - plantType : PlantType
+    - timeRemaining : long
+  }
+
+  class Leaderboard {
+    - entries : List<LeaderboardEntry>
+    --
+    + sortBy(column) : void
+  }
+  class LeaderboardEntry {
+    - username : String
+    - lastLevel : String
+    - miniGamesCompleted : int
+    - questsCompleted : int
+    - highestScore : int
+  }
+
+  ' Event system
+  class EventManager <<singleton>> {
+    - listeners : List<GameEventListener>
+    --
+    + subscribe(listener) : void
+    + publish(event) : void
+  }
+  interface GameEventListener {
+    + onGameEvent(event : GameEvent) : void
+  }
+  class QuestTracker implements GameEventListener { }
+  class NewsFeedManager implements GameEventListener { }
+}
+
+' ==============================
+' PACKAGE: minigame (Independent MiniGames)
+' ==============================
+package "minigame" #F0F8FF {
+  abstract class MiniGame {
+    # gameName : String
+    # isEnded : boolean
+    --
+    + start() : void
+    + advanceTime(ticks) : void
+    + handleCommand(cmd) : String
+  }
+  class VasebreakerMiniGame extends MiniGame { }
+  class WallnutBowlingMiniGame extends MiniGame { }
+  class IZombieMiniGame extends MiniGame { }
+  class BeghouledMiniGame extends MiniGame { }
+  class ZombotanyMiniGame extends MiniGame { }
+}
+
+' ==============================
+' PACKAGE: menu (Menus & Hub)
+' ==============================
+package "menu" #FFF5EE {
+  class MenuHub <<singleton>> {
+    - menuStack : Stack<Menu>
+    --
+    + enterMenu(menu : Menu) : void
+    + exitMenu() : void
+    + getCurrentMenu() : Menu
+    + processCommand(cmd : String) : String
+  }
+
+  abstract class Menu <<singleton>> {
+    + display() : void
+    + processCommand(cmd : String) : String
+  }
+  
+  class SignupMenu extends Menu { }
+  class LoginMenu extends Menu { }
+  class MainMenu extends Menu { }
+  class GameMenu extends Menu { }
+  class ShopMenu extends Menu { }
+  class GreenhouseMenu extends Menu { }
+  class CollectionMenu extends Menu { }
+  class SettingsMenu extends Menu { }
+  class ProfileMenu extends Menu { }
+  class NewsMenu extends Menu { }
+  class LeaderboardMenu extends Menu { }
+  class TravelLogMenu extends Menu { }
+}
+
+' ==============================
+' PACKAGE: controller (Global Controller)
+' ==============================
+package "controller" #F5F5F5 {
+  class GameController <<singleton>> {
+    - app : App
+    - menuHub : MenuHub
+    --
+    + run() : void
+    + parseGlobalCommand(input : String) : void
+  }
+}
+
+' ==============================
+' RELATIONSHIPS
+' ==============================
+App "1" --> "1" User
+App "1" --> "0..1" GameSession
+App "1" --> "0..1" MiniGame
+User "1" --> "1" SecurityQuestion
+User "1" --> "*" UserPlant
+User "1" --> "1" Coin
+User "1" --> "1" Diamond
+User "1" --> "1" Pot
+UserPlant "*" --> "1" PlantType : bases on
+
+Chapter "1" --> "*" Level
+Level "1" --> "1" Chapter : belongs to
+
+GameSession "1" *-- "1" Grid
+GameSession "1" *-- "1" WaveManager
+GameSession "1" *-- "1" SunManager
+GameSession "1" *-- "1" PlantFoodManager
+Grid "1" *-- "*" Tile
+Tile "0..1" o-- "1" Plant
+Tile "*" o-- "*" Zombie
+Plant "1" --> "1" PlantState
+Zombie "1" --> "1" ZombieState
+ZombieDecorator "1" o-- "1" Zombie : decorates
+
+GameSession "1" -- "1..*" UserPlant : selectedPlants
+
+Shop "1" *-- "*" ShopItem
+Greenhouse "1" *-- "*" Pot
+
+EventManager "1" --> "*" GameEventListener
+QuestTracker ..|> GameEventListener
+NewsFeedManager ..|> GameEventListener
+Quest "1" --> "1" QuestType
+Quest "1" --> "1" QuestPriority
+
+GameController "1" --> "1" App
+GameController "1" --> "1" MenuHub
+MenuHub "1" --> "*" Menu : stack
+MiniGame <|-- VasebreakerMiniGame
+MiniGame <|-- WallnutBowlingMiniGame
+MiniGame <|-- IZombieMiniGame
+MiniGame <|-- BeghouledMiniGame
+MiniGame <|-- ZombotanyMiniGame
+
+@enduml
