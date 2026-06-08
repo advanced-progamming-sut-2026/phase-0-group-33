@@ -1,6 +1,6 @@
 package model.entitie.zombie;
 
-public class ZombieState {
+public interface ZombieState {
 
     
 }

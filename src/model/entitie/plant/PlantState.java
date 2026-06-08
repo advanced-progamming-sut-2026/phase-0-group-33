@@ -1,4 +1,4 @@
 package model.entitie.plant;
 
-public class PlantState {
+public interface PlantState {
 }

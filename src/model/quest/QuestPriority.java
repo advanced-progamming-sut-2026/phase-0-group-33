@@ -1,5 +1,5 @@
 package model.quest;
 
-public class QuestPriority {
+public enum QuestPriority {
     
 }
