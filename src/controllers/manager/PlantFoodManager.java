@@ -1,4 +1,4 @@
-package manager;
+package controllers.manager;
 
 public class PlantFoodManager {
     
