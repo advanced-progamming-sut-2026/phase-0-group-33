@@ -3,7 +3,6 @@ package model.entitie.plant;
 import java.util.Set;
 
 public enum PlantType {
-    // ID, Name, Category, Tags, Cost, BaseHP, Damage, ActionInterval(s), Recharge(s)
     SUNFLOWER(1, "Sunflower", PlantCategory.SUN_PRODUCER, Set.of(PlantTag.DAY), 50, 300, 0, 24, 5),
     TWIN_SUNFLOWER(2, "Twin Sunflower", PlantCategory.SUN_PRODUCER, Set.of(PlantTag.DAY), 125, 300, 0, 24, 15),
     SUN_SHROOM(3, "Sun-shroom", PlantCategory.SUN_PRODUCER, Set.of(PlantTag.SHROOM, PlantTag.WRAMP_UP, PlantTag.NIGHT), 25, 300, 0, 24, 5),
@@ -17,7 +16,7 @@ public enum PlantType {
     PEA_POD(11, "Pea Pod", PlantCategory.SHOOTER, Set.of(PlantTag.PEA, PlantTag.STACK), 125, 300, 20, 1, 5),
     SPLIT_PEA(12, "Split Pea", PlantCategory.SHOOTER, Set.of(PlantTag.PEA), 125, 300, 20, 1, 5),
     CITRON(13, "Citron", PlantCategory.SHOOTER, Set.of(PlantTag.CHARGE), 350, 300, 800, 9, 5),
-    CAULIPOWER(14, "Caulipower", PlantCategory.HOMING, Set.of(PlantTag.MAGIC, PlantTag.CHARGE), 250, 300, -1, 12, 15), // -1 = Insta-kill
+    CAULIPOWER(14, "Caulipower", PlantCategory.HOMING, Set.of(PlantTag.MAGIC, PlantTag.CHARGE), 250, 300, -1, 12, 15),
     ELECTRIC_BLUEBERRY(15, "Electric Blueberry", PlantCategory.HOMING, Set.of(PlantTag.CHARGE), 150, 300, 5000, 12, 15),
     BOWLING_BULB(16, "Bowling Bulb", PlantCategory.SHOOTER, Set.of(PlantTag.CHARGE), 200, 300, 40, 2, 5),
     CACTUS(17, "Cactus", PlantCategory.STRIKE_THROUGH, Set.of(), 175, 300, 30, 1, 5),
@@ -40,11 +39,11 @@ public enum PlantType {
     GRAPESHOT(34, "Grapeshot", PlantCategory.EXPLOSIVE, Set.of(), 150, 0, 1800, -1, 35),
     JALAPENO(35, "Jalapeno", PlantCategory.EXPLOSIVE, Set.of(PlantTag.FIRE), 125, 0, 1800, -1, 35),
     DOOM_SHROOM(36, "Doom-shroom", PlantCategory.EXPLOSIVE, Set.of(PlantTag.SHROOM), 125, 0, 1800, -1, 15),
-    TANGLE_KELP(37, "Tangle Kelp", PlantCategory.EXPLOSIVE, Set.of(PlantTag.TRAP, PlantTag.WATER), 25, 300, -1, -1, 15), // -1 = Insta-kill
+    TANGLE_KELP(37, "Tangle Kelp", PlantCategory.EXPLOSIVE, Set.of(PlantTag.TRAP, PlantTag.WATER), 25, 300, -1, -1, 15),
     ICEBERG_LETTUCE(38, "Iceberg Lettuce", PlantCategory.EXPLOSIVE, Set.of(PlantTag.TRAP, PlantTag.ICE), 0, 300, 0, -1, 20),
     BONK_CHOY(39, "Bonk Choy", PlantCategory.MELEE, Set.of(), 150, 300, 15, 0, 5),
     PHAT_BEET(40, "Phat Beet", PlantCategory.MELEE, Set.of(PlantTag.AOE), 150, 300, 15, 2, 5),
-    CHOMPER(41, "Chomper", PlantCategory.MELEE, Set.of(), 150, 300, -1, 40, 5), // -1 = Insta-kill
+    CHOMPER(41, "Chomper", PlantCategory.MELEE, Set.of(), 150, 300, -1, 40, 5),
     WASABI_WHIP(42, "Wasabi Whip", PlantCategory.MELEE, Set.of(PlantTag.FIRE), 150, 300, 40, 2, 5),
     KIWIBEAST(43, "Kiwibeast", PlantCategory.MELEE, Set.of(PlantTag.AOE, PlantTag.WRAMP_UP), 175, 300, 15, 2, 5),
     WALL_NUT(44, "Wall-nut", PlantCategory.WALL_NUT, Set.of(), 50, 4000, 0, -1, 20),
@@ -63,7 +62,7 @@ public enum PlantType {
     ICE_SHROOM(57, "Ice-shroom", PlantCategory.EXPLOSIVE, Set.of(PlantTag.SHROOM, PlantTag.ICE), 75, 0, 0, -1, 50),
     LILY_PAD(58, "Lily Pad", PlantCategory.MODIFIER, Set.of(PlantTag.WATER, PlantTag.STACK), 25, 300, 0, -1, 5),
     HOT_POTATO(59, "Hot Potato", PlantCategory.EXPLOSIVE, Set.of(PlantTag.FIRE), 0, 0, 0, -1, 5),
-    GRAVE_BUSTER(60, "Grave Buster", PlantCategory.EXPLOSIVE, Set.of(), 0, 0, -1, -1, 10), // -1 = Insta-kill
+    GRAVE_BUSTER(60, "Grave Buster", PlantCategory.EXPLOSIVE, Set.of(), 0, 0, -1, -1, 10),
     ENLIGHTEN_MINT(61, "Enlighten-mint", PlantCategory.SUN_PRODUCER, Set.of(), 0, 0, 0, -1, 85),
     APPEASE_MINT(62, "Appease-mint", PlantCategory.SHOOTER, Set.of(), 0, 0, 0, -1, 85),
     ARMA_MINT(63, "Arma-mint", PlantCategory.LOBBER, Set.of(), 0, 0, 0, -1, 85),
@@ -80,9 +79,9 @@ public enum PlantType {
     private final Set<PlantTag> tags;
     private final int cost;
     private final int baseHp;
-    private final int damage;       // -1 means instant kill
-    private final double actionInterval; // seconds, -1 for non-attackers
-    private final int recharge;     // seconds
+    private final int damage; // -1 means instant kill
+    private final double actionInterval;
+    private final int recharge;
 
     PlantType(int id, String name, PlantCategory category, Set<PlantTag> tags,
               int cost, int baseHp, int damage, double actionInterval, int recharge) {
@@ -97,7 +96,6 @@ public enum PlantType {
         this.recharge = recharge;
     }
 
-    // Getters
     public int getId() { return id; }
     public String getName() { return name; }
     public PlantCategory getCategory() { return category; }
