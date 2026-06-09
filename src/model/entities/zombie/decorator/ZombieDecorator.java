@@ -1,4 +1,4 @@
-package model.entitie.zombie.decorator;
+package model.entities.zombie.decorator;
 
 public abstract class ZombieDecorator {
 }

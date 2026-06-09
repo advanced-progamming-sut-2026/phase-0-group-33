@@ -1,4 +1,4 @@
-package model.entitie.plant;
+package model.entities.plant;
 
 public abstract class Plant{
 }

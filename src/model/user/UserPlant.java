@@ -1,7 +1,7 @@
 package model.user;
 
-import model.entitie.plant.PlantStats;
-import model.entitie.plant.PlantType;
+import model.entities.plant.PlantStats;
+import model.entities.plant.PlantType;
 
 public class UserPlant {
 

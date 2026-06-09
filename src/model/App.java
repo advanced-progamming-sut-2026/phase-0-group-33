@@ -3,6 +3,7 @@ package model;
 import model.enums.Menus;
 import model.game.GameSession;
 import model.user.User;
+import views.MenuHub;
 
 public class App {
 
@@ -74,5 +75,10 @@ public class App {
 
     public Menus getCurrentMenu() {
         return currentMenu;
+    }
+
+    public void run() {
+        MenuHub menuHub = new MenuHub(this);
+        menuHub.run();
     }
 }

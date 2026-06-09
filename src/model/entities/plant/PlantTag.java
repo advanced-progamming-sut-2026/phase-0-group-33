@@ -1,4 +1,4 @@
-package model.entitie.plant;
+package model.entities.plant;
 
 public enum PlantTag {
     DAY,

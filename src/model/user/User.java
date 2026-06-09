@@ -3,7 +3,7 @@ package model.user;
 import model.asset.Coin;
 import model.asset.Diamond;
 import model.asset.Pot;
-import model.entitie.zombie.ZombieType;
+import model.entities.zombie.ZombieType;
 import model.enums.DifficultyLevel;
 import model.enums.Gender;
 import model.progress.level.Level;

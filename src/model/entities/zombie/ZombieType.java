@@ -1,4 +1,4 @@
-package model.entitie.zombie;
+package model.entities.zombie;
 
 public enum ZombieType {
     
