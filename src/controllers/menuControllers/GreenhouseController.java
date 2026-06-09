@@ -1,4 +1,4 @@
 package controllers.menuControllers;
 
-public class GreenhouseController {
+public class GreenhouseController implements AppController {
 }

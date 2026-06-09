@@ -1,4 +1,4 @@
 package controllers.menuControllers;
 
-public class GeneralController {
+public class GeneralController implements AppController {
 }

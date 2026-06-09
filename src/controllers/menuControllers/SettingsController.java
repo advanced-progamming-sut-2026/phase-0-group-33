@@ -1,4 +1,4 @@
 package controllers.menuControllers;
 
-public class SettingsController {
+public class SettingsController implements AppController {
 }

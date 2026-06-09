@@ -1,4 +1,4 @@
 package controllers.menuControllers;
 
-public class LoginController {
+public class LoginController implements AppController {
 }

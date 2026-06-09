@@ -1,4 +1,4 @@
 package controllers.menuControllers;
 
-public class GameController {
+public class GameController implements AppController {
 }

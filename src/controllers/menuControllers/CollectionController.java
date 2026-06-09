@@ -1,4 +1,5 @@
 package controllers.menuControllers;
 
-public class CollectionController {
+public class CollectionController implements AppController{
+    
 }

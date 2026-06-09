@@ -1,4 +1,4 @@
 package controllers.menuControllers;
 
-public class LeaderboardController {
+public class LeaderboardController implements AppController {
 }

@@ -1,4 +1,4 @@
 package controllers.menuControllers;
 
-public class ShopController {
+public class ShopController implements AppController {
 }

@@ -1,4 +1,4 @@
 package controllers.menuControllers;
 
-public class TravelLogController {
+public class TravelLogController implements AppController {
 }

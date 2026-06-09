@@ -1,4 +1,4 @@
 package controllers.menuControllers;
 
-public class NewsController {
+public class NewsController implements AppController {
 }

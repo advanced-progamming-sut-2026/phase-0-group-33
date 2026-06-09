@@ -1,4 +1,4 @@
 package controllers.menuControllers;
 
-public class ProfileController {
+public class ProfileController implements AppController {
 }
