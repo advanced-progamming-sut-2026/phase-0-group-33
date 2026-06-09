@@ -1,4 +1,22 @@
 package views.menus;
 
-public class GreenhouseMenu {
+import controllers.menuControllers.GreenhouseController;
+
+public class GreenhouseMenu implements AppMenu {
+    private final GreenhouseController controller;
+
+    public GreenhouseMenu(GreenhouseController controller) {
+        this.controller = controller;
+    }
+
+    @Override
+    public void display() {
+        // TODO
+    }
+
+    @Override
+    public String processCommand(String cmd) {
+        // TODO
+        return null;
+    }
 }
