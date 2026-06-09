@@ -10,7 +10,7 @@ skinparam packageBorderColor #A0A0A0
 ' ==============================
 ' MODEL PACKAGE
 ' ==============================
-package "model" #F8F8F8 {
+package "models" #F8F8F8 {
 
   ' Central application state (singleton)
   class App <<singleton>> {

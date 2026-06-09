@@ -5,7 +5,7 @@ skinparam class {
   BackgroundColor<<enum>> #E0FFFF
 }
 
-package "model" #F8F8F8 {
+package "models" #F8F8F8 {
   
   ' Application State Singleton
   class App <<singleton>> {

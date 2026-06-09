@@ -1,6 +1,6 @@
 package views;
 
-import model.App;
+import models.App;
 
 import java.util.Scanner;
 
