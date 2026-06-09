@@ -1,4 +1,9 @@
 package controllers.menuControllers;
 
-public class SettingsController implements AppController {
+import models.App;
+
+public class SettingsController extends BaseController {
+    public SettingsController(App app) {
+        super(app);
+    }
 }

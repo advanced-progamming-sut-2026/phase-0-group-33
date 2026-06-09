@@ -1,4 +1,9 @@
 package controllers.menuControllers;
 
-public class GameController implements AppController {
+import models.App;
+
+public class GameController extends BaseController {
+    public GameController(App app) {
+        super(app);
+    }
 }

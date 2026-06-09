@@ -1,4 +1,9 @@
 package controllers.menuControllers;
 
-public class NewsController implements AppController {
+import models.App;
+
+public class NewsController extends BaseController {
+    public NewsController(App app) {
+        super(app);
+    }
 }

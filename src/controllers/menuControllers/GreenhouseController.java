@@ -1,4 +1,9 @@
 package controllers.menuControllers;
 
-public class GreenhouseController implements AppController {
+import models.App;
+
+public class GreenhouseController extends BaseController {
+    public GreenhouseController(App app) {
+        super(app);
+    }
 }

@@ -35,19 +35,19 @@ public class MenuHub {
         this.scanner = new Scanner(System.in);
         this.currentMenu = Menus.SIGNUP;
 
-        CollectionController collectionController = new CollectionController();
-        GameController gameController = new GameController();
-        GreenhouseController greenhouseController = new GreenhouseController();
-        LeaderboardController leaderboardController = new LeaderboardController();
-        LoginController loginController = new LoginController();
-        MainController mainController = new MainController();
-        NewsController newsController = new NewsController();
-        ProfileController profileController = new ProfileController();
-        SettingsController settingsController = new SettingsController();
-        ShopController shopController = new ShopController();
-        SignupController signupController = new SignupController();
-        TravelLogController travellogController = new TravelLogController();
-        GeneralController generalController = new GeneralController();
+        CollectionController collectionController = new CollectionController(app);
+        GameController gameController = new GameController(app);
+        GreenhouseController greenhouseController = new GreenhouseController(app);
+        LeaderboardController leaderboardController = new LeaderboardController(app);
+        LoginController loginController = new LoginController(app);
+        MainController mainController = new MainController(app);
+        NewsController newsController = new NewsController(app);
+        ProfileController profileController = new ProfileController(app);
+        SettingsController settingsController = new SettingsController(app);
+        ShopController shopController = new ShopController(app);
+        SignupController signupController = new SignupController(app);
+        TravelLogController travellogController = new TravelLogController(app);
+        GeneralController generalController = new GeneralController(app);
 
         this.collectionMenu = new CollectionMenu(collectionController);
         this.gameMenu = new GameMenu(gameController);

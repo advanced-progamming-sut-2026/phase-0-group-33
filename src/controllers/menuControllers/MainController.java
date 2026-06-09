@@ -1,4 +1,9 @@
 package controllers.menuControllers;
 
-public class MainController implements AppController {
+import models.App;
+
+public class MainController extends BaseController {
+    public MainController(App app) {
+        super(app);
+    }
 }

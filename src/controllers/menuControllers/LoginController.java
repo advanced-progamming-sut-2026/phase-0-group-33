@@ -1,4 +1,9 @@
 package controllers.menuControllers;
 
-public class LoginController implements AppController {
+import models.App;
+
+public class LoginController extends BaseController {
+    public LoginController(App app) {
+        super(app);
+    }
 }

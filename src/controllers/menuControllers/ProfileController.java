@@ -1,4 +1,9 @@
 package controllers.menuControllers;
 
-public class ProfileController implements AppController {
+import models.App;
+
+public class ProfileController extends BaseController {
+    public ProfileController(App app) {
+        super(app);
+    }
 }

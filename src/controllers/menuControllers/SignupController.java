@@ -1,4 +1,9 @@
 package controllers.menuControllers;
 
-public class SignupController implements AppController {
+import models.App;
+
+public class SignupController extends BaseController {
+    public SignupController(App app) {
+        super(app);
+    }
 }

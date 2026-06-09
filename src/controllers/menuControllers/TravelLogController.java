@@ -1,4 +1,9 @@
 package controllers.menuControllers;
 
-public class TravelLogController implements AppController {
+import models.App;
+
+public class TravelLogController extends BaseController {
+    public TravelLogController(App app) {
+        super(app);
+    }
 }
