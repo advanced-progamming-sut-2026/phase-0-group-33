@@ -5,6 +5,8 @@ import models.game.GameSession;
 import models.user.User;
 import views.MenuHub;
 
+import java.awt.*;
+
 public class App {
 
     private static volatile App instance;
@@ -18,7 +20,7 @@ public class App {
     private Menus currentMenu;
 
     private App() {
-        //TODO: reflect exception(log)
+        //TODO
     }
 
     public static App getInstance() {
@@ -78,7 +80,7 @@ public class App {
     }
 
     public void run() {
-        MenuHub menuHub = new MenuHub(this);
+        MenuHub menuHub = MenuHub.getInstance(this);
         menuHub.run();
     }
 }

@@ -15,8 +15,8 @@ public class ShopMenu implements AppMenu {
     }
 
     @Override
-    public String processCommand(String cmd) {
+    public boolean processCommand(String cmd) {
         // TODO
-        return null;
+        return false;
     }
 }

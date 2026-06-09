@@ -2,5 +2,5 @@ package views.menus;
 
 public interface AppMenu {
     public abstract void display();
-    public abstract String processCommand(String cmd);
+    public abstract boolean processCommand(String cmd);
 }

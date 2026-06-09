@@ -2,10 +2,10 @@ package views.menus;
 
 import controllers.menuControllers.TravelLogController;
 
-public class TravelLogMenu implements AppMenu {
+public class TravellogMenu implements AppMenu {
     private final TravelLogController controller;
 
-    public TravelLogMenu(TravelLogController controller) {
+    public TravellogMenu(TravelLogController controller) {
         this.controller = controller;
     }
 
@@ -15,8 +15,8 @@ public class TravelLogMenu implements AppMenu {
     }
 
     @Override
-    public String processCommand(String cmd) {
+    public boolean processCommand(String cmd) {
         // TODO
-        return null;
+        return false;
     }
 }

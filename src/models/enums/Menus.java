@@ -6,7 +6,7 @@ public enum Menus {
     SETTINGS,
     PROFILE,
     NEWS,
-    TRAVEL_LOG,
+    TRAVELLOG,
     SIGNUP,
     LOGIN,
     MAIN,

@@ -1,11 +1,11 @@
 package views.menus;
 
-import controllers.menuControllers.ProfileController;
+import controllers.menuControllers.GeneralController;
 
-public class ProfileMenu implements AppMenu {
-    private final ProfileController controller;
+public class GeneralMenu implements AppMenu {
+    private final GeneralController controller;
 
-    public ProfileMenu(ProfileController controller) {
+    public GeneralMenu(GeneralController controller) {
         this.controller = controller;
     }
 
