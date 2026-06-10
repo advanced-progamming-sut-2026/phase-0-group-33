@@ -1,5 +1,7 @@
 package database;
 
+import models.enums.DifficultyLevel;
+import models.enums.Gender;
 import models.user.SecurityQuestion;
 import models.user.User;
 import java.sql.*;
@@ -20,8 +22,8 @@ public class UserDAO {
             stmt.setString(2, user.getPasswordHash());
             stmt.setString(3, user.getNickname());
             stmt.setString(4, user.getEmail());
-            stmt.setString(5, user.getGenderString());
-            stmt.setInt(6, user.getDifficultyLevelValue());
+            stmt.setString(5, user.getGender().toString());
+            stmt.setInt(6, user.getDifficultyLevel().getLevelNumber());
             stmt.setInt(7, user.getCoins().getAmount());
             stmt.setInt(8, user.getDiamonds().getAmount());
             stmt.setInt(9, user.getPots().getAmount());
@@ -100,11 +102,11 @@ public class UserDAO {
     }
 
     /** Update difficulty level. */
-    public boolean updateDifficulty(String username, int level) {
+    public boolean updateDifficulty(String username, DifficultyLevel level) {
         String sql = "UPDATE users SET difficulty_level = ? WHERE username = ?";
         try (Connection conn = dbManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, level);
+            stmt.setInt(1, level.getLevelNumber());
             stmt.setString(2, username);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -167,8 +169,8 @@ public class UserDAO {
         user.setPasswordHash(rs.getString("password_hash"));  // stored hash
         user.setNickname(rs.getString("nickname"));
         user.setEmail(rs.getString("email"));
-        user.setGender(rs.getString("gender"));
-        user.setDifficultyLevel(rs.getInt("difficulty_level"));
+        user.setGender(Gender.getByName(rs.getString("gender")));
+        user.setDifficultyLevel(DifficultyLevel.getDifficultyByLevel(rs.getInt("difficulty_level")));
         user.getCoins().setAmount(rs.getInt("coins"));
         user.getDiamonds().setAmount(rs.getInt("diamonds"));
         user.getPots().setAmount(rs.getInt("pots"));

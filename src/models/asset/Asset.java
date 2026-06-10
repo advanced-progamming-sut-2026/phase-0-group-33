@@ -2,7 +2,7 @@ package models.asset;
 
 public abstract class Asset {
 
-    protected int amount;
+    protected int amount = 0;
 
     public void add(int amountToAdd) {
         this.amount += amountToAdd;
@@ -17,7 +17,7 @@ public abstract class Asset {
     }
 
     public int getAmount() {
-        return amount;
+        return this.amount;
     }
 
     public void setAmount(int value) {

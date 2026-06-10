@@ -18,15 +18,15 @@ public class User {
     private String nickname;
     private String email;
     private Gender gender;
-    private Coin coins;
-    private Diamond diamonds;
-    private Pot pots;
+    private Coin coins = new Coin();
+    private Diamond diamonds = new Diamond();
+    private Pot pots = new Pot();
     private DifficultyLevel difficultyLevel = DifficultyLevel.MEDIUM;
     private SecurityQuestion securityQuestion;
     private Set<UserPlant> unlockedPlants = new HashSet<>();
     private Set<ZombieType> seenZombies = new HashSet<>();
     private Set<Level> completedLevels = new HashSet<>();
-    private int highestScore;
+    private int highestScore = 0;
 
     public User(String username, String passwordHash, String nickname, String email, Gender gender, SecurityQuestion securityQuestion) {
         this.username = username;
@@ -41,15 +41,9 @@ public class User {
 
     }
 
-    public boolean changePassword(String newPassword, String oldPassword) {
-        // TODO
-        return false;
-    }
+    public void changePasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
 
-    public boolean changeUsername(String newUsername) {
-        // TODO
-        return false;
-    }
+    public void changeUsername(String newUsername) { this.username = newUsername; }
 
     public void completeLevel(Level level) {
         if(level != null) this.completedLevels.add(level);
@@ -91,16 +85,8 @@ public class User {
         return gender;
     }
 
-    public String getGenderString() {
-        return gender.toString();
-    }
-
     public void setGender(Gender gender) {
         this.gender = gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = Gender.getByName(gender);
     }
 
     public Coin getCoins() {
@@ -131,16 +117,8 @@ public class User {
         return difficultyLevel;
     }
 
-    public int getDifficultyLevelValue() {
-        return difficultyLevel.getLevelNumber();
-    }
-
     public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
         this.difficultyLevel = difficultyLevel;
-    }
-
-    public void setDifficultyLevel(int difficultyLevel) {
-        this.difficultyLevel = DifficultyLevel.getDifficultyLevel(difficultyLevel);
     }
 
     public SecurityQuestion getSecurityQuestion() {

@@ -1,4 +1,4 @@
-package controllers.manager;
+package controllers.managers;
 
 public class WaveManager {
     

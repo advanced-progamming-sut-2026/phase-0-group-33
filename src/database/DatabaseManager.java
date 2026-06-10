@@ -12,11 +12,7 @@ public class DatabaseManager {
     private static final String PASSWORD = "Admin@1234";
 
     private DatabaseManager() {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("MySQL JDBC driver not found", e);
-        }
+
     }
 
     public static synchronized DatabaseManager getInstance() {

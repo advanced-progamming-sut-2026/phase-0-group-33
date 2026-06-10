@@ -11,7 +11,7 @@ public enum DifficultyLevel {
 
     public int getLevelNumber() { return this.level; }
 
-    public static DifficultyLevel getDifficultyLevel(int level) {
+    public static DifficultyLevel getDifficultyByLevel(int level) {
         for (DifficultyLevel difficultyLevel : DifficultyLevel.values()) {
             if (difficultyLevel.getLevelNumber() == level) {
                 return difficultyLevel;
