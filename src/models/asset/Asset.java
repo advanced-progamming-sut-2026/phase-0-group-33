@@ -19,4 +19,8 @@ public abstract class Asset {
     public int getAmount() {
         return amount;
     }
+
+    public void setAmount(int value) {
+        this.amount = value;
+    }
 }

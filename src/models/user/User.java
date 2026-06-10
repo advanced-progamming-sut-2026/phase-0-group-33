@@ -37,6 +37,10 @@ public class User {
         this.securityQuestion = securityQuestion;
     }
 
+    public User() {
+
+    }
+
     public boolean changePassword(String newPassword, String oldPassword) {
         // TODO
         return false;
@@ -87,8 +91,16 @@ public class User {
         return gender;
     }
 
+    public String getGenderString() {
+        return gender.toString();
+    }
+
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = Gender.getByName(gender);
     }
 
     public Coin getCoins() {
@@ -119,8 +131,16 @@ public class User {
         return difficultyLevel;
     }
 
+    public int getDifficultyLevelValue() {
+        return difficultyLevel.getLevelNumber();
+    }
+
     public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
         this.difficultyLevel = difficultyLevel;
+    }
+
+    public void setDifficultyLevel(int difficultyLevel) {
+        this.difficultyLevel = DifficultyLevel.getDifficultyLevel(difficultyLevel);
     }
 
     public SecurityQuestion getSecurityQuestion() {
