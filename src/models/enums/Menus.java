@@ -12,5 +12,13 @@ public enum Menus {
     MAIN,
     SHOP,
     GAME,
-    LEADERBOARD
+    LEADERBOARD;
+
+    public static Menus getMenuByName(String menuName) {
+        for (Menus m : Menus.values()) {
+            if (m.toString().equalsIgnoreCase(menuName))
+                return m;
+        }
+        return null;
+    }
 }

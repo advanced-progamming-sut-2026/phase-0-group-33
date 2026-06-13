@@ -27,6 +27,7 @@ public class User {
     private Set<ZombieType> seenZombies = new HashSet<>();
     private Set<Level> completedLevels = new HashSet<>();
     private int highestScore = 0;
+    private int numberOfGames;
 
     public User(String username, String passwordHash, String nickname, String email, Gender gender, SecurityQuestion securityQuestion) {
         this.username = username;
@@ -107,6 +108,10 @@ public class User {
 
     public Pot getPots() {
         return pots;
+    }
+
+    public int getNumberOfGames() {
+        return numberOfGames;
     }
 
     public void setPots(Pot pots) {
