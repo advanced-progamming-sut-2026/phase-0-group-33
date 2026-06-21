@@ -3,14 +3,14 @@ package views.menus;
 import controllers.menuControllers.TravelLogController;
 import models.Result;
 import models.enums.regexes.commandHandlers.GlobalCommands;
-import models.enums.regexes.commandHandlers.TravellogCommands;
+import models.enums.regexes.commandHandlers.TravelLogCommands;
 
 import java.util.regex.Matcher;
 
-public class TravellogMenu implements AppMenu {
+public class TravelLogMenu implements AppMenu {
     private final TravelLogController controller;
 
-    public TravellogMenu(TravelLogController controller) {
+    public TravelLogMenu(TravelLogController controller) {
         this.controller = controller;
     }
 
@@ -18,7 +18,7 @@ public class TravellogMenu implements AppMenu {
     public boolean processCommand(String cmd) {
         String input = cmd.trim();
 
-        Matcher travelLogPageMatcher = TravellogCommands.TRAVEL_LOG_PAGE.pattern.matcher(input);
+        Matcher travelLogPageMatcher = TravelLogCommands.TRAVEL_LOG_PAGE.pattern.matcher(input);
         if (travelLogPageMatcher.matches()) {
             String pageName = travelLogPageMatcher.group("pageName");
             // TODO

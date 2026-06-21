@@ -2,12 +2,12 @@ package models.enums.regexes.commandHandlers;
 
 import java.util.regex.Pattern;
 
-public enum TravellogCommands {
+public enum TravelLogCommands {
     TRAVEL_LOG_PAGE("^travel\\s+log\\s+page\\s+(?<pageName>.+?)$");
 
     public final Pattern pattern;
 
-    TravellogCommands(String regex) {
+    TravelLogCommands(String regex) {
         this.pattern = Pattern.compile(regex);
     }
 

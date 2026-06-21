@@ -58,7 +58,7 @@ public class MenuHub {
         this.settingsMenu = new SettingsMenu(settingsController);
         this.shopMenu = new ShopMenu(shopController);
         this.signupMenu = new SignupMenu(signupController);
-        this.travellogMenu = new TravellogMenu(travellogController);
+        this.travellogMenu = new TravelLogMenu(travellogController);
     }
 
     public static MenuHub getInstance(App app) {
