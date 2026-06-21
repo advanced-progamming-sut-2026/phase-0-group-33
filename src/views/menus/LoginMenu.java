@@ -17,40 +17,74 @@ public class LoginMenu implements AppMenu {
     @Override
     public boolean processCommand(String cmd) {
         String input = cmd.trim();
-        Matcher m;
-        Result result = new Result();
 
-        if ((m = LoginCommands.LOGIN.pattern.matcher(input)).matches()) {
-            String username = m.group("username");
-            String password = m.group("password");
-            String stay = m.group("stay");
-            result = controller.handleLogin(username, password, stay);
-        } else if ((m = LoginCommands.FORGET_PASSWORD.pattern.matcher(input)).matches()) {
-            String username = m.group("username");
-            String email = m.group("email");
-            result = controller.handleForgotPassword(username, email);
-        } else if ((m = LoginCommands.ANSWER.pattern.matcher(input)).matches()) {
-            String answer = m.group("answer");
-            result = controller.handleSecurityAnswer(answer);
-        } else if ((m = LoginCommands.NEW_PASSWORD.pattern.matcher(input)).matches()) {
-            String password = m.group("password");
-            String confirmation = m.group("password-confirm");
-            result = controller.handleNewPassword(password, confirmation);
-        } else if ((m = LoginCommands.QUIT_PASSWORD_RESET.pattern.matcher(input)).matches()) {
-            result = controller.handleResetPasswordQuit();
-        }  else if ((m = GlobalCommands.CHANGE_MENU.pattern.matcher(input)).matches()) {
-            String menu = m.group("menu");
-            result = controller.handleMenuChange(menu);
-        } else if ((m = GlobalCommands.SHOW_MENU.pattern.matcher(input)).matches()) {
+        Matcher loginMatcher = LoginCommands.LOGIN.pattern.matcher(input);
+        if (loginMatcher.matches()) {
+            String username = loginMatcher.group("username");
+            String password = loginMatcher.group("password");
+            String stay = loginMatcher.group("stay");
+            Result result = controller.handleLogin(username, password, stay);
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
+        Matcher forgetPasswordMatcher = LoginCommands.FORGET_PASSWORD.pattern.matcher(input);
+        if (forgetPasswordMatcher.matches()) {
+            String username = forgetPasswordMatcher.group("username");
+            String email = forgetPasswordMatcher.group("email");
+            Result result = controller.handleForgotPassword(username, email);
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
+        Matcher answerMatcher = LoginCommands.ANSWER.pattern.matcher(input);
+        if (answerMatcher.matches()) {
+            String answer = answerMatcher.group("answer");
+            Result result = controller.handleSecurityAnswer(answer);
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
+        Matcher newPasswordMatcher = LoginCommands.NEW_PASSWORD.pattern.matcher(input);
+        if (newPasswordMatcher.matches()) {
+            String password = newPasswordMatcher.group("password");
+            String confirmation = newPasswordMatcher.group("password-confirm");
+            Result result = controller.handleNewPassword(password, confirmation);
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
+        Matcher quitPasswordResetMatcher = LoginCommands.QUIT_PASSWORD_RESET.pattern.matcher(input);
+        if (quitPasswordResetMatcher.matches()) {
+            Result result = controller.handleResetPasswordQuit();
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
+        Matcher changeMenuMatcher = GlobalCommands.CHANGE_MENU.pattern.matcher(input);
+        if (changeMenuMatcher.matches()) {
+            String menu = changeMenuMatcher.group("menu");
+            Result result = controller.handleMenuChange(menu);
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
+        Matcher showMenuMatcher = GlobalCommands.SHOW_MENU.pattern.matcher(input);
+        if (showMenuMatcher.matches()) {
+            Result result = new Result();
             result.setSuccess(true);
             result.addMessage("Login menu");
-        } else if (((m = GlobalCommands.EXIT.pattern.matcher(input)).matches())) {
-            result = controller.handleExit();
-        }
-        if (result != null) {
             printResultMsg(result);
             return true;
         }
+
+        Matcher exitMatcher = GlobalCommands.EXIT.pattern.matcher(input);
+        if (exitMatcher.matches()) {
+            Result result = controller.handleExit();
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
         return false;
     }
 }
