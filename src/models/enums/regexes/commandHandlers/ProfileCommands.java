@@ -7,8 +7,7 @@ public enum ProfileCommands {
     CHANGE_NICKNAME("^menu\\s+profile\\s+change-nickname\\s+-u\\s+(?<nickname>.+?)$"),
     CHANGE_EMAIL("^menu\\s+profile\\s+change-email\\s+-u\\s+(?<email>.+?)$"),
     CHANGE_PASSWORD("^menu\\s+profile\\s+change-password\\s+-p\\s+(?<new_password>.+?)\\s+-o\\s+(?<old_password>.+?)$"),
-    SHOW_PROFILE("^menu\\s+profile\\s+show-info$"),
-    ;
+    SHOW_PROFILE("^menu\\s+profile\\s+show-info$");
 
     public final Pattern pattern;
 

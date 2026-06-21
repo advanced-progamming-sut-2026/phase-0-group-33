@@ -7,8 +7,7 @@ public enum LoginCommands {
     FORGET_PASSWORD("^forget\\s+password\\s+-u\\s+(?<username>.+?)\\s+-e\\s+(?<email>.+?)$"),
     ANSWER("^answer\\s+-a\\s+(?<answer>.+?)$"),
     NEW_PASSWORD("^new\\s+password\\s+-p(?<password>.+?)\\s+(?<password-confirm>.+?)$"),
-    QUIT_PASSWORD_RESET("^quit\\s+password\\s+reset$")
-    ;
+    QUIT_PASSWORD_RESET("^quit\\s+password\\s+reset$");
     public final Pattern pattern;
 
     LoginCommands(String regex) {
