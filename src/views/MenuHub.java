@@ -28,7 +28,6 @@ public class MenuHub {
     private final AppMenu shopMenu;
     private final AppMenu signupMenu;
     private final AppMenu travellogMenu;
-    private final AppMenu generalMenu;
 
     private MenuHub(App app) {
         this.app = app;
@@ -47,7 +46,6 @@ public class MenuHub {
         ShopController shopController = new ShopController(app);
         SignupController signupController = new SignupController(app);
         TravelLogController travellogController = new TravelLogController(app);
-        GeneralController generalController = new GeneralController(app);
 
         this.collectionMenu = new CollectionMenu(collectionController);
         this.gameMenu = new GameMenu(gameController);
@@ -61,7 +59,6 @@ public class MenuHub {
         this.shopMenu = new ShopMenu(shopController);
         this.signupMenu = new SignupMenu(signupController);
         this.travellogMenu = new TravellogMenu(travellogController);
-        this.generalMenu = new GeneralMenu(generalController);
     }
 
     public static MenuHub getInstance(App app) {
