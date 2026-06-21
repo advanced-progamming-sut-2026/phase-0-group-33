@@ -29,7 +29,7 @@ public class SignupController extends BaseController {
     public Result handleQuestionSelection(String questionNum, String answer, String confirmation) {
         Result result = new Result();
 
-        if (!SignupCommands.NUMBER_PATTER.matches(questionNum)) {
+        if (!SignupCommands.NUMBER_PATTERN.matches(questionNum)) {
             result.setSuccess(false);
             result.addMessage("Invalid quesion ID");
             return result;
