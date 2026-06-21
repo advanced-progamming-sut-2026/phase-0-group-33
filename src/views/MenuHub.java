@@ -106,11 +106,9 @@ public class MenuHub {
 
             String command = scanner.nextLine().trim();
 
-            if(generalMenu.processCommand(command)) continue;
+            boolean validCommand = menu.processCommand(command);
 
-            boolean isLocalCommand = menu.processCommand(command);
-
-            if(!isLocalCommand) {
+            if(!validCommand) {
                 // TODO: what should we do if it wasn't a valid message?
             }
         }
