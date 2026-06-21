@@ -1,16 +1,16 @@
 package views.menus;
 
-import controllers.menuControllers.MainMenuController;
+import controllers.menuControllers.MainController;
 import models.Result;
 import models.enums.regexes.commandHandlers.GlobalCommands;
-import models.enums.regexes.commandHandlers.MainMenuCommands;
+import models.enums.regexes.commandHandlers.MainCommands;
 
 import java.util.regex.Matcher;
 
 public class MainMenu implements AppMenu {
-    private final MainMenuController controller;
+    private final MainController controller;
 
-    public MainMenu(MainMenuController controller) {
+    public MainMenu(MainController controller) {
         this.controller = controller;
     }
 
@@ -18,44 +18,44 @@ public class MainMenu implements AppMenu {
     public boolean processCommand(String cmd) {
         String input = cmd.trim();
 
-        Matcher enterChapterMatcher = MainMenuCommands.ENTER_CHAPTER.pattern.matcher(input);
+        Matcher enterChapterMatcher = MainCommands.ENTER_CHAPTER.pattern.matcher(input);
         if (enterChapterMatcher.matches()) {
             String chaptername = enterChapterMatcher.group("chaptername");
             // TODO
             return true;
         }
 
-        Matcher enterGreenhouseMatcher = MainMenuCommands.ENTER_GREENHOUSE.pattern.matcher(input);
+        Matcher enterGreenhouseMatcher = MainCommands.ENTER_GREENHOUSE.pattern.matcher(input);
         if (enterGreenhouseMatcher.matches()) {
             // TODO
             return true;
         }
 
-        Matcher enterTravelLogMatcher = MainMenuCommands.ENTER_TRAVEL_LOG.pattern.matcher(input);
+        Matcher enterTravelLogMatcher = MainCommands.ENTER_TRAVEL_LOG.pattern.matcher(input);
         if (enterTravelLogMatcher.matches()) {
             // TODO
             return true;
         }
 
-        Matcher enterLeaderboardMatcher = MainMenuCommands.ENTER_LEADERBOARD.pattern.matcher(input);
+        Matcher enterLeaderboardMatcher = MainCommands.ENTER_LEADERBOARD.pattern.matcher(input);
         if (enterLeaderboardMatcher.matches()) {
             // TODO
             return true;
         }
 
-        Matcher enterCoinWalletMatcher = MainMenuCommands.ENTER_COIN_WALLET.pattern.matcher(input);
+        Matcher enterCoinWalletMatcher = MainCommands.ENTER_COIN_WALLET.pattern.matcher(input);
         if (enterCoinWalletMatcher.matches()) {
             // TODO
             return true;
         }
 
-        Matcher enterGemWalletMatcher = MainMenuCommands.ENTER_GEM_WALLET.pattern.matcher(input);
+        Matcher enterGemWalletMatcher = MainCommands.ENTER_GEM_WALLET.pattern.matcher(input);
         if (enterGemWalletMatcher.matches()) {
             // TODO
             return true;
         }
 
-        Matcher cheatAddMatcher = MainMenuCommands.CHEAT_ADD.pattern.matcher(input);
+        Matcher cheatAddMatcher = MainCommands.CHEAT_ADD.pattern.matcher(input);
         if (cheatAddMatcher.matches()) {
             String amount = cheatAddMatcher.group("amount");
             String type = cheatAddMatcher.group("type");
@@ -63,7 +63,7 @@ public class MainMenu implements AppMenu {
             return true;
         }
 
-        Matcher logoutMatcher = MainMenuCommands.LOGOUT.pattern.matcher(input);
+        Matcher logoutMatcher = MainCommands.LOGOUT.pattern.matcher(input);
         if (logoutMatcher.matches()) {
             // TODO
             return true;
