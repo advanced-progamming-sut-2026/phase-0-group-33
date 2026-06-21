@@ -18,48 +18,76 @@ public class ProfileMenu implements AppMenu {
     @Override
     public boolean processCommand(String cmd) {
         String input = cmd.trim();
-        Matcher m;
-        Result result = getResult();
 
-        if ((m = ProfileCommands.CHANGE_USERNAME.pattern.matcher(input)).matches()) {
-            String username = m.group("username");
-            result = controller.handleChangeUsername(username);
-        } else if ((m = ProfileCommands.CHANGE_NICKNAME.pattern.matcher(input)).matches()) {
-            String nickname = m.group("nickname");
-            result = controller.handleChangeNickname(nickname);
-        } else if ((m = ProfileCommands.CHANGE_EMAIL.pattern.matcher(input)).matches()) {
-            String email = m.group("email");
-            result = controller.handleChangeEmail(email);
-        } else if ((m = ProfileCommands.CHANGE_PASSWORD.pattern.matcher(input)).matches()) {
-            String password = m.group("new_password");
-            String oldPassword = m.group("old_password");
-            result = controller.handleChangePassword(oldPassword, password);
-        } else if ((m = ProfileCommands.SHOW_PROFILE.pattern.matcher(input)).matches()) {
-            result = controller.handleShowProfile();
+        Matcher changeUsernameMatcher = ProfileCommands.CHANGE_USERNAME.pattern.matcher(input);
+        if (changeUsernameMatcher.matches()) {
+            String username = changeUsernameMatcher.group("username");
+            Result result = controller.handleChangeUsername(username);
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
+        Matcher changeNicknameMatcher = ProfileCommands.CHANGE_NICKNAME.pattern.matcher(input);
+        if (changeNicknameMatcher.matches()) {
+            String nickname = changeNicknameMatcher.group("nickname");
+            Result result = controller.handleChangeNickname(nickname);
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
+        Matcher changeEmailMatcher = ProfileCommands.CHANGE_EMAIL.pattern.matcher(input);
+        if (changeEmailMatcher.matches()) {
+            String email = changeEmailMatcher.group("email");
+            Result result = controller.handleChangeEmail(email);
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
+        Matcher changePasswordMatcher = ProfileCommands.CHANGE_PASSWORD.pattern.matcher(input);
+        if (changePasswordMatcher.matches()) {
+            String password = changePasswordMatcher.group("new_password");
+            String oldPassword = changePasswordMatcher.group("old_password");
+            Result result = controller.handleChangePassword(oldPassword, password);
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
+        Matcher showProfileMatcher = ProfileCommands.SHOW_PROFILE.pattern.matcher(input);
+        if (showProfileMatcher.matches()) {
+            Result result = controller.handleShowProfile();
             printProfileInfo((User) result.getData());
-        }  else if ((m = GlobalCommands.CHANGE_MENU.pattern.matcher(input)).matches()) {
-            String menu = m.group("menu");
-            result = controller.handleMenuChange(menu);
-        } else if ((m = GlobalCommands.SHOW_MENU.pattern.matcher(input)).matches()) {
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
+        Matcher changeMenuMatcher = GlobalCommands.CHANGE_MENU.pattern.matcher(input);
+        if (changeMenuMatcher.matches()) {
+            String menu = changeMenuMatcher.group("menu");
+            Result result = controller.handleMenuChange(menu);
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
+        Matcher showMenuMatcher = GlobalCommands.SHOW_MENU.pattern.matcher(input);
+        if (showMenuMatcher.matches()) {
+            Result result = new Result();
             result.setSuccess(true);
             result.addMessage("Profile menu");
-        } else if (((m = GlobalCommands.EXIT.pattern.matcher(input)).matches())) {
-            result = controller.handleExit();
-        }
-        if (result != null) {
             printResultMsg(result);
             return true;
         }
+
+        Matcher exitMatcher = GlobalCommands.EXIT.pattern.matcher(input);
+        if (exitMatcher.matches()) {
+            Result result = controller.handleExit();
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
         return false;
     }
 
-    private static Result getResult() {
-        return new Result();
-    }
-
-
-    //---* Helper Function *---
-    public void printProfileInfo(User u) {
+    private void printProfileInfo(User u) {
         int levels = u.getCompletedLevels().size();
         System.out.println("Your Profile:");
         System.out.printf("%-20s | %-20s | %s \n",
