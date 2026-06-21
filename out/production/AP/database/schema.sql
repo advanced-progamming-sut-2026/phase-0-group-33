@@ -23,12 +23,31 @@ CREATE TABLE users (
 -- -----------------------------------------
 -- User's unlocked plants with upgrade level
 -- -----------------------------------------
+
+CREATE TABLE static_plants (
+                               id INT PRIMARY KEY,
+                               name VARCHAR(50) UNIQUE NOT NULL,
+                               category VARCHAR(50) NOT NULL,
+                               tags VARCHAR(100),
+                               cost INT NOT NULL,
+                               base_hp INT NOT NULL,
+                               base_damage VARCHAR(50), -- VARCHAR because damage can be "0", "20x3", etc.
+                               base_ability TEXT CHARACTER SET utf8mb4,
+                               plant_food_effect TEXT CHARACTER SET utf8mb4,
+                               lvl_2_upgrade VARCHAR(100),
+                               lvl_3_upgrade VARCHAR(100),
+                               lvl_4_upgrade VARCHAR(100),
+                               action_interval VARCHAR(20),
+                               recharge_time INT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE user_plants (
-                             username     VARCHAR(50) NOT NULL,
-                             plant_type   VARCHAR(30) NOT NULL,
-                             upgrade_level INT        NOT NULL DEFAULT 1,
-                             PRIMARY KEY (username, plant_type),
-                             FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
+                             username VARCHAR(50) NOT NULL,
+                             plant_id INT NOT NULL,
+                             upgrade_level INT NOT NULL DEFAULT 1,
+                             PRIMARY KEY (username, plant_id),
+                             FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE,
+                             FOREIGN KEY (plant_id) REFERENCES static_plants(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- -----------------------------------------
