@@ -17,35 +17,54 @@ public class SignupMenu implements AppMenu {
     @Override
     public boolean processCommand(String cmd) {
         String input = cmd.trim();
-        Matcher m;
-        Result result = new Result();
 
-        if ((m = SignupCommands.REGISTER.pattern.matcher(input)).matches()) {
-            String username = m.group("username");
-            String password = m.group("password");
-            String confirm = m.group("password-confirm");
-            String nickname = m.group("nickname");
-            String email = m.group("email");
-            String gender = m.group("gender");
-            result = controller.handleRegistry(username, password, confirm, nickname, email, gender);
-        } else if ((m = SignupCommands.SELECT_QUESTION.pattern.matcher(input)).matches()) {
-            String number = m.group("number");
-            String answer = m.group("answer");
-            String confirm = m.group("answer-confirm");
-            result = controller.handleQuestionSelection(number, answer, confirm);
-        } else if ((m = GlobalCommands.CHANGE_MENU.pattern.matcher(input)).matches()) {
-            String menu = m.group("menu");
-            result = controller.handleMenuChange(menu);
-        } else if ((m = GlobalCommands.SHOW_MENU.pattern.matcher(input)).matches()) {
+        Matcher registerMatcher = SignupCommands.REGISTER.pattern.matcher(input);
+        if (registerMatcher.matches()) {
+            String username = registerMatcher.group("username");
+            String password = registerMatcher.group("password");
+            String confirm = registerMatcher.group("password-confirm");
+            String nickname = registerMatcher.group("nickname");
+            String email = registerMatcher.group("email");
+            String gender = registerMatcher.group("gender");
+            Result result = controller.handleRegistry(username, password, confirm, nickname, email, gender);
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
+        Matcher selectQuestionMatcher = SignupCommands.SELECT_QUESTION.pattern.matcher(input);
+        if (selectQuestionMatcher.matches()) {
+            String number = selectQuestionMatcher.group("number");
+            String answer = selectQuestionMatcher.group("answer");
+            String confirm = selectQuestionMatcher.group("answer-confirm");
+            Result result = controller.handleQuestionSelection(number, answer, confirm);
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
+        Matcher changeMenuMatcher = GlobalCommands.CHANGE_MENU.pattern.matcher(input);
+        if (changeMenuMatcher.matches()) {
+            String menu = changeMenuMatcher.group("menu");
+            Result result = controller.handleMenuChange(menu);
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
+        Matcher showMenuMatcher = GlobalCommands.SHOW_MENU.pattern.matcher(input);
+        if (showMenuMatcher.matches()) {
+            Result result = new Result();
             result.setSuccess(true);
             result.addMessage("Signup menu");
-        } else if (((m = GlobalCommands.EXIT.pattern.matcher(input)).matches())) {
-            result = controller.handleExit();
-        }
-        if (result != null) {
             printResultMsg(result);
             return true;
         }
+
+        Matcher exitMatcher = GlobalCommands.EXIT.pattern.matcher(input);
+        if (exitMatcher.matches()) {
+            Result result = controller.handleExit();
+            if (result != null) printResultMsg(result);
+            return true;
+        }
+
         return false;
     }
 }
