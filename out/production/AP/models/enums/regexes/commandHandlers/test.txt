@@ -1,0 +1,22 @@
+package models.enums;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public enum MainMenuCommand implements MenuCommand {
+    ADD("^add\\s+-n\\s+(?<name>\\S+)\\s+-t\\s+(?<type>\\S+)\\s+-r\\s+(?<role>\\S+)$"),
+    START_GAME("^start\\s+game$"),
+    EXIT("^exit$"),
+    NAME("^[A-Za-z]{3,}$");
+
+    private final Pattern pattern;
+
+    MainMenuCommand(String regex) {
+        this.pattern = Pattern.compile(regex);
+    }
+
+    @Override
+    public Matcher matcher(String command) {
+        return pattern.matcher(command);
+    }
+}
