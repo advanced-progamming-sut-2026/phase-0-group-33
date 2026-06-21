@@ -16,11 +16,6 @@ public class ProfileMenu implements AppMenu {
     }
 
     @Override
-    public void display() {
-        // TODO
-    }
-
-    @Override
     public boolean processCommand(String cmd) {
         String input = cmd.trim();
         Matcher m;
@@ -55,7 +50,6 @@ public class ProfileMenu implements AppMenu {
             printResultMsg(result);
             return true;
         }
-        System.out.println("Invalid Command!");
         return false;
     }
 

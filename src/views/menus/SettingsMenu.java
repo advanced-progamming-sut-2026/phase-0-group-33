@@ -10,11 +10,6 @@ public class SettingsMenu implements AppMenu {
     }
 
     @Override
-    public void display() {
-        // TODO
-    }
-
-    @Override
     public boolean processCommand(String cmd) {
         // TODO
         return false;
