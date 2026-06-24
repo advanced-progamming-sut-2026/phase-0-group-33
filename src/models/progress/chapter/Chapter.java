@@ -1,7 +1,6 @@
 package models.progress.chapter;
 
 import models.progress.level.Level;
-
 import java.util.List;
 
 public abstract class Chapter {
@@ -11,7 +10,17 @@ public abstract class Chapter {
     protected List<Level> levels;
 
     public void unlockNextLevel() {
-        // TODO
+        if (levels == null || levels.isEmpty()) {
+            return;
+        }
+        if (currentUnlockedLevel == null) {
+            currentUnlockedLevel = levels.get(0);
+            return;
+        }
+        int currentIndex = levels.indexOf(currentUnlockedLevel);
+        if (currentIndex >= 0 && currentIndex < levels.size() - 1) {
+            currentUnlockedLevel = levels.get(currentIndex + 1);
+        }
     }
 
     public Level getCurrentUnlockedLevel() {
@@ -20,5 +29,9 @@ public abstract class Chapter {
 
     public void setCurrentUnlockedLevel(Level currentUnlockedLevel) {
         this.currentUnlockedLevel = currentUnlockedLevel;
+    }
+
+    public List<Level> getLevels() {
+        return levels;
     }
 }
