@@ -1,7 +1,6 @@
 package models.asset;
 
 public abstract class Asset {
-
     protected int amount = 0;
 
     public void add(int amountToAdd) {
