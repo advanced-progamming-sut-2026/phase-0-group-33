@@ -1,5 +1,32 @@
 package models.entities.zombie;
 
 public enum ZombieType {
-    
+    NORMAL,
+    CONE,
+    BUCKET,
+    KNIGHT,
+    BLOCK,
+    GARGANTUAR,
+    IMP,
+    ALLSTAR,
+    ARCAD,
+    PARASOL,
+    TURQUOISE,
+    PROSPECTOR,
+    PIANIST,
+    NEWSPAPER,
+    BARREL,
+    RA,
+    EXPLORER,
+    TOMBRAISER,
+    DODORIDER,
+    HUNTER,
+    TROGLOBITE,
+    FISHERMAN,
+    SNORKEL,
+    OCTOPUS,
+    JUGGLER,
+    WIZARD,
+    KING,
+    IMPDRAGON
 }
