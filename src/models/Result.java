@@ -10,6 +10,26 @@ public class Result {
     public Result() {
     }
 
+    /** Convenience factory for a successful result with optional messages. */
+    public static Result ok(String... messages) { // Can have multiple messages
+        Result result = new Result();
+        result.setSuccess(true);
+        for (String message : messages) {
+            result.addMessage(message);
+        }
+        return result;
+    }
+
+    /** Convenience factory for a failed result with optional messages. */
+    public static Result fail(String... messages) { // Can have multiple messages
+        Result result = new Result();
+        result.setSuccess(false);
+        for (String message : messages) {
+            result.addMessage(message);
+        }
+        return result;
+    }
+
     public void addMessage(String message) {
         this.messages.add(message);
     }

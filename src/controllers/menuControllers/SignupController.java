@@ -31,7 +31,7 @@ public class SignupController extends BaseController {
 
         if (!SignupCommands.NUMBER_PATTERN.matches(questionNum)) {
             result.setSuccess(false);
-            result.addMessage("Invalid quesion ID");
+            result.addMessage("Invalid question ID");
             return result;
         }
 

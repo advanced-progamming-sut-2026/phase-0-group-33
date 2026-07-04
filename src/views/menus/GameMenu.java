@@ -4,193 +4,72 @@ import controllers.menuControllers.GameController;
 import models.Result;
 import models.enums.regexes.commandHandlers.GameCommands;
 import models.enums.regexes.commandHandlers.GlobalCommands;
-
-import java.util.regex.Matcher;
+import views.CommandRouter;
 
 public class GameMenu implements AppMenu {
-    private final GameController controller;
+    private final CommandRouter router = new CommandRouter();
 
     public GameMenu(GameController controller) {
-        this.controller = controller;
+        registerPreparationCommands(controller);
+        registerBattleCommands(controller);
+        registerInfoAndGlobalCommands(controller);
+    }
+
+    private void registerPreparationCommands(GameController controller) {
+        router.add(GameCommands.SHOW_ALL_PLANTS.pattern, matcher -> controller.handleShowAllPlants())
+                .add(GameCommands.SHOW_AVAILABLE_PLANTS.pattern,
+                        matcher -> controller.handleShowAvailablePlants())
+                .add(GameCommands.ADD_PLANT.pattern,
+                        matcher -> controller.handleAddPlant(matcher.group("type")))
+                .add(GameCommands.REMOVE_PLANT.pattern,
+                        matcher -> controller.handleRemovePlant(matcher.group("type")))
+                .add(GameCommands.BOOST_PLANT.pattern,
+                        matcher -> controller.handleBoostPlant(matcher.group("type")))
+                .add(GameCommands.START_GAME.pattern, matcher -> controller.handleStartGame())
+                .add(GameCommands.START_ZOMBIE_WAVES.pattern,
+                        matcher -> controller.handleStartZombieWaves());
+    }
+
+    private void registerBattleCommands(GameController controller) {
+        router.add(GameCommands.ADVANCE_TIME.pattern, matcher ->
+                        controller.handleAdvanceTime(Integer.parseInt(matcher.group("count"))))
+                .add(GameCommands.COLLECT_SUN.pattern, matcher -> controller.handleCollectSun(
+                        Integer.parseInt(matcher.group("x")), Integer.parseInt(matcher.group("y"))))
+                .add(GameCommands.CHEAT_ADD_SUN.pattern, matcher ->
+                        controller.handleCheatAddSun(Integer.parseInt(matcher.group("count"))))
+                .add(GameCommands.RELEASE_NUKE.pattern, matcher -> controller.handleReleaseNuke())
+                .add(GameCommands.PLANT_PLANT.pattern, matcher -> controller.handlePlant(
+                        matcher.group("type"),
+                        Integer.parseInt(matcher.group("x")), Integer.parseInt(matcher.group("y"))))
+                .add(GameCommands.CHEAT_REMOVE_COOLDOWN.pattern,
+                        matcher -> controller.handleCheatRemoveCooldown())
+                .add(GameCommands.PLUCK_PLANT.pattern, matcher -> controller.handlePluck(
+                        Integer.parseInt(matcher.group("x")), Integer.parseInt(matcher.group("y"))))
+                .add(GameCommands.FEED_PLANT.pattern, matcher -> controller.handleFeedPlant(
+                        Integer.parseInt(matcher.group("x")), Integer.parseInt(matcher.group("y"))))
+                .add(GameCommands.CHEAT_ADD_PLANT_FOOD.pattern,
+                        matcher -> controller.handleCheatAddPlantFood())
+                .add(GameCommands.CHEAT_SPAWN_ZOMBIE.pattern, matcher -> controller.handleCheatSpawnZombie(
+                        matcher.group("type"),
+                        Integer.parseInt(matcher.group("x")), Integer.parseInt(matcher.group("y"))));
+    }
+
+    private void registerInfoAndGlobalCommands(GameController controller) {
+        router.add(GameCommands.SHOW_SUN_AMOUNT.pattern, matcher -> controller.handleShowSunAmount())
+                .add(GameCommands.SHOW_MAP.pattern, matcher -> controller.handleShowMap())
+                .add(GameCommands.SHOW_PLANTS_STATUS.pattern,
+                        matcher -> controller.handleShowPlantsStatus())
+                .add(GameCommands.SHOW_TILE_STATUS.pattern, matcher -> controller.handleShowTileStatus(
+                        Integer.parseInt(matcher.group("x")), Integer.parseInt(matcher.group("y"))))
+                .add(GameCommands.ZOMBIES_INFO.pattern, matcher -> controller.handleZombiesInfo())
+                .add(GlobalCommands.SHOW_MENU.pattern, matcher -> Result.ok("Game menu"))
+                .add(GlobalCommands.CHANGE_MENU.pattern,
+                        matcher -> controller.handleMenuChange(matcher.group("menu")))
+                .add(GlobalCommands.EXIT.pattern, matcher -> controller.handleExit());
     }
 
     @Override
     public boolean processCommand(String cmd) {
-        String input = cmd.trim();
-
-        Matcher showAllPlantsMatcher = GameCommands.SHOW_ALL_PLANTS.pattern.matcher(input);
-        if (showAllPlantsMatcher.matches()) {
-            // TODO
-            return true;
-        }
-
-        Matcher showAvailablePlantsMatcher = GameCommands.SHOW_AVAILABLE_PLANTS.pattern.matcher(input);
-        if (showAvailablePlantsMatcher.matches()) {
-            // TODO
-            return true;
-        }
-
-        Matcher addPlantMatcher = GameCommands.ADD_PLANT.pattern.matcher(input);
-        if (addPlantMatcher.matches()) {
-            String type = addPlantMatcher.group("type");
-            // TODO
-            return true;
-        }
-
-        Matcher removePlantMatcher = GameCommands.REMOVE_PLANT.pattern.matcher(input);
-        if (removePlantMatcher.matches()) {
-            String type = removePlantMatcher.group("type");
-            // TODO
-            return true;
-        }
-
-        Matcher boostPlantMatcher = GameCommands.BOOST_PLANT.pattern.matcher(input);
-        if (boostPlantMatcher.matches()) {
-            String type = boostPlantMatcher.group("type");
-            // TODO
-            return true;
-        }
-
-        Matcher startGameMatcher = GameCommands.START_GAME.pattern.matcher(input);
-        if (startGameMatcher.matches()) {
-            // TODO
-            return true;
-        }
-
-        Matcher startZombieWavesMatcher = GameCommands.START_ZOMBIE_WAVES.pattern.matcher(input);
-        if (startZombieWavesMatcher.matches()) {
-            // TODO
-            return true;
-        }
-
-        Matcher advanceTimeMatcher = GameCommands.ADVANCE_TIME.pattern.matcher(input);
-        if (advanceTimeMatcher.matches()) {
-            String count = advanceTimeMatcher.group("count");
-            // TODO
-            return true;
-        }
-
-        Matcher collectSunMatcher = GameCommands.COLLECT_SUN.pattern.matcher(input);
-        if (collectSunMatcher.matches()) {
-            String x = collectSunMatcher.group("x");
-            String y = collectSunMatcher.group("y");
-            // TODO
-            return true;
-        }
-
-        Matcher showSunAmountMatcher = GameCommands.SHOW_SUN_AMOUNT.pattern.matcher(input);
-        if (showSunAmountMatcher.matches()) {
-            // TODO
-            return true;
-        }
-
-        Matcher cheatAddSunMatcher = GameCommands.CHEAT_ADD_SUN.pattern.matcher(input);
-        if (cheatAddSunMatcher.matches()) {
-            String count = cheatAddSunMatcher.group("count");
-            // TODO
-            return true;
-        }
-
-        Matcher releaseNukeMatcher = GameCommands.RELEASE_NUKE.pattern.matcher(input);
-        if (releaseNukeMatcher.matches()) {
-            // TODO
-            return true;
-        }
-
-        Matcher plantPlantMatcher = GameCommands.PLANT_PLANT.pattern.matcher(input);
-        if (plantPlantMatcher.matches()) {
-            String type = plantPlantMatcher.group("type");
-            String x = plantPlantMatcher.group("x");
-            String y = plantPlantMatcher.group("y");
-            // TODO
-            return true;
-        }
-
-        Matcher cheatRemoveCooldownMatcher = GameCommands.CHEAT_REMOVE_COOLDOWN.pattern.matcher(input);
-        if (cheatRemoveCooldownMatcher.matches()) {
-            // TODO
-            return true;
-        }
-
-        Matcher pluckPlantMatcher = GameCommands.PLUCK_PLANT.pattern.matcher(input);
-        if (pluckPlantMatcher.matches()) {
-            String x = pluckPlantMatcher.group("x");
-            String y = pluckPlantMatcher.group("y");
-            // TODO
-            return true;
-        }
-
-        Matcher feedPlantMatcher = GameCommands.FEED_PLANT.pattern.matcher(input);
-        if (feedPlantMatcher.matches()) {
-            String x = feedPlantMatcher.group("x");
-            String y = feedPlantMatcher.group("y");
-            // TODO
-            return true;
-        }
-
-        Matcher cheatAddPlantFoodMatcher = GameCommands.CHEAT_ADD_PLANT_FOOD.pattern.matcher(input);
-        if (cheatAddPlantFoodMatcher.matches()) {
-            // TODO
-            return true;
-        }
-
-        Matcher showMapMatcher = GameCommands.SHOW_MAP.pattern.matcher(input);
-        if (showMapMatcher.matches()) {
-            // TODO
-            return true;
-        }
-
-        Matcher showPlantsStatusMatcher = GameCommands.SHOW_PLANTS_STATUS.pattern.matcher(input);
-        if (showPlantsStatusMatcher.matches()) {
-            // TODO
-            return true;
-        }
-
-        Matcher showTileStatusMatcher = GameCommands.SHOW_TILE_STATUS.pattern.matcher(input);
-        if (showTileStatusMatcher.matches()) {
-            String x = showTileStatusMatcher.group("x");
-            String y = showTileStatusMatcher.group("y");
-            // TODO
-            return true;
-        }
-
-        Matcher zombiesInfoMatcher = GameCommands.ZOMBIES_INFO.pattern.matcher(input);
-        if (zombiesInfoMatcher.matches()) {
-            // TODO
-            return true;
-        }
-
-        Matcher cheatSpawnZombieMatcher = GameCommands.CHEAT_SPAWN_ZOMBIE.pattern.matcher(input);
-        if (cheatSpawnZombieMatcher.matches()) {
-            String type = cheatSpawnZombieMatcher.group("type");
-            String x = cheatSpawnZombieMatcher.group("x");
-            String y = cheatSpawnZombieMatcher.group("y");
-            // TODO
-            return true;
-        }
-
-        Matcher changeMenuMatcher = GlobalCommands.CHANGE_MENU.pattern.matcher(input);
-        if (changeMenuMatcher.matches()) {
-            String menu = changeMenuMatcher.group("menu");
-            // TODO
-            return true;
-        }
-
-        Matcher showMenuMatcher = GlobalCommands.SHOW_MENU.pattern.matcher(input);
-        if (showMenuMatcher.matches()) {
-            Result result = new Result();
-            result.setSuccess(true);
-            result.addMessage("Game menu");
-            printResultMsg(result);
-            return true;
-        }
-
-        Matcher exitMatcher = GlobalCommands.EXIT.pattern.matcher(input);
-        if (exitMatcher.matches()) {
-            // TODO
-            return true;
-        }
-
-        return false;
+        return router.dispatch(cmd.trim());
     }
 }

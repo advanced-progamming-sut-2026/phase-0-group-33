@@ -1,112 +1,87 @@
 package views;
 
-import controllers.menuControllers.*;
+import controllers.menuControllers.CollectionController;
+import controllers.menuControllers.GameController;
+import controllers.menuControllers.GreenhouseController;
+import controllers.menuControllers.LeaderboardController;
+import controllers.menuControllers.LoginController;
+import controllers.menuControllers.MainController;
+import controllers.menuControllers.NewsController;
+import controllers.menuControllers.ProfileController;
+import controllers.menuControllers.SettingsController;
+import controllers.menuControllers.ShopController;
+import controllers.menuControllers.SignupController;
+import controllers.menuControllers.TravelLogController;
 import models.App;
 import models.enums.Menus;
 import views.menus.AppMenu;
-import views.menus.*;
+import views.menus.CollectionMenu;
+import views.menus.GameMenu;
+import views.menus.GreenhouseMenu;
+import views.menus.LeaderboardMenu;
+import views.menus.LoginMenu;
+import views.menus.MainMenu;
+import views.menus.NewsMenu;
+import views.menus.ProfileMenu;
+import views.menus.SettingsMenu;
+import views.menus.ShopMenu;
+import views.menus.SignupMenu;
+import views.menus.TravelLogMenu;
 
-
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Scanner;
 
+/**
+ * Owns the REPL loop: reads a line, routes it to the menu the {@link App}
+ * currently points at, and prints an error for unrecognized commands.
+ */
 public class MenuHub {
     private static MenuHub instance;
 
     private final App app;
     private final Scanner scanner;
-    private Menus currentMenu;
-
-    private final AppMenu collectionMenu;
-    private final AppMenu gameMenu;
-    private final AppMenu greenhouseMenu;
-    private final AppMenu leaderboardMenu;
-    private final AppMenu loginMenu;
-    private final AppMenu mainMenu;
-    private final AppMenu newsMenu;
-    private final AppMenu profileMenu;
-    private final AppMenu settingsMenu;
-    private final AppMenu shopMenu;
-    private final AppMenu signupMenu;
-    private final AppMenu travellogMenu;
+    private final Map<Menus, AppMenu> menus = new EnumMap<>(Menus.class);
 
     private MenuHub(App app) {
         this.app = app;
         this.scanner = new Scanner(System.in);
-        this.currentMenu = Menus.SIGNUP;
 
-        CollectionController collectionController = new CollectionController(app);
-        GameController gameController = new GameController(app);
-        GreenhouseController greenhouseController = new GreenhouseController(app);
-        LeaderboardController leaderboardController = new LeaderboardController(app);
-        LoginController loginController = new LoginController(app);
-        MainController mainController = new MainController(app);
-        NewsController newsController = new NewsController(app);
-        ProfileController profileController = new ProfileController(app);
-        SettingsController settingsController = new SettingsController(app);
-        ShopController shopController = new ShopController(app);
-        SignupController signupController = new SignupController(app);
-        TravelLogController travellogController = new TravelLogController(app);
-
-        this.collectionMenu = new CollectionMenu(collectionController);
-        this.gameMenu = new GameMenu(gameController);
-        this.greenhouseMenu = new GreenhouseMenu(greenhouseController);
-        this.leaderboardMenu = new LeaderboardMenu(leaderboardController);
-        this.loginMenu = new LoginMenu(loginController);
-        this.mainMenu = new MainMenu(mainController);
-        this.newsMenu = new NewsMenu(newsController);
-        this.profileMenu = new ProfileMenu(profileController);
-        this.settingsMenu = new SettingsMenu(settingsController);
-        this.shopMenu = new ShopMenu(shopController);
-        this.signupMenu = new SignupMenu(signupController);
-        this.travellogMenu = new TravelLogMenu(travellogController);
+        menus.put(Menus.COLLECTION, new CollectionMenu(new CollectionController(app)));
+        menus.put(Menus.GAME, new GameMenu(new GameController(app)));
+        menus.put(Menus.GREENHOUSE, new GreenhouseMenu(new GreenhouseController(app)));
+        menus.put(Menus.LEADERBOARD, new LeaderboardMenu(new LeaderboardController(app)));
+        menus.put(Menus.LOGIN, new LoginMenu(new LoginController(app)));
+        menus.put(Menus.MAIN, new MainMenu(new MainController(app)));
+        menus.put(Menus.NEWS, new NewsMenu(new NewsController(app)));
+        menus.put(Menus.PROFILE, new ProfileMenu(new ProfileController(app)));
+        menus.put(Menus.SETTINGS, new SettingsMenu(new SettingsController(app)));
+        menus.put(Menus.SHOP, new ShopMenu(new ShopController(app)));
+        menus.put(Menus.SIGNUP, new SignupMenu(new SignupController(app)));
+        menus.put(Menus.TRAVELLOG, new TravelLogMenu(new TravelLogController(app)));
     }
 
     public static MenuHub getInstance(App app) {
-        if (instance == null) instance = new MenuHub(app);
+        if (instance == null) {
+            instance = new MenuHub(app);
+        }
         return instance;
     }
 
     public AppMenu getCurrentMenu() {
-        switch (currentMenu) {
-            case COLLECTION:
-                return collectionMenu;
-            case GAME:
-                return gameMenu;
-            case GREENHOUSE:
-                return greenhouseMenu;
-            case LEADERBOARD:
-                return leaderboardMenu;
-            case LOGIN:
-                return loginMenu;
-            case MAIN:
-                return mainMenu;
-            case NEWS:
-                return newsMenu;
-            case PROFILE:
-                return profileMenu;
-            case SETTINGS:
-                return settingsMenu;
-            case SHOP:
-                return shopMenu;
-            case SIGNUP:
-                return signupMenu;
-            case TRAVELLOG:
-                return travellogMenu;
-            default:
-                return null;
-        }
+        return menus.get(app.getCurrentMenu());
     }
-    
+
     public void run() {
-        while(true) {
-            AppMenu menu = getCurrentMenu();
-
+        while (!app.isExitRequested() && scanner.hasNextLine()) {
             String command = scanner.nextLine().trim();
-
+            if (command.isEmpty()) {
+                continue;
+            }
+            AppMenu menu = getCurrentMenu();
             boolean validCommand = menu.processCommand(command);
-
-            if(!validCommand) {
-                // TODO: what should we do if it wasn't a valid message?
+            if (!validCommand) {
+                System.out.println("Invalid command!");
             }
         }
     }

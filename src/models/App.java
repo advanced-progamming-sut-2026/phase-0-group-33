@@ -14,6 +14,7 @@ public class App {
     private User currentUser;
     private boolean stayLoggedIn;
     private GameSession currentGameSession;
+    private boolean exitRequested;
 
     // TODO: private MiniGame activeMiniGame;
 
@@ -53,6 +54,10 @@ public class App {
 
     public boolean isStayLoggedIn() {
         return stayLoggedIn;
+    }
+
+    public boolean isExitRequested() {
+        return exitRequested;
     }
 
     public void setStayLoggedIn(boolean stayLoggedIn) {
