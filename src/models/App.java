@@ -10,7 +10,6 @@ import views.MenuHub;
 /**
  * Application-level state: the logged-in user, the active menu and the
  * running game session. This is the single source of truth for navigation;
- * {@link views.MenuHub} always reads the current menu from here.
  */
 public class App {
 
