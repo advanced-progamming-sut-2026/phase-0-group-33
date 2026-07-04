@@ -1,6 +1,5 @@
 package models.entities.zombie;
 
-import models.entities.plant.Plant;
 import models.map.Position;
 
 import java.util.LinkedHashMap;
@@ -11,13 +10,13 @@ public class Zombie {
     protected Position position;
     protected int health;
     protected double speed;
-    protected ZombieState state;
 
     // Battle-time attributes (owned by the outermost decorator instance).
     private boolean glowing;
     private int chilledTicks;
     private int frozenTicks;
     private int spawnWave;
+    private final ZombieBattleState battle = new ZombieBattleState();
 
     public Zombie(ZombieType type, Position position, int health, double speed) {
         this.type = type;
@@ -26,17 +25,34 @@ public class Zombie {
         this.speed = speed;
     }
 
-    public void move() {
-    }
-
-    public void attack(Plant plant) {
-    }
-
     public void takeDamage(int damage) {
         health -= damage;
     }
 
-    /** Armor pieces still intact, in outermost-first order (for the zombies info output). */
+    /** Damage that ignores armor entirely (doc: poison tag). */
+    public void damageHealthDirectly(int damage) {
+        health -= damage;
+    }
+
+    /**
+     * Removes metallic armor pieces (doc: magnet-shroom). Returns true if any
+     * removed.
+     */
+    public boolean stripMetallicArmor() {
+        return false;
+    }
+
+    /**
+     * Special-behavior runtime state (always accessed via the outermost decorator).
+     */
+    public ZombieBattleState getBattle() {
+        return battle;
+    }
+
+    /**
+     * Armor pieces still intact, in outermost-first order (for the zombies info
+     * output).
+     */
     public Map<String, Integer> getArmorInfo() {
         return new LinkedHashMap<>();
     }
@@ -118,11 +134,4 @@ public class Zombie {
         this.speed = speed;
     }
 
-    public ZombieState getState() {
-        return state;
-    }
-
-    public void setState(ZombieState state) {
-        this.state = state;
-    }
 }
