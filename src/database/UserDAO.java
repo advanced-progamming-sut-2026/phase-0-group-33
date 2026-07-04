@@ -4,196 +4,187 @@ import models.enums.DifficultyLevel;
 import models.enums.Gender;
 import models.user.SecurityQuestion;
 import models.user.User;
-import java.sql.*;
+import utils.FileStore;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 
 public class UserDAO {
+    private static final String USERS_DIR = "users";
 
-    private final DatabaseManager dbManager = DatabaseManager.getInstance();
+    private static String fileFor(String username) {
+        return USERS_DIR + "/" + username + ".properties";
+    }
 
     /** Insert a new user. Returns true if successful. */
     public boolean insertUser(User user) {
-        String sql = "INSERT INTO users (username, password_hash, nickname, email, gender, " +
-                "difficulty_level, coins, diamonds, pots, security_question, security_answer, " +
-                "highest_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = dbManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, user.getUsername());
-            stmt.setString(2, user.getPasswordHash());
-            stmt.setString(3, user.getNickname());
-            stmt.setString(4, user.getEmail());
-            stmt.setString(5, user.getGender().toString());
-            stmt.setInt(6, user.getDifficultyLevel().getLevelNumber());
-            stmt.setInt(7, user.getCoins().getAmount());
-            stmt.setInt(8, user.getDiamonds().getAmount());
-            stmt.setInt(9, user.getPots().getAmount());
-            stmt.setString(10, user.getSecurityQuestion().getQuestion());
-            stmt.setString(11, user.getSecurityQuestion().getAnswer());
-            stmt.setInt(12, user.getHighestScore());
-
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (existsByUsername(user.getUsername())) {
             return false;
         }
+        return writeUser(user);
+    }
+
+    private boolean writeUser(User user) {
+        Map<String, String> values = new LinkedHashMap<>();
+        values.put("username", user.getUsername());
+        values.put("passwordHash", user.getPasswordHash());
+        values.put("nickname", user.getNickname());
+        values.put("email", user.getEmail());
+        values.put("gender", user.getGender() == null ? "PREFER NOT TO SAY" : user.getGender().toString());
+        values.put("difficulty", String.valueOf(user.getDifficultyLevel().getLevelNumber()));
+        values.put("coins", String.valueOf(user.getCoins().getAmount()));
+        values.put("diamonds", String.valueOf(user.getDiamonds().getAmount()));
+        values.put("pots", String.valueOf(user.getPots().getAmount()));
+        values.put("securityQuestion", user.getSecurityQuestion().getQuestion());
+        values.put("securityAnswer", user.getSecurityQuestion().getAnswer());
+        values.put("highestScore", String.valueOf(user.getHighestScore()));
+        values.put("numberOfGames", String.valueOf(user.getNumberOfGames()));
+        List<String> lines = new ArrayList<>();
+        for (Map.Entry<String, String> entry : values.entrySet()) {
+            lines.add(entry.getKey() + "=" + entry.getValue());
+        }
+        return FileStore.writeLines(fileFor(user.getUsername()), lines);
     }
 
     /** Find user by username. Returns null if not found. */
     public User findByUsername(String username) {
-        String sql = "SELECT * FROM users WHERE username = ?";
-        try (Connection conn = dbManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return mapRowToUser(rs);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (username == null || !FileStore.exists(fileFor(username))) {
+            return null;
         }
-        return null;
+        Map<String, String> values = new LinkedHashMap<>();
+        for (String line : FileStore.readLines(fileFor(username))) {
+            int sep = line.indexOf('=');
+            if (sep > 0) {
+                values.put(line.substring(0, sep), line.substring(sep + 1));
+            }
+        }
+        return mapToUser(values);
+    }
+
+    private User mapToUser(Map<String, String> values) {
+        User user = new User();
+        user.setUsername(values.get("username"));
+        user.setPasswordHash(values.get("passwordHash"));
+        user.setNickname(values.get("nickname"));
+        user.setEmail(values.get("email"));
+        user.setGender(Gender.getByName(values.getOrDefault("gender", "")));
+        user.setDifficultyLevel(DifficultyLevel.getDifficultyByLevel(
+                parseInt(values.get("difficulty"), 3)));
+        user.getCoins().setAmount(parseInt(values.get("coins"), 0));
+        user.getDiamonds().setAmount(parseInt(values.get("diamonds"), 0));
+        user.getPots().setAmount(parseInt(values.get("pots"), 0));
+        user.setSecurityQuestion(new SecurityQuestion(
+                values.getOrDefault("securityQuestion", ""),
+                values.getOrDefault("securityAnswer", "")));
+        user.setHighestScore(parseInt(values.get("highestScore"), 0));
+        user.setNumberOfGames(parseInt(values.get("numberOfGames"), 0));
+        return user;
+    }
+
+    private static int parseInt(String text, int defaultValue) {
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException | NullPointerException e) {
+            return defaultValue;
+        }
     }
 
     /** Update user's password. */
     public boolean updatePassword(String username, String newHashedPassword) {
-        String sql = "UPDATE users SET password_hash = ? WHERE username = ?";
-        try (Connection conn = dbManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, newHashedPassword);
-            stmt.setString(2, username);
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
+        User user = findByUsername(username);
+        if (user == null) {
             return false;
         }
+        user.setPasswordHash(newHashedPassword);
+        return writeUser(user);
     }
 
     /** Update profile fields that can be changed (username, nickname, email). */
     public boolean updateProfile(String oldUsername, String newUsername, String nickname, String email) {
-        String sql = "UPDATE users SET username = ?, nickname = ?, email = ? WHERE username = ?";
-        try (Connection conn = dbManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, newUsername);
-            stmt.setString(2, nickname);
-            stmt.setString(3, email);
-            stmt.setString(4, oldUsername);
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
+        User user = findByUsername(oldUsername);
+        if (user == null) {
             return false;
         }
+        user.setUsername(newUsername);
+        user.setNickname(nickname);
+        user.setEmail(email);
+        if (!oldUsername.equals(newUsername)) {
+            utils.UserDataStore.evict(oldUsername);
+            FileStore.rename(fileFor(oldUsername), fileFor(newUsername));
+            FileStore.rename("user_" + oldUsername + ".properties",
+                    "user_" + newUsername + ".properties");
+            FileStore.rename("news_" + oldUsername + ".txt", "news_" + newUsername + ".txt");
+        }
+        return writeUser(user);
     }
 
     /** Update coins, diamonds, pots counts. */
     public boolean updateCurrencies(String username, int coins, int diamonds, int pots) {
-        String sql = "UPDATE users SET coins = ?, diamonds = ?, pots = ? WHERE username = ?";
-        try (Connection conn = dbManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, coins);
-            stmt.setInt(2, diamonds);
-            stmt.setInt(3, pots);
-            stmt.setString(4, username);
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
+        User user = findByUsername(username);
+        if (user == null) {
             return false;
         }
+        user.getCoins().setAmount(coins);
+        user.getDiamonds().setAmount(diamonds);
+        user.getPots().setAmount(pots);
+        return writeUser(user);
     }
 
     /** Update difficulty level. */
     public boolean updateDifficulty(String username, DifficultyLevel level) {
-        String sql = "UPDATE users SET difficulty_level = ? WHERE username = ?";
-        try (Connection conn = dbManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, level.getLevelNumber());
-            stmt.setString(2, username);
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
+        User user = findByUsername(username);
+        if (user == null) {
             return false;
         }
+        user.setDifficultyLevel(level);
+        return writeUser(user);
     }
 
-    /** Update highest score. */
+    /** Update highest score (miopoint). */
     public boolean updateHighestScore(String username, int score) {
-        String sql = "UPDATE users SET highest_score = ? WHERE username = ?";
-        try (Connection conn = dbManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, score);
-            stmt.setString(2, username);
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
+        User user = findByUsername(username);
+        if (user == null) {
             return false;
         }
+        user.setHighestScore(score);
+        return writeUser(user);
+    }
+
+    /** Increment the played-games counter shown in the profile. */
+    public boolean incrementGamesPlayed(String username) {
+        User user = findByUsername(username);
+        if (user == null) {
+            return false;
+        }
+        user.setNumberOfGames(user.getNumberOfGames() + 1);
+        return writeUser(user);
     }
 
     /** Check if a username exists. */
     public boolean existsByUsername(String username) {
-        String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
-        try (Connection conn = dbManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return FileStore.exists(fileFor(username));
     }
 
     /** Get user's security question (for password reset). */
     public SecurityQuestion getSecurityQuestion(String username) {
-        String sql = "SELECT security_question, security_answer FROM users WHERE username = ?";
-        try (Connection conn = dbManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new SecurityQuestion(rs.getString("security_question"),
-                        rs.getString("security_answer"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+        User user = findByUsername(username);
+        return user == null ? null : user.getSecurityQuestion();
     }
 
     /** Loads all users (for the leaderboard). */
-    public java.util.List<User> getAllUsers() {
-        java.util.List<User> users = new java.util.ArrayList<>();
-        String sql = "SELECT * FROM users";
-        try (Connection conn = dbManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                users.add(mapRowToUser(rs));
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        for (String fileName : FileStore.listFiles(USERS_DIR)) {
+            if (fileName.endsWith(".properties")) {
+                User user = findByUsername(fileName.substring(0, fileName.length() - ".properties".length()));
+                if (user != null) {
+                    users.add(user);
+                }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return users;
-    }
-
-    /** Helper to map a ResultSet row to a User object. */
-    private User mapRowToUser(ResultSet rs) throws SQLException {
-        User user = new User();
-        user.setUsername(rs.getString("username"));
-        user.setPasswordHash(rs.getString("password_hash"));  // stored hash
-        user.setNickname(rs.getString("nickname"));
-        user.setEmail(rs.getString("email"));
-        user.setGender(Gender.getByName(rs.getString("gender")));
-        user.setDifficultyLevel(DifficultyLevel.getDifficultyByLevel(rs.getInt("difficulty_level")));
-        user.getCoins().setAmount(rs.getInt("coins"));
-        user.getDiamonds().setAmount(rs.getInt("diamonds"));
-        user.getPots().setAmount(rs.getInt("pots"));
-        user.setSecurityQuestion(new SecurityQuestion(
-                rs.getString("security_question"),
-                rs.getString("security_answer")));
-        user.setHighestScore(rs.getInt("highest_score"));
-        return user;
     }
 }
