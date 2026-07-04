@@ -27,7 +27,13 @@ public enum ZombieType {
     TURQUOISE(24, "Turquoise", 100, 250, 0.185, 500, ArmorType.NONE, "ZombieCrystalSkull"),
     PROSPECTOR(25, "Prospector", 100, 190, 0.16, 200, ArmorType.NONE, "ZombieProspector"),
     PIANO(26, "Piano", 4000, 840, 0.12, 450, ArmorType.NONE, "ZombiePiano"),
-    NEWSPAPER(27, "Newspaper", 200, 460, 0.22, 700, ArmorType.NEWSPAPER, "ZombieNewspaper");
+    NEWSPAPER(27, "Newspaper", 200, 460, 0.22, 700, ArmorType.NEWSPAPER, "ZombieNewspaper"),
+    BARREL_ROLLER(32, "Barrel Roller", 100, 470, 0.185, 600, ArmorType.NONE, "ZombieBarrelRoller"),
+    // Zombotany minigame zombies (doc: minigames chapter).
+    PEASHOOTER_ZOMBIE(28, "Peashooter Zombie", 100, 190, 0.185, 200, ArmorType.NONE, "ZombotanyPea"),
+    WALLNUT_ZOMBIE(29, "Wall-nut Zombie", 100, 1100, 0.12, 300, ArmorType.NONE, "ZombotanyWallnut"),
+    JALAPENO_ZOMBIE(30, "Jalapeno Zombie", 100, 190, 0.185, 350, ArmorType.NONE, "ZombotanyJalapeno"),
+    SQUASH_ZOMBIE(31, "Squash Zombie", 100, 190, 0.3, 300, ArmorType.NONE, "ZombotanySquash");
 
     private final int id;
     private final String name;
@@ -39,7 +45,7 @@ public enum ZombieType {
     private final String internalId;
 
     ZombieType(int id, String name, int eatDps, int hitpoints, double speed,
-               int waveCost, ArmorType armorType, String internalId) {
+            int waveCost, ArmorType armorType, String internalId) {
         this.id = id;
         this.name = name;
         this.eatDps = eatDps;
