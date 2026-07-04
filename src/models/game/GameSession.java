@@ -1,6 +1,5 @@
 package models.game;
 
-import controllers.managers.PlantFoodManager;
 import controllers.managers.SunManager;
 import controllers.managers.WaveManager;
 import models.entities.plant.PlantType;

@@ -80,7 +80,8 @@ public class PlantManager {
 
         if (currentPlant.getUpgradeLevel() >= MAX_PLANT_LEVEL) {
             result.setSuccess(false);
-            result.addMessage(currentPlant.getBasePlant().getName() + " is already at max level (" + MAX_PLANT_LEVEL + ").");
+            result.addMessage(currentPlant.getBasePlant().getName()
+                    + " is already at max level (" + MAX_PLANT_LEVEL + ").");
             return result;
         }
 
@@ -189,7 +190,8 @@ public class PlantManager {
             }
         }
 
-        EffectivePlantStats stats = new EffectivePlantStats(effectiveHp, effectiveCost, base.getBaseDamage(), base.getRechargeTime());
+        EffectivePlantStats stats = new EffectivePlantStats(
+                effectiveHp, effectiveCost, base.getBaseDamage(), base.getRechargeTime());
 
         result.setSuccess(true);
         result.setData(stats);
