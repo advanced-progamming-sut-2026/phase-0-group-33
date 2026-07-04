@@ -19,6 +19,21 @@ public abstract class Chapter {
     /** Zombies that may appear in this chapter's waves. */
     public abstract List<ZombieType> getZombiePool();
 
+    /** Zombies the doc lists as common to every chapter. */
+    protected static List<ZombieType> commonZombies() {
+        return List.of(ZombieType.NORMAL, ZombieType.CONE_HEAD, ZombieType.BUCKET_HEAD,
+                ZombieType.BRICK_HEAD, ZombieType.KNIGHT, ZombieType.GARGANTUAR,
+                ZombieType.IMP, ZombieType.ALLSTAR, ZombieType.ARCAD, ZombieType.UMBRELLA,
+                ZombieType.TURQUOISE, ZombieType.PROSPECTOR, ZombieType.PIANO,
+                ZombieType.NEWSPAPER, ZombieType.BARREL_ROLLER);
+    }
+
+    protected static List<ZombieType> withCommons(ZombieType... chapterSpecific) {
+        List<ZombieType> pool = new java.util.ArrayList<>(commonZombies());
+        pool.addAll(List.of(chapterSpecific));
+        return pool;
+    }
+
     /** Dark Ages is night: no sun falls from the sky. */
     public boolean isNight() {
         return false;
@@ -40,7 +55,7 @@ public abstract class Chapter {
             return null;
         }
         String normalized = chapterName.replaceAll("[\\s_-]", "").toLowerCase();
-        Chapter[] all = {new Egypt(), new FrostBite(), new WaveyBeach(), new DarkAges()};
+        Chapter[] all = { new Egypt(), new FrostBite(), new WaveyBeach(), new DarkAges() };
         for (Chapter chapter : all) {
             if (chapter.getName().replaceAll("[\\s_-]", "").toLowerCase().equals(normalized)) {
                 return chapter;

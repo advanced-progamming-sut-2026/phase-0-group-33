@@ -1,7 +1,6 @@
 package models.map;
 
 import java.awt.Point;
-import models.entities.plant.Plant;
 import models.entities.zombie.Zombie;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.List;
 public class Tile {
     private Point position;
     private TerrainType terrain;
-    private Plant plant;
     private List<Zombie> zombies;
     private boolean hasLawnMower;
     private int graveHealth;
@@ -18,7 +16,6 @@ public class Tile {
     public Tile(Point position, TerrainType terrain, boolean hasLawnMower) {
         this.position = position;
         this.terrain = terrain;
-        this.plant = null;
         this.zombies = new ArrayList<>();
         this.hasLawnMower = hasLawnMower;
         if (terrain == TerrainType.GRAVE) {
@@ -26,7 +23,10 @@ public class Tile {
         }
     }
 
-    /** Gravestone HP (doc: 700; blocked shots damage it, then it becomes normal ground). */
+    /**
+     * Gravestone HP (doc: 700; blocked shots damage it, then it becomes normal
+     * ground).
+     */
     public int getGraveHealth() {
         return graveHealth;
     }
@@ -51,14 +51,6 @@ public class Tile {
         this.hasLilyPad = hasLilyPad;
     }
 
-    public void addPlant(Plant plant) {
-        this.plant = plant;
-    }
-
-    public void removePlant() {
-        this.plant = null;
-    }
-
     public Point getPosition() {
         return position;
     }
@@ -73,10 +65,6 @@ public class Tile {
 
     public void setTerrain(TerrainType terrain) {
         this.terrain = terrain;
-    }
-
-    public Plant getPlant() {
-        return plant;
     }
 
     public List<Zombie> getZombies() {
