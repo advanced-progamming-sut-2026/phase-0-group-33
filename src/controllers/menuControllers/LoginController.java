@@ -5,8 +5,7 @@ import models.App;
 import models.Result;
 import models.enums.Menus;
 import models.user.SecurityQuestion;
-
-import java.awt.*;
+import utils.SessionStore;
 
 /**
  * Handles login, forgot-password, and password-reset flows.
@@ -24,11 +23,16 @@ public class LoginController extends BaseController {
     }
 
     public Result handleLogin(String username, String password, String stayLoggedInString) {
-        boolean stayLoggedIn = stayLoggedInString.equalsIgnoreCase("-stay-logged-in");
+        boolean stayLoggedIn = stayLoggedInString != null;
 
         Result result = UserManager.getInstance().login(username, password);
         if (result.isSuccessfull()) {
             app.setStayLoggedIn(stayLoggedIn);
+            if (stayLoggedIn) {
+                SessionStore.saveSession(username);
+            }
+            app.navigateTo(Menus.MAIN);
+            result.addMessage("Redirected to main menu");
         }
         return result;
     }
@@ -100,6 +104,7 @@ public class LoginController extends BaseController {
         return result;
     }
 
+    /** Per the doc, exiting the login menu returns the user to the signup menu. */
     public Result handleExit() {
         Result result = new Result();
         result.setSuccess(true);

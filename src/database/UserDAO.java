@@ -162,6 +162,22 @@ public class UserDAO {
         return null;
     }
 
+    /** Loads all users (for the leaderboard). */
+    public java.util.List<User> getAllUsers() {
+        java.util.List<User> users = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM users";
+        try (Connection conn = dbManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                users.add(mapRowToUser(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+
     /** Helper to map a ResultSet row to a User object. */
     private User mapRowToUser(ResultSet rs) throws SQLException {
         User user = new User();

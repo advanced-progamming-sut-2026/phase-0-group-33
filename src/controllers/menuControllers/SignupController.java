@@ -20,7 +20,7 @@ public class SignupController extends BaseController {
 
         int count = 1;
         for (SecurityQuestionData q : SecurityQuestionData.values()) {
-            result.addMessage(count + ". " + q);
+            result.addMessage(count + ". " + q.getQuestion());
             count++;
         }
         return result;
@@ -31,7 +31,7 @@ public class SignupController extends BaseController {
 
         if (!SignupCommands.NUMBER_PATTERN.matches(questionNum)) {
             result.setSuccess(false);
-            result.addMessage("Invalid question ID");
+            result.addMessage("Invalid quesion ID");
             return result;
         }
 
@@ -75,15 +75,12 @@ public class SignupController extends BaseController {
         return result;
     }
 
+    /** Per the doc, exiting the signup menu terminates the program. */
     public Result handleExit() {
-        //TODO(kamyar): Can't print a message. have to change the main loop "while(currentMenu != null)"
-        //TODO(kamyar): Save the current user before exit
-
         Result result = new Result();
-        if (!App.getInstance().isStayLoggedIn()) {
-            result = UserManager.getInstance().logout();
-        }
-        System.exit(0);
+        result.setSuccess(true);
+        result.addMessage("Goodbye!");
+        app.requestExit();
         return result;
     }
 }

@@ -34,6 +34,12 @@ public class UserManager {
 
     public User getCurrentUser() { return currentUser; }
     public boolean isLoggedIn() { return currentUser != null; }
+    public void setCurrentUser(User user) { this.currentUser = user; }
+
+    /** Loads a user straight from storage (used to restore a stay-logged-in session). */
+    public User loadUser(String username) {
+        return userDAO.findByUsername(username);
+    }
 
     public Result logout() {
         currentUser = null;
@@ -43,7 +49,7 @@ public class UserManager {
         return r;
     }
 
-    // ─── REGISTRATION STEP 1 ──────────────────
+    // REGISTRATION STEP 1 -------------------------------------------------
     public Result registerUser(String username, String password, String passwordConfirm,
                                String nickname, String email, String gender) {
         Result result = new Result();
@@ -96,7 +102,7 @@ public class UserManager {
         return result;
     }
 
-    // ─── REGISTRATION STEP 2 ──────────────────
+    // REGISTRATION STEP 2 -------------------------------------------------
     public Result completeRegistration(String question, String answer) {
         Result result = new Result();
         if (pendingUsername == null) {
@@ -119,9 +125,8 @@ public class UserManager {
 
         if (userDAO.insertUser(user)) {
             clearPending();
-            currentUser = user;
             result.setSuccess(true);
-            result.addMessage("Account created successfully. You are now logged in.");
+            result.addMessage("Account created successfully. Please log in.");
         } else {
             result.addMessage("Database error. Please try again.");
             result.setSuccess(false);
@@ -137,7 +142,7 @@ public class UserManager {
         pendingGender = null;
     }
 
-    // ─── LOGIN ─────────────────────────────────
+    // LOGIN --------------------------------------------------------------
     public Result login(String username, String password) {
         Result result = new Result();
         User user = userDAO.findByUsername(username);
@@ -158,7 +163,7 @@ public class UserManager {
         return result;
     }
 
-    // ─── FORGOT PASSWORD ──────────────────────
+    // FORGOT PASSWORD ------------------------------------------------------
     public Result getSecurityQuestionForUser(String username) {
         Result result = new Result();
         User user = userDAO.findByUsername(username);
@@ -208,7 +213,7 @@ public class UserManager {
         return result;
     }
 
-    // ─── PROFILE CHANGES ──────────────────────
+    // PROFILE CHANGES ------------------------------------------------------
     public Result changeUsername(String newUsername) {
         Result result = new Result();
         if (currentUser == null) {
@@ -353,7 +358,7 @@ public class UserManager {
         return result;
     }
 
-    // ─── CURRENCIES ────────────────────────────
+    // CURRENCIES -----------------------------------------------------------
     public Result addCoins(int amount) {
         Result result = new Result();
         if (currentUser == null) {
@@ -381,6 +386,20 @@ public class UserManager {
         syncCurrencies();
         result.setSuccess(true);
         result.addMessage(amount + " diamonds added. Total: " + newVal);
+        return result;
+    }
+
+    public Result addPots(int amount) {
+        Result result = new Result();
+        if (currentUser == null) {
+            result.addMessage("Not logged in.");
+            result.setSuccess(false);
+            return result;
+        }
+        currentUser.getPots().add(amount);
+        syncCurrencies();
+        result.setSuccess(true);
+        result.addMessage(amount + " pots added. Total: " + currentUser.getPots().getAmount());
         return result;
     }
 

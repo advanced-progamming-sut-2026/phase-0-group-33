@@ -1,22 +1,86 @@
 package controllers.menuControllers;
 
+import database.UserDAO;
 import models.App;
 import models.Result;
+import models.enums.Menus;
+import models.user.User;
+import utils.UserDataStore;
 
+import java.util.Comparator;
+import java.util.List;
+
+/**
+ * Leaderboard: all registered players with their progress, completed
+ * minigames, finished quests and best scoring-game result, sortable by any
+ * of those columns.
+ */
 public class LeaderboardController extends BaseController {
+    private final UserDAO userDAO = new UserDAO();
+
     public LeaderboardController(App app) {
         super(app);
     }
 
-    public Result handleShowLeaderboard(String column) {
-        return null;
+    public Result handleShowLeaderboard(String sortColumn) {
+        List<User> users = userDAO.getAllUsers();
+        if (users.isEmpty()) {
+            return Result.fail("Could not load users (is the database reachable?).");
+        }
+        sort(users, sortColumn == null ? "miopoint" : sortColumn.toLowerCase());
+        Result result = Result.ok(String.format("%-20s | %-8s | %-9s | %-7s | %s",
+                "Username", "Levels", "Minigames", "Quests", "Miopoint"));
+        for (User user : users) {
+            UserDataStore store = new UserDataStore(user.getUsername());
+            result.addMessage(String.format("%-20s | %-8d | %-9d | %-7d | %d",
+                    user.getUsername(), completedLevels(store),
+                    store.getInt("minigamesWon", 0), store.getInt("questsDone", 0),
+                    user.getHighestScore()));
+        }
+        return result;
+    }
+
+    private void sort(List<User> users, String column) {
+        Comparator<User> comparator;
+        switch (column) {
+            case "levels":
+                comparator = Comparator.comparingInt(u -> completedLevels(new UserDataStore(u.getUsername())));
+                break;
+            case "minigames":
+                comparator = Comparator.comparingInt(
+                        u -> new UserDataStore(u.getUsername()).getInt("minigamesWon", 0));
+                break;
+            case "quests":
+                comparator = Comparator.comparingInt(
+                        u -> new UserDataStore(u.getUsername()).getInt("questsDone", 0));
+                break;
+            default:
+                comparator = Comparator.comparingInt(User::getHighestScore);
+                break;
+        }
+        users.sort(comparator.reversed());
+    }
+
+    private int completedLevels(UserDataStore store) {
+        int total = 0;
+        for (String chapter : new String[]{"Egypt", "Frost Bite", "Wavey Beach", "Dark Ages"}) {
+            total += store.getInt("progress." + chapter, 1) - 1;
+        }
+        return total;
     }
 
     public Result handleMenuChange(String menuName) {
-        return null;
+        Menus menu = Menus.getMenuByName(menuName);
+        if (menu == Menus.MAIN) {
+            app.navigateTo(menu);
+            return Result.ok("Redirected to main menu");
+        }
+        return Result.fail(menu == null ? "No menu with the given name"
+                : "You can't move to " + menuName + " from the leaderboard");
     }
 
     public Result handleExit() {
-        return null;
+        app.navigateTo(Menus.MAIN);
+        return Result.ok("Redirected to Main menu");
     }
 }
