@@ -11,7 +11,7 @@ public class SettingsMenu implements AppMenu {
 
     public SettingsMenu(SettingsController controller) {
         router.add(SettingsCommands.CHANGE_DIFFICULTY.pattern,
-                        matcher -> controller.handleChangeDifficulty(matcher.group("level")))
+                matcher -> controller.handleChangeDifficulty(matcher.group("level")))
                 .add(GlobalCommands.SHOW_MENU.pattern, matcher -> Result.ok("Settings menu"))
                 .add(GlobalCommands.CHANGE_MENU.pattern,
                         matcher -> controller.handleMenuChange(matcher.group("menu")))

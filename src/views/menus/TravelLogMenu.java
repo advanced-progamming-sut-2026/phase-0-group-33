@@ -11,7 +11,9 @@ public class TravelLogMenu implements AppMenu {
 
     public TravelLogMenu(TravelLogController controller) {
         router.add(TravelLogCommands.TRAVEL_LOG_PAGE.pattern,
-                        matcher -> controller.handleShowPage(matcher.group("pageName")))
+                matcher -> controller.handleShowPage(matcher.group("pageName")))
+                .add(TravelLogCommands.PLAY_MINIGAME.pattern, matcher -> controller.handlePlayMinigame(
+                        matcher.group("name"), Integer.parseInt(matcher.group("difficulty"))))
                 .add(GlobalCommands.SHOW_MENU.pattern, matcher -> Result.ok("Travel log menu"))
                 .add(GlobalCommands.CHANGE_MENU.pattern,
                         matcher -> controller.handleMenuChange(matcher.group("menu")))

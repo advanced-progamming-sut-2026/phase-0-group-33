@@ -11,9 +11,9 @@ public class SignupMenu implements AppMenu {
 
     public SignupMenu(SignupController controller) {
         router.add(SignupCommands.REGISTER.pattern, matcher -> controller.handleRegistry(
-                        matcher.group("username"), matcher.group("password"),
-                        matcher.group("passwordConfirm"), matcher.group("nickname"),
-                        matcher.group("email"), matcher.group("gender")))
+                matcher.group("username"), matcher.group("password"),
+                matcher.group("passwordConfirm"), matcher.group("nickname"),
+                matcher.group("email"), matcher.group("gender")))
                 .add(SignupCommands.SELECT_QUESTION.pattern, matcher -> controller.handleQuestionSelection(
                         matcher.group("number"), matcher.group("answer"),
                         matcher.group("answerConfirm")))
