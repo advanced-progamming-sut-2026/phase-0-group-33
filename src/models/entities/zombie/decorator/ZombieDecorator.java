@@ -6,6 +6,8 @@ import models.entities.zombie.ZombieState;
 import models.entities.zombie.ZombieType;
 import models.map.Position;
 
+import java.util.Map;
+
 public abstract class ZombieDecorator extends Zombie {
     protected Zombie decoratedZombie;
 
@@ -73,5 +75,10 @@ public abstract class ZombieDecorator extends Zombie {
     @Override
     public void setState(ZombieState state) {
         decoratedZombie.setState(state);
+    }
+
+    @Override
+    public Map<String, Integer> getArmorInfo() {
+        return decoratedZombie.getArmorInfo();
     }
 }

@@ -2,14 +2,31 @@ package models.entities.zombie.decorator;
 
 import models.entities.zombie.Zombie;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class CrownArmorDecorator extends ZombieDecorator {
+    // Doc (zombies section): the knight's crown and shoulder armor each have 1600 HP.
     private int crownHealth;
     private int shoulderArmorHealth;
 
     public CrownArmorDecorator(Zombie decoratedZombie) {
         super(decoratedZombie);
-        this.crownHealth = 800;
-        this.shoulderArmorHealth = 800;
+        this.crownHealth = 1600;
+        this.shoulderArmorHealth = 1600;
+    }
+
+    @Override
+    public Map<String, Integer> getArmorInfo() {
+        Map<String, Integer> info = new LinkedHashMap<>();
+        if (crownHealth > 0) {
+            info.put("crown", crownHealth);
+        }
+        if (shoulderArmorHealth > 0) {
+            info.put("shoulderArmor", shoulderArmorHealth);
+        }
+        info.putAll(super.getArmorInfo());
+        return info;
     }
 
     @Override

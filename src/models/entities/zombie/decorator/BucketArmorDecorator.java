@@ -2,12 +2,25 @@ package models.entities.zombie.decorator;
 
 import models.entities.zombie.Zombie;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class BucketArmorDecorator extends ZombieDecorator {
     private int bucketHealth;
 
     public BucketArmorDecorator(Zombie decoratedZombie) {
         super(decoratedZombie);
         this.bucketHealth = 1100;
+    }
+
+    @Override
+    public Map<String, Integer> getArmorInfo() {
+        Map<String, Integer> info = new LinkedHashMap<>();
+        if (bucketHealth > 0) {
+            info.put("bucket", bucketHealth);
+        }
+        info.putAll(super.getArmorInfo());
+        return info;
     }
 
     @Override
