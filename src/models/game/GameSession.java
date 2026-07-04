@@ -1,22 +1,22 @@
 package models.game;
 
+import controllers.managers.BattleCommands;
 import controllers.managers.CombatManager;
+import controllers.managers.MinigameManager;
+import controllers.managers.PlantActionManager;
+import controllers.managers.PlantingManager;
 import controllers.managers.SunManager;
 import controllers.managers.WaveManager;
+import controllers.managers.ZombieBehaviorManager;
 import models.Result;
-import models.entities.plant.PlantCategory;
-import models.entities.plant.PlantTag;
 import models.entities.plant.PlantType;
 import models.entities.zombie.Zombie;
 import models.entities.zombie.ZombieType;
 import models.map.Grid;
-import models.map.TerrainType;
-import models.map.Tile;
 import models.progress.level.Level;
 import models.progress.level.special.SpecialLevelType;
 import models.user.User;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -24,9 +24,9 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * One run of a level: plant selection (preparation), then the
- * battle. 10 ticks equal one second. Implements waves, lawnmowers,
- * plant food, cheats, and the win/lose flow.
+ * One run of a level, the scoring game or a minigame. Holds the battle state;
+ * the mechanics live in the managers (combat, zombie behavior, waves, suns,
+ * planting, minigames), all driven by {@link BattleCommands} ticks.
  */
 public class GameSession {
     public static final int ROWS = 5;
@@ -34,70 +34,105 @@ public class GameSession {
     public static final int TICKS_PER_SECOND = 10;
     private static final int DEFAULT_STARTING_SUN = 50;
 
-    private final User user;
-    private final Level level;
+    private final GameSetup setup;
     private final Grid grid = new Grid(ROWS, COLS);
     private final boolean[] lawnMowers = new boolean[ROWS + 1];
+    private final boolean[] brains = new boolean[ROWS + 1];
     private final PlantSelection selection;
     private final List<PlacedPlant> plants = new ArrayList<>();
     private final List<Zombie> zombies = new ArrayList<>();
+    private final List<PushedObject> pushedObjects = new ArrayList<>();
     private final Set<ZombieType> encounteredZombies = new HashSet<>();
-    private final Random random = new Random();
+    private final Random random;
     private final SunManager sunManager;
     private final WaveManager waveManager;
     private final CombatManager combatManager;
+    private final PlantActionManager plantActionManager;
+    private final ZombieBehaviorManager behaviorManager;
+    private final PlantingManager plantingManager;
+    private final BattleCommands battleCommands;
+    private final MinigameManager minigameManager;
+    private final ScoreTracker scoreTracker = new ScoreTracker();
     private GamePhase phase = GamePhase.PREPARATION;
     private int tickCount;
     private int plantFoods;
     private boolean cooldownsDisabled;
     private int plantsLost;
     private int zombiesKilled;
-    private int beltTicks;
     private int timerTicksLeft = -1;
 
-    public GameSession(User user, Level level, List<String> unlockedPlantNames, int initialPlantFoods) {
-        this.user = user;
-        this.level = level;
-        this.selection = new PlantSelection(new ArrayList<>(unlockedPlantNames), level.getSpecialType());
-        this.plantFoods = Math.min(3, initialPlantFoods);
-        int dl = user.getDifficultyLevel().getLevelNumber();
-        boolean sky = !level.getChapter().isNight() && !isSpecial(SpecialLevelType.NIGHT_OPS)
-                && !isSpecial(SpecialLevelType.PLANT_WHAT_YOU_GET);
-        int startingSun = isSpecial(SpecialLevelType.PLANT_WHAT_YOU_GET) ? 800 : DEFAULT_STARTING_SUN;
-        this.sunManager = new SunManager(startingSun, sky, dl / 3.0, random);
-        this.waveManager = new WaveManager(this, level.getChapter().getZombiePool(),
-                level.getWaveCount(), level.getBaseWaveBudget(), 3.0 / dl, random);
+    public GameSession(GameSetup setup) {
+        this.setup = setup;
+        this.random = setup.getSeed() >= 0 ? new Random(setup.getSeed()) : new Random();
+        this.selection = new PlantSelection(new ArrayList<>(setup.getUnlockedPlants()),
+                setup.getLevel() == null ? null : setup.getLevel().getSpecialType());
+        this.plantFoods = Math.min(3, setup.getPlantFoods());
+        this.sunManager = new SunManager(startingSun(), skyEnabled(), difficulty() / 3.0, random);
+        this.waveManager = new WaveManager(this, zombiePool(), waveCount(), waveBudget(),
+                3.0 / difficulty(), random);
         this.combatManager = new CombatManager(this);
-        initBoard();
+        this.plantActionManager = new PlantActionManager(this, combatManager);
+        this.behaviorManager = new ZombieBehaviorManager(this, combatManager);
+        this.plantingManager = new PlantingManager(this);
+        this.battleCommands = new BattleCommands(this);
+        this.minigameManager = new MinigameManager(this, setup.getDifficultyTier());
+        BoardBuilder.build(grid, setup.getLevel() == null ? null : setup.getLevel().getChapter(), random);
+        initModeState();
+    }
+
+    private void initModeState() {
+        for (int row = 1; row <= ROWS; row++) {
+            lawnMowers[row] = getMode() != GameMode.I_ZOMBIE;
+            brains[row] = getMode() == GameMode.I_ZOMBIE;
+        }
         if (isSpecial(SpecialLevelType.TIMED_WAR)) {
             timerTicksLeft = 120 * TICKS_PER_SECOND;
         }
-    }
-
-    private void initBoard() {
-        int waterColumns = level.getChapter().getWaterColumns();
-        for (int row = 1; row <= ROWS; row++) {
-            lawnMowers[row] = true;
-            for (int col = 1; col <= COLS; col++) {
-                TerrainType terrain = col > COLS - waterColumns ? TerrainType.WATER : TerrainType.NORMAL;
-                grid.setTile(col - 1, row - 1, new Tile(new Point(col, row), terrain, col == 1));
-            }
-        }
-        for (int i = 0; i < level.getChapter().getGraveCount(); i++) {
-            int col = 3 + random.nextInt(COLS - 3);
-            int row = 1 + random.nextInt(ROWS);
-            Tile tile = grid.getTile(col - 1, row - 1);
-            if (tile.getTerrain() == TerrainType.NORMAL) {
-                grid.setTile(col - 1, row - 1, new Tile(new Point(col, row), TerrainType.GRAVE, false));
-            }
+        minigameManager.setUpBoard();
+        if (minigameManager.startsImmediately()) {
+            phase = GamePhase.BATTLE;
         }
     }
 
-    private boolean isSpecial(SpecialLevelType type) {
-        return level.getSpecialType() == type;
+    private int startingSun() {
+        if (getMode() == GameMode.I_ZOMBIE) {
+            return 100 + 50 * setup.getDifficultyTier();
+        }
+        return isSpecial(SpecialLevelType.PLANT_WHAT_YOU_GET) ? 800 : DEFAULT_STARTING_SUN;
     }
 
-    // ---- Preparation ----
+    private boolean skyEnabled() {
+        if (getMode() != GameMode.ADVENTURE && getMode() != GameMode.SCORING
+                && getMode() != GameMode.ZOMBOTANY) {
+            return false;
+        }
+        boolean night = setup.getLevel() != null && setup.getLevel().getChapter().isNight();
+        return !night && !isSpecial(SpecialLevelType.NIGHT_OPS)
+                && !isSpecial(SpecialLevelType.PLANT_WHAT_YOU_GET);
+    }
+
+    private List<ZombieType> zombiePool() {
+        if (setup.getZombiePoolOverride() != null) {
+            return setup.getZombiePoolOverride();
+        }
+        return setup.getLevel().getChapter().getZombiePool();
+    }
+
+    private int waveCount() {
+        return setup.getLevel() == null ? 2 + setup.getDifficultyTier()
+                : setup.getLevel().getWaveCount();
+    }
+
+    private int waveBudget() {
+        return setup.getLevel() == null ? 150 + 100 * setup.getDifficultyTier()
+                : setup.getLevel().getBaseWaveBudget();
+    }
+
+    public boolean isSpecial(SpecialLevelType type) {
+        return setup.getLevel() != null && setup.getLevel().getSpecialType() == type;
+    }
+
+    // Preparation --------------------------------------------------------
 
     public Result listAllPlants() {
         return selection.listAllPlants();
@@ -130,11 +165,12 @@ public class GameSession {
         if (isSpecial(SpecialLevelType.SAVE_OUR_SEEDS)) {
             placeProtectedSeeds();
         }
+        behaviorManager.spawnFrozenZombiesIfFrostbite();
         return Result.ok("The battle begins! Use 'start zombie waves' to summon the horde.");
     }
 
     private void placeProtectedSeeds() {
-        for (int row : new int[]{2, 4}) {
+        for (int row : new int[] { 2, 4 }) {
             PlacedPlant seed = new PlacedPlant(PlantType.WALL_NUT, 1, row, PlantType.WALL_NUT.getBaseHp());
             seed.setProtectedSeed(true);
             plants.add(seed);
@@ -142,219 +178,15 @@ public class GameSession {
         }
     }
 
-    // ----- Battle commands -----
-
-    public Result startZombieWaves() {
-        if (phase != GamePhase.BATTLE) {
-            return Result.fail("Start the game first.");
-        }
-        if (waveManager.isStarted()) {
-            return Result.fail("The zombie waves have already started.");
-        }
-        waveManager.startWaves();
-        return Result.ok();
-    }
-
-    public Result advanceTime(int ticks) {
-        if (phase != GamePhase.BATTLE) {
-            return Result.fail("There is no running game to advance.");
-        }
-        for (int i = 0; i < ticks && phase == GamePhase.BATTLE; i++) {
-            tick();
-        }
-        return Result.ok();
-    }
-
-    private void tick() {
-        tickCount++;
-        sunManager.tick();
-        for (PlantSlot slot : selection.getSlots()) {
-            slot.tick();
-        }
-        if (isSpecial(SpecialLevelType.CONVEYOR_BELT)) {
-            conveyorTick();
-        }
-        combatManager.plantsAct();
-        combatManager.zombiesAct();
-        if (phase != GamePhase.BATTLE) {
-            return;
-        }
-        waveManager.tick();
-        tickTimer();
-        if (waveManager.allWavesCleared()) {
-            winGame();
-        }
-    }
-
-    /** conveyor belt level: every 12 seconds the belt delivers a random plant. */
-    private void conveyorTick() {
-        beltTicks++;
-        if (beltTicks % (12 * TICKS_PER_SECOND) != 0 || selection.isFull()) {
-            return;
-        }
-        List<String> names = selection.getUnlockedPlantNames();
-        PlantType type = resolvePlantType(names.get(random.nextInt(names.size())));
-        if (type != null) {
-            PlantSlot slot = new PlantSlot(type);
-            slot.setSingleUse(true);
-            selection.getSlots().add(slot);
-            System.out.println("The conveyor belt delivered a " + type.getName() + ".");
-        }
-    }
-
-    private void tickTimer() {
-        if (timerTicksLeft < 0) {
-            return;
-        }
-        timerTicksLeft--;
-        if (timerTicksLeft == 0) {
-            if (zombiesKilled >= 12) {
-                winGame();
-            } else {
-                loseGame("Time is up! You only killed " + zombiesKilled + " of 12 zombies.");
-            }
-        }
-    }
-
-    public Result plantAt(String typeName, int x, int y) {
-        if (phase != GamePhase.BATTLE) {
-            return Result.fail("Start the game before planting.");
-        }
-        PlantType type = resolvePlantType(typeName);
-        PlantSlot slot = type == null ? null : selection.findSlot(type);
-        if (slot == null) {
-            return Result.fail("This plant is not among your chosen plants.");
-        }
-        Result placement = validatePlacement(type, x, y, slot);
-        if (placement != null) {
-            return placement;
-        }
-        boolean free = isSpecial(SpecialLevelType.CONVEYOR_BELT);
-        if (!free && !sunManager.spendSun(type.getCost())) {
-            return Result.fail("Not enough sun: " + type.getName() + " costs " + type.getCost()
-                    + " and you have " + sunManager.getSunBalance() + ".");
-        }
-        return placePlant(type, x, y, slot);
-    }
-
-    private Result validatePlacement(PlantType type, int x, int y, PlantSlot slot) {
-        if (x < 1 || x > COLS || y < 1 || y > ROWS) {
-            return Result.fail("Coordinates are outside the lawn.");
-        }
-        if (!slot.isReady()) {
-            return Result.fail("This plant is recharging; wait "
-                    + (slot.getCooldownTicks() / TICKS_PER_SECOND + 1) + " more seconds.");
-        }
-        Tile tile = grid.getTile(x - 1, y - 1);
-        if (tile.getTerrain() == TerrainType.GRAVE) {
-            return Result.fail("You cannot plant on a gravestone.");
-        }
-        if (plantAt(x, y) != null) {
-            return Result.fail("There is already a plant on this tile.");
-        }
-        boolean waterPlant = type.getTags().contains(PlantTag.WATER);
-        if (tile.getTerrain() == TerrainType.WATER && !waterPlant && !tile.isHasLilyPad()) {
-            return Result.fail("You need a Lily Pad to plant here.");
-        }
-        if (tile.getTerrain() != TerrainType.WATER && type == PlantType.LILY_PAD) {
-            return Result.fail("Lily Pads can only be planted on water.");
-        }
-        return null;
-    }
-
-    private Result placePlant(PlantType type, int x, int y, PlantSlot slot) {
-        Tile tile = grid.getTile(x - 1, y - 1);
-        if (type == PlantType.LILY_PAD) {
-            tile.setHasLilyPad(true);
-        } else {
-            PlacedPlant plant = new PlacedPlant(type, x, y, Math.max(1, type.getBaseHp()));
-            if (type.getCategory() == PlantCategory.EXPLOSIVE
-                    && !type.getTags().contains(PlantTag.TRAP)) {
-                plant.setFuseTicks(15);
-            }
-            plants.add(plant);
-            if (slot.isBoosted()) {
-                combatManager.applyPlantFood(plant);
-                slot.setBoosted(false);
-            }
-        }
-        if (slot.isSingleUse()) {
-            selection.getSlots().remove(slot);
-        } else if (!cooldownsDisabled) {
-            slot.setCooldownTicks(type.getRecharge() * TICKS_PER_SECOND);
-        }
-        return Result.ok(type.getName() + " planted at (" + x + ", " + y + ").");
-    }
-
-    public Result pluckPlant(int x, int y) {
-        PlacedPlant plant = plantAt(x, y);
-        if (plant == null) {
-            return Result.fail("There is no plant on this tile.");
-        }
-        removePlant(plant, false);
-        return Result.ok(plant.getType().getName() + " was removed from (" + x + ", " + y + ").");
-    }
-
-    public Result feedPlant(int x, int y) {
-        if (plantFoods <= 0) {
-            return Result.fail("You have no plant food.");
-        }
-        PlacedPlant plant = plantAt(x, y);
-        if (plant == null) {
-            return Result.fail("There is no plant on this tile.");
-        }
-        plantFoods--;
-        combatManager.applyPlantFood(plant);
-        return Result.ok("Plant food fed to " + plant.getType().getName()
-                + "; you have " + plantFoods + " plant foods left.");
-    }
-
-    public Result collectSun(int x, int y) {
-        Sun collected = sunManager.collectAt(x, y);
-        if (collected == null) {
-            return Result.fail("There is no sun to collect at (" + x + ", " + y + ").");
-        }
-        if (collected.isFalling()) {
-            combatManager.applyRadioactiveExplosion(x, y);
-            return Result.ok("The radioactive sun exploded!");
-        }
-        if (collected.isProducedByPlant()) {
-            PlacedPlant producer = plantAt(x, y);
-            if (producer != null) {
-                producer.setSunPending(false);
-            }
-        }
-        return Result.ok("Sun collected. You now have " + sunManager.getSunBalance() + " sun.");
-    }
-
-    public Result releaseNuke() {
-        if (phase != GamePhase.BATTLE) {
-            return Result.fail("There is no running game.");
-        }
-        for (Zombie zombie : new ArrayList<>(zombies)) {
-            combatManager.damageZombie(zombie, Integer.MAX_VALUE / 2);
-        }
-        return Result.ok("The nuke wiped every zombie off the map.");
-    }
-
-    public Result cheatSpawnZombie(String typeName, int x, int y) {
-        ZombieType type = resolveZombieType(typeName);
-        if (type == null) {
-            return Result.fail("No zombie with this name exists.");
-        }
-        if (x < 1 || x > COLS || y < 1 || y > ROWS) {
-            return Result.fail("Coordinates are outside the lawn.");
-        }
-        spawnZombie(type, x, y, waveManager.getCurrentWave());
-        return Result.ok(type.getName() + " spawned at (" + x + ", " + y + ").");
-    }
-
     // Shared state used by the managers -----------------------------------
 
     public Zombie spawnZombie(ZombieType type, double x, int row, int wave) {
         Zombie zombie = ZombieFactory.create(type, x, row, getHealthFactor());
         zombie.setSpawnWave(wave);
-        zombie.setGlowing(random.nextInt(100) < 5);
+        zombie.getBattle().setSpawnTick(tickCount);
+        if (getMode() != GameMode.I_ZOMBIE) {
+            zombie.setGlowing(random.nextInt(100) < 5);
+        }
         zombies.add(zombie);
         encounteredZombies.add(type);
         return zombie;
@@ -369,7 +201,10 @@ public class GameSession {
         return null;
     }
 
-    /** Removes a plant; when a zombie destroyed it, prints the doc message and checks specials. */
+    /**
+     * Removes a plant; when a zombie destroyed it, prints the doc message and
+     * checks specials.
+     */
     public void removePlant(PlacedPlant plant, boolean killedByZombie) {
         plants.remove(plant);
         sunManager.clearProducedAt(plant.getX(), plant.getY());
@@ -379,6 +214,9 @@ public class GameSession {
         System.out.printf("Plant %s at (%d, %d) is destroyed.%n",
                 plant.getType().getName(), plant.getX(), plant.getY());
         plantsLost++;
+        scoreTracker.onPlantLost();
+        combatManager.onPlantEaten(plant);
+        minigameManager.onPlantEaten(plant);
         if (plant.isProtectedSeed()) {
             loseGame("A protected plant was lost. You failed to save our seeds!");
         } else if (isSpecial(SpecialLevelType.LOVE_YOUR_PLANTS) && plantsLost >= 5) {
@@ -400,13 +238,37 @@ public class GameSession {
         }
     }
 
-    private void winGame() {
+    public void winGame() {
+        if (phase != GamePhase.BATTLE) {
+            return;
+        }
         phase = GamePhase.WON;
-        System.out.println("Dear humanz, zis is not done yet; we will come back to eat your brainz, humanz.");
+        scoreTracker.onGameWon(unusedMowerCount());
+        if (getMode() == GameMode.ADVENTURE || getMode() == GameMode.ZOMBOTANY
+                || getMode() == GameMode.SCORING) {
+            System.out.println(
+                    "Dear humanz, zis is not done yet; we will come back to eat your brainz, humanz.");
+        } else {
+            System.out.println("You won the minigame!");
+        }
+        if (getMode() == GameMode.SCORING) {
+            System.out.println("Your miopoint score: " + scoreTracker.getScore());
+        }
     }
 
-    public void countKill() {
+    public void countKill(Zombie zombie) {
         zombiesKilled++;
+        scoreTracker.onZombieKilled(tickCount, zombie.getBattle().getSpawnTick());
+    }
+
+    public int unusedMowerCount() {
+        int count = 0;
+        for (int row = 1; row <= ROWS; row++) {
+            if (lawnMowers[row]) {
+                count++;
+            }
+        }
+        return count;
     }
 
     // Accessors ------------------------------------------------------------
@@ -419,44 +281,58 @@ public class GameSession {
         lawnMowers[row] = false;
     }
 
+    public boolean hasBrain(int row) {
+        return row >= 1 && row <= ROWS && brains[row];
+    }
+
+    public void eatBrain(int row) {
+        brains[row] = false;
+    }
+
     public boolean isOver() {
         return phase == GamePhase.WON || phase == GamePhase.LOST;
     }
 
-    public static PlantType resolvePlantType(String name) {
-        if (name == null) {
-            return null;
-        }
-        for (PlantType type : PlantType.values()) {
-            if (normalize(type.getName()).equals(normalize(name))) {
-                return type;
-            }
-        }
-        return null;
+    public PlantSlot findSlot(PlantType type) {
+        return selection.findSlot(type);
     }
 
-    public static ZombieType resolveZombieType(String name) {
-        if (name == null) {
-            return null;
-        }
-        for (ZombieType type : ZombieType.values()) {
-            if (normalize(type.getName()).equals(normalize(name))) {
-                return type;
-            }
-        }
-        return null;
+    /** Effective sun cost including collection upgrades (level 4+: cost -25). */
+    public int effectiveCost(PlantType type) {
+        int level = plantLevel(type);
+        return Math.max(0, type.getCost() - (level >= 4 ? 25 : 0));
     }
 
-    private static String normalize(String text) {
-        return text.replaceAll("[\\s_-]", "").toLowerCase();
+    /** Effective max HP including collection upgrades (level 3+: HP +150). */
+    public int effectiveHp(PlantType type) {
+        int level = plantLevel(type);
+        return Math.max(1, type.getBaseHp() + (level >= 3 ? 150 : 0));
+    }
+
+    /** Effective damage including collection upgrades (+20% per level above 1). */
+    public int effectiveDamage(PlantType type) {
+        int base = type.getDamage() < 0 ? 9999 : type.getDamage();
+        return (int) Math.round(base * (1 + 0.2 * (plantLevel(type) - 1)));
+    }
+
+    private int plantLevel(PlantType type) {
+        return Math.max(1, setup.getPlantLevels().getOrDefault(type.getName(), 1));
+    }
+
+    public GameMode getMode() {
+        return setup.getMode();
+    }
+
+    public int difficulty() {
+        return setup.getUser().getDifficultyLevel().getLevelNumber();
     }
 
     public User getUser() {
-        return user;
+        return setup.getUser();
     }
 
     public Level getLevel() {
-        return level;
+        return setup.getLevel();
     }
 
     public Grid getGrid() {
@@ -467,12 +343,20 @@ public class GameSession {
         return selection.getSlots();
     }
 
+    public PlantSelection getSelection() {
+        return selection;
+    }
+
     public List<PlacedPlant> getPlants() {
         return plants;
     }
 
     public List<Zombie> getZombies() {
         return zombies;
+    }
+
+    public List<PushedObject> getPushedObjects() {
+        return pushedObjects;
     }
 
     public Set<ZombieType> getEncounteredZombies() {
@@ -487,12 +371,48 @@ public class GameSession {
         return waveManager;
     }
 
+    public CombatManager getCombatManager() {
+        return combatManager;
+    }
+
+    public PlantActionManager getPlantActionManager() {
+        return plantActionManager;
+    }
+
+    public ZombieBehaviorManager getBehaviorManager() {
+        return behaviorManager;
+    }
+
+    public PlantingManager getPlantingManager() {
+        return plantingManager;
+    }
+
+    public BattleCommands getBattleCommands() {
+        return battleCommands;
+    }
+
+    public MinigameManager getMinigameManager() {
+        return minigameManager;
+    }
+
+    public ScoreTracker getScoreTracker() {
+        return scoreTracker;
+    }
+
     public GamePhase getPhase() {
         return phase;
     }
 
+    public void setPhase(GamePhase phase) {
+        this.phase = phase;
+    }
+
     public int getTickCount() {
         return tickCount;
+    }
+
+    public void incrementTick() {
+        tickCount++;
     }
 
     public int getPlantFoods() {
@@ -503,6 +423,10 @@ public class GameSession {
         this.plantFoods = Math.min(3, plantFoods);
     }
 
+    public boolean isCooldownsDisabled() {
+        return cooldownsDisabled;
+    }
+
     public void disableCooldowns() {
         this.cooldownsDisabled = true;
         for (PlantSlot slot : selection.getSlots()) {
@@ -510,15 +434,29 @@ public class GameSession {
         }
     }
 
+    public int getTimerTicksLeft() {
+        return timerTicksLeft;
+    }
+
+    public void setTimerTicksLeft(int timerTicksLeft) {
+        this.timerTicksLeft = timerTicksLeft;
+    }
+
+    public int getZombiesKilled() {
+        return zombiesKilled;
+    }
+
     public Random getRandom() {
         return random;
     }
 
+    /** Zombie health scale (doc: dl/3). */
     public double getHealthFactor() {
-        return user.getDifficultyLevel().getLevelNumber() / 3.0;
+        return difficulty() / 3.0;
     }
 
+    /** Zombie damage scale (doc: dl/3). */
     public double getDamageFactor() {
-        return user.getDifficultyLevel().getLevelNumber() / 3.0;
+        return difficulty() / 3.0;
     }
 }

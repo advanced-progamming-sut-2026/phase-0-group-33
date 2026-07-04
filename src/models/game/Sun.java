@@ -1,8 +1,6 @@
 package models.game;
 
-/**
- * A sun on the board: either falling from the sky or produced by a plant
- */
+
 public class Sun {
 
     public enum SunKind {
@@ -57,7 +55,9 @@ public class Sun {
         return ticksToLand > 0;
     }
 
-    /** Advances the fall by one tick; returns true the moment it touches the ground. */
+    /**
+     * Advances the fall by one tick; returns true the moment it touches the ground.
+     */
     public boolean tickFall() {
         if (ticksToLand > 0) {
             ticksToLand--;

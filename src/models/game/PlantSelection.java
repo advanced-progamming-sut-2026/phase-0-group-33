@@ -10,7 +10,8 @@ import java.util.List;
 
 /**
  * The pre-game plant picking state: which seeds the player chose for the
- * level and the level-specific selection rules
+ * level (doc: 8 slots by default) and the level-specific selection rules
+ * (conveyor belt, locked plants, plant-what-you-get).
  */
 public class PlantSelection {
     private static final int DEFAULT_SLOTS = 8;
@@ -48,7 +49,7 @@ public class PlantSelection {
         if (specialType == SpecialLevelType.CONVEYOR_BELT) {
             return Result.fail("This is a conveyor belt level; plants arrive on the belt.");
         }
-        PlantType type = GameSession.resolvePlantType(typeName);
+        PlantType type = Names.plant(typeName);
         if (type == null) {
             return Result.fail("No plant with this name exists.");
         }
@@ -84,7 +85,7 @@ public class PlantSelection {
         if (!preparationPhase) {
             return Result.fail("You can only change your selection before starting the game.");
         }
-        PlantType type = GameSession.resolvePlantType(typeName);
+        PlantType type = Names.plant(typeName);
         if (type == null) {
             return Result.fail("No plant with this name exists.");
         }
@@ -98,7 +99,7 @@ public class PlantSelection {
 
     /** Marks a selected plant as boosted (payment is handled by the controller). */
     public Result markBoosted(String typeName) {
-        PlantType type = GameSession.resolvePlantType(typeName);
+        PlantType type = Names.plant(typeName);
         PlantSlot slot = type == null ? null : findSlot(type);
         if (slot == null) {
             return Result.fail("This plant is not in your selection.");
@@ -121,7 +122,7 @@ public class PlantSelection {
 
     private boolean isUnlocked(PlantType type) {
         for (String name : unlockedPlantNames) {
-            if (GameSession.resolvePlantType(name) == type) {
+            if (Names.plant(name) == type) {
                 return true;
             }
         }

@@ -2,10 +2,7 @@ package models.game;
 
 import models.entities.plant.PlantType;
 
-/**
- * A seed slot chosen for the level Tracks the
- * per-type recharge cooldown and a pending boost.
- */
+
 public class PlantSlot {
     private final PlantType type;
     private int cooldownTicks;

@@ -9,11 +9,7 @@ import models.entities.zombie.decorator.CrownArmorDecorator;
 import models.entities.zombie.decorator.NewspaperArmorDecorator;
 import models.map.Position;
 
-/**
- * Builds battle-ready zombies: applies difficulty scaling to health
- * (doc: zombie HP scales by dl/3) and wraps armored types in their
- * armor decorators.
- */
+
 public final class ZombieFactory {
 
     private ZombieFactory() {
