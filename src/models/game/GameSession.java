@@ -12,7 +12,6 @@ public class GameSession {
     private Grid grid;
     private WaveManager waveManager;
     private SunManager sunManager;
-    private PlantFoodManager plantFoodManager;
     private List<UserPlant> selectedPlants;
     private int tickCount;
     private boolean isEnded;
@@ -67,14 +66,6 @@ public class GameSession {
 
     public void setSunManager(SunManager sunManager) {
         this.sunManager = sunManager;
-    }
-
-    public PlantFoodManager getPlantFoodManager() {
-        return plantFoodManager;
-    }
-
-    public void setPlantFoodManager(PlantFoodManager plantFoodManager) {
-        this.plantFoodManager = plantFoodManager;
     }
 
     public List<UserPlant> getSelectedPlants() {

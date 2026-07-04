@@ -1,7 +1,10 @@
 package models.progress.chapter;
 
-import models.progress.level.Level;
+import models.entities.zombie.ZombieType;
+import models.progress.level.BossLevel;
 import models.progress.level.OrdinaryLevel;
+import models.progress.level.special.ConveyorBelt;
+import models.progress.level.special.LockedPlants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +14,22 @@ public class Egypt extends Chapter {
     public Egypt() {
         this.name = "Egypt";
         this.levels = new ArrayList<>();
-        for (int i = 1; i <= 6; i++) {
-            levels.add(new OrdinaryLevel(this, i));
-        }
+        levels.add(new OrdinaryLevel(this, 1));
+        levels.add(new ConveyorBelt(this, 2));
+        levels.add(new LockedPlants(this, 3));
+        levels.add(new BossLevel(this, 4));
         this.currentUnlockedLevel = levels.get(0);
+    }
+
+    @Override
+    public List<ZombieType> getZombiePool() {
+        return List.of(ZombieType.NORMAL, ZombieType.CONE_HEAD, ZombieType.BUCKET_HEAD,
+                ZombieType.BRICK_HEAD, ZombieType.RA, ZombieType.EXPLORER,
+                ZombieType.TOMB_RAISER, ZombieType.IMP, ZombieType.GARGANTUAR);
+    }
+
+    @Override
+    public int getGraveCount() {
+        return 2;
     }
 }
