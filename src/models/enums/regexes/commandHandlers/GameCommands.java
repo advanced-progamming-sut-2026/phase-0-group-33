@@ -27,7 +27,14 @@ public enum GameCommands {
     SHOW_PLANTS_STATUS("^show\\s+plants\\s+status$"),
     SHOW_TILE_STATUS("^show\\s+tile\\s+status\\s+-l\\s+\\((?<x>\\d+),\\s*(?<y>\\d+)\\)$"),
     ZOMBIES_INFO("^zombies\\s+info$"),
-    CHEAT_SPAWN_ZOMBIE("^cheat\\s+spawn-zombie\\s+-t\\s+(?<type>.+?)\\s+-l\\s+(?<x>\\d+),\\s*(?<y>\\d+)$");
+    CHEAT_SPAWN_ZOMBIE("^cheat\\s+spawn-zombie\\s+-t\\s+(?<type>.+?)\\s+-l\\s+(?<x>\\d+),\\s*(?<y>\\d+)$"),
+
+    // Minigame commands (doc: minigames chapter; exact wording is ours to pick).
+    BREAK_VASE("^break\\s+vase\\s+-l\\s+\\((?<x>\\d+),\\s*(?<y>\\d+)\\)$"),
+    PLACE_ZOMBIE("^place\\s+zombie\\s+-t\\s+(?<type>.+?)\\s+-l\\s+\\((?<x>\\d+),\\s*(?<y>\\d+)\\)$"),
+    SWAP_PLANTS("^swap\\s+-l\\s+\\((?<x1>\\d+),\\s*(?<y1>\\d+)\\)\\s+"
+            + "\\((?<x2>\\d+),\\s*(?<y2>\\d+)\\)$"),
+    BEGHOULED_UPGRADE("^upgrade\\s+-t\\s+(?<type>.+?)$");
 
     public final Pattern pattern;
 
