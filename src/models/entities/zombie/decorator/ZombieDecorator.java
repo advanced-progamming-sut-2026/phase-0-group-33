@@ -1,8 +1,6 @@
 package models.entities.zombie.decorator;
 
-import models.entities.plant.Plant;
 import models.entities.zombie.Zombie;
-import models.entities.zombie.ZombieState;
 import models.entities.zombie.ZombieType;
 import models.map.Position;
 

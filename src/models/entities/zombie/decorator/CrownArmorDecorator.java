@@ -6,7 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class CrownArmorDecorator extends ZombieDecorator {
-    // Doc (zombies section): the knight's crown and shoulder armor each have 1600 HP.
+    // Doc (zombies section): the knight's crown and shoulder armor each have 1600
+    // HP.
     private int crownHealth;
     private int shoulderArmorHealth;
 
@@ -27,6 +28,17 @@ public class CrownArmorDecorator extends ZombieDecorator {
         }
         info.putAll(super.getArmorInfo());
         return info;
+    }
+
+    /** Helmet and shoulder armor are metal; the magnet-shroom can pull them off. */
+    @Override
+    public boolean stripMetallicArmor() {
+        if (crownHealth > 0 || shoulderArmorHealth > 0) {
+            crownHealth = 0;
+            shoulderArmorHealth = 0;
+            return true;
+        }
+        return super.stripMetallicArmor();
     }
 
     @Override
