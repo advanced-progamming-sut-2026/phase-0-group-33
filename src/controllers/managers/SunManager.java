@@ -135,8 +135,4 @@ public class SunManager {
         sunBalance -= amount;
         return true;
     }
-
-    public List<Sun> getSuns() {
-        return suns;
-    }
 }

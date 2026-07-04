@@ -85,10 +85,6 @@ public class PlantManager {
             return result;
         }
 
-        // TODO: integrate resource system.
-        // Example: Result paymentResult = UserManager.getInstance().spendCoins(upgradeCost);
-        // if (!paymentResult.isSuccess()) return paymentResult;
-
         boolean success = userPlantDAO.upgradePlant(username, plantId);
         if (!success) {
             result.setSuccess(false);
