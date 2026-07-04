@@ -124,4 +124,8 @@ public class WaveManager {
     public int getCurrentWave() {
         return currentWave;
     }
+
+    public int getTotalWaves() {
+        return totalWaves;
+    }
 }
