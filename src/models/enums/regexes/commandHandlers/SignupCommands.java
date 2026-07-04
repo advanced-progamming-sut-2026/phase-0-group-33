@@ -4,8 +4,11 @@ import java.util.regex.Pattern;
 
 public enum SignupCommands {
     NUMBER_PATTERN("^-?\\d+$"),
-    REGISTER("^register\\s+-u\\s+(?<username>.+?)\\s+-p\\s+(?<password>.+?)\\s+(?<password-confirm>.+?)\\s+-n\\s+(?<nickname>.+?)\\s+-e\\s+(?<email>.+?)\\s+-g\\s+(?<gender>.+?)$"),
-    SELECT_QUESTION("^pick\\s+question\\s+-q\\s+(?<number>.+?)\\s+-a\\s+(?<answer>.+?)\\s+-c\\s+(?<answer-confirm>.+?)$");
+    REGISTER("^register\\s+-u\\s+(?<username>.+?)\\s+-p\\s+(?<password>.+?)"
+            + "\\s+(?<passwordConfirm>.+?)\\s+-n\\s+(?<nickname>.+?)"
+            + "\\s+-e\\s+(?<email>.+?)\\s+-g\\s+(?<gender>.+?)$"),
+    SELECT_QUESTION("^pick\\s+question\\s+-q\\s+(?<number>.+?)\\s+-a\\s+(?<answer>.+?)"
+            + "\\s+-c\\s+(?<answerConfirm>.+?)$");
 
     public final Pattern pattern;
 
