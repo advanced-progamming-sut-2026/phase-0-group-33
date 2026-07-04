@@ -6,11 +6,14 @@ import models.game.GamePhase;
 import models.game.GameSession;
 import models.game.PlacedPlant;
 import models.game.PlantSlot;
-import models.map.TerrainType;
 import models.map.Tile;
 
 import java.util.Map;
 
+/**
+ * Text rendering of the battle state: the map, plant/tile status and the
+ * {@code zombies info} report (format follows the sample in the doc).
+ */
 public final class GameBoardPrinter {
 
     private GameBoardPrinter() {
@@ -24,7 +27,8 @@ public final class GameBoardPrinter {
                 session.getSunManager().getSunBalance(), session.getPlantFoods()));
         for (int row = 1; row <= GameSession.ROWS; row++) {
             StringBuilder line = new StringBuilder();
-            line.append(session.hasLawnMower(row) ? "[M]" : "[ ]").append(' ');
+            String edge = session.hasBrain(row) ? "[B]" : session.hasLawnMower(row) ? "[M]" : "[ ]";
+            line.append(edge).append(' ');
             for (int col = 1; col <= GameSession.COLS; col++) {
                 line.append(renderTile(session, col, row)).append(' ');
             }
@@ -37,11 +41,11 @@ public final class GameBoardPrinter {
 
     private static String renderTile(GameSession session, int col, int row) {
         Tile tile = session.getGrid().getTile(col - 1, row - 1);
-        char terrain = '.';
-        if (tile.getTerrain() == TerrainType.WATER) {
-            terrain = '~';
-        } else if (tile.getTerrain() == TerrainType.GRAVE) {
-            terrain = '#';
+        char terrain = terrainChar(tile);
+        for (models.game.Vase vase : session.getMinigameManager().getVases()) {
+            if (vase.getX() == col && vase.getY() == row) {
+                terrain = 'U';
+            }
         }
         PlacedPlant plant = session.plantAt(col, row);
         char plantChar = plant == null ? terrain : plant.getType().getName().charAt(0);
@@ -57,7 +61,24 @@ public final class GameBoardPrinter {
         return "" + plantChar + zombieChar + sunChar;
     }
 
-    /** Doc: for each chosen plant, its sun cost and when it can be planted. */
+    private static char terrainChar(Tile tile) {
+        switch (tile.getTerrain()) {
+            case WATER:
+                return '~';
+            case GRAVE:
+                return '#';
+            case SLIDER_UP:
+                return '^';
+            case SLIDER_DOWN:
+                return 'v';
+            default:
+                return '.';
+        }
+    }
+
+    /**
+     * Doc: for each chosen plant, its sun cost and whether/when it can be planted.
+     */
     public static Result showPlantsStatus(GameSession session) {
         Result result = Result.ok("Your plants:");
         for (PlantSlot slot : session.getSlots()) {
@@ -99,7 +120,10 @@ public final class GameBoardPrinter {
         return result;
     }
 
-    /** Prints every zombie in the doc's format. */
+    /**
+     * Prints every zombie in the doc's sample format (position, health, armor,
+     * effects).
+     */
     public static Result zombiesInfo(GameSession session) {
         if (session.getPhase() != GamePhase.BATTLE && session.getZombies().isEmpty()) {
             return Result.ok("There are no zombies on the map.");
@@ -118,8 +142,14 @@ public final class GameBoardPrinter {
             if (zombie.getFrozenTicks() > 0) {
                 result.addMessage("        frozen: " + formatSeconds(zombie.getFrozenTicks()));
             }
+            if (zombie.getBattle().getIceHealth() > 0) {
+                result.addMessage("        frozen: " + zombie.getBattle().getIceHealth() + " ice HP");
+            }
             if (zombie.getChilledTicks() > 0) {
                 result.addMessage("        chilled: " + formatSeconds(zombie.getChilledTicks()));
+            }
+            if (zombie.getBattle().isHypnotized()) {
+                result.addMessage("        hypnotized");
             }
             result.addMessage("");
         }
