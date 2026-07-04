@@ -1,5 +1,87 @@
 package models.game;
 
+import controllers.managers.PlantFoodManager;
+import controllers.managers.SunManager;
+import controllers.managers.WaveManager;
+import models.map.Grid;
+import models.user.UserPlant;
+
+import java.util.List;
+
 public class GameSession {
-    
+    private Grid grid;
+    private WaveManager waveManager;
+    private SunManager sunManager;
+    private PlantFoodManager plantFoodManager;
+    private List<UserPlant> selectedPlants;
+    private int tickCount;
+    private boolean isEnded;
+
+    public void advanceTime(int ticks) {
+    }
+
+    public void placePlant(String type, String pos) {
+    }
+
+    public void pluckPlant(String pos) {
+    }
+
+    public void showMap() {
+    }
+
+    public Grid getGrid() {
+        return grid;
+    }
+
+    public void setGrid(Grid grid) {
+        this.grid = grid;
+    }
+
+    public WaveManager getWaveManager() {
+        return waveManager;
+    }
+
+    public void setWaveManager(WaveManager waveManager) {
+        this.waveManager = waveManager;
+    }
+
+    public SunManager getSunManager() {
+        return sunManager;
+    }
+
+    public void setSunManager(SunManager sunManager) {
+        this.sunManager = sunManager;
+    }
+
+    public PlantFoodManager getPlantFoodManager() {
+        return plantFoodManager;
+    }
+
+    public void setPlantFoodManager(PlantFoodManager plantFoodManager) {
+        this.plantFoodManager = plantFoodManager;
+    }
+
+    public List<UserPlant> getSelectedPlants() {
+        return selectedPlants;
+    }
+
+    public void setSelectedPlants(List<UserPlant> selectedPlants) {
+        this.selectedPlants = selectedPlants;
+    }
+
+    public int getTickCount() {
+        return tickCount;
+    }
+
+    public void setTickCount(int tickCount) {
+        this.tickCount = tickCount;
+    }
+
+    public boolean isEnded() {
+        return isEnded;
+    }
+
+    public void setEnded(boolean ended) {
+        isEnded = ended;
+    }
 }
