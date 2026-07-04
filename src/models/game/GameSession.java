@@ -3,6 +3,7 @@ package models.game;
 import controllers.managers.PlantFoodManager;
 import controllers.managers.SunManager;
 import controllers.managers.WaveManager;
+import models.entities.plant.PlantType;
 import models.map.Grid;
 import models.user.UserPlant;
 
@@ -16,6 +17,22 @@ public class GameSession {
     private List<UserPlant> selectedPlants;
     private int tickCount;
     private boolean isEnded;
+
+    public static PlantType resolvePlantType(String name) {
+        if (name == null) {
+            return null;
+        }
+        for (PlantType type : PlantType.values()) {
+            if (normalize(type.getName()).equals(normalize(name))) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+    private static String normalize(String text) {
+        return text.replaceAll("[\\s_-]", "").toLowerCase();
+    }
 
     public void advanceTime(int ticks) {
     }
