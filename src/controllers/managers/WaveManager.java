@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Zombie waves of one game session.
- */
 public class WaveManager {
     private final GameSession session;
     private final List<ZombieType> pool;
@@ -44,7 +41,6 @@ public class WaveManager {
         return budgets;
     }
 
-    /** Starts wave 1 (invoked by the {@code start zombie waves} command). */
     public void startWaves() {
         if (!started) {
             started = true;
@@ -52,7 +48,6 @@ public class WaveManager {
         }
     }
 
-    /** Called every tick: opens the next wave once 75% of the current one is dead. */
     public void tick() {
         if (!started || currentWave >= totalWaves) {
             return;
@@ -82,6 +77,7 @@ public class WaveManager {
         } else {
             System.out.printf("Wave %d started.%n", waveNumber);
         }
+        session.getBehaviorManager().onWaveStart(waveNumber);
         currentWaveSpawnedHp = 0;
         double budget = waveBudgets[waveNumber - 1];
         while (true) {
@@ -100,6 +96,7 @@ public class WaveManager {
             System.out.printf("Zombie %s spawned at wave %d in lane %d which costed %d.%n",
                     type.getName(), waveNumber, lane, cost);
         }
+        session.getBehaviorManager().afterWaveSpawn(waveNumber);
     }
 
     private boolean anyAffordable(double budget) {
@@ -116,7 +113,6 @@ public class WaveManager {
         return started;
     }
 
-    /** True once every wave has been sent and every zombie is gone. */
     public boolean allWavesCleared() {
         return started && currentWave >= totalWaves && session.getZombies().isEmpty();
     }

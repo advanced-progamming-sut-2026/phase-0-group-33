@@ -14,11 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Per-tick battle manager for one game session: plant actions, zombie
- * movement and eating, lawnmowers, deaths and drops. Damage the zombies deal
- * 3 per the settings section of the doc.
- */
 public class CombatManager {
     private static final int INSTANT_KILL_DAMAGE = 9999;
     private static final double MOWER_LINE = 0.5;
@@ -31,14 +26,15 @@ public class CombatManager {
         this.session = session;
     }
 
-    // ---- Plants ----
-
     public void plantsAct() {
         for (PlacedPlant plant : new ArrayList<>(session.getPlants())) {
             if (plant.isDead()) {
                 continue;
             }
             if (tickFuse(plant)) {
+                continue;
+            }
+            if (plant.isDisabled() || plant.getArmTicks() > 0) {
                 continue;
             }
             if (plant.getActionCooldownTicks() > 0) {
@@ -63,6 +59,11 @@ public class CombatManager {
     private void actPlant(PlacedPlant plant) {
         PlantType type = plant.getType();
         double interval = Math.max(0.5, type.getActionInterval());
+        if (type == PlantType.MAGNET_SHROOM) {
+            session.getPlantActionManager().magnet(plant);
+            plant.setActionCooldownTicks((int) Math.round(interval * GameSession.TICKS_PER_SECOND));
+            return;
+        }
         switch (type.getCategory()) {
             case SUN_PRODUCER:
                 produceSun(plant);
@@ -105,7 +106,6 @@ public class CombatManager {
                 plant.getType().getName(), plant.getX(), plant.getY());
     }
 
-    /** Sun output per producer type */
     private int productionValue(PlacedPlant plant) {
         switch (plant.getType()) {
             case TWIN_SUNFLOWER:
@@ -193,7 +193,6 @@ public class CombatManager {
         }
     }
 
-    /** Detonates an explosive plant: Jalapeno burns its row, others hit a 3x3 area. */
     public void explode(PlacedPlant plant) {
         if (plant.getType() == PlantType.JALAPENO) {
             for (Zombie zombie : zombiesInRowAfter(plant.getY(), 0)) {
@@ -216,11 +215,24 @@ public class CombatManager {
     }
 
     private void hitZombie(Zombie zombie, PlantType source) {
+        if (!session.getBehaviorManager().beforeHit(zombie, source)) {
+            return;
+        }
         if (source.getTags().contains(PlantTag.ICE)) {
             zombie.setChilledTicks(3 * GameSession.TICKS_PER_SECOND);
         }
         if (source.getTags().contains(PlantTag.FIRE)) {
             zombie.setChilledTicks(0);
+        }
+        if (source.getTags().contains(PlantTag.POISON)) {
+            zombie.damageHealthDirectly(plantDamage(source));
+            if (zombie.isDead() && session.getZombies().remove(zombie)) {
+                announceDeath(zombie);
+                session.countKill(zombie);
+                session.getBehaviorManager().onZombieDeath(zombie);
+                handleDrops(zombie);
+            }
+            return;
         }
         damageZombie(zombie, plantDamage(source));
     }
@@ -229,7 +241,6 @@ public class CombatManager {
         return type.getDamage() < 0 ? INSTANT_KILL_DAMAGE : type.getDamage();
     }
 
-    /** Radioactive sun collected mid-air: 150 dmg to zombies in 5x5, 80 to plants in 3x3. */
     public void applyRadioactiveExplosion(int x, int y) {
         for (Zombie zombie : new ArrayList<>(session.getZombies())) {
             if (Math.abs(zombie.getPosition().getX() - x) <= 2.5
@@ -246,8 +257,6 @@ public class CombatManager {
             }
         }
     }
-
-    // ---- Zombies ----
 
     public void zombiesAct() {
         kingTicks++;
@@ -267,6 +276,9 @@ public class CombatManager {
     }
 
     private void actZombie(Zombie zombie) {
+        if (session.getBehaviorManager().handleSpecial(zombie)) {
+            return;
+        }
         if (zombie.getType() == ZombieType.KING) {
             kingConvert();
             return;
@@ -288,7 +300,6 @@ public class CombatManager {
         }
     }
 
-    /** Doc: every few seconds the King turns a nearby simple zombie into a Knight. */
     private void kingConvert() {
         if (kingTicks % (10 * GameSession.TICKS_PER_SECOND) != 0) {
             return;
@@ -303,7 +314,6 @@ public class CombatManager {
         }
     }
 
-    /** a Gargantuar throws its Imp to column 3 once it drops to half health. */
     private void gargantuarImpThrow(Zombie zombie) {
         if (zombie.getType() != ZombieType.GARGANTUAR || impThrown.contains(zombie)) {
             return;
@@ -328,11 +338,30 @@ public class CombatManager {
     }
 
     private void eatPlant(Zombie zombie, PlacedPlant plant) {
-        if (zombie.getType() == ZombieType.GARGANTUAR) {
+        if (plant.isSheep()) {
+            return;
+        }
+        if (zombie.getType() == ZombieType.WIZARD) {
+            if (!plant.isSheep()) {
+                plant.setSheep(true);
+                zombie.getBattle().getSheepPlants().add(plant);
+            }
+            return;
+        }
+        if (zombie.getType() == ZombieType.GARGANTUAR || zombie.getType() == ZombieType.PIANO) {
+            plant.setPumpkinHealth(0);
             plant.setHealth(0);
         } else {
             double dps = zombie.getType().getEatDps() * session.getDamageFactor();
-            plant.setHealth(plant.getHealth() - (int) Math.ceil(dps / GameSession.TICKS_PER_SECOND));
+            int bite = (int) Math.ceil(dps / GameSession.TICKS_PER_SECOND);
+            if (plant.getPumpkinHealth() > 0) {
+                plant.setPumpkinHealth(Math.max(0, plant.getPumpkinHealth() - bite));
+            } else {
+                plant.setHealth(plant.getHealth() - bite);
+            }
+            if (plant.getType() == PlantType.ENDURIAN) {
+                damageZombie(zombie, plant.getType().getDamage() / GameSession.TICKS_PER_SECOND + 1);
+            }
         }
         if (plant.isDead()) {
             session.removePlant(plant, true);
@@ -341,6 +370,20 @@ public class CombatManager {
 
     private void reachHouse(Zombie zombie) {
         int row = (int) zombie.getPosition().getY();
+        if (session.getMode() == models.game.GameMode.I_ZOMBIE) {
+            if (session.hasBrain(row)) {
+                session.eatBrain(row);
+                System.out.printf("Your zombie ate the brain in row %d!%n", row);
+            }
+            session.getZombies().remove(zombie);
+            for (int r = 1; r <= GameSession.ROWS; r++) {
+                if (session.hasBrain(r)) {
+                    return;
+                }
+            }
+            session.winGame();
+            return;
+        }
         if (session.hasLawnMower(row)) {
             session.useLawnMower(row);
             List<String> names = new ArrayList<>();
@@ -348,7 +391,7 @@ public class CombatManager {
                 if ((int) inRow.getPosition().getY() == row) {
                     names.add(inRow.getType().getName());
                     session.getZombies().remove(inRow);
-                    session.countKill();
+                    session.countKill(inRow);
                 }
             }
             System.out.printf("The lawn mower in the row %d is triggered and killed these zombies:%n", row);
@@ -360,15 +403,58 @@ public class CombatManager {
         }
     }
 
-    // Deaths and drops --------------------------------------------------
-
-    /** Applies damage and handles death, drops and messages. */
     public void damageZombie(Zombie zombie, int damage) {
         zombie.takeDamage(damage);
         if (zombie.isDead() && session.getZombies().remove(zombie)) {
             announceDeath(zombie);
-            session.countKill();
+            session.countKill(zombie);
+            session.getBehaviorManager().onZombieDeath(zombie);
             handleDrops(zombie);
+        }
+    }
+
+    public void onPlantEaten(PlacedPlant plant) {
+        if (plant.getType() == PlantType.GARLIC) {
+            moveZombiesOffLane(plant);
+        } else if (plant.getType() == PlantType.HYPNO_SHROOM) {
+            hypnotizeEater(plant);
+        } else if (plant.getType() == PlantType.SUN_BEAN) {
+            session.getSunManager().addSun(50);
+            System.out.println("The digested Sun Bean released 50 sun!");
+        } else if (plant.getType().getTags().contains(PlantTag.EXPLOSIVE)) {
+            damageArea(plant.getX(), plant.getY(), 1, PlantType.EXPLODE_O_NUT);
+            System.out.printf("%s exploded as it died!%n", plant.getType().getName());
+        }
+    }
+
+    private void moveZombiesOffLane(PlacedPlant garlic) {
+        for (Zombie zombie : session.getZombies()) {
+            if ((int) zombie.getPosition().getY() != garlic.getY()
+                    || Math.abs(zombie.getPosition().getX() - garlic.getX()) > 1) {
+                continue;
+            }
+            int row = garlic.getY() + (session.getRandom().nextBoolean() ? 1 : -1);
+            if (row < 1) {
+                row = garlic.getY() + 1;
+            }
+            if (row > GameSession.ROWS) {
+                row = garlic.getY() - 1;
+            }
+            zombie.getPosition().setY(row);
+            System.out.printf("The garlic pushed the %s to lane %d!%n",
+                    zombie.getType().getName(), row);
+        }
+    }
+
+    private void hypnotizeEater(PlacedPlant shroom) {
+        for (Zombie zombie : session.getZombies()) {
+            if ((int) zombie.getPosition().getY() == shroom.getY()
+                    && Math.abs(zombie.getPosition().getX() - shroom.getX()) <= 1) {
+                zombie.getBattle().setHypnotized(true);
+                System.out.printf("The %s is hypnotized and fights for you now!%n",
+                        zombie.getType().getName());
+                return;
+            }
         }
     }
 
@@ -408,7 +494,6 @@ public class CombatManager {
         }
     }
 
-    /** Applies the plant food effect of the given plant (doc: plants section). */
     public void applyPlantFood(PlacedPlant plant) {
         switch (plant.getType().getCategory()) {
             case SUN_PRODUCER:
@@ -432,8 +517,6 @@ public class CombatManager {
             damageZombie(zombie, damage);
         }
     }
-
-    // ---- Queries ----
 
     private Zombie firstZombieInRowAfter(int row, double x) {
         Zombie first = null;

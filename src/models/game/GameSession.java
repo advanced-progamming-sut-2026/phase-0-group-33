@@ -23,11 +23,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-/**
- * One run of a level, the scoring game or a minigame. Holds the battle state;
- * the mechanics live in the managers (combat, zombie behavior, waves, suns,
- * planting, minigames), all driven by {@link BattleCommands} ticks.
- */
 public class GameSession {
     public static final int ROWS = 5;
     public static final int COLS = 9;
@@ -132,8 +127,6 @@ public class GameSession {
         return setup.getLevel() != null && setup.getLevel().getSpecialType() == type;
     }
 
-    // Preparation --------------------------------------------------------
-
     public Result listAllPlants() {
         return selection.listAllPlants();
     }
@@ -178,7 +171,45 @@ public class GameSession {
         }
     }
 
-    // Shared state used by the managers -----------------------------------
+    public Result advanceTime(int ticks) {
+        return battleCommands.advanceTime(ticks);
+    }
+
+    public Result collectSun(int x, int y) {
+        return battleCommands.collectSun(x, y);
+    }
+
+    public Result startZombieWaves() {
+        return battleCommands.startZombieWaves();
+    }
+
+    public Result plantAt(String typeName, int x, int y) {
+        return plantingManager.plant(typeName, x, y);
+    }
+
+    public Result pluckPlant(int x, int y) {
+        return plantingManager.pluck(x, y);
+    }
+
+    public Result feedPlant(int x, int y) {
+        return battleCommands.feedPlant(x, y);
+    }
+
+    public Result cheatSpawnZombie(String typeName, int x, int y) {
+        return battleCommands.cheatSpawnZombie(typeName, x, y);
+    }
+
+    public Result releaseNuke() {
+        return battleCommands.releaseNuke();
+    }
+
+    public static PlantType resolvePlantType(String name) {
+        return Names.plant(name);
+    }
+
+    public static ZombieType resolveZombieType(String name) {
+        return Names.zombie(name);
+    }
 
     public Zombie spawnZombie(ZombieType type, double x, int row, int wave) {
         Zombie zombie = ZombieFactory.create(type, x, row, getHealthFactor());
@@ -201,10 +232,6 @@ public class GameSession {
         return null;
     }
 
-    /**
-     * Removes a plant; when a zombie destroyed it, prints the doc message and
-     * checks specials.
-     */
     public void removePlant(PlacedPlant plant, boolean killedByZombie) {
         plants.remove(plant);
         sunManager.clearProducedAt(plant.getX(), plant.getY());
@@ -224,7 +251,6 @@ public class GameSession {
         }
     }
 
-    /** Dead Line special: crossing the marked line loses the level instantly. */
     public void checkDeadline(Zombie zombie) {
         if (isSpecial(SpecialLevelType.DEAD_LINE) && zombie.getPosition().getX() < 4) {
             loseGame("A zombie crossed the dead line; you lose!");
@@ -271,8 +297,6 @@ public class GameSession {
         return count;
     }
 
-    // Accessors ------------------------------------------------------------
-
     public boolean hasLawnMower(int row) {
         return row >= 1 && row <= ROWS && lawnMowers[row];
     }
@@ -297,19 +321,16 @@ public class GameSession {
         return selection.findSlot(type);
     }
 
-    /** Effective sun cost including collection upgrades (level 4+: cost -25). */
     public int effectiveCost(PlantType type) {
         int level = plantLevel(type);
         return Math.max(0, type.getCost() - (level >= 4 ? 25 : 0));
     }
 
-    /** Effective max HP including collection upgrades (level 3+: HP +150). */
     public int effectiveHp(PlantType type) {
         int level = plantLevel(type);
         return Math.max(1, type.getBaseHp() + (level >= 3 ? 150 : 0));
     }
 
-    /** Effective damage including collection upgrades (+20% per level above 1). */
     public int effectiveDamage(PlantType type) {
         int base = type.getDamage() < 0 ? 9999 : type.getDamage();
         return (int) Math.round(base * (1 + 0.2 * (plantLevel(type) - 1)));
@@ -450,12 +471,10 @@ public class GameSession {
         return random;
     }
 
-    /** Zombie health scale (doc: dl/3). */
     public double getHealthFactor() {
         return difficulty() / 3.0;
     }
 
-    /** Zombie damage scale (doc: dl/3). */
     public double getDamageFactor() {
         return difficulty() / 3.0;
     }

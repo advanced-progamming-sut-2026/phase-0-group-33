@@ -7,10 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Sun economy of one game session: the player's sun balance, suns falling
- * from the sky, and suns waiting on producer plants.
- */
 public class SunManager {
     private static final int TICKS_PER_SECOND = 10;
 
@@ -30,13 +26,11 @@ public class SunManager {
         this.ticksUntilNextDrop = dropIntervalTicks();
     }
 
-    /** Doc: x = max(6 + 0.05t, 12), then scaled by dl/3 for difficulty. */
     private int dropIntervalTicks() {
         double seconds = Math.max(6 + 0.05 * (elapsedTicks / (double) TICKS_PER_SECOND), 12);
         return (int) Math.round(seconds * TICKS_PER_SECOND * difficultyFactor);
     }
 
-    /** Advances one tick: progresses falling suns and schedules sky drops. */
     public void tick() {
         elapsedTicks++;
         for (Sun sun : suns) {
@@ -66,18 +60,10 @@ public class SunManager {
         System.out.printf("New %s sun is dropping at position (%d, %d)%n", kind.getLabel(), x, y);
     }
 
-    /** Adds a sun produced by a plant, which waits on the plant until collected. */
     public void addProducedSun(int x, int y, int value) {
         suns.add(Sun.produced(x, y, value));
     }
 
-    /**
-     * Collects the sun at the given tile.
-     *
-     * @return the collected sun, or null when there is nothing collectable there.
-     *         A radioactive sun collected mid-air is returned still "falling";
-     *         the caller must apply its explosion instead of adding sun.
-     */
     public Sun collectAt(int x, int y) {
         Sun landedMatch = null;
         for (Sun sun : suns) {
@@ -100,7 +86,6 @@ public class SunManager {
         return landedMatch;
     }
 
-    /** Removes plant-produced suns waiting at the tile (the plant beneath is gone). */
     public void clearProducedAt(int x, int y) {
         Iterator<Sun> iterator = suns.iterator();
         while (iterator.hasNext()) {
@@ -109,6 +94,16 @@ public class SunManager {
                 iterator.remove();
             }
         }
+    }
+
+    public Sun stealLanded() {
+        for (Sun sun : suns) {
+            if (!sun.isFalling() && !sun.isProducedByPlant()) {
+                suns.remove(sun);
+                return sun;
+            }
+        }
+        return null;
     }
 
     public boolean hasSunAt(int x, int y) {
