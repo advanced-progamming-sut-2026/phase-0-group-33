@@ -14,7 +14,6 @@ public class UserManager {
     private final UserDAO userDAO;
     private User currentUser;
 
-    // Pending registration data (step 1)
     private String pendingUsername;
     private String pendingPasswordHash;
     private String pendingNickname;
@@ -36,7 +35,6 @@ public class UserManager {
     public boolean isLoggedIn() { return currentUser != null; }
     public void setCurrentUser(User user) { this.currentUser = user; }
 
-    /** Loads a user straight from storage (used to restore a stay-logged-in session). */
     public User loadUser(String username) {
         return userDAO.findByUsername(username);
     }
@@ -49,7 +47,6 @@ public class UserManager {
         return r;
     }
 
-    // REGISTRATION STEP 1 -------------------------------------------------
     public Result registerUser(String username, String password, String passwordConfirm,
                                String nickname, String email, String gender) {
         Result result = new Result();
@@ -90,7 +87,6 @@ public class UserManager {
             return result;
         }
 
-        // Store pending data
         pendingUsername = username;
         pendingPasswordHash = PasswordHasher.hash(password);
         pendingNickname = nickname;
@@ -102,7 +98,6 @@ public class UserManager {
         return result;
     }
 
-    // REGISTRATION STEP 2 -------------------------------------------------
     public Result completeRegistration(String question, String answer) {
         Result result = new Result();
         if (pendingUsername == null) {
@@ -142,7 +137,6 @@ public class UserManager {
         pendingGender = null;
     }
 
-    // LOGIN --------------------------------------------------------------
     public Result login(String username, String password) {
         Result result = new Result();
         User user = userDAO.findByUsername(username);
@@ -163,7 +157,6 @@ public class UserManager {
         return result;
     }
 
-    // FORGOT PASSWORD ------------------------------------------------------
     public Result getSecurityQuestionForUser(String username) {
         Result result = new Result();
         User user = userDAO.findByUsername(username);
@@ -213,7 +206,6 @@ public class UserManager {
         return result;
     }
 
-    // PROFILE CHANGES ------------------------------------------------------
     public Result changeUsername(String newUsername) {
         Result result = new Result();
         if (currentUser == null) {
@@ -358,7 +350,6 @@ public class UserManager {
         return result;
     }
 
-    // CURRENCIES -----------------------------------------------------------
     public Result addCoins(int amount) {
         Result result = new Result();
         if (currentUser == null) {
@@ -424,7 +415,7 @@ public class UserManager {
     }
 
     public Result spendDiamonds(int amount) {
-        // similar logic
+
         Result result = new Result();
         if (currentUser == null) {
             result.addMessage("Not logged in.");
@@ -453,6 +444,14 @@ public class UserManager {
         }
     }
 
+    public void recordGamePlayed() {
+        if (currentUser == null) {
+            return;
+        }
+        currentUser.setNumberOfGames(currentUser.getNumberOfGames() + 1);
+        userDAO.incrementGamesPlayed(currentUser.getUsername());
+    }
+
     public Result updateHighestScore(int score) {
         Result result = new Result();
         if (currentUser == null) {
@@ -479,7 +478,7 @@ public class UserManager {
             result.setSuccess(false);
             return result;
         }
-        // Create a simple data object or use a Map
+
         String info = String.format(
                 "Username: %s, Nickname: %s, Coins: %d, Diamonds: %d, Pots: %d, Difficulty: %s, High score: %d",
                 currentUser.getUsername(),

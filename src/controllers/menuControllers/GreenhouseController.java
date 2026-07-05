@@ -20,7 +20,7 @@ public class GreenhouseController extends BaseController {
     }
 
     private UserDataStore store() {
-        return new UserDataStore(app.getCurrentUser().getUsername());
+        return UserDataStore.forUser(app.getCurrentUser().getUsername());
     }
 
     private int unlockedSlots() {
@@ -113,7 +113,6 @@ public class GreenhouseController extends BaseController {
         return result;
     }
 
-    /** Doc: 1 diamond per remaining hour, rounded up (2.5h costs 3 diamonds). */
     public Result handleGrow(int x, int y) {
         UserDataStore store = store();
         String plant = store.get(potKey(x, y) + ".plant", null);

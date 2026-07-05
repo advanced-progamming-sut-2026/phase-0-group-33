@@ -10,6 +10,7 @@ public enum MainCommands {
     ENTER_COIN_WALLET("^menu\\s+coin-wallet$"),
     ENTER_GEM_WALLET("^menu\\s+gem-wallet$"),
     CHEAT_ADD("^menu\\s+cheat\\s+add\\s+(?<amount>\\d+)\\s+(?<type>coin|diamond)$"),
+    SCORING_GAME("^menu\\s+scoring-game$"),
     LOGOUT("^menu\\s+logout$");
 
     public final Pattern pattern;

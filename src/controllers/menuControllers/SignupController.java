@@ -75,7 +75,6 @@ public class SignupController extends BaseController {
         return result;
     }
 
-    /** Per the doc, exiting the signup menu terminates the program. */
     public Result handleExit() {
         Result result = new Result();
         result.setSuccess(true);

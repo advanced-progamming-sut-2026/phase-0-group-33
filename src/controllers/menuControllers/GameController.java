@@ -5,6 +5,7 @@ import models.App;
 import models.Result;
 import models.entities.zombie.ZombieType;
 import models.enums.Menus;
+import models.game.GameMode;
 import models.game.GamePhase;
 import models.game.GameSession;
 import models.progress.chapter.Chapter;
@@ -12,11 +13,6 @@ import utils.NewsStore;
 import utils.UserDataStore;
 import views.GameBoardPrinter;
 
-/**
- * Game menu: pre-game plant selection and every in-battle command.
- * Delegates the mechanics to the {@link GameSession}; this class handles
- * payments, persistence of the outcome and navigation.
- */
 public class GameController extends BaseController {
 
     public GameController(App app) {
@@ -47,12 +43,11 @@ public class GameController extends BaseController {
         return session() == null ? noSession() : session().removePlantFromSelection(type);
     }
 
-    /** Doc: boosting costs 2 diamonds, or consumes a boost stored in the greenhouse. */
     public Result handleBoostPlant(String type) {
         if (session() == null) {
             return noSession();
         }
-        UserDataStore store = new UserDataStore(app.getCurrentUser().getUsername());
+        UserDataStore store = UserDataStore.forUser(app.getCurrentUser().getUsername());
         String boostKey = "boost." + type;
         if (store.getInt(boostKey, 0) > 0) {
             Result result = session().markBoosted(type);
@@ -175,16 +170,61 @@ public class GameController extends BaseController {
         return session() == null ? noSession() : GameBoardPrinter.zombiesInfo(session());
     }
 
-    /** Persists the outcome once the battle ends and returns to the main menu. */
+    public Result handleBreakVase(int x, int y) {
+        if (session() == null) {
+            return noSession();
+        }
+        Result result = session().getMinigameManager().breakVase(x, y);
+        finalizeIfOver();
+        return result;
+    }
+
+    public Result handlePlaceZombie(String type, int x, int y) {
+        if (session() == null) {
+            return noSession();
+        }
+        Result result = session().getMinigameManager().placeZombie(type, x, y);
+        finalizeIfOver();
+        return result;
+    }
+
+    public Result handleSwap(int x1, int y1, int x2, int y2) {
+        if (session() == null) {
+            return noSession();
+        }
+        Result result = session().getMinigameManager().swap(x1, y1, x2, y2);
+        finalizeIfOver();
+        return result;
+    }
+
+    public Result handleBeghouledUpgrade(String type) {
+        return session() == null ? noSession()
+                : session().getMinigameManager().beghouledUpgrade(type);
+    }
+
     private void finalizeIfOver() {
         GameSession session = session();
         if (session == null || !session.isOver()) {
             return;
         }
-        UserDataStore store = new UserDataStore(app.getCurrentUser().getUsername());
+        UserDataStore store = UserDataStore.forUser(app.getCurrentUser().getUsername());
         recordSeenZombies(session, store);
+        UserManager.getInstance().recordGamePlayed();
         if (session.getPhase() == GamePhase.WON) {
-            recordVictory(session, store);
+            if (session.getLevel() != null) {
+                recordVictory(session, store);
+            } else if (session.getMode() != GameMode.SCORING) {
+                store.addInt("minigamesWon", 1);
+                NewsStore.add(app.getCurrentUser().getUsername(),
+                        "Minigame won: " + session.getMode());
+                UserManager.getInstance().addCoins(200);
+                System.out.println("Minigame reward: 200 coins.");
+            }
+        }
+        if (session.getMode() == GameMode.SCORING) {
+            int score = session.getScoreTracker().getScore();
+            UserManager.getInstance().updateHighestScore(score);
+            System.out.println("Your miopoint score was recorded: " + score);
         }
         store.save();
         app.setCurrentGameSession(null);
@@ -231,7 +271,6 @@ public class GameController extends BaseController {
         return Result.fail("You can't move to " + menuName + " from the game menu");
     }
 
-    /** Doc: exiting the game menu returns the player to the main menu. */
     public Result handleExit() {
         app.navigateTo(Menus.MAIN);
         return Result.ok("Redirected to Main menu");

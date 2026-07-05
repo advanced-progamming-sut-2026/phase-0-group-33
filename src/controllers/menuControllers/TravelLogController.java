@@ -3,19 +3,18 @@ package controllers.menuControllers;
 import models.App;
 import models.Result;
 import models.enums.Menus;
+import models.game.GameMode;
+import models.game.GameSession;
+import models.game.GameSetup;
 import models.quest.Quest;
 import models.quest.QuestPriority;
 import models.quest.QuestType;
+import models.user.User;
 import utils.UserDataStore;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Travel log (Quest section). Quests are grouped into pages by their
- * priority; page names: critical, high, daily. Progress is based on the
- * user's stored chapter progress.
- */
 public class TravelLogController extends BaseController {
 
     public TravelLogController(App app) {
@@ -23,9 +22,13 @@ public class TravelLogController extends BaseController {
     }
 
     public Result handleShowPage(String pageName) {
+        if (pageName.equalsIgnoreCase("minigame") || pageName.equalsIgnoreCase("minigames")) {
+            return minigamePage();
+        }
         List<Quest> quests = questsForPage(pageName.toLowerCase());
         if (quests == null) {
-            return Result.fail("No travel log page with this name. Pages: critical, high, daily");
+            return Result.fail(
+                    "No travel log page with this name. Pages: critical, high, daily, minigame");
         }
         Result result = Result.ok("Travel log - " + pageName + " quests:");
         for (Quest quest : quests) {
@@ -36,7 +39,7 @@ public class TravelLogController extends BaseController {
     }
 
     private List<Quest> questsForPage(String pageName) {
-        UserDataStore store = new UserDataStore(app.getCurrentUser().getUsername());
+        UserDataStore store = UserDataStore.forUser(app.getCurrentUser().getUsername());
         switch (pageName) {
             case "critical":
                 return criticalQuests(store);
@@ -49,7 +52,6 @@ public class TravelLogController extends BaseController {
         }
     }
 
-    /** Critical: story quests that unlock new plants and always top the list. */
     private List<Quest> criticalQuests(UserDataStore store) {
         List<Quest> quests = new ArrayList<>();
         for (String chapter : new String[]{"Egypt", "Frost Bite", "Wavey Beach", "Dark Ages"}) {
@@ -61,7 +63,6 @@ public class TravelLogController extends BaseController {
         return quests;
     }
 
-    /** High: epic challenges rewarded with diamonds. */
     private List<Quest> highQuests(UserDataStore store) {
         List<Quest> quests = new ArrayList<>();
         Quest special = buildQuest("Win 2 special levels (reward: diamonds)",
@@ -73,7 +74,6 @@ public class TravelLogController extends BaseController {
         return quests;
     }
 
-    /** Daily/medium: repeatable engagement quests. */
     private List<Quest> dailyQuests(UserDataStore store) {
         List<Quest> quests = new ArrayList<>();
         Quest daily = buildQuest("Buy the shop's daily offer",
@@ -81,6 +81,53 @@ public class TravelLogController extends BaseController {
         daily.setProgress(store.get("daily.lastBuy", "").isEmpty() ? 0 : 1);
         quests.add(daily);
         return quests;
+    }
+
+    private Result minigamePage() {
+        UserDataStore store = UserDataStore.forUser(app.getCurrentUser().getUsername());
+        return Result.ok("Travel log - minigames (won so far: " + store.getInt("minigamesWon", 0) + "):",
+                "- Vasebreaker | break every vase, survive what hides inside",
+                "- Wallnut Bowling | bowl nuts from behind the red line",
+                "- I Zombie | command the zombies and eat all the brains",
+                "- Beghouled | match 3 plants, upgrade, survive the endless horde",
+                "- Zombotany | zombies with plant powers",
+                "Each minigame has 3 stages; start one with:",
+                "play minigame -n <name> -d <1|2|3>");
+    }
+
+    public Result handlePlayMinigame(String name, int difficulty) {
+        GameMode mode = resolveMinigame(name);
+        if (mode == null) {
+            return Result.fail("No minigame with this name. "
+                    + "Options: vasebreaker, wallnut-bowling, i-zombie, beghouled, zombotany");
+        }
+        User user = app.getCurrentUser();
+        UserDataStore store = UserDataStore.forUser(user.getUsername());
+        List<String> unlockedPlants = MainController.unlockedPlants(store);
+        app.setCurrentGameSession(new GameSession(GameSetup.minigame(user, mode, unlockedPlants,
+                difficulty, MainController.plantLevels(store, unlockedPlants))));
+        app.navigateTo(Menus.GAME);
+        return Result.ok(mode + " (stage " + difficulty + ") started!",
+                "Use 'show map' to look around and 'advance time -t <n> ticks' to play.");
+    }
+
+    private GameMode resolveMinigame(String name) {
+        String normalized = name.replaceAll("[\\s_-]", "").toLowerCase();
+        switch (normalized) {
+            case "vasebreaker":
+                return GameMode.VASEBREAKER;
+            case "wallnutbowling":
+            case "bowling":
+                return GameMode.WALLNUT_BOWLING;
+            case "izombie":
+                return GameMode.I_ZOMBIE;
+            case "beghouled":
+                return GameMode.BEGHOULED;
+            case "zombotany":
+                return GameMode.ZOMBOTANY;
+            default:
+                return null;
+        }
     }
 
     private Quest buildQuest(String description, QuestPriority priority, QuestType type, int goal) {

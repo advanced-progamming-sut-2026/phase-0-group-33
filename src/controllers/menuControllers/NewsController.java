@@ -7,7 +7,6 @@ import utils.NewsStore;
 
 import java.util.List;
 
-/** News menu: unlock events; unread items are marked read once shown. */
 public class NewsController extends BaseController {
 
     public NewsController(App app) {

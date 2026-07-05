@@ -5,6 +5,7 @@ import models.App;
 import models.Result;
 import models.enums.Menus;
 import models.user.User;
+import utils.UserDataStore;
 
 public class ProfileController extends BaseController {
     public ProfileController(App app) {
@@ -36,8 +37,20 @@ public class ProfileController extends BaseController {
             return result;
         }
 
+        UserDataStore store = UserDataStore.forUser(user.getUsername());
+        int levelsDone = 0;
+        for (String chapter : new String[] { "Egypt", "Frost Bite", "Wavey Beach", "Dark Ages" }) {
+            levelsDone += store.getInt("progress." + chapter, 1) - 1;
+        }
         result.setSuccess(true);
         result.setData(user);
+        result.addMessage("Username: " + user.getUsername());
+        result.addMessage("Nickname: " + user.getNickname());
+        result.addMessage("Games played: " + user.getNumberOfGames());
+        result.addMessage("Coins: " + user.getCoins().getAmount());
+        result.addMessage("Diamonds: " + user.getDiamonds().getAmount());
+        result.addMessage("Levels completed: " + levelsDone);
+        result.addMessage("Best miopoint score: " + user.getHighestScore());
         return result;
     }
 

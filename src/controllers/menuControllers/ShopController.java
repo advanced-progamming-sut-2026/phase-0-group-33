@@ -11,11 +11,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Shop (reached from the greenhouse). Items and prices follow the shop table
- * in the doc; the daily offer is a 10-packet bundle for a random unlocked
- * plant at 20% off (1600 coins), resets at 00:00 system time, once per day.
- */
 public class ShopController extends BaseController {
     private static final int POT_PRICE = 2000;
     private static final int MAX_POTS = 20;
@@ -31,7 +26,7 @@ public class ShopController extends BaseController {
     }
 
     private UserDataStore store() {
-        return new UserDataStore(app.getCurrentUser().getUsername());
+        return UserDataStore.forUser(app.getCurrentUser().getUsername());
     }
 
     public Result handleShopList() {
@@ -53,7 +48,6 @@ public class ShopController extends BaseController {
                         + plant + status);
     }
 
-    /** The daily plant is derived from the date, so it is stable for the whole day. */
     private String dailyPlant() {
         List<String> unlocked = MainController.unlockedPlants(store());
         Random dayRandom = new Random(LocalDate.now().toEpochDay());
@@ -195,7 +189,6 @@ public class ShopController extends BaseController {
                 : "You can't move to " + menuName + " from the shop");
     }
 
-    /** The shop is reached from the greenhouse, so exiting returns there. */
     public Result handleExit() {
         app.navigateTo(Menus.GREENHOUSE);
         return Result.ok("Redirected to Greenhouse menu");

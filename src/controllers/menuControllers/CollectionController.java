@@ -12,10 +12,6 @@ import utils.UserDataStore;
 
 import java.util.List;
 
-/**
- * Collection menu: browse plants/zombies, inspect details, and purchase or
- * upgrade plants and enough seed packets of that plant.
- */
 public class CollectionController extends BaseController {
     private static final int PURCHASE_COST = 2000;
     private static final int UPGRADE_COIN_COST = 1000;
@@ -27,7 +23,7 @@ public class CollectionController extends BaseController {
     }
 
     private UserDataStore store() {
-        return new UserDataStore(app.getCurrentUser().getUsername());
+        return UserDataStore.forUser(app.getCurrentUser().getUsername());
     }
 
     public Result handleShowPlants() {
@@ -101,7 +97,6 @@ public class CollectionController extends BaseController {
         return result;
     }
 
-    /** Doc: upgrading needs enough coins and seed packets of that plant. */
     public Result handleUpgradePlant(String plantName) {
         PlantType type = GameSession.resolvePlantType(plantName);
         if (type == null) {
@@ -130,7 +125,6 @@ public class CollectionController extends BaseController {
         return Result.ok(type.getName() + " upgraded to level " + (level + 1) + ".");
     }
 
-    /** Doc: purchasing a new plant costs 2000 coins. */
     public Result handlePurchasePlant(String plantName) {
         PlantType type = GameSession.resolvePlantType(plantName);
         if (type == null) {
@@ -151,7 +145,6 @@ public class CollectionController extends BaseController {
         return Result.ok(type.getName() + " purchased for " + PURCHASE_COST + " coins.");
     }
 
-    /** Doc: exiting the collection menu returns to the game menu. */
     public Result handleMenuChange(String menuName) {
         Menus menu = Menus.getMenuByName(menuName);
         if (menu == Menus.GAME || menu == Menus.MAIN) {
@@ -163,6 +156,10 @@ public class CollectionController extends BaseController {
     }
 
     public Result handleExit() {
+        if (app.getCurrentGameSession() == null) {
+            app.navigateTo(Menus.MAIN);
+            return Result.ok("Redirected to Main menu");
+        }
         app.navigateTo(Menus.GAME);
         return Result.ok("Redirected to Game menu");
     }

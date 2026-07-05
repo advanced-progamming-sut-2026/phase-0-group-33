@@ -6,7 +6,6 @@ import models.Result;
 import models.enums.DifficultyLevel;
 import models.enums.Menus;
 
-/** Settings menu: difficulty level 1..5 (default is 3). */
 public class SettingsController extends BaseController {
 
     public SettingsController(App app) {

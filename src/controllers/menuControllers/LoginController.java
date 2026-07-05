@@ -7,13 +7,6 @@ import models.enums.Menus;
 import models.user.SecurityQuestion;
 import utils.SessionStore;
 
-/**
- * Handles login, forgot-password, and password-reset flows.
- * Temporary fields during password recovery:
- * pendingUsername  - username from the initial forgot-password request
- * pendingEmail     - email address entered by the user
- */
-
 public class LoginController extends BaseController {
     private String pendingUsername;
     private String pendingEmail;
@@ -104,7 +97,6 @@ public class LoginController extends BaseController {
         return result;
     }
 
-    /** Per the doc, exiting the login menu returns the user to the signup menu. */
     public Result handleExit() {
         Result result = new Result();
         result.setSuccess(true);

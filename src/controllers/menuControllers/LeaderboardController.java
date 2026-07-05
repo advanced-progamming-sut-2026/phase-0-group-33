@@ -10,11 +10,6 @@ import utils.UserDataStore;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Leaderboard: all registered players with their progress, completed
- * minigames, finished quests and best scoring-game result, sortable by any
- * of those columns.
- */
 public class LeaderboardController extends BaseController {
     private final UserDAO userDAO = new UserDAO();
 
@@ -31,7 +26,7 @@ public class LeaderboardController extends BaseController {
         Result result = Result.ok(String.format("%-20s | %-8s | %-9s | %-7s | %s",
                 "Username", "Levels", "Minigames", "Quests", "Miopoint"));
         for (User user : users) {
-            UserDataStore store = new UserDataStore(user.getUsername());
+            UserDataStore store = UserDataStore.forUser(user.getUsername());
             result.addMessage(String.format("%-20s | %-8d | %-9d | %-7d | %d",
                     user.getUsername(), completedLevels(store),
                     store.getInt("minigamesWon", 0), store.getInt("questsDone", 0),
@@ -44,15 +39,15 @@ public class LeaderboardController extends BaseController {
         Comparator<User> comparator;
         switch (column) {
             case "levels":
-                comparator = Comparator.comparingInt(u -> completedLevels(new UserDataStore(u.getUsername())));
+                comparator = Comparator.comparingInt(u -> completedLevels(UserDataStore.forUser(u.getUsername())));
                 break;
             case "minigames":
                 comparator = Comparator.comparingInt(
-                        u -> new UserDataStore(u.getUsername()).getInt("minigamesWon", 0));
+                        u -> UserDataStore.forUser(u.getUsername()).getInt("minigamesWon", 0));
                 break;
             case "quests":
                 comparator = Comparator.comparingInt(
-                        u -> new UserDataStore(u.getUsername()).getInt("questsDone", 0));
+                        u -> UserDataStore.forUser(u.getUsername()).getInt("questsDone", 0));
                 break;
             default:
                 comparator = Comparator.comparingInt(User::getHighestScore);
