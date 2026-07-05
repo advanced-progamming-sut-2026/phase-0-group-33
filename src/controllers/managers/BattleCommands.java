@@ -121,6 +121,7 @@ public class BattleCommands {
                 producer.setSunPending(false);
             }
         }
+        QuestManager.getInstance().onSunCollected(session.getUser().getUsername(), sun.getValue());
         return Result.ok("Collected " + sun.getValue() + " sun. Balance: "
                 + session.getSunManager().getSunBalance());
     }

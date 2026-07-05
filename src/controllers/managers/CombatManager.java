@@ -229,12 +229,13 @@ public class CombatManager {
             if (zombie.isDead() && session.getZombies().remove(zombie)) {
                 announceDeath(zombie);
                 session.countKill(zombie);
+                recordQuestKill(zombie, source);
                 session.getBehaviorManager().onZombieDeath(zombie);
                 handleDrops(zombie);
             }
             return;
         }
-        damageZombie(zombie, plantDamage(source));
+        damageZombie(zombie, plantDamage(source), source);
     }
 
     private int plantDamage(PlantType type) {
@@ -404,13 +405,24 @@ public class CombatManager {
     }
 
     public void damageZombie(Zombie zombie, int damage) {
+        damageZombie(zombie, damage, null);
+    }
+
+    public void damageZombie(Zombie zombie, int damage, PlantType source) {
         zombie.takeDamage(damage);
         if (zombie.isDead() && session.getZombies().remove(zombie)) {
             announceDeath(zombie);
             session.countKill(zombie);
+            recordQuestKill(zombie, source);
             session.getBehaviorManager().onZombieDeath(zombie);
             handleDrops(zombie);
         }
+    }
+
+    private void recordQuestKill(Zombie zombie, PlantType source) {
+        session.getQuestStats().onKill(source, session.getTickCount(),
+                zombie.getPosition().getX(),
+                !session.hasLawnMower((int) zombie.getPosition().getY()));
     }
 
     public void onPlantEaten(PlacedPlant plant) {

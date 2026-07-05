@@ -78,6 +78,9 @@ public class WaveManager {
             System.out.printf("Wave %d started.%n", waveNumber);
         }
         session.getBehaviorManager().onWaveStart(waveNumber);
+        if (waveNumber == 1) {
+            session.getQuestStats().onWaveOneStarted(session.getTickCount());
+        }
         currentWaveSpawnedHp = 0;
         double budget = waveBudgets[waveNumber - 1];
         while (true) {

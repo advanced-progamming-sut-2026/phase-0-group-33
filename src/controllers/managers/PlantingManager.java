@@ -75,15 +75,17 @@ public class PlantingManager {
         if (type == PlantType.LILY_PAD) {
             tile.setHasLilyPad(true);
             consume(slot, cost);
+            session.getQuestStats().onPlanted(type, x, y);
             return Result.ok("Lily Pad placed on the water at (" + x + ", " + y + ").");
         }
         if (type == PlantType.GOLD_BLOOM) {
             session.getSunManager().addSun(375);
             consume(slot, cost);
+            session.getQuestStats().onPlanted(type, x, y);
             return Result.ok("Gold Bloom burst into 375 sun!");
         }
         if (type.getName().toLowerCase().contains("mint")) {
-            return releaseMint(type, slot, cost);
+            return releaseMint(type, slot, cost, x, y);
         }
         Result occupied = handleStacking(type, slot, cost, x, y);
         if (occupied != null) {
@@ -101,6 +103,7 @@ public class PlantingManager {
         }
         session.getPlants().add(plant);
         consume(slot, cost);
+        session.getQuestStats().onPlanted(type, x, y);
         if (slot.isBoosted()) {
             slot.setBoosted(false);
             session.getCombatManager().applyPlantFood(plant);
@@ -151,6 +154,7 @@ public class PlantingManager {
             }
             existing.setStackCount(existing.getStackCount() + 1);
             consume(slot, cost);
+            session.getQuestStats().onPlanted(type, x, y);
             return Result.ok("Pea Pod at (" + x + ", " + y + ") now has "
                     + existing.getStackCount() + " heads.");
         }
@@ -160,13 +164,14 @@ public class PlantingManager {
             }
             existing.setPumpkinHealth(session.effectiveHp(PlantType.PUMPKIN));
             consume(slot, cost);
+            session.getQuestStats().onPlanted(type, x, y);
             return Result.ok(existing.getType().getName() + " at (" + x + ", " + y
                     + ") is now protected by a Pumpkin.");
         }
         return Result.fail("There is already a plant at (" + x + ", " + y + ").");
     }
 
-    private Result releaseMint(PlantType type, PlantSlot slot, int cost) {
+    private Result releaseMint(PlantType type, PlantSlot slot, int cost, int x, int y) {
         int affected = 0;
         for (PlacedPlant plant : new ArrayList<>(session.getPlants())) {
             if (plant.getType().getCategory() == type.getCategory()) {
@@ -175,12 +180,14 @@ public class PlantingManager {
             }
         }
         consume(slot, cost);
+        session.getQuestStats().onPlanted(type, x, y);
         return Result.ok(type.getName() + " empowered " + affected
                 + " plants of its family and vanished.");
     }
 
     private Result detonateInstantly(PlantType type, PlantSlot slot, int cost, int x, int y) {
         consume(slot, cost);
+        session.getQuestStats().onPlanted(type, x, y);
         if (type == PlantType.ICE_SHROOM) {
             for (Zombie zombie : session.getZombies()) {
                 zombie.setFrozenTicks(5 * GameSession.TICKS_PER_SECOND);
@@ -189,7 +196,8 @@ public class PlantingManager {
         }
         if (type == PlantType.DOOM_SHROOM) {
             for (Zombie zombie : new ArrayList<>(session.getZombies())) {
-                session.getCombatManager().damageZombie(zombie, session.effectiveDamage(type) + 800);
+                session.getCombatManager().damageZombie(zombie,
+                        session.effectiveDamage(type) + 800, type);
             }
             return Result.ok("Doom-shroom devastated the whole garden!");
         }

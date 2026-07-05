@@ -1,5 +1,6 @@
 package controllers.menuControllers;
 
+import controllers.managers.QuestManager;
 import controllers.managers.UserManager;
 import models.App;
 import models.Result;
@@ -226,6 +227,8 @@ public class GameController extends BaseController {
             UserManager.getInstance().updateHighestScore(score);
             System.out.println("Your miopoint score was recorded: " + score);
         }
+        QuestManager.getInstance().onGameFinished(app.getCurrentUser(), session,
+                session.getPhase() == GamePhase.WON);
         store.save();
         app.setCurrentGameSession(null);
         app.navigateTo(Menus.MAIN);

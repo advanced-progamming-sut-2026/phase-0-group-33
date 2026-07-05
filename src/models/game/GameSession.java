@@ -48,6 +48,7 @@ public class GameSession {
     private final BattleCommands battleCommands;
     private final MinigameManager minigameManager;
     private final ScoreTracker scoreTracker = new ScoreTracker();
+    private final QuestStats questStats = new QuestStats();
     private GamePhase phase = GamePhase.PREPARATION;
     private int tickCount;
     private int plantFoods;
@@ -285,6 +286,18 @@ public class GameSession {
     public void countKill(Zombie zombie) {
         zombiesKilled++;
         scoreTracker.onZombieKilled(tickCount, zombie.getBattle().getSpawnTick());
+    }
+
+    public QuestStats getQuestStats() {
+        return questStats;
+    }
+
+    public int getPlantsLost() {
+        return plantsLost;
+    }
+
+    public double getSpeedFactor() {
+        return difficulty() / 3.0;
     }
 
     public int unusedMowerCount() {
