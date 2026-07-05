@@ -16,18 +16,18 @@ public abstract class ZombieDecorator extends Zombie {
     }
 
     @Override
-    public void move() {
-        decoratedZombie.move();
-    }
-
-    @Override
-    public void attack(Plant plant) {
-        decoratedZombie.attack(plant);
-    }
-
-    @Override
     public void takeDamage(int damage) {
         decoratedZombie.takeDamage(damage);
+    }
+
+    @Override
+    public void damageHealthDirectly(int damage) {
+        decoratedZombie.damageHealthDirectly(damage);
+    }
+
+    @Override
+    public boolean stripMetallicArmor() {
+        return decoratedZombie.stripMetallicArmor();
     }
 
     @Override
@@ -63,16 +63,6 @@ public abstract class ZombieDecorator extends Zombie {
     @Override
     public void setSpeed(double speed) {
         decoratedZombie.setSpeed(speed);
-    }
-
-    @Override
-    public ZombieState getState() {
-        return decoratedZombie.getState();
-    }
-
-    @Override
-    public void setState(ZombieState state) {
-        decoratedZombie.setState(state);
     }
 
     @Override

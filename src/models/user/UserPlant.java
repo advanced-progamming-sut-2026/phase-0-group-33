@@ -1,6 +1,5 @@
 package models.user;
 
-import models.entities.plant.PlantStats;
 import models.entities.plant.PlantType;
 
 public class UserPlant {
@@ -10,10 +9,6 @@ public class UserPlant {
 
     public UserPlant(PlantType plantType) {
         this.plantType = plantType;
-    }
-
-    public PlantStats getUpgradedStats() {
-        return null;
     }
 
     public void upgrade() {

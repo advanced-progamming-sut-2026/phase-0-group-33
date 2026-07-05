@@ -6,5 +6,7 @@ public enum TerrainType {
     ICE,
     WATER,
     LILYPAD,
-    FROZEN
+    FROZEN,
+    SLIDER_UP,
+    SLIDER_DOWN
 }

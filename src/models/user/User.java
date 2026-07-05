@@ -114,6 +114,10 @@ public class User {
         return numberOfGames;
     }
 
+    public void setNumberOfGames(int numberOfGames) {
+        this.numberOfGames = numberOfGames;
+    }
+
     public void setPots(Pot pots) {
         this.pots = pots;
     }
