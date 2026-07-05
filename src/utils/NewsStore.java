@@ -18,6 +18,16 @@ public final class NewsStore {
         FileStore.writeLines(fileName(username), lines);
     }
 
+    public static int countUnread(String username) {
+        int count = 0;
+        for (String line : FileStore.readLines(fileName(username))) {
+            if (line.startsWith("0|")) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public static List<String> readUnread(String username) {
         List<String> lines = FileStore.readLines(fileName(username));
         List<String> unread = new ArrayList<>();

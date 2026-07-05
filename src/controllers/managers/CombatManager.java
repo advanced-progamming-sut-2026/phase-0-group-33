@@ -444,7 +444,7 @@ public class CombatManager {
             eatPlant(zombie, blocking);
             return;
         }
-        double speed = zombie.getSpeed() / GameSession.TICKS_PER_SECOND;
+        double speed = zombie.getSpeed() * session.getSpeedFactor() / GameSession.TICKS_PER_SECOND;
         if (zombie.getChilledTicks() > 0) {
             speed /= 2;
         }

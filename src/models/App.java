@@ -4,6 +4,7 @@ import controllers.managers.UserManager;
 import models.enums.Menus;
 import models.game.GameSession;
 import models.user.User;
+import utils.NewsStore;
 import utils.SessionStore;
 import views.MenuHub;
 
@@ -93,6 +94,11 @@ public class App {
             setStayLoggedIn(true);
             navigateTo(Menus.MAIN);
             System.out.println("Welcome back, " + user.getNickname() + "! You are still logged in.");
+            int unread = NewsStore.countUnread(username);
+            if (unread > 0) {
+                System.out.println("[!] You have " + unread
+                        + " unread news; check the news menu.");
+            }
         } else {
             SessionStore.clearSession();
         }

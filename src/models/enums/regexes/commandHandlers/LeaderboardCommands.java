@@ -3,7 +3,8 @@ package models.enums.regexes.commandHandlers;
 import java.util.regex.Pattern;
 
 public enum LeaderboardCommands {
-    SHOW_LEADERBOARD("^show\\s+leaderboard(?:\\s+-s\\s+(?<column>\\S+))?$");
+    SHOW_LEADERBOARD("^show\\s+leaderboard(?:\\s+-s\\s+(?<column>\\S+))?"
+            + "(?:\\s+-o\\s+(?<order>asc|desc))?$");
 
     public final Pattern pattern;
 

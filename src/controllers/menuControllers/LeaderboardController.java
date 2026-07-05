@@ -17,29 +17,36 @@ public class LeaderboardController extends BaseController {
         super(app);
     }
 
-    public Result handleShowLeaderboard(String sortColumn) {
+    private static final String[] CHAPTERS = {"Egypt", "Frost Bite", "Wavey Beach", "Dark Ages"};
+
+    public Result handleShowLeaderboard(String sortColumn, String order) {
         List<User> users = userDAO.getAllUsers();
         if (users.isEmpty()) {
             return Result.fail("Could not load users (is the database reachable?).");
         }
-        sort(users, sortColumn == null ? "miopoint" : sortColumn.toLowerCase());
-        Result result = Result.ok(String.format("%-20s | %-8s | %-9s | %-7s | %s",
-                "Username", "Levels", "Minigames", "Quests", "Miopoint"));
+        sort(users, sortColumn == null ? "miopoint" : sortColumn.toLowerCase(),
+                !"asc".equalsIgnoreCase(order));
+        Result result = Result.ok(String.format("%-20s | %-16s | %-9s | %-7s | %-7s | %s",
+                "Username", "Last Level", "Minigames", "Daily Q", "Other Q", "Miopoint"));
         for (User user : users) {
             UserDataStore store = UserDataStore.forUser(user.getUsername());
-            result.addMessage(String.format("%-20s | %-8d | %-9d | %-7d | %d",
-                    user.getUsername(), completedLevels(store),
-                    store.getInt("minigamesWon", 0), store.getInt("questsDone", 0),
-                    user.getHighestScore()));
+            int daily = store.getInt("dailyQuestsDone", 0);
+            int other = Math.max(0, store.getInt("questsDone", 0) - daily);
+            result.addMessage(String.format("%-20s | %-16s | %-9d | %-7d | %-7d | %d",
+                    user.getUsername(), lastLevel(store),
+                    store.getInt("minigamesWon", 0), daily, other, user.getHighestScore()));
         }
+        result.addMessage("Sort with: show leaderboard -s "
+                + "<levels|minigames|quests|dailyquests|miopoint> -o <asc|desc>");
         return result;
     }
 
-    private void sort(List<User> users, String column) {
+    private void sort(List<User> users, String column, boolean descending) {
         Comparator<User> comparator;
         switch (column) {
             case "levels":
-                comparator = Comparator.comparingInt(u -> completedLevels(UserDataStore.forUser(u.getUsername())));
+                comparator = Comparator.comparingInt(
+                        u -> completedLevels(UserDataStore.forUser(u.getUsername())));
                 break;
             case "minigames":
                 comparator = Comparator.comparingInt(
@@ -49,16 +56,33 @@ public class LeaderboardController extends BaseController {
                 comparator = Comparator.comparingInt(
                         u -> UserDataStore.forUser(u.getUsername()).getInt("questsDone", 0));
                 break;
+            case "dailyquests":
+                comparator = Comparator.comparingInt(
+                        u -> UserDataStore.forUser(u.getUsername()).getInt("dailyQuestsDone", 0));
+                break;
             default:
                 comparator = Comparator.comparingInt(User::getHighestScore);
                 break;
         }
-        users.sort(comparator.reversed());
+        users.sort(descending ? comparator.reversed() : comparator);
+    }
+
+    private String lastLevel(UserDataStore store) {
+        String best = "-";
+        int bestLevel = 0;
+        for (String chapter : CHAPTERS) {
+            int completed = store.getInt("progress." + chapter, 1) - 1;
+            if (completed > bestLevel) {
+                bestLevel = completed;
+                best = chapter + " L" + completed;
+            }
+        }
+        return best;
     }
 
     private int completedLevels(UserDataStore store) {
         int total = 0;
-        for (String chapter : new String[]{"Egypt", "Frost Bite", "Wavey Beach", "Dark Ages"}) {
+        for (String chapter : CHAPTERS) {
             total += store.getInt("progress." + chapter, 1) - 1;
         }
         return total;

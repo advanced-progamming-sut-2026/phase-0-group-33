@@ -11,7 +11,8 @@ public class LeaderboardMenu implements AppMenu {
 
     public LeaderboardMenu(LeaderboardController controller) {
         router.add(LeaderboardCommands.SHOW_LEADERBOARD.pattern,
-                        matcher -> controller.handleShowLeaderboard(matcher.group("column")))
+                        matcher -> controller.handleShowLeaderboard(
+                                matcher.group("column"), matcher.group("order")))
                 .add(GlobalCommands.SHOW_MENU.pattern, matcher -> Result.ok("Leaderboard menu"))
                 .add(GlobalCommands.CHANGE_MENU.pattern,
                         matcher -> controller.handleMenuChange(matcher.group("menu")))

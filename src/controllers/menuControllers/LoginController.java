@@ -5,6 +5,7 @@ import models.App;
 import models.Result;
 import models.enums.Menus;
 import models.user.SecurityQuestion;
+import utils.NewsStore;
 import utils.SessionStore;
 
 public class LoginController extends BaseController {
@@ -26,6 +27,11 @@ public class LoginController extends BaseController {
             }
             app.navigateTo(Menus.MAIN);
             result.addMessage("Redirected to main menu");
+            int unread = NewsStore.countUnread(username);
+            if (unread > 0) {
+                result.addMessage("[!] You have " + unread
+                        + " unread news; check the news menu.");
+            }
         }
         return result;
     }
