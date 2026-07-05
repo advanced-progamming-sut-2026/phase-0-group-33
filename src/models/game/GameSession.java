@@ -10,6 +10,7 @@ import controllers.managers.WaveManager;
 import controllers.managers.ZombieBehaviorManager;
 import models.Result;
 import models.entities.plant.PlantType;
+import models.entities.plant.PlantUpgrades;
 import models.entities.zombie.Zombie;
 import models.entities.zombie.ZombieType;
 import models.map.Grid;
@@ -335,18 +336,21 @@ public class GameSession {
     }
 
     public int effectiveCost(PlantType type) {
-        int level = plantLevel(type);
-        return Math.max(0, type.getCost() - (level >= 4 ? 25 : 0));
+        return Math.max(0, type.getCost() - PlantUpgrades.costReduction(type, plantLevel(type)));
     }
 
     public int effectiveHp(PlantType type) {
-        int level = plantLevel(type);
-        return Math.max(1, type.getBaseHp() + (level >= 3 ? 150 : 0));
+        return Math.max(1, type.getBaseHp() + PlantUpgrades.hpBonus(type, plantLevel(type)));
     }
 
     public int effectiveDamage(PlantType type) {
         int base = type.getDamage() < 0 ? 9999 : type.getDamage();
-        return (int) Math.round(base * (1 + 0.2 * (plantLevel(type) - 1)));
+        return base + PlantUpgrades.damageBonus(type, plantLevel(type));
+    }
+
+    public int effectiveRecharge(PlantType type) {
+        return Math.max(0,
+                type.getRecharge() - PlantUpgrades.rechargeReduction(type, plantLevel(type)));
     }
 
     private int plantLevel(PlantType type) {

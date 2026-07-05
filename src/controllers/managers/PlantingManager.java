@@ -48,6 +48,14 @@ public class PlantingManager {
             int seconds = slot.getCooldownTicks() / GameSession.TICKS_PER_SECOND + 1;
             return Result.fail(type.getName() + " is recharging; ready in " + seconds + "s.");
         }
+        if (type == PlantType.IMITATER) {
+            PlantType copied = imitatedType(slot);
+            if (copied == null) {
+                return Result.fail("Imitater needs another selected plant to copy.");
+            }
+            System.out.println("Imitater transforms into a " + copied.getName() + "!");
+            type = copied;
+        }
         int cost = session.effectiveCost(type);
         if (session.getSunManager().getSunBalance() < cost) {
             return Result.fail("Not enough sun: " + type.getName() + " costs " + cost
@@ -207,10 +215,20 @@ public class PlantingManager {
         return Result.ok(type.getName() + " exploded at (" + x + ", " + y + ").");
     }
 
+    private PlantType imitatedType(PlantSlot imitaterSlot) {
+        for (PlantSlot other : session.getSlots()) {
+            if (other != imitaterSlot && other.getType() != PlantType.IMITATER) {
+                return other.getType();
+            }
+        }
+        return null;
+    }
+
     private void consume(PlantSlot slot, int cost) {
         session.getSunManager().spendSun(cost);
         if (!session.isCooldownsDisabled()) {
-            slot.setCooldownTicks(slot.getType().getRecharge() * GameSession.TICKS_PER_SECOND);
+            slot.setCooldownTicks(
+                    session.effectiveRecharge(slot.getType()) * GameSession.TICKS_PER_SECOND);
         }
         if (slot.isSingleUse()) {
             session.getSlots().remove(slot);
