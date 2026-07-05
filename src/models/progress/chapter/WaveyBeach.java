@@ -25,6 +25,7 @@ public class WaveyBeach extends Chapter {
     public List<ZombieType> getZombiePool() {
         return List.of(ZombieType.NORMAL, ZombieType.CONE_HEAD, ZombieType.BUCKET_HEAD,
                 ZombieType.FISHERMAN, ZombieType.OCTOPUS, ZombieType.SNORKEL,
+                ZombieType.SURFER, ZombieType.FAST_SWIMMER,
                 ZombieType.IMP, ZombieType.GARGANTUAR);
     }
 

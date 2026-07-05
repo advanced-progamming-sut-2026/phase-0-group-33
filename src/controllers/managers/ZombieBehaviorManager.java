@@ -97,7 +97,14 @@ public class ZombieBehaviorManager {
                 wizardCurse(zombie);
                 return false;
             case ALLSTAR:
+            case SURFER:
                 return allStarCharge(zombie);
+            case PHARAOH:
+                pharaohRage(zombie);
+                return false;
+            case FAST_SWIMMER:
+                fastSwim(zombie);
+                return false;
             case TURQUOISE:
                 turquoiseAct(zombie);
                 return false;
@@ -421,6 +428,30 @@ public class ZombieBehaviorManager {
         System.out.println("The Pianist's tune shuffled the zombies between lanes!");
     }
 
+    private void pharaohRage(Zombie zombie) {
+        if (zombie.totalArmor() == 0 && !zombie.getBattle().isRaging()) {
+            zombie.getBattle().setRaging(true);
+            zombie.setSpeed(zombie.getType().getSpeed() * 3);
+            System.out.println("The Pharaoh broke out of his sarcophagus and is running!");
+        }
+    }
+
+    private void fastSwim(Zombie zombie) {
+        if (isUnderwater(zombie)) {
+            zombie.getPosition().setX(zombie.getPosition().getX()
+                    - 2 * zombie.getSpeed() / GameSession.TICKS_PER_SECOND);
+        }
+    }
+
+    private void releaseWeasel(Zombie hoarder) {
+        if (session.getRandom().nextInt(100) < 20) {
+            session.spawnZombie(ZombieType.WEASEL, hoarder.getPosition().getX(),
+                    (int) hoarder.getPosition().getY(),
+                    Math.max(1, hoarder.getSpawnWave()));
+            System.out.println("A weasel burst out of the Weasel Hoarder's coat!");
+        }
+    }
+
     private void newspaperRage(Zombie zombie) {
         if (zombie.totalArmor() == 0 && !zombie.getBattle().isRaging()) {
             zombie.getBattle().setRaging(true);
@@ -513,6 +544,9 @@ public class ZombieBehaviorManager {
         }
         if (zombie.getType() == ZombieType.PROSPECTOR && source.getTags().contains(PlantTag.ICE)) {
             zombie.getBattle().setDynamiteTicks(-1);
+        }
+        if (zombie.getType() == ZombieType.WEASEL_HOARDER) {
+            releaseWeasel(zombie);
         }
         if (zombie.getType() == ZombieType.JUGGLER) {
             return jugglerDeflect(zombie, source);

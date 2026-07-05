@@ -23,6 +23,7 @@ public class FrostBite extends Chapter {
 
     @Override
     public List<ZombieType> getZombiePool() {
-        return withCommons(ZombieType.DODO, ZombieType.HUNTER, ZombieType.TROGLOBITE);
+        return withCommons(ZombieType.DODO, ZombieType.HUNTER, ZombieType.TROGLOBITE,
+                ZombieType.WEASEL_HOARDER);
     }
 }

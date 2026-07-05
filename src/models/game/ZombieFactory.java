@@ -7,6 +7,7 @@ import models.entities.zombie.decorator.BucketArmorDecorator;
 import models.entities.zombie.decorator.ConeArmorDecorator;
 import models.entities.zombie.decorator.CrownArmorDecorator;
 import models.entities.zombie.decorator.NewspaperArmorDecorator;
+import models.entities.zombie.decorator.SarcophagusArmorDecorator;
 import models.map.Position;
 
 public final class ZombieFactory {
@@ -18,7 +19,7 @@ public final class ZombieFactory {
         int hp = (int) Math.round(type.getHitpoints() * difficultyFactor);
         Zombie zombie = new Zombie(type, new Position(x, row), hp, type.getSpeed());
         Zombie decorated = applyArmor(type, zombie);
-        if (type == ZombieType.ALLSTAR) {
+        if (type == ZombieType.ALLSTAR || type == ZombieType.SURFER) {
             decorated.getBattle().setCharging(true);
         }
         if (type == ZombieType.PROSPECTOR) {
@@ -39,6 +40,8 @@ public final class ZombieFactory {
                 return new BrickArmorDecorator(zombie);
             case NEWSPAPER:
                 return new NewspaperArmorDecorator(zombie);
+            case PHARAOH:
+                return new SarcophagusArmorDecorator(zombie);
             default:
                 return zombie;
         }

@@ -23,7 +23,8 @@ public class Egypt extends Chapter {
 
     @Override
     public List<ZombieType> getZombiePool() {
-        return withCommons(ZombieType.RA, ZombieType.EXPLORER, ZombieType.TOMB_RAISER);
+        return withCommons(ZombieType.RA, ZombieType.EXPLORER, ZombieType.TOMB_RAISER,
+                ZombieType.PHARAOH, ZombieType.CAMEL);
     }
 
     @Override

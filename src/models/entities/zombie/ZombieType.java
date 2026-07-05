@@ -29,6 +29,13 @@ public enum ZombieType {
     PIANO(26, "Piano", 4000, 840, 0.12, 450, ArmorType.NONE, "ZombiePiano"),
     NEWSPAPER(27, "Newspaper", 200, 460, 0.22, 700, ArmorType.NEWSPAPER, "ZombieNewspaper"),
     BARREL_ROLLER(32, "Barrel Roller", 100, 470, 0.185, 600, ArmorType.NONE, "ZombieBarrelRoller"),
+    PHARAOH(33, "Pharaoh", 100, 300, 0.12, 550, ArmorType.SARCOPHAGUS, "ZombiePharaohDefault"),
+    CAMEL(34, "Camel", 100, 1140, 0.15, 700, ArmorType.NONE, "ZombieCamelDefault"),
+    WEASEL_HOARDER(35, "Weasel Hoarder", 100, 300, 0.185, 450,
+            ArmorType.NONE, "ZombieWeaselHoarderDefault"),
+    WEASEL(36, "Weasel", 50, 60, 0.5, 50, ArmorType.NONE, "ZombieWeaselDefault"),
+    SURFER(37, "Surfer", 100, 350, 0.4, 500, ArmorType.NONE, "ZombieBeachSurfer"),
+    FAST_SWIMMER(38, "Fast Swimmer", 100, 300, 0.12, 350, ArmorType.NONE, "ZombieBeachFastSwimmer"),
 
     PEASHOOTER_ZOMBIE(28, "Peashooter Zombie", 100, 190, 0.185, 200, ArmorType.NONE, "ZombotanyPea"),
     WALLNUT_ZOMBIE(29, "Wall-nut Zombie", 100, 1100, 0.12, 300, ArmorType.NONE, "ZombotanyWallnut"),
@@ -99,7 +106,8 @@ public enum ZombieType {
         BUCKET(1100, true),
         BRICK(2200, false),
         CROWN_SHOULDER(3200, true),
-        NEWSPAPER(800, false);
+        NEWSPAPER(800, false),
+        SARCOPHAGUS(1000, false);
 
         private final int armorHitpoints;
         private final boolean metallic;
