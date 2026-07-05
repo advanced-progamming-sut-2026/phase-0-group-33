@@ -11,7 +11,6 @@ public class Zombie {
     protected int health;
     protected double speed;
 
-    // Battle-time attributes (owned by the outermost decorator instance).
     private boolean glowing;
     private int chilledTicks;
     private int frozenTicks;
@@ -29,30 +28,18 @@ public class Zombie {
         health -= damage;
     }
 
-    /** Damage that ignores armor entirely (doc: poison tag). */
     public void damageHealthDirectly(int damage) {
         health -= damage;
     }
 
-    /**
-     * Removes metallic armor pieces (doc: magnet-shroom). Returns true if any
-     * removed.
-     */
     public boolean stripMetallicArmor() {
         return false;
     }
 
-    /**
-     * Special-behavior runtime state (always accessed via the outermost decorator).
-     */
     public ZombieBattleState getBattle() {
         return battle;
     }
 
-    /**
-     * Armor pieces still intact, in outermost-first order (for the zombies info
-     * output).
-     */
     public Map<String, Integer> getArmorInfo() {
         return new LinkedHashMap<>();
     }
@@ -61,7 +48,6 @@ public class Zombie {
         return getHealth() <= 0 && totalArmor() <= 0;
     }
 
-    /** Total remaining armor hit points across all decorators. */
     public int totalArmor() {
         int total = 0;
         for (int armorHp : getArmorInfo().values()) {

@@ -3,7 +3,6 @@ package models.progress.level.special;
 import models.progress.chapter.Chapter;
 import models.progress.level.Level;
 
-/** A level with one of the eight special rule sets from the doc. */
 public class SpecialLevel extends Level {
     private final SpecialLevelType specialType;
 

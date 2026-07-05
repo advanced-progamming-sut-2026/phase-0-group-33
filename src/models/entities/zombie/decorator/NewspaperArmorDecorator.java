@@ -5,7 +5,6 @@ import models.entities.zombie.Zombie;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-
 public class NewspaperArmorDecorator extends ZombieDecorator {
     private int newspaperHealth = 190;
 

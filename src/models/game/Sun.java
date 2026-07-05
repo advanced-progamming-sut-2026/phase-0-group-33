@@ -1,6 +1,5 @@
 package models.game;
 
-
 public class Sun {
 
     public enum SunKind {
@@ -41,12 +40,10 @@ public class Sun {
         this.producedByPlant = producedByPlant;
     }
 
-    /** A sun dropping from the sky; lands after 5 seconds (50 ticks). */
     public static Sun falling(SunKind kind, int x, int y) {
         return new Sun(kind, x, y, 50, kind.getValue(), false);
     }
 
-    /** A sun produced by a sun-producer plant, waiting on its tile. */
     public static Sun produced(int x, int y, int value) {
         return new Sun(SunKind.NORMAL, x, y, 0, value, true);
     }
@@ -55,9 +52,6 @@ public class Sun {
         return ticksToLand > 0;
     }
 
-    /**
-     * Advances the fall by one tick; returns true the moment it touches the ground.
-     */
     public boolean tickFall() {
         if (ticksToLand > 0) {
             ticksToLand--;

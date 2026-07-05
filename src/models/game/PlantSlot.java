@@ -2,7 +2,6 @@ package models.game;
 
 import models.entities.plant.PlantType;
 
-
 public class PlantSlot {
     private final PlantType type;
     private int cooldownTicks;
@@ -43,7 +42,6 @@ public class PlantSlot {
         this.boosted = boosted;
     }
 
-    /** Conveyor-belt slots disappear after one use. */
     public boolean isSingleUse() {
         return singleUse;
     }

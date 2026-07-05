@@ -3,7 +3,7 @@ package models.enums.regexes.commandHandlers;
 import java.util.regex.Pattern;
 
 public enum GameCommands {
-    // Plant Selection
+
     SHOW_ALL_PLANTS("^show\\s+all\\s+plants$"),
     SHOW_AVAILABLE_PLANTS("^show\\s+available\\s+plants$"),
     ADD_PLANT("^add\\s+plant\\s+-t\\s+(?<type>.+?)$"),
@@ -12,7 +12,6 @@ public enum GameCommands {
     START_GAME("^start\\s+game$"),
     START_ZOMBIE_WAVES("^start\\s+zombie\\s+waves$"),
 
-    // In-Game Operations
     ADVANCE_TIME("^advance\\s+time\\s+-t\\s+(?<count>\\d+)\\s+ticks$"),
     COLLECT_SUN("^collect\\s+sun\\s+-l\\s+\\((?<x>\\d+),\\s*(?<y>\\d+)\\)$"),
     SHOW_SUN_AMOUNT("^show\\s+sun\\s+amount$"),
@@ -29,7 +28,6 @@ public enum GameCommands {
     ZOMBIES_INFO("^zombies\\s+info$"),
     CHEAT_SPAWN_ZOMBIE("^cheat\\s+spawn-zombie\\s+-t\\s+(?<type>.+?)\\s+-l\\s+(?<x>\\d+),\\s*(?<y>\\d+)$"),
 
-    // Minigame commands (doc: minigames chapter; exact wording is ours to pick).
     BREAK_VASE("^break\\s+vase\\s+-l\\s+\\((?<x>\\d+),\\s*(?<y>\\d+)\\)$"),
     PLACE_ZOMBIE("^place\\s+zombie\\s+-t\\s+(?<type>.+?)\\s+-l\\s+\\((?<x>\\d+),\\s*(?<y>\\d+)\\)$"),
     SWAP_PLANTS("^swap\\s+-l\\s+\\((?<x1>\\d+),\\s*(?<y1>\\d+)\\)\\s+"

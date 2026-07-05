@@ -2,7 +2,6 @@ package models.game;
 
 import models.entities.plant.PlantType;
 
-
 public class RollingNut {
     private final PlantType type;
     private double x;

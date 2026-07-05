@@ -26,4 +26,3 @@ public class SecurityQuestion {
         this.answer = answer;
     }
 }
-

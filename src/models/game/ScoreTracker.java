@@ -1,14 +1,5 @@
 package models.game;
 
-/**
- * Miopoint scoring for the scoring game (doc: bonus scoring section).
- * Five patterns award points on top of a base amount per kill:
- * 1) multi-kill: several zombies dying in the same tick,
- * 2) speed kill: a zombie dies within 5 seconds of spawning,
- * 3) mass kill: 4+ zombies die within one second,
- * 4) streak: 5 kills without losing a single plant,
- * 5) untouched defense: finishing with unused lawnmowers.
- */
 public class ScoreTracker {
     private static final int BASE_KILL = 10;
     private static final int MULTI_KILL_BONUS = 50;
@@ -24,7 +15,6 @@ public class ScoreTracker {
     private int killsInLastSecond;
     private int streak;
 
-    /** Pattern hooks; called for every zombie death. */
     public void onZombieKilled(int tick, int spawnTick) {
         score += BASE_KILL;
         if (tick == lastKillTick) {
@@ -57,12 +47,10 @@ public class ScoreTracker {
         }
     }
 
-    /** Streak pattern resets whenever the player loses a plant. */
     public void onPlantLost() {
         streak = 0;
     }
 
-    /** End-of-game bonus for every lawnmower that was never triggered. */
     public void onGameWon(int unusedMowers) {
         score += MOWER_BONUS * unusedMowers;
     }

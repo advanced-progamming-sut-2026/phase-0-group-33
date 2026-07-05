@@ -29,7 +29,7 @@ public enum ZombieType {
     PIANO(26, "Piano", 4000, 840, 0.12, 450, ArmorType.NONE, "ZombiePiano"),
     NEWSPAPER(27, "Newspaper", 200, 460, 0.22, 700, ArmorType.NEWSPAPER, "ZombieNewspaper"),
     BARREL_ROLLER(32, "Barrel Roller", 100, 470, 0.185, 600, ArmorType.NONE, "ZombieBarrelRoller"),
-    // Zombotany minigame zombies (doc: minigames chapter).
+
     PEASHOOTER_ZOMBIE(28, "Peashooter Zombie", 100, 190, 0.185, 200, ArmorType.NONE, "ZombotanyPea"),
     WALLNUT_ZOMBIE(29, "Wall-nut Zombie", 100, 1100, 0.12, 300, ArmorType.NONE, "ZombotanyWallnut"),
     JALAPENO_ZOMBIE(30, "Jalapeno Zombie", 100, 190, 0.185, 350, ArmorType.NONE, "ZombotanyJalapeno"),
@@ -98,7 +98,7 @@ public enum ZombieType {
         CONE(370, false),
         BUCKET(1100, true),
         BRICK(2200, false),
-        CROWN_SHOULDER(3200, true), // 1600+1600
+        CROWN_SHOULDER(3200, true),
         NEWSPAPER(800, false);
 
         private final int armorHitpoints;

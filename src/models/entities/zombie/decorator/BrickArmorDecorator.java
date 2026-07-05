@@ -5,7 +5,6 @@ import models.entities.zombie.Zombie;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** Block/brick head armor (doc: the block on its head has 2200 HP). */
 public class BrickArmorDecorator extends ZombieDecorator {
     private int blockHealth;
 

@@ -3,7 +3,6 @@ package models.game;
 import models.entities.plant.PlantType;
 import models.entities.zombie.ZombieType;
 
-
 public class Vase {
 
     public enum VaseKind {
@@ -38,12 +37,10 @@ public class Vase {
         return kind;
     }
 
-    /** Zombie inside, or null when the vase holds a seed packet. */
     public ZombieType getZombie() {
         return zombie;
     }
 
-    /** Seed packet inside, or null when the vase holds a zombie. */
     public PlantType getPacket() {
         return packet;
     }

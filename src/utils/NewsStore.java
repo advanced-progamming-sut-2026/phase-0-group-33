@@ -12,14 +12,12 @@ public final class NewsStore {
         return "news_" + username + ".txt";
     }
 
-    /** Appends a new unread news entry for the user. */
     public static void add(String username, String message) {
         List<String> lines = FileStore.readLines(fileName(username));
         lines.add("0|" + message);
         FileStore.writeLines(fileName(username), lines);
     }
 
-    /** Returns unread news and marks all of it as read. */
     public static List<String> readUnread(String username) {
         List<String> lines = FileStore.readLines(fileName(username));
         List<String> unread = new ArrayList<>();
@@ -36,7 +34,6 @@ public final class NewsStore {
         return unread;
     }
 
-    /** Returns every news entry, oldest first. */
     public static List<String> readAll(String username) {
         List<String> all = new ArrayList<>();
         for (String line : FileStore.readLines(fileName(username))) {

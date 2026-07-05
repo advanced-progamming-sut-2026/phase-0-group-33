@@ -8,11 +8,6 @@ import models.progress.level.special.SpecialLevelType;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * The pre-game plant picking state: which seeds the player chose for the
- * level (doc: 8 slots by default) and the level-specific selection rules
- * (conveyor belt, locked plants, plant-what-you-get).
- */
 public class PlantSelection {
     private static final int DEFAULT_SLOTS = 8;
 
@@ -97,7 +92,6 @@ public class PlantSelection {
         return Result.ok(type.getName() + " removed from your selection.");
     }
 
-    /** Marks a selected plant as boosted (payment is handled by the controller). */
     public Result markBoosted(String typeName) {
         PlantType type = Names.plant(typeName);
         PlantSlot slot = type == null ? null : findSlot(type);

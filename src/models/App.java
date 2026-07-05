@@ -7,10 +7,6 @@ import models.user.User;
 import utils.SessionStore;
 import views.MenuHub;
 
-/**
- * Application-level state: the logged-in user, the active menu and the
- * running game session. This is the single source of truth for navigation;
- */
 public class App {
 
     private static volatile App instance;
@@ -72,7 +68,6 @@ public class App {
         return currentMenu;
     }
 
-    /** Asks the main loop to terminate after the current command finishes. */
     public void requestExit() {
         this.exitRequested = true;
     }
@@ -81,7 +76,6 @@ public class App {
         return exitRequested;
     }
 
-    /** Restores a stay-logged-in session (if any), then runs the menu loop. */
     public void run() {
         restoreSession();
         MenuHub menuHub = MenuHub.getInstance(this);

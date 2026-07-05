@@ -9,10 +9,6 @@ import models.progress.chapter.FrostBite;
 import java.awt.Point;
 import java.util.Random;
 
-/**
- * Builds the 5x9 lawn for a chapter: water columns (Big Wave Beach),
- * gravestones (Egypt / Dark Ages) and Frostbite's slider tiles.
- */
 public final class BoardBuilder {
 
     private BoardBuilder() {
@@ -48,7 +44,6 @@ public final class BoardBuilder {
         }
     }
 
-    /** Doc (Frostbite): slider tiles push zombies to a fixed neighboring lane. */
     private static void placeSliders(Grid grid, Random random) {
         for (TerrainType slider : new TerrainType[] { TerrainType.SLIDER_UP, TerrainType.SLIDER_DOWN }) {
             int col = 3 + random.nextInt(GameSession.COLS - 3);

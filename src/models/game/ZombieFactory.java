@@ -9,7 +9,6 @@ import models.entities.zombie.decorator.CrownArmorDecorator;
 import models.entities.zombie.decorator.NewspaperArmorDecorator;
 import models.map.Position;
 
-
 public final class ZombieFactory {
 
     private ZombieFactory() {

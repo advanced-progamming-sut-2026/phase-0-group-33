@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class UserDAO {
     private static final String USERS_DIR = "users";
 
@@ -19,7 +18,6 @@ public class UserDAO {
         return USERS_DIR + "/" + username + ".properties";
     }
 
-    /** Insert a new user. Returns true if successful. */
     public boolean insertUser(User user) {
         if (existsByUsername(user.getUsername())) {
             return false;
@@ -49,7 +47,6 @@ public class UserDAO {
         return FileStore.writeLines(fileFor(user.getUsername()), lines);
     }
 
-    /** Find user by username. Returns null if not found. */
     public User findByUsername(String username) {
         if (username == null || !FileStore.exists(fileFor(username))) {
             return null;
@@ -92,7 +89,6 @@ public class UserDAO {
         }
     }
 
-    /** Update user's password. */
     public boolean updatePassword(String username, String newHashedPassword) {
         User user = findByUsername(username);
         if (user == null) {
@@ -102,7 +98,6 @@ public class UserDAO {
         return writeUser(user);
     }
 
-    /** Update profile fields that can be changed (username, nickname, email). */
     public boolean updateProfile(String oldUsername, String newUsername, String nickname, String email) {
         User user = findByUsername(oldUsername);
         if (user == null) {
@@ -121,7 +116,6 @@ public class UserDAO {
         return writeUser(user);
     }
 
-    /** Update coins, diamonds, pots counts. */
     public boolean updateCurrencies(String username, int coins, int diamonds, int pots) {
         User user = findByUsername(username);
         if (user == null) {
@@ -133,7 +127,6 @@ public class UserDAO {
         return writeUser(user);
     }
 
-    /** Update difficulty level. */
     public boolean updateDifficulty(String username, DifficultyLevel level) {
         User user = findByUsername(username);
         if (user == null) {
@@ -143,7 +136,6 @@ public class UserDAO {
         return writeUser(user);
     }
 
-    /** Update highest score (miopoint). */
     public boolean updateHighestScore(String username, int score) {
         User user = findByUsername(username);
         if (user == null) {
@@ -153,7 +145,6 @@ public class UserDAO {
         return writeUser(user);
     }
 
-    /** Increment the played-games counter shown in the profile. */
     public boolean incrementGamesPlayed(String username) {
         User user = findByUsername(username);
         if (user == null) {
@@ -163,18 +154,15 @@ public class UserDAO {
         return writeUser(user);
     }
 
-    /** Check if a username exists. */
     public boolean existsByUsername(String username) {
         return FileStore.exists(fileFor(username));
     }
 
-    /** Get user's security question (for password reset). */
     public SecurityQuestion getSecurityQuestion(String username) {
         User user = findByUsername(username);
         return user == null ? null : user.getSecurityQuestion();
     }
 
-    /** Loads all users (for the leaderboard). */
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         for (String fileName : FileStore.listFiles(USERS_DIR)) {

@@ -8,12 +8,12 @@ public class Shop {
     private ShopItem dailyOffer;
 
     public boolean buyItem(String itemId, int count) {
-        // TODO
+
         return false;
     }
 
     public void refreshDaily() {
-        // TODO
+
     }
 
     public List<ShopItem> getPermanentItems() {

@@ -5,7 +5,6 @@ import models.game.PlacedPlant;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class ZombieBattleState {
     private int stolenSun;
     private int stealTicksLeft;
@@ -162,7 +161,6 @@ public class ZombieBattleState {
         this.spawnTick = spawnTick;
     }
 
-    /** Last slider column this zombie was pushed from (prevents slide loops). */
     public int getLastSliderColumn() {
         return lastSliderColumn;
     }

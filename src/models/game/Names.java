@@ -3,7 +3,6 @@ package models.game;
 import models.entities.plant.PlantType;
 import models.entities.zombie.ZombieType;
 
-/** Name lookup for plants and zombies, tolerant of case, spaces and dashes. */
 public final class Names {
 
     private Names() {

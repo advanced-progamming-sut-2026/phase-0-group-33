@@ -89,7 +89,7 @@ public enum PlantType {
         private final Set<PlantTag> tags;
         private final int cost;
         private final int baseHp;
-        private final int damage; // -1 means instant kill
+        private final int damage;
         private final double actionInterval;
         private final int recharge;
 

@@ -10,16 +10,11 @@ import models.map.Tile;
 
 import java.util.Map;
 
-/**
- * Text rendering of the battle state: the map, plant/tile status and the
- * {@code zombies info} report (format follows the sample in the doc).
- */
 public final class GameBoardPrinter {
 
     private GameBoardPrinter() {
     }
 
-    /** Prints the map: header info first (doc: show map section), then the grid. */
     public static Result showMap(GameSession session) {
         Result result = Result.ok(String.format(
                 "Wave: %d/%d | Sun: %d | Plant foods: %d",
@@ -76,9 +71,6 @@ public final class GameBoardPrinter {
         }
     }
 
-    /**
-     * Doc: for each chosen plant, its sun cost and whether/when it can be planted.
-     */
     public static Result showPlantsStatus(GameSession session) {
         Result result = Result.ok("Your plants:");
         for (PlantSlot slot : session.getSlots()) {
@@ -97,7 +89,6 @@ public final class GameBoardPrinter {
         return result;
     }
 
-    /** Doc: plants and zombies on the given tile with their intrinsic stats. */
     public static Result showTileStatus(GameSession session, int x, int y) {
         if (x < 1 || x > GameSession.COLS || y < 1 || y > GameSession.ROWS) {
             return Result.fail("Coordinates are outside the lawn.");
@@ -120,10 +111,6 @@ public final class GameBoardPrinter {
         return result;
     }
 
-    /**
-     * Prints every zombie in the doc's sample format (position, health, armor,
-     * effects).
-     */
     public static Result zombiesInfo(GameSession session) {
         if (session.getPhase() != GamePhase.BATTLE && session.getZombies().isEmpty()) {
             return Result.ok("There are no zombies on the map.");

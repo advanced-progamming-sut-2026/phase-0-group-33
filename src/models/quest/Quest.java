@@ -13,7 +13,7 @@ public class Quest {
     private Asset reward;
 
     public void updateProgress(Object event) {
-        // TODO
+
     }
 
     public boolean isCompleted() {

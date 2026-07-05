@@ -23,15 +23,10 @@ public class Tile {
         }
     }
 
-    /**
-     * Gravestone HP (doc: 700; blocked shots damage it, then it becomes normal
-     * ground).
-     */
     public int getGraveHealth() {
         return graveHealth;
     }
 
-    /** Damages the gravestone; the tile turns to normal ground once it breaks. */
     public void damageGrave(int damage) {
         if (terrain != TerrainType.GRAVE) {
             return;

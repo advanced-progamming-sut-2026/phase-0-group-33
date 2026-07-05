@@ -32,10 +32,6 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Scanner;
 
-/**
- * Owns the REPL loop: reads a line, routes it to the menu the {@link App}
- * currently points at, and prints an error for unrecognized commands.
- */
 public class MenuHub {
     private static MenuHub instance;
 

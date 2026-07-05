@@ -1,6 +1,5 @@
 package models.game;
 
-
 public class PushedObject {
 
     public enum Kind {
@@ -50,7 +49,6 @@ public class PushedObject {
         return row;
     }
 
-    /** A barrel whose pusher died stays where it is (doc: Barrel Roller). */
     public boolean isMoving() {
         return moving;
     }

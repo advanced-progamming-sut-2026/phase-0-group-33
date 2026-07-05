@@ -23,9 +23,6 @@ public class BucketArmorDecorator extends ZombieDecorator {
         return info;
     }
 
-    /**
-     * The bucket is metal; the magnet-shroom can rip it off (doc: zombies chapter).
-     */
     @Override
     public boolean stripMetallicArmor() {
         if (bucketHealth > 0) {

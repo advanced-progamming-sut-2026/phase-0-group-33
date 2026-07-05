@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class UserDataStore {
     private static final Map<String, UserDataStore> CACHE = new LinkedHashMap<>();
 
@@ -17,15 +16,10 @@ public class UserDataStore {
         load();
     }
 
-    /**
-     * Shared per-user instance so concurrent writers (quests, victories,
-     * shop) never overwrite each other's just-saved keys.
-     */
     public static synchronized UserDataStore forUser(String username) {
         return CACHE.computeIfAbsent(username, UserDataStore::new);
     }
 
-    /** Drops the cached instance (after a username change renames the file). */
     public static synchronized void evict(String username) {
         CACHE.remove(username);
     }
@@ -39,7 +33,6 @@ public class UserDataStore {
         }
     }
 
-    /** Persists the current state to disk. */
     public void save() {
         List<String> lines = new ArrayList<>();
         for (Map.Entry<String, String> entry : values.entrySet()) {
@@ -84,10 +77,6 @@ public class UserDataStore {
         values.remove(key);
     }
 
-    /**
-     * Adds a delta to an integer value, clamping at zero, and returns the new
-     * value.
-     */
     public int addInt(String key, int delta) {
         int updated = Math.max(0, getInt(key, 0) + delta);
         setInt(key, updated);

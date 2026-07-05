@@ -2,7 +2,6 @@ package models.game;
 
 import models.entities.plant.PlantType;
 
-/** A plant standing on the lawn during battle. */
 public class PlacedPlant {
     private final PlantType type;
     private int x;
@@ -39,7 +38,6 @@ public class PlacedPlant {
         return x;
     }
 
-    /** Plants can be dragged around (Fisherman's hook, Beghouled swaps). */
     public void setX(int x) {
         this.x = x;
     }
@@ -76,9 +74,6 @@ public class PlacedPlant {
         this.actionCooldownTicks = actionCooldownTicks;
     }
 
-    /**
-     * True while a produced sun sits uncollected on this plant (blocks production).
-     */
     public boolean isSunPending() {
         return sunPending;
     }
@@ -87,7 +82,6 @@ public class PlacedPlant {
         this.sunPending = sunPending;
     }
 
-    /** Growth stage for wramp-up plants such as Sun-shroom (1..3). */
     public int getGrowthStage() {
         return growthStage;
     }
@@ -96,7 +90,6 @@ public class PlacedPlant {
         this.growthStage = growthStage;
     }
 
-    /** Fuse for non-trap explosives; -1 means no fuse running. */
     public int getFuseTicks() {
         return fuseTicks;
     }
@@ -105,7 +98,6 @@ public class PlacedPlant {
         this.fuseTicks = fuseTicks;
     }
 
-    /** Save Our Seeds: losing a protected plant loses the level. */
     public boolean isProtectedSeed() {
         return protectedSeed;
     }
@@ -114,7 +106,6 @@ public class PlacedPlant {
         this.protectedSeed = protectedSeed;
     }
 
-    /** Hunter zombie ice hits; the third hit freezes the plant (doc). */
     public int getIceHits() {
         return iceHits;
     }
@@ -123,7 +114,6 @@ public class PlacedPlant {
         this.iceHits = iceHits;
     }
 
-    /** Remaining HP of the ice encasing this plant; 0 means not frozen. */
     public int getIceHealth() {
         return iceHealth;
     }
@@ -132,7 +122,6 @@ public class PlacedPlant {
         this.iceHealth = iceHealth;
     }
 
-    /** Frostbite ice-wind freeze level (doc: the third level freezes the plant). */
     public int getFreezeLevel() {
         return freezeLevel;
     }
@@ -141,7 +130,6 @@ public class PlacedPlant {
         this.freezeLevel = freezeLevel;
     }
 
-    /** Remaining HP of an octopus stuck on this plant; 0 means none. */
     public int getOctopusHealth() {
         return octopusHealth;
     }
@@ -150,7 +138,6 @@ public class PlacedPlant {
         this.octopusHealth = octopusHealth;
     }
 
-    /** Wizard zombie transformation; sheep plants do nothing and are not eaten. */
     public boolean isSheep() {
         return sheep;
     }
@@ -159,7 +146,6 @@ public class PlacedPlant {
         this.sheep = sheep;
     }
 
-    /** Pea Pod stacking count (doc: stack tag, up to 5 heads). */
     public int getStackCount() {
         return stackCount;
     }
@@ -168,7 +154,6 @@ public class PlacedPlant {
         this.stackCount = stackCount;
     }
 
-    /** Pumpkin shell HP protecting the plant underneath (doc: stack tag). */
     public int getPumpkinHealth() {
         return pumpkinHealth;
     }
@@ -177,7 +162,6 @@ public class PlacedPlant {
         this.pumpkinHealth = pumpkinHealth;
     }
 
-    /** Charge-tag warm-up ticks before the plant may act (doc: charge tag). */
     public int getArmTicks() {
         return armTicks;
     }
@@ -186,7 +170,6 @@ public class PlacedPlant {
         this.armTicks = armTicks;
     }
 
-    /** True when the plant cannot act (frozen, under an octopus, or a sheep). */
     public boolean isDisabled() {
         return iceHealth > 0 || octopusHealth > 0 || sheep;
     }

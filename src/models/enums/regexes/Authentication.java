@@ -2,7 +2,6 @@ package models.enums.regexes;
 
 import java.util.regex.Pattern;
 
-
 public enum Authentication {
     USERNAME("^[a-zA-Z0-9-]+$",
             "Username can only contain letters, digits, and hyphens."),
