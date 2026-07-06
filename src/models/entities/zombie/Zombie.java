@@ -45,7 +45,7 @@ public class Zombie {
     }
 
     public boolean isDead() {
-        return getHealth() <= 0 && totalArmor() <= 0;
+        return getHealth() <= 0;
     }
 
     public int totalArmor() {

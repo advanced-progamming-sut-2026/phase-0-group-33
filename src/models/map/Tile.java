@@ -12,6 +12,10 @@ public class Tile {
     private boolean hasLawnMower;
     private int graveHealth;
     private boolean hasLilyPad;
+    private int graveSunContent;
+    private boolean gravePlantFood;
+    private boolean necromancy;
+    private boolean lowTide;
 
     public Tile(Point position, TerrainType terrain, boolean hasLawnMower) {
         this.position = position;
@@ -38,6 +42,43 @@ public class Tile {
         }
     }
 
+    public int getGraveSunContent() {
+        return graveSunContent;
+    }
+
+    public void setGraveSunContent(int graveSunContent) {
+        this.graveSunContent = graveSunContent;
+    }
+
+    public boolean isGravePlantFood() {
+        return gravePlantFood;
+    }
+
+    public void setGravePlantFood(boolean gravePlantFood) {
+        this.gravePlantFood = gravePlantFood;
+    }
+
+    public void clearGraveContent() {
+        this.graveSunContent = 0;
+        this.gravePlantFood = false;
+    }
+
+    public boolean isNecromancy() {
+        return necromancy;
+    }
+
+    public void setNecromancy(boolean necromancy) {
+        this.necromancy = necromancy;
+    }
+
+    public boolean isLowTide() {
+        return lowTide;
+    }
+
+    public void setLowTide(boolean lowTide) {
+        this.lowTide = lowTide;
+    }
+
     public boolean isHasLilyPad() {
         return hasLilyPad;
     }
@@ -59,6 +100,12 @@ public class Tile {
     }
 
     public void setTerrain(TerrainType terrain) {
+        if (terrain == TerrainType.GRAVE && this.terrain != TerrainType.GRAVE) {
+            this.graveHealth = 700;
+        } else if (terrain != TerrainType.GRAVE) {
+            this.graveHealth = 0;
+            clearGraveContent();
+        }
         this.terrain = terrain;
     }
 

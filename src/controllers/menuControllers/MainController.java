@@ -26,6 +26,9 @@ public class MainController extends BaseController {
         super(app);
     }
 
+    private static final List<String> CHAPTER_ORDER =
+            Arrays.asList("Egypt", "Frost Bite", "Wavey Beach", "Dark Ages");
+
     public Result handleEnterChapter(String chapterName) {
         Chapter chapter = Chapter.getByName(chapterName);
         if (chapter == null) {
@@ -33,6 +36,15 @@ public class MainController extends BaseController {
         }
         User user = app.getCurrentUser();
         UserDataStore store = UserDataStore.forUser(user.getUsername());
+        int order = CHAPTER_ORDER.indexOf(chapter.getName());
+        if (order > 0) {
+            String previous = CHAPTER_ORDER.get(order - 1);
+            Chapter previousChapter = Chapter.getByName(previous);
+            if (store.getInt("progress." + previous, 1) < previousChapter.getLevels().size()) {
+                return Result.fail("This chapter is locked; finish the levels of "
+                        + previous + " first.");
+            }
+        }
         int unlockedLevel = store.getInt("progress." + chapter.getName(), 1);
         Level level = chapter.getLevels().get(
                 Math.min(unlockedLevel, chapter.getLevels().size()) - 1);

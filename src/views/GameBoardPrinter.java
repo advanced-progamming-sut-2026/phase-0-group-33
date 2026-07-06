@@ -30,7 +30,8 @@ public final class GameBoardPrinter {
             result.addMessage(line.toString());
         }
         result.addMessage("Legend: [M] mower | letter = plant initial | digit = zombies | * sun | "
-                + "~ water | # grave");
+                + "~ water | # grave | $ grave with sun | % grave with plant food | "
+                + "+ necromancy | _ low tide");
         return result;
     }
 
@@ -59,15 +60,21 @@ public final class GameBoardPrinter {
     private static char terrainChar(Tile tile) {
         switch (tile.getTerrain()) {
             case WATER:
-                return '~';
+                return tile.isLowTide() ? '_' : '~';
             case GRAVE:
-                return '#';
+                if (tile.getGraveSunContent() > 0) {
+                    return '$';
+                }
+                return tile.isGravePlantFood() ? '%' : '#';
             case SLIDER_UP:
                 return '^';
             case SLIDER_DOWN:
                 return 'v';
             default:
-                return '.';
+                if (tile.isNecromancy()) {
+                    return '+';
+                }
+                return tile.isLowTide() ? '_' : '.';
         }
     }
 
@@ -100,6 +107,20 @@ public final class GameBoardPrinter {
         if (plant != null) {
             result.addMessage(String.format("Plant: %s | HP: %d/%d",
                     plant.getType().getName(), plant.getHealth(), plant.getMaxHealth()));
+            if (plant.getPumpkinHealth() > 0) {
+                result.addMessage("    pumpkin shield: " + plant.getPumpkinHealth());
+            }
+            if (plant.getIceHealth() > 0) {
+                result.addMessage("    frozen: " + plant.getIceHealth() + " ice HP");
+            } else if (plant.getFreezeLevel() > 0) {
+                result.addMessage("    freeze level: " + plant.getFreezeLevel() + "/3");
+            }
+            if (plant.getOctopusHealth() > 0) {
+                result.addMessage("    octopus: " + plant.getOctopusHealth() + " HP");
+            }
+            if (plant.isSheep()) {
+                result.addMessage("    cursed into a sheep");
+            }
         }
         for (Zombie zombie : session.getZombies()) {
             if ((int) zombie.getPosition().getY() == y

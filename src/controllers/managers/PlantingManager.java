@@ -13,6 +13,7 @@ import models.game.PlacedPlant;
 import models.game.PlantSlot;
 import models.map.TerrainType;
 import models.map.Tile;
+import models.progress.level.special.SpecialLevelType;
 
 import java.util.ArrayList;
 
@@ -56,7 +57,7 @@ public class PlantingManager {
             System.out.println("Imitater transforms into a " + copied.getName() + "!");
             type = copied;
         }
-        int cost = session.effectiveCost(type);
+        int cost = slot.isSingleUse() ? 0 : session.effectiveCost(type);
         if (session.getSunManager().getSunBalance() < cost) {
             return Result.fail("Not enough sun: " + type.getName() + " costs " + cost
                     + " and you have " + session.getSunManager().getSunBalance() + ".");
@@ -71,12 +72,19 @@ public class PlantingManager {
             return terrainError;
         }
         if (type == PlantType.GRAVE_BUSTER) {
+            session.getCombatManager().grantGraveContent(tile);
             tile.setTerrain(TerrainType.NORMAL);
             consume(slot, cost);
             return Result.ok("The grave at (" + x + ", " + y + ") was busted.");
         }
         if (type == PlantType.HOT_POTATO) {
-            tile.setTerrain(TerrainType.NORMAL);
+            PlacedPlant frozen = session.plantAt(x, y);
+            if (frozen != null && frozen.getIceHealth() > 0) {
+                frozen.setIceHealth(0);
+                frozen.setFreezeLevel(0);
+            } else {
+                tile.setTerrain(TerrainType.NORMAL);
+            }
             consume(slot, cost);
             return Result.ok("The ice at (" + x + ", " + y + ") melted away.");
         }
@@ -115,8 +123,22 @@ public class PlantingManager {
         if (slot.isBoosted()) {
             slot.setBoosted(false);
             session.getCombatManager().applyPlantFood(plant);
+        } else if (consumeStoredBoost(type)) {
+            System.out.println("A stored greenhouse boost activated for " + type.getName() + "!");
+            session.getCombatManager().applyPlantFood(plant);
         }
         return Result.ok(type.getName() + " planted at (" + x + ", " + y + ").");
+    }
+
+    private boolean consumeStoredBoost(PlantType type) {
+        utils.UserDataStore store = utils.UserDataStore.forUser(
+                session.getUser().getUsername());
+        if (store.getInt("boost." + type.getName(), 0) <= 0) {
+            return false;
+        }
+        store.setInt("boost." + type.getName(), 0);
+        store.save();
+        return true;
     }
 
     private Result checkTerrain(PlantType type, Tile tile, int x, int y) {
@@ -135,8 +157,8 @@ public class PlantingManager {
             return Result.fail("This tile is frozen; melt it with a Hot Potato first.");
         }
         if (terrain != TerrainType.FROZEN && terrain != TerrainType.ICE
-                && type == PlantType.HOT_POTATO) {
-            return Result.fail("Hot Potato can only be used on frozen tiles.");
+                && type == PlantType.HOT_POTATO && !hasFrozenPlant(tile)) {
+            return Result.fail("Hot Potato can only be used on frozen tiles or frozen plants.");
         }
         if (terrain == TerrainType.WATER && type != PlantType.LILY_PAD
                 && !type.getTags().contains(PlantTag.WATER) && !tile.isHasLilyPad()) {
@@ -149,6 +171,12 @@ public class PlantingManager {
             return Result.fail("Tangle Kelp can only be planted in water.");
         }
         return null;
+    }
+
+    private boolean hasFrozenPlant(Tile tile) {
+        PlacedPlant plant = session.plantAt(
+                (int) tile.getPosition().getX(), (int) tile.getPosition().getY());
+        return plant != null && plant.getIceHealth() > 0;
     }
 
     private Result handleStacking(PlantType type, PlantSlot slot, int cost, int x, int y) {
@@ -226,7 +254,9 @@ public class PlantingManager {
 
     private void consume(PlantSlot slot, int cost) {
         session.getSunManager().spendSun(cost);
-        if (!session.isCooldownsDisabled()) {
+        boolean freePlanting = session.isSpecial(SpecialLevelType.PLANT_WHAT_YOU_GET)
+                && !session.getWaveManager().isStarted();
+        if (!session.isCooldownsDisabled() && !freePlanting) {
             slot.setCooldownTicks(
                     session.effectiveRecharge(slot.getType()) * GameSession.TICKS_PER_SECOND);
         }
@@ -247,6 +277,9 @@ public class PlantingManager {
                 return Result.ok("Lily Pad removed from (" + x + ", " + y + ").");
             }
             return Result.fail("There is no plant at (" + x + ", " + y + ").");
+        }
+        if (plant.isProtectedSeed()) {
+            return Result.fail("You cannot pluck a protected plant; keep it alive!");
         }
         session.removePlant(plant, false);
         return Result.ok(plant.getType().getName() + " plucked from (" + x + ", " + y + ").");

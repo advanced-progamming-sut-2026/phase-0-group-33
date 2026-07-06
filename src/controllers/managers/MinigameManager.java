@@ -419,8 +419,48 @@ public class MinigameManager {
                 session.getCombatManager().damageZombie(zombie, 1_000_000);
             }
             session.winGame();
+            return result;
+        }
+        if (!possibleMoveExists()) {
+            resetBoard();
+            result.addMessage("No more possible matches; the garden was reshuffled!");
         }
         return result;
+    }
+
+    private boolean possibleMoveExists() {
+        for (int row = 1; row <= GameSession.ROWS; row++) {
+            for (int col = 1; col <= GameSession.COLS; col++) {
+                if (trySwapCreatesMatch(col, row, col + 1, row)
+                        || trySwapCreatesMatch(col, row, col, row + 1)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean trySwapCreatesMatch(int x1, int y1, int x2, int y2) {
+        PlacedPlant first = session.plantAt(x1, y1);
+        PlacedPlant second = session.plantAt(x2, y2);
+        if (first == null || second == null) {
+            return false;
+        }
+        swapPositions(first, second);
+        boolean match = hasMatch();
+        swapPositions(first, second);
+        return match;
+    }
+
+    private void resetBoard() {
+        for (PlacedPlant plant : new ArrayList<>(session.getPlants())) {
+            int x = plant.getX();
+            int y = plant.getY();
+            session.removePlant(plant, false);
+            PlantType type = BEGHOULED_TYPES.get(
+                    session.getRandom().nextInt(BEGHOULED_TYPES.size()));
+            session.getPlants().add(new PlacedPlant(type, x, y, type.getBaseHp()));
+        }
     }
 
     private void swapPositions(PlacedPlant a, PlacedPlant b) {

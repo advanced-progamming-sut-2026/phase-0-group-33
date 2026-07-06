@@ -231,6 +231,9 @@ public class UserManager {
         if (userDAO.updateProfile(currentUser.getUsername(), newUsername,
                 currentUser.getNickname(), currentUser.getEmail())) {
             currentUser.setUsername(newUsername);
+            if (models.App.getInstance().isStayLoggedIn()) {
+                utils.SessionStore.saveSession(newUsername);
+            }
             result.setSuccess(true);
             result.addMessage("Username changed.");
         } else {
@@ -307,6 +310,11 @@ public class UserManager {
         }
         if (!PasswordHasher.hash(oldPassword).equals(currentUser.getPasswordHash())) {
             result.addMessage("Old password is incorrect.");
+            result.setSuccess(false);
+            return result;
+        }
+        if (PasswordHasher.hash(newPassword).equals(currentUser.getPasswordHash())) {
+            result.addMessage("New password is the same as the current one.");
             result.setSuccess(false);
             return result;
         }

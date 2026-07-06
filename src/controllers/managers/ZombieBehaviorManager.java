@@ -195,7 +195,7 @@ public class ZombieBehaviorManager {
         for (PlacedPlant plant : new ArrayList<>(session.getPlants())) {
             if (plant.getY() == (int) zombie.getPosition().getY()
                     && plant.getX() < zombie.getPosition().getX()
-                    && zombie.getPosition().getX() - plant.getX() <= 1.5) {
+                    && zombie.getPosition().getX() - plant.getX() <= 1.0) {
                 System.out.printf("The Explorer's torch burnt %s at (%d, %d)!%n",
                         plant.getType().getName(), plant.getX(), plant.getY());
                 session.removePlant(plant, true);
@@ -223,12 +223,12 @@ public class ZombieBehaviorManager {
             return;
         }
         PlacedPlant target = nearestPlantInRow(zombie);
-        if (target == null || target.getIceHealth() > 0) {
+        if (target == null || target.getIceHealth() > 0
+                || target.getType().getTags().contains(PlantTag.FIRE)) {
             return;
         }
-        target.setIceHits(target.getIceHits() + 1);
-        if (target.getIceHits() >= 3) {
-            target.setIceHits(0);
+        target.setFreezeLevel(target.getFreezeLevel() + 1);
+        if (target.getFreezeLevel() >= 3) {
             target.setIceHealth(600);
             System.out.printf("%s at (%d, %d) is frozen solid by the Hunter!%n",
                     target.getType().getName(), target.getX(), target.getY());
@@ -333,6 +333,19 @@ public class ZombieBehaviorManager {
             session.removePlant(tackled, true);
             zombie.getBattle().setCharging(false);
             zombie.setSpeed(zombie.getType().getSpeed() / 3);
+            return true;
+        }
+        for (Zombie other : new ArrayList<>(session.getZombies())) {
+            if (other != zombie && other.getBattle().isHypnotized()
+                    && (int) other.getPosition().getY() == (int) zombie.getPosition().getY()
+                    && Math.abs(other.getPosition().getX() - zombie.getPosition().getX()) <= 0.5) {
+                System.out.printf("The All Star tackled the hypnotized %s!%n",
+                        other.getType().getName());
+                combatManager.damageZombie(other, 1_000_000);
+                zombie.getBattle().setCharging(false);
+                zombie.setSpeed(zombie.getType().getSpeed() / 3);
+                return true;
+            }
         }
         if (zombie.getPosition().getX() < 0.5) {
             zombie.getBattle().setCharging(false);
@@ -531,7 +544,7 @@ public class ZombieBehaviorManager {
             return false;
         }
         if (zombie.getType() == ZombieType.SNORKEL && isUnderwater(zombie)
-                && source.getCategory() != PlantCategory.LOBBER) {
+                && !isEatingPlant(zombie) && source.getCategory() != PlantCategory.LOBBER) {
             return false;
         }
         if (zombie.getType() == ZombieType.EXPLORER) {
@@ -584,6 +597,12 @@ public class ZombieBehaviorManager {
                 (int) Math.round(zombie.getPosition().getX()) - 1,
                 (int) zombie.getPosition().getY() - 1);
         return tile != null && tile.getTerrain() == TerrainType.WATER;
+    }
+
+    private boolean isEatingPlant(Zombie zombie) {
+        int column = (int) Math.round(zombie.getPosition().getX());
+        PlacedPlant plant = session.plantAt(column, (int) zombie.getPosition().getY());
+        return plant != null && Math.abs(zombie.getPosition().getX() - column) <= 0.4;
     }
 
     public void onZombieDeath(Zombie zombie) {
@@ -739,6 +758,22 @@ public class ZombieBehaviorManager {
                 session.removePlant(plant, false);
             }
         }
+        lowTideAmbush();
+    }
+
+    private void lowTideAmbush() {
+        for (int row = 1; row <= GameSession.ROWS; row++) {
+            for (int col = 1; col <= GameSession.COLS; col++) {
+                Tile tile = session.getGrid().getTile(col - 1, row - 1);
+                if (tile.isLowTide() && tile.getTerrain() == TerrainType.WATER
+                        && session.getRandom().nextInt(100) < 30) {
+                    session.spawnZombie(ZombieType.NORMAL, col, row,
+                            Math.max(1, session.getWaveManager().getCurrentWave()));
+                    System.out.printf("A zombie emerged from beneath the low tide at (%d, %d)!%n",
+                            col, row);
+                }
+            }
+        }
     }
 
     private void darkAgesGraves() {
@@ -753,11 +788,13 @@ public class ZombieBehaviorManager {
             tile.setTerrain(TerrainType.GRAVE);
             if (session.getRandom().nextInt(100) < 30) {
                 if (session.getRandom().nextBoolean()) {
-                    session.getSunManager().addSun(50);
-                    System.out.printf("A grave rose at (%d, %d) carrying 50 sun!%n", col, row);
+                    tile.setGraveSunContent(50);
+                    System.out.printf("A grave rose at (%d, %d) carrying 50 sun;"
+                            + " break it to collect!%n", col, row);
                 } else {
-                    session.setPlantFoods(session.getPlantFoods() + 1);
-                    System.out.printf("A grave rose at (%d, %d) carrying a plant food!%n", col, row);
+                    tile.setGravePlantFood(true);
+                    System.out.printf("A grave rose at (%d, %d) carrying a plant food;"
+                            + " break it to collect!%n", col, row);
                 }
             } else {
                 System.out.printf("A grave rose at (%d, %d).%n", col, row);
@@ -769,8 +806,7 @@ public class ZombieBehaviorManager {
         for (int row = 1; row <= GameSession.ROWS; row++) {
             for (int col = 1; col <= GameSession.COLS; col++) {
                 Tile tile = session.getGrid().getTile(col - 1, row - 1);
-                if (tile.getTerrain() == TerrainType.GRAVE
-                        && session.getRandom().nextInt(100) < 25) {
+                if (tile.getTerrain() == TerrainType.GRAVE && tile.isNecromancy()) {
                     session.spawnZombie(ZombieType.NORMAL, col, row,
                             Math.max(1, session.getWaveManager().getCurrentWave()));
                     System.out.printf("Necromancy! A zombie crawled out from the grave at (%d, %d).%n",

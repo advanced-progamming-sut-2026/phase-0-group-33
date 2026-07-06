@@ -58,7 +58,7 @@ public class CombatManager {
 
     private void actPlant(PlacedPlant plant) {
         PlantType type = plant.getType();
-        double interval = Math.max(0.5, type.getActionInterval());
+        double interval = Math.max(0.25, type.getActionInterval());
         if (type == PlantType.MAGNET_SHROOM) {
             session.getPlantActionManager().magnet(plant);
             plant.setActionCooldownTicks((int) Math.round(interval * GameSession.TICKS_PER_SECOND));
@@ -133,6 +133,21 @@ public class CombatManager {
             Tile grave = graveBetween(plant.getY(), plant.getX(), target.getPosition().getX());
             if (grave != null) {
                 grave.damageGrave(plantDamage(plant.getType()));
+                if (grave.getTerrain() != TerrainType.GRAVE) {
+                    grantGraveContent(grave);
+                }
+                return;
+            }
+            models.game.PushedObject pushed = pushedObjectBetween(
+                    plant.getY(), plant.getX(), target.getPosition().getX());
+            if (pushed != null) {
+                pushed.damage(plantDamage(plant.getType()));
+                return;
+            }
+            PlacedPlant blocked = disabledPlantBetween(
+                    plant.getY(), plant.getX(), target.getPosition().getX());
+            if (blocked != null) {
+                damageDisablingLayer(blocked, plant.getType());
                 return;
             }
         }
@@ -347,13 +362,27 @@ public class CombatManager {
     }
 
     public void explode(PlacedPlant plant) {
-        if (plant.getType() == PlantType.JALAPENO) {
+        PlantType type = plant.getType();
+        if (type == PlantType.JALAPENO) {
             for (Zombie zombie : zombiesInRowAfter(plant.getY(), 0)) {
                 zombie.setChilledTicks(0);
-                damageZombie(zombie, plantDamage(plant.getType()));
+                damageZombie(zombie, plantDamage(type));
             }
+        } else if (type == PlantType.ICEBERG_LETTUCE) {
+            for (Zombie zombie : new ArrayList<>(session.getZombies())) {
+                if ((int) zombie.getPosition().getY() == plant.getY()
+                        && Math.abs(zombie.getPosition().getX() - plant.getX()) <= 0.5) {
+                    zombie.setFrozenTicks(5 * GameSession.TICKS_PER_SECOND);
+                    System.out.printf("The Iceberg Lettuce froze the %s solid!%n",
+                            zombie.getType().getName());
+                    break;
+                }
+            }
+        } else if (type == PlantType.POTATO_MINE || type == PlantType.SQUASH
+                || type == PlantType.TANGLE_KELP) {
+            damageArea(plant.getX(), plant.getY(), 0, type);
         } else {
-            damageArea(plant.getX(), plant.getY(), 1, plant.getType());
+            damageArea(plant.getX(), plant.getY(), 1, type);
         }
         session.removePlant(plant, false);
     }
@@ -371,7 +400,7 @@ public class CombatManager {
         if (!session.getBehaviorManager().beforeHit(zombie, source)) {
             return;
         }
-        if (source.getTags().contains(PlantTag.ICE)) {
+        if (source.getTags().contains(PlantTag.ICE) && !isFrostbiteLevel()) {
             zombie.setChilledTicks(3 * GameSession.TICKS_PER_SECOND);
         }
         if (source.getTags().contains(PlantTag.FIRE)) {
@@ -394,6 +423,11 @@ public class CombatManager {
     private int plantDamage(PlantType type) {
         int damage = session.effectiveDamage(type);
         return damage >= 9999 ? INSTANT_KILL_DAMAGE : damage;
+    }
+
+    private boolean isFrostbiteLevel() {
+        return session.getLevel() != null
+                && session.getLevel().getChapter() instanceof models.progress.chapter.FrostBite;
     }
 
     public void applyRadioactiveExplosion(int x, int y) {
@@ -435,7 +469,7 @@ public class CombatManager {
             return;
         }
         if (zombie.getType() == ZombieType.KING) {
-            kingConvert();
+            kingConvert(zombie);
             return;
         }
         gargantuarImpThrow(zombie);
@@ -455,15 +489,19 @@ public class CombatManager {
         }
     }
 
-    private void kingConvert() {
+    private void kingConvert(Zombie king) {
         if (kingTicks % (10 * GameSession.TICKS_PER_SECOND) != 0) {
             return;
         }
         for (Zombie zombie : new ArrayList<>(session.getZombies())) {
-            if (zombie.getType() == ZombieType.NORMAL) {
+            if (zombie.getType() == ZombieType.NORMAL
+                    && Math.abs(zombie.getPosition().getX() - king.getPosition().getX()) <= 2
+                    && Math.abs(zombie.getPosition().getY() - king.getPosition().getY()) <= 1) {
                 session.getZombies().remove(zombie);
                 session.spawnZombie(ZombieType.KNIGHT, zombie.getPosition().getX(),
                         (int) zombie.getPosition().getY(), zombie.getSpawnWave());
+                System.out.printf("The King knighted a zombie in lane %d!%n",
+                        (int) zombie.getPosition().getY());
                 return;
             }
         }
@@ -866,5 +904,56 @@ public class CombatManager {
             }
         }
         return null;
+    }
+
+    public void grantGraveContent(Tile tile) {
+        if (tile.getGraveSunContent() > 0) {
+            session.getSunManager().addSun(tile.getGraveSunContent());
+            System.out.printf("The broken grave released %d sun!%n", tile.getGraveSunContent());
+        }
+        if (tile.isGravePlantFood()) {
+            session.setPlantFoods(session.getPlantFoods() + 1);
+            System.out.printf("The broken grave held a plant food; you have %d plant foods now.%n",
+                    session.getPlantFoods());
+        }
+        tile.clearGraveContent();
+    }
+
+    private models.game.PushedObject pushedObjectBetween(int row, double fromX, double toX) {
+        for (models.game.PushedObject pushed : session.getPushedObjects()) {
+            if (pushed.getRow() == row && !pushed.isDestroyed()
+                    && pushed.getX() > fromX && pushed.getX() <= toX) {
+                return pushed;
+            }
+        }
+        return null;
+    }
+
+    private PlacedPlant disabledPlantBetween(int row, double fromX, double toX) {
+        for (PlacedPlant other : session.getPlants()) {
+            if (other.getY() == row && other.getX() > fromX && other.getX() < toX
+                    && (other.getIceHealth() > 0 || other.getOctopusHealth() > 0)) {
+                return other;
+            }
+        }
+        return null;
+    }
+
+    private void damageDisablingLayer(PlacedPlant blocked, PlantType source) {
+        int damage = source.getTags().contains(PlantTag.FIRE) ? 600 : plantDamage(source);
+        if (blocked.getIceHealth() > 0) {
+            blocked.setIceHealth(Math.max(0, blocked.getIceHealth() - damage));
+            if (blocked.getIceHealth() == 0) {
+                blocked.setFreezeLevel(0);
+                System.out.printf("The ice around %s at (%d, %d) shattered.%n",
+                        blocked.getType().getName(), blocked.getX(), blocked.getY());
+            }
+        } else if (blocked.getOctopusHealth() > 0) {
+            blocked.setOctopusHealth(Math.max(0, blocked.getOctopusHealth() - damage));
+            if (blocked.getOctopusHealth() == 0) {
+                System.out.printf("The octopus on %s at (%d, %d) was destroyed.%n",
+                        blocked.getType().getName(), blocked.getX(), blocked.getY());
+            }
+        }
     }
 }

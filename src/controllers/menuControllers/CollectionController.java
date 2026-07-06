@@ -86,6 +86,9 @@ public class CollectionController extends BaseController {
         if (type == null) {
             return Result.fail("No zombie with this name exists.");
         }
+        if (!store().get("zombies", "").contains(type.getName())) {
+            return Result.fail("You have not encountered this zombie yet; its frame is empty.");
+        }
         Result result = Result.ok(type.getName() + ":");
         result.addMessage("    hp: " + type.getHitpoints());
         result.addMessage("    speed: " + type.getSpeed() + " tiles/s");
@@ -110,16 +113,18 @@ public class CollectionController extends BaseController {
         if (level >= MAX_PLANT_LEVEL) {
             return Result.fail(type.getName() + " is already at max level (" + MAX_PLANT_LEVEL + ").");
         }
+        int packetCost = UPGRADE_PACKET_COST * level;
+        int coinCost = UPGRADE_COIN_COST * level;
         int packets = store.getInt("packets." + type.getName(), 0);
-        if (packets < UPGRADE_PACKET_COST) {
-            return Result.fail("Not enough seed packets: you need " + UPGRADE_PACKET_COST
+        if (packets < packetCost) {
+            return Result.fail("Not enough seed packets: you need " + packetCost
                     + " and have " + packets + ".");
         }
-        Result payment = UserManager.getInstance().spendCoins(UPGRADE_COIN_COST);
+        Result payment = UserManager.getInstance().spendCoins(coinCost);
         if (!payment.isSuccessfull()) {
             return payment;
         }
-        store.setInt("packets." + type.getName(), packets - UPGRADE_PACKET_COST);
+        store.setInt("packets." + type.getName(), packets - packetCost);
         store.setInt("level." + type.getName(), level + 1);
         store.save();
         return Result.ok(type.getName() + " upgraded to level " + (level + 1) + ".");

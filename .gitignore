@@ -1,0 +1,37 @@
+# --- Build output ---
+out/
+build/
+target/
+bin/
+*.class
+*.jar
+*.war
+
+# --- Runtime game data (user saves, sessions, news - created by the game) ---
+data/
+
+# --- IntelliJ IDEA ---
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# --- Eclipse / VS Code (in case teammates use them) ---
+.classpath
+.project
+.settings/
+.vscode/
+
+# --- Logs & temp files ---
+*.log
+*.tmp
+*.swp
+*~
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Claude Code local files ---
+.claude/

@@ -106,7 +106,7 @@ public enum ZombieType {
         BUCKET(1100, true),
         BRICK(2200, false),
         CROWN_SHOULDER(3200, true),
-        NEWSPAPER(800, false),
+        NEWSPAPER(190, false),
         SARCOPHAGUS(1000, false);
 
         private final int armorHitpoints;

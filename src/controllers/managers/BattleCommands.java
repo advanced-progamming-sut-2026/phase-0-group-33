@@ -142,6 +142,7 @@ public class BattleCommands {
         }
         session.setPlantFoods(session.getPlantFoods() - 1);
         session.getCombatManager().applyPlantFood(plant);
+        checkVictory();
         return Result.ok(plant.getType().getName() + " unleashed its plant food power. "
                 + "Plant foods left: " + session.getPlantFoods());
     }

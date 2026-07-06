@@ -4,7 +4,9 @@ import models.map.Grid;
 import models.map.TerrainType;
 import models.map.Tile;
 import models.progress.chapter.Chapter;
+import models.progress.chapter.DarkAges;
 import models.progress.chapter.FrostBite;
+import models.progress.chapter.WaveyBeach;
 
 import java.awt.Point;
 import java.util.Random;
@@ -30,6 +32,25 @@ public final class BoardBuilder {
         placeGraves(grid, chapter.getGraveCount(), random);
         if (chapter instanceof FrostBite) {
             placeSliders(grid, random);
+        }
+        if (chapter instanceof DarkAges) {
+            markSpecialTiles(grid, random, 4, true);
+        }
+        if (chapter instanceof WaveyBeach) {
+            markSpecialTiles(grid, random, 3, false);
+        }
+    }
+
+    private static void markSpecialTiles(Grid grid, Random random, int count, boolean necromancy) {
+        for (int i = 0; i < count; i++) {
+            int col = 4 + random.nextInt(GameSession.COLS - 3);
+            int row = 1 + random.nextInt(GameSession.ROWS);
+            Tile tile = grid.getTile(col - 1, row - 1);
+            if (necromancy) {
+                tile.setNecromancy(true);
+            } else {
+                tile.setLowTide(true);
+            }
         }
     }
 

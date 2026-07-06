@@ -89,7 +89,9 @@ public class LoginController extends BaseController {
             return result;
         }
         result = UserManager.getInstance().resetPassword(pendingUsername, password);
-        result.addMessage(handleResetPasswordQuit().getMessages().get(0));
+        if (result.isSuccessfull()) {
+            result.addMessage(handleResetPasswordQuit().getMessages().get(0));
+        }
         return result;
     }
 

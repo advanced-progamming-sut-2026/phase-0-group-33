@@ -64,6 +64,17 @@ public class GreenhouseController extends BaseController {
         return "gh." + x + "." + y;
     }
 
+    private static List<String> boostablePlants(UserDataStore store) {
+        List<String> result = new java.util.ArrayList<>();
+        for (String name : MainController.unlockedPlants(store)) {
+            models.entities.plant.PlantType type = models.game.Names.plant(name);
+            if (type != null && type.getBaseHp() > 0) {
+                result.add(name);
+            }
+        }
+        return result;
+    }
+
     public Result handlePlantPot(int x, int y) {
         if (x < 1 || x > COLS || y < 1 || y > ROWS) {
             return Result.fail("Pot coordinates must be x in 1..5 and y in 1..4.");
@@ -75,9 +86,9 @@ public class GreenhouseController extends BaseController {
         if (store.get(potKey(x, y) + ".plant", null) != null) {
             return Result.fail("This pot is already occupied.");
         }
-        List<String> unlocked = MainController.unlockedPlants(store);
+        List<String> unlocked = boostablePlants(store);
         Random random = new Random();
-        boolean marigold = random.nextBoolean();
+        boolean marigold = unlocked.isEmpty() || random.nextBoolean();
         String plant = marigold ? MARIGOLD : unlocked.get(random.nextInt(unlocked.size()));
         long hours = marigold ? 2 : 8;
         store.set(potKey(x, y) + ".plant", plant);

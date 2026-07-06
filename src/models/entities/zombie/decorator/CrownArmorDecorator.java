@@ -31,9 +31,8 @@ public class CrownArmorDecorator extends ZombieDecorator {
 
     @Override
     public boolean stripMetallicArmor() {
-        if (crownHealth > 0 || shoulderArmorHealth > 0) {
+        if (crownHealth > 0) {
             crownHealth = 0;
-            shoulderArmorHealth = 0;
             return true;
         }
         return super.stripMetallicArmor();
