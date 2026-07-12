@@ -7703,11 +7703,12 @@
 > menu enter chapter -c Egypt
 ? Entered Egypt, level 1
 > add plant -t Sunflower
-> add plant -t Peashooter
+> add plant -t Wall-nut
 > start game
 ? The battle begins!
 > cheat add -n 1000 suns
 > plant plant -t Wall-nut -l (5, 2)
+? Wall-nut planted at (5, 2).
 > cheat spawn-zombie -t Gargantuar -l 6, 2
 > advance time -t 700 ticks
 ? Plant Wall-nut at (5, 2) is destroyed.
