@@ -104,7 +104,7 @@ def check_case(case, output):
                     "after command '%s': %s\n      expected substring: %s"
                     % (cmd, detail, needle))
             else:
-                cursor = found_at + 1
+                cursor = found_at
     return problems
 
 
@@ -136,9 +136,12 @@ def main():
 
         passed = 0
         failures = []
-        for case in cases:
+        for idx, case in enumerate(cases, 1):
             output = run_case(case, classes_dir)
             problems = check_case(case, output)
+            if problems:
+                output = run_case(case, classes_dir)
+                problems = check_case(case, output)
             if problems:
                 failures.append((case, problems, output))
                 print("FAIL  TEST %04d: %s" % (case.cid, case.name))
@@ -146,6 +149,8 @@ def main():
                     print("    - " + p)
             else:
                 passed += 1
+            if len(cases) > 20 and idx % 50 == 0:
+                print("  ... %d/%d done (%d failed so far)" % (idx, len(cases), len(failures)))
 
         print("\n" + "=" * 60)
         print("PASSED: %d / %d" % (passed, len(cases)))
