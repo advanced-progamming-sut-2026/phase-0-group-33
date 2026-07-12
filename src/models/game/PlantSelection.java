@@ -92,7 +92,7 @@ public class PlantSelection {
         return Result.ok(type.getName() + " removed from your selection.");
     }
 
-    public Result markBoosted(String typeName) {
+    public Result canBoost(String typeName) {
         PlantType type = Names.plant(typeName);
         PlantSlot slot = type == null ? null : findSlot(type);
         if (slot == null) {
@@ -101,7 +101,16 @@ public class PlantSelection {
         if (slot.isBoosted()) {
             return Result.fail("This plant is already boosted.");
         }
-        slot.setBoosted(true);
+        return Result.ok();
+    }
+
+    public Result markBoosted(String typeName) {
+        Result validation = canBoost(typeName);
+        if (!validation.isSuccessfull()) {
+            return validation;
+        }
+        PlantType type = Names.plant(typeName);
+        findSlot(type).setBoosted(true);
         return Result.ok(type.getName() + " is boosted for this level.");
     }
 

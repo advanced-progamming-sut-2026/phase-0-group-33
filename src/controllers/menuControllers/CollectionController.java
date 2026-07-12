@@ -45,13 +45,28 @@ public class CollectionController extends BaseController {
         return result;
     }
 
+    private java.util.Set<String> seenZombies() {
+        java.util.Set<String> seen = new java.util.LinkedHashSet<>();
+        String stored = store().get("zombies", "");
+        if (!stored.isEmpty()) {
+            seen.addAll(java.util.Arrays.asList(stored.split(",")));
+        }
+        GameSession session = app.getCurrentGameSession();
+        if (session != null) {
+            for (ZombieType type : session.getEncounteredZombies()) {
+                seen.add(type.getName());
+            }
+        }
+        return seen;
+    }
+
     public Result handleShowZombies() {
-        String seen = store().get("zombies", "");
+        java.util.Set<String> seen = seenZombies();
         if (seen.isEmpty()) {
             return Result.ok("You have not seen any zombies yet.");
         }
         Result result = Result.ok("Zombies you have seen:");
-        for (String name : seen.split(",")) {
+        for (String name : seen) {
             result.addMessage("- " + name);
         }
         return result;
@@ -86,7 +101,7 @@ public class CollectionController extends BaseController {
         if (type == null) {
             return Result.fail("No zombie with this name exists.");
         }
-        if (!store().get("zombies", "").contains(type.getName())) {
+        if (!seenZombies().contains(type.getName())) {
             return Result.fail("You have not encountered this zombie yet; its frame is empty.");
         }
         Result result = Result.ok(type.getName() + ":");

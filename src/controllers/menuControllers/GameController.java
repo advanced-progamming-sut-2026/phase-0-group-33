@@ -48,6 +48,10 @@ public class GameController extends BaseController {
         if (session() == null) {
             return noSession();
         }
+        Result validation = session().canBoost(type);
+        if (!validation.isSuccessfull()) {
+            return validation;
+        }
         UserDataStore store = UserDataStore.forUser(app.getCurrentUser().getUsername());
         String boostKey = "boost." + type;
         if (store.getInt(boostKey, 0) > 0) {

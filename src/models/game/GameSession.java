@@ -149,6 +149,10 @@ public class GameSession {
         return selection.markBoosted(typeName);
     }
 
+    public Result canBoost(String typeName) {
+        return selection.canBoost(typeName);
+    }
+
     public Result startGame() {
         if (phase != GamePhase.PREPARATION) {
             return Result.fail("The game has already started.");

@@ -133,7 +133,7 @@ public final class GameBoardPrinter {
     }
 
     public static Result zombiesInfo(GameSession session) {
-        if (session.getPhase() != GamePhase.BATTLE && session.getZombies().isEmpty()) {
+        if (session.getZombies().isEmpty()) {
             return Result.ok("There are no zombies on the map.");
         }
         Result result = Result.ok();
