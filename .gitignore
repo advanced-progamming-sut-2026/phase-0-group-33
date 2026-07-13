@@ -33,9 +33,6 @@ data/
 Thumbs.db
 desktop.ini
 
-# --- Claude Code local files ---
-.claude/
-
 # Python
 __pycache__/
 *.pyc
