@@ -170,6 +170,19 @@ public class UserManager {
         return result;
     }
 
+    public Result getSecurityQuestionForUser(String username, String email) {
+        User user = userDAO.findByUsername(username);
+        if (user == null) {
+            return Result.fail("User not found.");
+        }
+        if (email == null || !email.equalsIgnoreCase(user.getEmail())) {
+            return Result.fail("The email does not match this username.");
+        }
+        Result result = Result.ok();
+        result.setData(user.getSecurityQuestion());
+        return result;
+    }
+
     public Result verifySecurityAnswer(String username, String answer) {
         Result result = new Result();
         SecurityQuestion sq = (SecurityQuestion) getSecurityQuestionForUser(username).getData();

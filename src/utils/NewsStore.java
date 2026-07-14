@@ -46,9 +46,21 @@ public final class NewsStore {
 
     public static List<String> readAll(String username) {
         List<String> all = new ArrayList<>();
+        List<String> updated = new ArrayList<>();
+        boolean changed = false;
         for (String line : FileStore.readLines(fileName(username))) {
             int sep = line.indexOf('|');
-            all.add(sep >= 0 ? line.substring(sep + 1) : line);
+            String message = sep >= 0 ? line.substring(sep + 1) : line;
+            all.add(message);
+            if (line.startsWith("0|")) {
+                updated.add("1|" + message);
+                changed = true;
+            } else {
+                updated.add(line);
+            }
+        }
+        if (changed) {
+            FileStore.writeLines(fileName(username), updated);
         }
         return all;
     }

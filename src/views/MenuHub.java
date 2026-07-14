@@ -14,6 +14,7 @@ import controllers.menuControllers.SignupController;
 import controllers.menuControllers.TravelLogController;
 import models.App;
 import models.enums.Menus;
+import models.enums.regexes.commandHandlers.GlobalCommands;
 import views.menus.AppMenu;
 import views.menus.CollectionMenu;
 import views.menus.GameMenu;
@@ -72,6 +73,11 @@ public class MenuHub {
         while (!app.isExitRequested() && scanner.hasNextLine()) {
             String command = scanner.nextLine().trim();
             if (command.isEmpty()) {
+                continue;
+            }
+            if (GlobalCommands.FORCE_QUIT.matches(command)) {
+                System.out.println("Exiting the game. Goodbye!");
+                app.requestExit();
                 continue;
             }
             AppMenu menu = getCurrentMenu();

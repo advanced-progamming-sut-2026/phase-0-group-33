@@ -101,6 +101,7 @@ These commands work in **every** menu:
 | `menu show current` | Prints the name of the menu you are currently in. |
 | `menu enter <menu_name>` | Moves to another menu (only to menus reachable from the current one). |
 | `menu exit` | Leaves the current menu (see per-menu behavior below). |
+| `quit` (aliases: `exit game`, `force quit`) | **Global force-quit** — closes the game from *any* menu, including while logged in. |
 
 **Menu graph (who can go where):**
 
@@ -148,7 +149,7 @@ Passwords are stored **hashed (SHA-256)**, never in plain text — this satisfie
 | Command | Description |
 |---------|-------------|
 | `login -u <username> -p <password> [-stay-logged-in]` | Logs in. With `-stay-logged-in` you remain logged in across program restarts. On login you are told if you have unread news. |
-| `forget password -u <username> -e <email>` | Starts password recovery — prints your saved security question. |
+| `forget password -u <username> -e <email>` | Starts password recovery. Both the username **and** the email must match the account; otherwise `The email does not match this username.` is shown. On a match, your saved security question is printed. |
 | `answer -a <answer>` | Answers the security question. If correct, you may set a new password. |
 | `new password -p <password> <confirm>` | Sets a new password (same strength rules as signup). |
 | `quit password reset` | Aborts an in-progress password reset. |

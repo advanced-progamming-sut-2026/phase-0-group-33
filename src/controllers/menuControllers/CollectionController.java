@@ -161,8 +161,20 @@ public class CollectionController extends BaseController {
         }
         store.set("plants", String.join(",", unlocked) + "," + type.getName());
         store.save();
+        reflectUnlockInActiveSession(type.getName());
         NewsStore.add(app.getCurrentUser().getUsername(), "New plant unlocked: " + type.getName());
         return Result.ok(type.getName() + " purchased for " + PURCHASE_COST + " coins.");
+    }
+
+    private void reflectUnlockInActiveSession(String plantName) {
+        GameSession session = app.getCurrentGameSession();
+        if (session == null) {
+            return;
+        }
+        List<String> live = session.getSelection().getUnlockedPlantNames();
+        if (!live.contains(plantName)) {
+            live.add(plantName);
+        }
     }
 
     public Result handleMenuChange(String menuName) {

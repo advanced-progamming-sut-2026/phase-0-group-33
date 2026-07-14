@@ -43,7 +43,8 @@ public class LoginController extends BaseController {
             result.addMessage("Finish or abort the current password-reset session");
             return result;
         }
-        Result questionResult = UserManager.getInstance().getSecurityQuestionForUser(username);
+        Result questionResult = UserManager.getInstance()
+                .getSecurityQuestionForUser(username, email);
         if (!questionResult.isSuccessfull()) return questionResult;
 
         pendingUsername = username;

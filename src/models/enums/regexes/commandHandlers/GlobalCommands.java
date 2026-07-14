@@ -5,7 +5,8 @@ import java.util.regex.Pattern;
 public enum GlobalCommands {
     EXIT("^menu\\s+exit$"),
     SHOW_MENU("^menu\\s+show\\s+current$"),
-    CHANGE_MENU("^menu\\s+enter\\s+(?<menu>.+?)$");
+    CHANGE_MENU("^menu\\s+enter\\s+(?<menu>.+?)$"),
+    FORCE_QUIT("^(?:quit|exit\\s+game|force\\s+quit)$");
 
     public final Pattern pattern;
 

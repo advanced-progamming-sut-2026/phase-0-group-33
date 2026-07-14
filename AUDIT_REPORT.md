@@ -124,13 +124,24 @@ The last four live in Wavey Beach / Dark Ages, which require clearing the earlie
 
 ---
 
-## 8. The One Finding
+## 8. Findings & Fixes
 
-**Buying a plant while a level's plant-selection screen is already open does not refresh that open selection.**
+All items below were found during the audit and have been **fixed** (verified with real runs and covered by new tests in the suite).
 
-- Repro: enter Egypt → `menu enter collection` → `purchase-plant -p Snow Pea` (succeeds) → back to game → `add plant -t Snow Pea` → **`You have not unlocked this plant yet.`**
-- Cause: the `GameSession` snapshots your unlocked-plant list when the chapter is entered, so a purchase made *during* that same session isn't reflected.
-- Workaround / expected flow: buy plants first (from the shop/collection), then enter the chapter — or simply `menu exit` and re-enter the chapter, after which the plant is selectable. Verified: after re-entering, `add plant -t Snow Pea` succeeds and the plant behaves correctly (chills zombies, etc.).
-- Severity: **minor** — no crash, correct message shown, and it does not affect the normal buy-then-play order.
+**8.1 Buying a plant mid-session didn't refresh the open selection — FIXED.**
+- Was: enter Egypt → collection → `purchase-plant -p Snow Pea` → back to game → `add plant -t Snow Pea` → `You have not unlocked this plant yet.`
+- Now: a purchase during an active session is reflected immediately in that session's selection. `add plant -t Snow Pea` → `Snow Pea added to your selection.`
 
-Everything else behaves exactly as the doc specifies.
+**8.2 `menu news show-all` didn't mark news as read — FIXED.**
+- Was: after viewing all news, `show-unread` still listed the items.
+- Now: `show-all` marks every item read; a following `show-unread` → `No unread news.`
+
+**8.3 No way to quit while logged in — FIXED.**
+- Was: from the main menu (and everywhere while logged in) the program could not be exited; `-stay-logged-in` left you stuck.
+- Now: a global `quit` (aliases `exit game`, `force quit`) force-quits from **any** menu → `Exiting the game. Goodbye!`
+
+**8.4 Password recovery only checked the username — FIXED.**
+- Was: `forget password -u <user> -e <email>` found the account by username alone and ignored the email.
+- Now: both must match. Wrong email → `The email does not match this username.`; only when username **and** email match is the security question shown.
+
+The suite (now with dedicated tests for each fix) passes 1000/1000. Everything else behaves exactly as the doc specifies.
