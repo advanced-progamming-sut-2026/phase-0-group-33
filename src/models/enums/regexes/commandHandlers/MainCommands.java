@@ -10,6 +10,13 @@ public enum MainCommands {
     ENTER_COIN_WALLET("^menu\\s+coin-wallet$"),
     ENTER_GEM_WALLET("^menu\\s+gem-wallet$"),
     CHEAT_ADD("^menu\\s+cheat\\s+add\\s+(?<amount>\\d+)\\s+(?<type>coin|diamond)$"),
+    CHEAT_UNLOCK_ALL("^menu\\s+cheat\\s+unlock-all$"),
+    CHEAT_UNLOCK_PLANTS("^menu\\s+cheat\\s+unlock-plants$"),
+    CHEAT_UNLOCK_CHAPTERS("^menu\\s+cheat\\s+unlock-chapters$"),
+    CHEAT_RICH("^menu\\s+cheat\\s+rich$"),
+    CHEAT_MAX_PLANTS("^menu\\s+cheat\\s+max-plants$"),
+    ENTER_CHAPTER_LEVEL(
+            "^menu\\s+enter\\s+chapter\\s+-c\\s+(?<chaptername>.+?)\\s+-l\\s+(?<level>\\d+)$"),
     SCORING_GAME("^menu\\s+scoring-game$"),
     LOGOUT("^menu\\s+logout$");
 

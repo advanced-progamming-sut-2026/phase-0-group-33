@@ -162,6 +162,7 @@ The hub. Reached after authentication.
 | Command | Description |
 |---------|-------------|
 | `menu enter chapter -c <chaptername>` | Enters a chapter and loads its furthest-unlocked level, then drops you into plant selection. Chapters: `Egypt`, `Frost Bite`, `Wavey Beach`, `Dark Ages`. |
+| `menu enter chapter -c <chaptername> -l <level>` | Jumps straight to a specific level of a chapter (must be unlocked — see [cheats](#cheat-commands)). |
 | `menu scoring-game` | Starts the scoring (miopoint) game — same daily zombie algorithm for every player. |
 | `menu greenhouse` | Shortcut to the Greenhouse menu. |
 | `menu travel-log` | Shortcut to the Travel Log (quests + minigames). |
@@ -171,7 +172,7 @@ The hub. Reached after authentication.
 | `menu enter <settings\|news\|profile\|greenhouse\|travellog\|leaderboard>` | Enter one of the sub-menus. |
 | `menu logout` | Logs out and returns to the Signup menu. This is the **only** way to leave the main menu. |
 
-`menu cheat add <n> <coin\|diamond>` is available here — see [Cheat Commands](#cheat-commands).
+Several cheat commands live here (`menu cheat unlock-all`, `unlock-chapters`, `unlock-plants`, `max-plants`, `rich`, `add <n> <coin|diamond>`) — see [Cheat Commands](#cheat-commands). For a demo, `menu cheat unlock-all` opens the whole game at once.
 
 ### Settings Menu
 
@@ -331,14 +332,30 @@ The doc explicitly leaves many details to the team. This section documents **our
 
 ### Levels & Chapters
 
-Each chapter has 4 levels: an ordinary level, two special levels, and a boss level (**boss levels are Phase 2**, so they are placeholders here).
+The adventure has **4 chapters**, each with **4 levels** in a fixed order: an ordinary level, two special levels, then a boss level (**boss levels are Phase 2**, so they are placeholders here). Chapters unlock in order — you must finish a chapter to open the next one (or use the [`unlock-chapters` cheat](#cheat-commands)).
 
-| Chapter | Level 2 (special) | Level 3 (special) | Extra zombies |
-|---------|-------------------|-------------------|---------------|
-| Egypt | Conveyor Belt | Locked Plants | Ra, Explorer, Tomb Raiser, Pharaoh, Camel |
-| Frost Bite | Save Our Seeds | Timed War | Dodo, Hunter, Troglobite, Weasel Hoarder |
-| Wavey Beach | Dead Line | Love Your Plants | Fisherman, Octopus, Snorkel, Surfer, Fast Swimmer |
-| Dark Ages | Night Ops | Plant What You Get | Juggler, Wizard, King, Imp Dragon |
+Enter a chapter at its furthest-unlocked level:
+
+```
+menu enter chapter -c <chaptername>
+```
+
+Or jump straight to a specific level (only if it is unlocked, or after the unlock cheat):
+
+```
+menu enter chapter -c <chaptername> -l <level>
+```
+
+**Full level list:**
+
+| Chapter | L1 | L2 | L3 | L4 | Extra zombies |
+|---------|----|----|----|----|---------------|
+| **Egypt** | Ordinary | Conveyor Belt | Locked Plants | Boss *(P2)* | Ra, Explorer, Tomb Raiser, Pharaoh, Camel |
+| **Frost Bite** | Ordinary | Save Our Seeds | Timed War | Boss *(P2)* | Dodo, Hunter, Troglobite, Weasel Hoarder |
+| **Wavey Beach** | Ordinary | Dead Line | Love Your Plants | Boss *(P2)* | Fisherman, Octopus, Snorkel, Surfer, Fast Swimmer |
+| **Dark Ages** | Ordinary | Night Ops | Plant What You Get | Boss *(P2)* | Juggler, Wizard, King, Imp Dragon |
+
+Chapter names accept any spacing/casing: `Egypt`, `Frost Bite`/`frostbite`, `Wavey Beach`/`waveybeach`, `Dark Ages`/`darkages`.
 
 **Difficulty formula per level (our choice, doc allows it):** a level has `2 + levelNumber` waves; the first wave's zombie-cost budget is `100 + 100 × levelNumber`; each subsequent wave is ×1.25, and the final wave is ×2 of the previous one (per the doc).
 
@@ -444,13 +461,35 @@ Difficulty `dl` (1–5, default 3) scales the game by the doc's `dl/3` factor:
 
 ## Cheat Commands
 
-Available in the relevant menus for testing:
+Available in the relevant menus for testing and for demos.
 
-| Command | Where | Effect |
-|---------|-------|--------|
-| `menu cheat add <n> <coin\|diamond>` | Main | Adds coins or diamonds. |
-| `cheat add -n <count> suns` | In battle | Adds sun. |
-| `cheat add-plant-food` | In battle | Grants 1 plant food. |
-| `cheat remove-cooldown` | In battle | Removes all plant recharge limits. |
-| `cheat spawn-zombie -t <type> -l <x, y>` | In battle | Spawns a zombie at a tile. |
-| `release the nuke` | In battle | Kills every zombie on the map. |
+### Progression cheats (Main menu) — for a quick presentation
+
+These let you reach any locked part of the game instantly, so you don't have to play through everything before a demo.
+
+| Command | Effect |
+|---------|--------|
+| `menu cheat unlock-all` | **The one-shot demo cheat.** Unlocks every chapter & level, unlocks all plants at max level, and grants 1,000,000 coins + 1,000,000 diamonds + 15 pots + 3 plant foods. |
+| `menu cheat unlock-chapters` | Unlocks all 4 chapters and all of their levels (including the boss levels). |
+| `menu cheat unlock-plants` | Unlocks every plant defined in the game. |
+| `menu cheat max-plants` | Sets every plant to max level (5). |
+| `menu cheat rich` | Grants 1,000,000 coins & diamonds, 15 pots and 3 plant foods. |
+| `menu cheat add <n> <coin\|diamond>` | Adds a specific amount of coins or diamonds. |
+
+After `unlock-chapters` (or `unlock-all`) you can jump directly to any level:
+
+```
+menu enter chapter -c <chaptername> -l <level>      # e.g. menu enter chapter -c Dark Ages -l 3
+```
+
+> **Typical demo flow:** `menu cheat unlock-all` → `menu enter chapter -c <any> -l <any>` → play. No grinding required.
+
+### In-battle cheats
+
+| Command | Effect |
+|---------|--------|
+| `cheat add -n <count> suns` | Adds sun. |
+| `cheat add-plant-food` | Grants 1 plant food (max 3). |
+| `cheat remove-cooldown` | Removes all plant recharge limits. |
+| `cheat spawn-zombie -t <type> -l <x, y>` | Spawns a zombie at a tile. |
+| `release the nuke` | Kills every zombie on the map. |

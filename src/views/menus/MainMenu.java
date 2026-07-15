@@ -10,8 +10,22 @@ public class MainMenu implements AppMenu {
         private final CommandRouter router = new CommandRouter();
 
         public MainMenu(MainController controller) {
-                router.add(MainCommands.ENTER_CHAPTER.pattern,
-                                matcher -> controller.handleEnterChapter(matcher.group("chaptername")))
+                router.add(MainCommands.ENTER_CHAPTER_LEVEL.pattern,
+                                matcher -> controller.handleEnterChapter(matcher.group("chaptername"),
+                                                Integer.parseInt(matcher.group("level"))))
+                                .add(MainCommands.ENTER_CHAPTER.pattern,
+                                                matcher -> controller.handleEnterChapter(
+                                                                matcher.group("chaptername")))
+                                .add(MainCommands.CHEAT_UNLOCK_ALL.pattern,
+                                                matcher -> controller.handleCheatUnlockAll())
+                                .add(MainCommands.CHEAT_UNLOCK_PLANTS.pattern,
+                                                matcher -> controller.handleCheatUnlockPlants())
+                                .add(MainCommands.CHEAT_UNLOCK_CHAPTERS.pattern,
+                                                matcher -> controller.handleCheatUnlockChapters())
+                                .add(MainCommands.CHEAT_RICH.pattern,
+                                                matcher -> controller.handleCheatRich())
+                                .add(MainCommands.CHEAT_MAX_PLANTS.pattern,
+                                                matcher -> controller.handleCheatMaxPlants())
                                 .add(MainCommands.ENTER_GREENHOUSE.pattern,
                                                 matcher -> controller.handleMenuChange("greenhouse"))
                                 .add(MainCommands.ENTER_TRAVEL_LOG.pattern,

@@ -30,6 +30,10 @@ public class MainController extends BaseController {
             Arrays.asList("Egypt", "Frost Bite", "Wavey Beach", "Dark Ages");
 
     public Result handleEnterChapter(String chapterName) {
+        return handleEnterChapter(chapterName, -1);
+    }
+
+    public Result handleEnterChapter(String chapterName, int requestedLevel) {
         Chapter chapter = Chapter.getByName(chapterName);
         if (chapter == null) {
             return Result.fail("No chapter with the given name.");
@@ -45,9 +49,24 @@ public class MainController extends BaseController {
                         + previous + " first.");
             }
         }
-        int unlockedLevel = store.getInt("progress." + chapter.getName(), 1);
-        Level level = chapter.getLevels().get(
-                Math.min(unlockedLevel, chapter.getLevels().size()) - 1);
+        int levelNumber;
+        if (requestedLevel > 0) {
+            if (requestedLevel > chapter.getLevels().size()) {
+                return Result.fail(chapter.getName() + " only has "
+                        + chapter.getLevels().size() + " levels.");
+            }
+            int unlocked = store.getInt("progress." + chapter.getName(), 1);
+            if (requestedLevel > unlocked) {
+                return Result.fail("Level " + requestedLevel + " of " + chapter.getName()
+                        + " is locked (unlocked up to level " + unlocked
+                        + "). Use 'menu cheat unlock-chapters' to open everything.");
+            }
+            levelNumber = requestedLevel;
+        } else {
+            int unlockedLevel = store.getInt("progress." + chapter.getName(), 1);
+            levelNumber = Math.min(unlockedLevel, chapter.getLevels().size());
+        }
+        Level level = chapter.getLevels().get(levelNumber - 1);
         chapter.setCurrentUnlockedLevel(level);
 
         List<String> unlockedPlants = unlockedPlants(store);
@@ -63,6 +82,61 @@ public class MainController extends BaseController {
                 : " [special: " + level.getSpecialType() + "]";
         return Result.ok("Entered " + chapter.getName() + ", level " + level.getLevelNumber() + special,
                 "Pick your plants, then use 'start game'.");
+    }
+
+    public Result handleCheatUnlockChapters() {
+        UserDataStore store = UserDataStore.forUser(app.getCurrentUser().getUsername());
+        for (String name : CHAPTER_ORDER) {
+            Chapter chapter = Chapter.getByName(name);
+            store.setInt("progress." + name, chapter.getLevels().size());
+        }
+        store.save();
+        return Result.ok("All chapters and levels unlocked. "
+                + "Jump to any with: menu enter chapter -c <name> -l <level>");
+    }
+
+    public Result handleCheatUnlockPlants() {
+        UserDataStore store = UserDataStore.forUser(app.getCurrentUser().getUsername());
+        List<String> names = new java.util.ArrayList<>();
+        for (models.entities.plant.PlantType type : models.entities.plant.PlantType.values()) {
+            names.add(type.getName());
+        }
+        store.set("plants", String.join(",", names));
+        store.save();
+        return Result.ok("All " + names.size() + " plants unlocked.");
+    }
+
+    public Result handleCheatMaxPlants() {
+        UserDataStore store = UserDataStore.forUser(app.getCurrentUser().getUsername());
+        int count = 0;
+        for (models.entities.plant.PlantType type : models.entities.plant.PlantType.values()) {
+            store.setInt("level." + type.getName(), 5);
+            count++;
+        }
+        store.save();
+        return Result.ok(count + " plants set to max level (5).");
+    }
+
+    public Result handleCheatRich() {
+        UserManager.getInstance().addCoins(1_000_000);
+        UserManager.getInstance().addDiamonds(1_000_000);
+        UserManager.getInstance().addPots(15);
+        UserDataStore store = UserDataStore.forUser(app.getCurrentUser().getUsername());
+        store.setInt("plantFoods", 3);
+        store.save();
+        return Result.ok("Granted 1,000,000 coins, 1,000,000 diamonds, 15 pots and 3 plant foods.");
+    }
+
+    public Result handleCheatUnlockAll() {
+        handleCheatUnlockChapters();
+        handleCheatUnlockPlants();
+        handleCheatMaxPlants();
+        handleCheatRich();
+        return Result.ok("CHEAT: everything unlocked.",
+                "- all 4 chapters and every level",
+                "- all plants (at max level)",
+                "- 1,000,000 coins & diamonds, 15 pots, 3 plant foods",
+                "Enter any level with: menu enter chapter -c <name> -l <level>");
     }
 
     public static Map<String, Integer> plantLevels(UserDataStore store, List<String> plants) {
