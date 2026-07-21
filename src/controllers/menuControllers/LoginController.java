@@ -10,7 +10,6 @@ import utils.SessionStore;
 
 public class LoginController extends BaseController {
     private String pendingUsername;
-    private String pendingEmail;
 
     public LoginController(App app) {
         super(app);
@@ -48,7 +47,6 @@ public class LoginController extends BaseController {
         if (!questionResult.isSuccessfull()) return questionResult;
 
         pendingUsername = username;
-        pendingEmail = email;
 
         SecurityQuestion question = (SecurityQuestion) questionResult.getData();
         result.addMessage(question.getQuestion());
@@ -67,7 +65,6 @@ public class LoginController extends BaseController {
 
         if (!result.isSuccessfull()) {
             pendingUsername = null;
-            pendingEmail = null;
             result.addMessage("Returned to login menu");
             return result;
         }
@@ -99,7 +96,6 @@ public class LoginController extends BaseController {
     public Result handleResetPasswordQuit() {
         Result result = new Result();
         pendingUsername = null;
-        pendingEmail = null;
 
         result.setSuccess(true);
         result.addMessage("Returned to login menu");

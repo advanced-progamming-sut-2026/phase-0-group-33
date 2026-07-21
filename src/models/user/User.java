@@ -29,7 +29,8 @@ public class User {
     private int highestScore = 0;
     private int numberOfGames;
 
-    public User(String username, String passwordHash, String nickname, String email, Gender gender, SecurityQuestion securityQuestion) {
+    public User(String username, String passwordHash, String nickname, String email,
+                Gender gender, SecurityQuestion securityQuestion) {
         this.username = username;
         this.passwordHash = passwordHash;
         this.nickname = nickname;

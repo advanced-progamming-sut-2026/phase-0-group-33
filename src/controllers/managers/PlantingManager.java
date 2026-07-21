@@ -67,38 +67,13 @@ public class PlantingManager {
 
     private Result plantOnTile(PlantType type, PlantSlot slot, int cost, int x, int y) {
         Tile tile = session.getGrid().getTile(x - 1, y - 1);
-        Result terrainError = checkTerrain(type, tile, x, y);
+        Result terrainError = checkTerrain(type, tile);
         if (terrainError != null) {
             return terrainError;
         }
-        if (type == PlantType.GRAVE_BUSTER) {
-            session.getCombatManager().grantGraveContent(tile);
-            tile.setTerrain(TerrainType.NORMAL);
-            consume(slot, cost);
-            return Result.ok("The grave at (" + x + ", " + y + ") was busted.");
-        }
-        if (type == PlantType.HOT_POTATO) {
-            PlacedPlant frozen = session.plantAt(x, y);
-            if (frozen != null && frozen.getIceHealth() > 0) {
-                frozen.setIceHealth(0);
-                frozen.setFreezeLevel(0);
-            } else {
-                tile.setTerrain(TerrainType.NORMAL);
-            }
-            consume(slot, cost);
-            return Result.ok("The ice at (" + x + ", " + y + ") melted away.");
-        }
-        if (type == PlantType.LILY_PAD) {
-            tile.setHasLilyPad(true);
-            consume(slot, cost);
-            session.getQuestStats().onPlanted(type, x, y);
-            return Result.ok("Lily Pad placed on the water at (" + x + ", " + y + ").");
-        }
-        if (type == PlantType.GOLD_BLOOM) {
-            session.getSunManager().addSun(375);
-            consume(slot, cost);
-            session.getQuestStats().onPlanted(type, x, y);
-            return Result.ok("Gold Bloom burst into 375 sun!");
+        Result utility = plantUtility(type, slot, cost, x, y, tile);
+        if (utility != null) {
+            return utility;
         }
         if (type.getName().toLowerCase().contains("mint")) {
             return releaseMint(type, slot, cost, x, y);
@@ -130,6 +105,39 @@ public class PlantingManager {
         return Result.ok(type.getName() + " planted at (" + x + ", " + y + ").");
     }
 
+    private Result plantUtility(PlantType type, PlantSlot slot, int cost, int x, int y, Tile tile) {
+        if (type == PlantType.GRAVE_BUSTER) {
+            session.getCombatManager().grantGraveContent(tile);
+            tile.setTerrain(TerrainType.NORMAL);
+            consume(slot, cost);
+            return Result.ok("The grave at (" + x + ", " + y + ") was busted.");
+        }
+        if (type == PlantType.HOT_POTATO) {
+            PlacedPlant frozen = session.plantAt(x, y);
+            if (frozen != null && frozen.getIceHealth() > 0) {
+                frozen.setIceHealth(0);
+                frozen.setFreezeLevel(0);
+            } else {
+                tile.setTerrain(TerrainType.NORMAL);
+            }
+            consume(slot, cost);
+            return Result.ok("The ice at (" + x + ", " + y + ") melted away.");
+        }
+        if (type == PlantType.LILY_PAD) {
+            tile.setHasLilyPad(true);
+            consume(slot, cost);
+            session.getQuestStats().onPlanted(type, x, y);
+            return Result.ok("Lily Pad placed on the water at (" + x + ", " + y + ").");
+        }
+        if (type == PlantType.GOLD_BLOOM) {
+            session.getSunManager().addSun(375);
+            consume(slot, cost);
+            session.getQuestStats().onPlanted(type, x, y);
+            return Result.ok("Gold Bloom burst into 375 sun!");
+        }
+        return null;
+    }
+
     private boolean consumeStoredBoost(PlantType type) {
         utils.UserDataStore store = utils.UserDataStore.forUser(
                 session.getUser().getUsername());
@@ -141,7 +149,7 @@ public class PlantingManager {
         return true;
     }
 
-    private Result checkTerrain(PlantType type, Tile tile, int x, int y) {
+    private Result checkTerrain(PlantType type, Tile tile) {
         TerrainType terrain = tile.getTerrain();
         if (terrain == TerrainType.GRAVE && type != PlantType.GRAVE_BUSTER) {
             return Result.fail("You cannot plant on a gravestone.");

@@ -15,15 +15,19 @@ import java.util.List;
 import java.util.Set;
 
 public class CombatManager {
-    private static final int INSTANT_KILL_DAMAGE = 9999;
+    static final int INSTANT_KILL_DAMAGE = 9999;
     private static final double MOWER_LINE = 0.5;
 
     private final GameSession session;
     private final Set<Zombie> impThrown = new HashSet<>();
+    private final PlantFoodEffects plantFoodEffects;
+    private final ShotPatterns shotPatterns;
     private int kingTicks;
 
     public CombatManager(GameSession session) {
         this.session = session;
+        this.plantFoodEffects = new PlantFoodEffects(session, this);
+        this.shotPatterns = new ShotPatterns(session, this);
     }
 
     public void plantsAct() {
@@ -64,7 +68,7 @@ public class CombatManager {
             plant.setActionCooldownTicks((int) Math.round(interval * GameSession.TICKS_PER_SECOND));
             return;
         }
-        if (specialShot(plant, type)) {
+        if (shotPatterns.specialShot(plant, type)) {
             plant.setActionCooldownTicks((int) Math.round(interval * GameSession.TICKS_PER_SECOND));
             return;
         }
@@ -124,7 +128,7 @@ public class CombatManager {
         }
     }
 
-    private void shoot(PlacedPlant plant, boolean pierceGraves) {
+    void shoot(PlacedPlant plant, boolean pierceGraves) {
         Zombie target = firstZombieInRowAfter(plant.getY(), plant.getX());
         if (target == null) {
             return;
@@ -173,135 +177,6 @@ public class CombatManager {
         return false;
     }
 
-    private boolean specialShot(PlacedPlant plant, PlantType type) {
-        switch (type) {
-            case THREEPEATER:
-                shootThreeLanes(plant);
-                return true;
-            case SPLIT_PEA:
-                shoot(plant, false);
-                shootBackward(plant, 2);
-                return true;
-            case STARFRUIT:
-                starShot(plant);
-                return true;
-            case ROTOBAGA:
-                diagonalShot(plant);
-                return true;
-            case PUFF_SHROOM:
-            case SEA_SHROOM:
-                shortRangeShot(plant);
-                return true;
-            case KERNEL_PULT:
-                kernelLob(plant);
-                return true;
-            case CAULIPOWER:
-                hypnotizeShot(plant);
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    private void shootThreeLanes(PlacedPlant plant) {
-        for (int row = plant.getY() - 1; row <= plant.getY() + 1; row++) {
-            if (row < 1 || row > GameSession.ROWS) {
-                continue;
-            }
-            Zombie target = firstZombieInRowAfter(row, plant.getX());
-            if (target != null) {
-                hitZombie(target, plant.getType());
-            }
-        }
-    }
-
-    private void shootBackward(PlacedPlant plant, int shots) {
-        Zombie target = lastZombieInRowBefore(plant.getY(), plant.getX());
-        for (int i = 0; i < shots && target != null && !target.isDead(); i++) {
-            hitZombie(target, plant.getType());
-        }
-    }
-
-    private void starShot(PlacedPlant plant) {
-        Zombie forward = firstZombieInRowAfter(plant.getY(), plant.getX());
-        if (forward != null) {
-            hitZombie(forward, plant.getType());
-        }
-        Zombie backward = lastZombieInRowBefore(plant.getY(), plant.getX());
-        if (backward != null) {
-            hitZombie(backward, plant.getType());
-        }
-        for (Zombie zombie : new ArrayList<>(session.getZombies())) {
-            if (Math.abs(zombie.getPosition().getX() - plant.getX()) <= 0.5
-                    && (int) zombie.getPosition().getY() != plant.getY()) {
-                hitZombie(zombie, plant.getType());
-            }
-        }
-    }
-
-    private void diagonalShot(PlacedPlant plant) {
-        for (int row : new int[] { plant.getY() - 1, plant.getY() + 1 }) {
-            if (row < 1 || row > GameSession.ROWS) {
-                continue;
-            }
-            Zombie ahead = firstZombieInRowAfter(row, plant.getX());
-            if (ahead != null) {
-                hitZombie(ahead, plant.getType());
-            }
-            Zombie behind = lastZombieInRowBefore(row, plant.getX());
-            if (behind != null) {
-                hitZombie(behind, plant.getType());
-            }
-        }
-    }
-
-    private void shortRangeShot(PlacedPlant plant) {
-        Zombie target = firstZombieInRowAfter(plant.getY(), plant.getX());
-        if (target != null && target.getPosition().getX() - plant.getX() <= 3) {
-            hitZombie(target, plant.getType());
-        }
-    }
-
-    private void kernelLob(PlacedPlant plant) {
-        Zombie target = firstZombieInRowAfter(plant.getY(), plant.getX());
-        if (target == null) {
-            return;
-        }
-        if (session.getRandom().nextInt(100) < 25) {
-            target.setFrozenTicks(3 * GameSession.TICKS_PER_SECOND);
-            damageZombie(target, plantDamage(plant.getType()) * 2, plant.getType());
-            System.out.printf("Butter pinned the %s in place!%n", target.getType().getName());
-        } else {
-            hitZombie(target, plant.getType());
-        }
-    }
-
-    private void hypnotizeShot(PlacedPlant plant) {
-        List<Zombie> candidates = new ArrayList<>();
-        for (Zombie zombie : session.getZombies()) {
-            if (!zombie.getBattle().isHypnotized() && !zombie.getBattle().isSunProducer()) {
-                candidates.add(zombie);
-            }
-        }
-        if (candidates.isEmpty()) {
-            return;
-        }
-        Zombie target = candidates.get(session.getRandom().nextInt(candidates.size()));
-        target.getBattle().setHypnotized(true);
-        System.out.printf("Caulipower's magic shot hypnotized the %s!%n",
-                target.getType().getName());
-    }
-
-    private Zombie lastZombieInRowBefore(int row, double x) {
-        Zombie last = null;
-        for (Zombie zombie : session.getZombies()) {
-            if ((int) zombie.getPosition().getY() == row && zombie.getPosition().getX() < x
-                    && (last == null || zombie.getPosition().getX() > last.getPosition().getX())) {
-                last = zombie;
-            }
-        }
-        return last;
-    }
 
     private void strikeThrough(PlacedPlant plant) {
         for (Zombie zombie : zombiesInRowAfter(plant.getY(), plant.getX())) {
@@ -387,7 +262,7 @@ public class CombatManager {
         session.removePlant(plant, false);
     }
 
-    private void damageArea(double centerX, double centerY, int radius, PlantType source) {
+    void damageArea(double centerX, double centerY, int radius, PlantType source) {
         for (Zombie zombie : new ArrayList<>(session.getZombies())) {
             if (Math.abs(zombie.getPosition().getX() - centerX) <= radius + 0.5
                     && Math.abs(zombie.getPosition().getY() - centerY) <= radius) {
@@ -396,7 +271,7 @@ public class CombatManager {
         }
     }
 
-    private void hitZombie(Zombie zombie, PlantType source) {
+    void hitZombie(Zombie zombie, PlantType source) {
         if (!session.getBehaviorManager().beforeHit(zombie, source)) {
             return;
         }
@@ -420,7 +295,7 @@ public class CombatManager {
         damageZombie(zombie, plantDamage(source), source);
     }
 
-    private int plantDamage(PlantType type) {
+    int plantDamage(PlantType type) {
         int damage = session.effectiveDamage(type);
         return damage >= 9999 ? INSTANT_KILL_DAMAGE : damage;
     }
@@ -699,183 +574,10 @@ public class CombatManager {
     }
 
     public void applyPlantFood(PlacedPlant plant) {
-        if (applySpecificPlantFood(plant)) {
-            return;
-        }
-        switch (plant.getType().getCategory()) {
-            case SUN_PRODUCER:
-                session.getSunManager().addSun(150);
-                break;
-            case WALL_NUT:
-                plant.setHealth(plant.getMaxHealth() + plant.getType().getBaseHp());
-                break;
-            case EXPLOSIVE:
-                explode(plant);
-                break;
-            default:
-                powerAttack(plant);
-                break;
-        }
+        plantFoodEffects.apply(plant);
     }
 
-    private boolean applySpecificPlantFood(PlacedPlant plant) {
-        switch (plant.getType()) {
-            case TWIN_SUNFLOWER:
-                session.getSunManager().addSun(250);
-                return true;
-            case PRIMAL_SUNFLOWER:
-            case SUN_SHROOM:
-                plant.setGrowthStage(3);
-                session.getSunManager().addSun(225);
-                return true;
-            case REPEATER:
-            case PEA_POD:
-            case MEGA_GATLING_PEA:
-                giantPea(plant);
-                return true;
-            case THREEPEATER:
-                fanBarrage(plant);
-                return true;
-            case KERNEL_PULT:
-                butterEveryZombie(plant);
-                return true;
-            case MELON_PULT:
-            case WINTER_MELON:
-            case PEPPER_PULT:
-                giantMelons(plant);
-                return true;
-            case SNOW_PEA:
-                freezeLane(plant);
-                return true;
-            case CHOMPER:
-                devour(plant, 3);
-                return true;
-            case SQUASH:
-                crushRandom(plant, 2);
-                return true;
-            case ICEBERG_LETTUCE:
-                freezeEveryZombie();
-                return true;
-            case TANGLE_KELP:
-                drownRandom(plant, 3);
-                return true;
-            case CAULIPOWER:
-                hypnotizeRandom(3);
-                return true;
-            case MAGNET_SHROOM:
-                magnetEveryZombie();
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    private void giantPea(PlacedPlant plant) {
-        Zombie target = firstZombieInRowAfter(plant.getY(), plant.getX());
-        if (target != null) {
-            damageZombie(target, plantDamage(plant.getType()) * 20, plant.getType());
-        }
-        powerAttack(plant);
-    }
-
-    private void fanBarrage(PlacedPlant plant) {
-        int damage = plantDamage(plant.getType()) * 5;
-        for (Zombie zombie : new ArrayList<>(session.getZombies())) {
-            damageZombie(zombie, damage, plant.getType());
-        }
-    }
-
-    private void butterEveryZombie(PlacedPlant plant) {
-        for (Zombie zombie : new ArrayList<>(session.getZombies())) {
-            zombie.setFrozenTicks(3 * GameSession.TICKS_PER_SECOND);
-            damageZombie(zombie, plantDamage(plant.getType()) * 2, plant.getType());
-        }
-        System.out.println("Butter rained on every zombie's head!");
-    }
-
-    private void giantMelons(PlacedPlant plant) {
-        for (int i = 0; i < 3 && !session.getZombies().isEmpty(); i++) {
-            Zombie target = session.getZombies().get(
-                    session.getRandom().nextInt(session.getZombies().size()));
-            damageArea(target.getPosition().getX(), target.getPosition().getY(), 1,
-                    plant.getType());
-        }
-    }
-
-    private void freezeLane(PlacedPlant plant) {
-        for (Zombie zombie : new ArrayList<>(zombiesInRowAfter(plant.getY(), 0))) {
-            zombie.setFrozenTicks(4 * GameSession.TICKS_PER_SECOND);
-            damageZombie(zombie, plantDamage(plant.getType()) * 5, plant.getType());
-        }
-    }
-
-    private void devour(PlacedPlant plant, int count) {
-        for (int i = 0; i < count && !session.getZombies().isEmpty(); i++) {
-            Zombie target = session.getZombies().get(
-                    session.getRandom().nextInt(session.getZombies().size()));
-            damageZombie(target, INSTANT_KILL_DAMAGE, plant.getType());
-        }
-    }
-
-    private void crushRandom(PlacedPlant plant, int count) {
-        devour(plant, count);
-    }
-
-    private void freezeEveryZombie() {
-        for (Zombie zombie : session.getZombies()) {
-            zombie.setFrozenTicks(5 * GameSession.TICKS_PER_SECOND);
-        }
-        System.out.println("Every zombie on the lawn is frozen!");
-    }
-
-    private void drownRandom(PlacedPlant plant, int count) {
-        int drowned = 0;
-        for (Zombie zombie : new ArrayList<>(session.getZombies())) {
-            if (drowned >= count) {
-                return;
-            }
-            Tile tile = session.getGrid().getTile(
-                    (int) Math.round(zombie.getPosition().getX()) - 1,
-                    (int) zombie.getPosition().getY() - 1);
-            if (tile != null && tile.getTerrain() == TerrainType.WATER) {
-                damageZombie(zombie, INSTANT_KILL_DAMAGE, plant.getType());
-                drowned++;
-            }
-        }
-    }
-
-    private void hypnotizeRandom(int count) {
-        int done = 0;
-        for (Zombie zombie : session.getZombies()) {
-            if (done >= count) {
-                return;
-            }
-            if (!zombie.getBattle().isHypnotized() && !zombie.getBattle().isSunProducer()) {
-                zombie.getBattle().setHypnotized(true);
-                System.out.printf("The %s is hypnotized and fights for you now!%n",
-                        zombie.getType().getName());
-                done++;
-            }
-        }
-    }
-
-    private void magnetEveryZombie() {
-        for (Zombie zombie : session.getZombies()) {
-            if (zombie.totalArmor() > 0 && zombie.stripMetallicArmor()) {
-                System.out.printf("Magnet-shroom devoured the %s's metal armor!%n",
-                        zombie.getType().getName());
-            }
-        }
-    }
-
-    private void powerAttack(PlacedPlant plant) {
-        int damage = plantDamage(plant.getType()) * 10;
-        for (Zombie zombie : new ArrayList<>(zombiesInRowAfter(plant.getY(), 0))) {
-            damageZombie(zombie, damage, plant.getType());
-        }
-    }
-
-    private Zombie firstZombieInRowAfter(int row, double x) {
+    Zombie firstZombieInRowAfter(int row, double x) {
         Zombie first = null;
         for (Zombie zombie : session.getZombies()) {
             if ((int) zombie.getPosition().getY() == row && zombie.getPosition().getX() >= x
@@ -886,7 +588,7 @@ public class CombatManager {
         return first;
     }
 
-    private List<Zombie> zombiesInRowAfter(int row, double x) {
+    List<Zombie> zombiesInRowAfter(int row, double x) {
         List<Zombie> result = new ArrayList<>();
         for (Zombie zombie : session.getZombies()) {
             if ((int) zombie.getPosition().getY() == row && zombie.getPosition().getX() >= x) {

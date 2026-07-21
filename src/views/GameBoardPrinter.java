@@ -2,7 +2,6 @@ package views;
 
 import models.Result;
 import models.entities.zombie.Zombie;
-import models.game.GamePhase;
 import models.game.GameSession;
 import models.game.PlacedPlant;
 import models.game.PlantSlot;

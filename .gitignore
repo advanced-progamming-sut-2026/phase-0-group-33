@@ -7,6 +7,10 @@ bin/
 *.jar
 *.war
 
+# --- Gradle ---
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
 # --- Runtime game data (user saves, sessions, news - created by the game) ---
 data/
 

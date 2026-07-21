@@ -48,7 +48,14 @@
 
 The project has no external dependencies — plain Java (JDK 17+).
 
-**Recommended (never hits a stale build):**
+**Recommended — Gradle:**
+
+```bash
+./gradlew run          # Linux / macOS
+gradlew.bat run        # Windows
+```
+
+**Also available (no build tool needed):**
 
 ```bash
 python run_game.py
@@ -66,6 +73,24 @@ java -cp out/production/AP Main
 **IntelliJ:** run `Main.java`. If you ever see `Could not find or load main class Main`, do `Build → Rebuild Project` (a partial/incremental build can miss the default-package `Main` class).
 
 All persistent data (accounts, progress, greenhouse, news, quests) is written to a `data/` folder next to where you launch the program.
+
+---
+
+## Build & Code Quality (Gradle)
+
+The project is a standard Gradle Java build. The existing `src/` layout is kept as-is (configured via `sourceSets`), so IntelliJ and the scripts above keep working.
+
+| Task | What it does |
+|------|--------------|
+| `gradlew build` | Compiles the project. |
+| `gradlew run` | Compiles and starts the game (stdin is wired up for the CLI). |
+| `gradlew lint` | Runs **Checkstyle + PMD** together. |
+| `gradlew checkstyleMain` | Naming, line length (≤120), method length (≤50), unused imports. |
+| `gradlew pmdMain` | Unused locals/fields/methods/parameters, `NcssCount` (method ≤50, class ≤500). |
+
+The linter rules in `config/checkstyle/checkstyle.xml` and `config/pmd/ruleset.xml` mirror exactly the Checkstyle/PMD rules listed in the course document. Reports are written to `build/reports/{checkstyle,pmd}/main.html`.
+
+**Current status: 0 Checkstyle violations, 0 PMD violations.**
 
 ---
 

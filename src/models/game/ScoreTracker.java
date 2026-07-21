@@ -10,7 +10,6 @@ public class ScoreTracker {
 
     private int score;
     private int lastKillTick = -1;
-    private int killsInLastTick;
     private int killsInLastSecondWindowStart = -1;
     private int killsInLastSecond;
     private int streak;
@@ -18,11 +17,9 @@ public class ScoreTracker {
     public void onZombieKilled(int tick, int spawnTick) {
         score += BASE_KILL;
         if (tick == lastKillTick) {
-            killsInLastTick++;
             score += MULTI_KILL_BONUS;
         } else {
             lastKillTick = tick;
-            killsInLastTick = 1;
         }
         if (tick - spawnTick <= 50) {
             score += SPEED_KILL_BONUS;
