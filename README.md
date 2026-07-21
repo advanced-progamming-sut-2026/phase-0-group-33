@@ -31,6 +31,7 @@
   - [Shop Menu](#shop-menu)
   - [Travel Log Menu](#travel-log-menu)
   - [Leaderboard Menu](#leaderboard-menu)
+- [**Reading the Map** (symbol guide)](#reading-the-map)
 - [Design Decisions Left to Us](#design-decisions-left-to-us)
   - [Levels & Chapters](#levels--chapters)
   - [Special Levels](#special-levels)
@@ -270,12 +271,115 @@ Time is discrete: **1 tick = 0.1 second in-game**, so **10 ticks = 1 second**. N
 
 | Command | Description |
 |---------|-------------|
-| `show map` | Renders the lawn plus a header (wave, sun, plant foods) and a legend. Water `~`, grave `#`, sliders `^`/`v`, vases `U`, mowers `[M]`, brains `[B]`. |
+| `show map` | Renders the lawn plus a header (wave, sun, plant foods) and a legend. **Full symbol guide → [Reading the Map](#reading-the-map).** |
 | `show plants status` | For each selected plant: cost and whether/when it can be planted. |
 | `show tile status -l (<x>, <y>)` | Details of the plant(s)/zombie(s) on a tile. |
 | `zombies info` | Every zombie on the lawn: position, health, armor pieces and active effects (chilled/frozen/hypnotized), in the doc's format. |
 
 **Minigame-only battle commands** (see [Minigames](#minigames)): `break vase -l (<x>, <y>)`, `place zombie -t <type> -l (<x>, <y>)`, `swap -l (<x1>, <y1>) (<x2>, <y2>)`, `upgrade -t <type>`.
+
+---
+
+## Reading the Map
+
+`show map` prints a header, 5 lawn rows, and a legend. Real output:
+
+```
+Wave: 0/6 | Sun: 4875 | Plant foods: 3
+[M] S * .   .   .   .   .   .   #   .
+[M] .   .   .   .   .   .   .   .   .
+[M] .   P   .   W   .   .   .   .   .
+[M] .   .   .   #   .   .   .   .   . *
+[M] .   .   .1  .   .   .   .   .   .
+```
+
+### Every tile is 3 characters
+
+Each cell is **exactly 3 slots** (then a space). Reading them left to right:
+
+```
+ S * ←  slot 3: sun waiting here
+ │ │
+ │ └─── slot 2: how many zombies
+ └───── slot 1: plant or terrain
+```
+
+| Slot | Meaning | Possible values |
+|:---:|---|---|
+| **1** | What occupies the tile | a **letter** = plant (first letter of its name) · otherwise a **terrain** symbol (table below) |
+| **2** | Zombie count | `1`–`9` = that many zombies standing here · *(blank)* = none · `9` also means "9 or more" |
+| **3** | Collectable sun | `*` = sun is sitting here, grab it with `collect sun` · *(blank)* = nothing |
+
+So `S *` = a **S**unflower with a sun ready on it. `.1 ` = empty ground with **1 zombie**. `W  ` = a **W**all-nut, nothing else.
+
+### Slot 1 — terrain symbols (when no plant is on the tile)
+
+| Symbol | Meaning |
+|:---:|---|
+| `.` | normal ground — you can plant here |
+| `~` | **water** (Big Wave Beach) — needs a Lily Pad, or a `Water`-tag plant |
+| `_` | **low tide** — a beach tile the water has receded from; zombies may surface here |
+| `#` | **grave** — blocks straight shots, cannot be planted on (700 HP, or use Grave Buster) |
+| `$` | **grave holding 50 sun** — break it to collect (Dark Ages) |
+| `%` | **grave holding a plant food** — break it to collect (Dark Ages) |
+| `+` | **necromancy tile** — a zombie can crawl out of here at wave start (Dark Ages) |
+| `^` | **slider up** — a zombie stepping here is pushed one lane up (Frostbite) |
+| `v` | **slider down** — a zombie stepping here is pushed one lane down (Frostbite) |
+| `U` | **vase** — Vasebreaker minigame only; break it with `break vase` |
+
+### Slot 1 — plant letters
+
+A plant always wins over terrain, and is shown as the **first letter of its name**:
+
+| Letter | Common plants |
+|:---:|---|
+| `S` | **S**unflower, **S**now Pea, **S**quash, **S**tarfruit, **S**plit Pea, **S**weet Potato… |
+| `P` | **P**eashooter, **P**otato Mine, **P**umpkin, **P**ea Pod, **P**hat Beet, **P**epper-pult… |
+| `W` | **W**all-nut, **W**inter Melon, **W**asabi Whip |
+| `C` | **C**abbage-pult, **C**herry Bomb, **C**actus, **C**homper, **C**itron, **C**at-tail |
+| `T` | **T**all-nut, **T**orchwood, **T**win Sunflower, **T**angle Kelp, **T**hreepeater |
+
+> ⚠️ **Letters collide** — `S` could be Sunflower *or* Squash *or* Snow Pea. The map is a quick overview, not a precise readout. When you need certainty use:
+> ```
+> show tile status -l (x, y)
+> ```
+> which prints the exact plant name, its HP, and everything standing on that tile.
+
+### Row prefix — the left edge
+
+| Prefix | Meaning |
+|:---:|---|
+| `[M]` | the row still has its **lawn mower** (one free save) |
+| `[ ]` | the mower in this row is **already used** — the next zombie that reaches the house ends the game |
+| `[B]` | a **brain** — only in the *I, Zombie* minigame, where you attack the brains |
+
+### Header line
+
+```
+Wave: 0/6 | Sun: 4875 | Plant foods: 3
+```
+
+- `Wave: 0/6` — current wave / total waves (`0` = the horde has not been summoned yet; use `start zombie waves`)
+- `Sun: 4875` — your spendable sun
+- `Plant foods: 3` — plant foods in stock (max 3)
+
+### Worked example — Big Wave Beach
+
+```
+Wave: 1/6 | Sun: 50 | Plant foods: 3
+[M] .   .   .   .   .   _   _   ~   ~
+[M] .   .   .   . * .   .   .   ~ * ~
+[M] .   .   .   _   .   .   .   ~   ~
+[M] .   .   .   .1  .   .   .   ~   ~
+[M] .   .   .1  .   .   .   .   ~   ~
+```
+
+Reading it: all 5 mowers are intact · the last two columns are **water** (`~`) so you need Lily Pads there · columns 6–7 of row 1 and column 4 of row 3 are **low tide** (`_`) · there is **sun to collect** at (4, 2) and at (8, 2) · **one zombie** is advancing in row 4 at column 4 and another in row 5 at column 3.
+
+### Two things the map does *not* show
+
+- **Lily Pads** — a water tile with a Lily Pad still prints `~`. Only `show tile status` reports `(lily pad)`.
+- **Frozen / disabled plants** — a plant encased in ice, covered by an octopus, or turned into a sheep still shows its normal letter. Use `show tile status` or `zombies info` for status effects.
 
 Win message: `Dear humanz, zis is not done yet; we will come back to eat your brainz, humanz.` — you return to the main menu as a winner. If a zombie reaches the house on a mower-less row: `The zombie ate your brain; LOSER!!!`.
 
