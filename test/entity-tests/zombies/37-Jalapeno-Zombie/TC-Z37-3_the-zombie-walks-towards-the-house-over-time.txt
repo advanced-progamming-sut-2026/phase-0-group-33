@@ -9,17 +9,18 @@
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
 # --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   The Jalapeno Zombie burns its lane and dies with it after ~10 seconds.
+# --------------------------------------------------------------------------
 
 > menu scoring-game
 ? Scoring game started
-> add plant -t Sunflower
+> add plant -t Peashooter
 > start game
 ? The battle begins
-> cheat add -n 9000 suns
-> cheat remove-cooldown
-> cheat spawn-zombie -t Jalapeno Zombie -l 9,3
-> zombies info
-?     position: 9, 3
-> advance time -t 150 ticks
+> cheat spawn-zombie -t Jalapeno Zombie -l 9,2
+> advance time -t 30 ticks
 > zombies info
 ? Jalapeno Zombie:
+?     position: 8.4, 2

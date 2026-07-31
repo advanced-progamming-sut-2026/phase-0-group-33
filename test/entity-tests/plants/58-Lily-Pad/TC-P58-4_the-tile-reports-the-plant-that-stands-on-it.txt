@@ -1,4 +1,4 @@
-=== TEST P58-4: the tile reports the plant that stands on it
+=== TEST P58-4: the water tile reports that it now carries a lily pad
 #
 # Entity    : Lily Pad
 # HP        : 300
@@ -9,13 +9,25 @@
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
 # --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   A Lily Pad is a tile flag, not a stacked plant: the tile reports
+#   'terrain: WATER (lily pad)'. A plant put on top does report 'Plant: ...'.
+# --------------------------------------------------------------------------
 
+> menu cheat unlock-all
 > menu enter chapter -c Wavey Beach -l 1
+? Entered Wavey Beach
 > add plant -t Lily Pad
+> add plant -t Peashooter
 > start game
 ? The battle begins
 > cheat add -n 9000 suns
 > cheat remove-cooldown
 > plant plant -t Lily Pad -l (9,3)
+? Lily Pad placed on the water at (9, 3).
 > show tile status -l (9,3)
-? Plant: Lily Pad
+? terrain: WATER (lily pad)
+> plant plant -t Peashooter -l (9,3)
+> show tile status -l (9,3)
+? Plant: Peashooter

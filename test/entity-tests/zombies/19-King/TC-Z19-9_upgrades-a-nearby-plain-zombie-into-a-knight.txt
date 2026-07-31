@@ -9,15 +9,21 @@
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
 # --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   The promotion needs a plain Normal within 2 columns and 10 seconds.
+# --------------------------------------------------------------------------
 
+> menu cheat unlock-all
 > menu enter chapter -c Dark Ages -l 1
+? Entered Dark Ages, level 1
 > add plant -t Sunflower
 > start game
 ? The battle begins
-> cheat add -n 9000 suns
-> cheat remove-cooldown
-> cheat spawn-zombie -t King -l 9,3
-> cheat spawn-zombie -t Normal -l 8,3
-> advance time -t 400 ticks
+> cheat spawn-zombie -t King -l 8,2
+> cheat spawn-zombie -t Normal -l 8,2
+> advance time -t 120 ticks
+? The King knighted a zombie in lane 2!
 > zombies info
 ? Knight:
+?         crown: 1600

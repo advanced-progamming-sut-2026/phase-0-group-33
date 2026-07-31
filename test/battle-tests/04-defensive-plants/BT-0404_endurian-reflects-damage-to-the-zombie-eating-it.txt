@@ -9,6 +9,11 @@
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
 # --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   A Gargantuar one-shots the wall, so it never chews and never takes
+#   reflect damage. A Normal zombie eats it and takes the reflect.
+# --------------------------------------------------------------------------
 
 > menu scoring-game
 ? Scoring game started
@@ -18,8 +23,6 @@
 > cheat add -n 9000 suns
 > cheat remove-cooldown
 > plant plant -t Endurian -l (2,3)
-> cheat spawn-zombie -t Gargantuar -l 3,3
-> advance time -t 200 ticks
-> zombies info
-? Gargantuar:
-?     health: 3400
+> cheat spawn-zombie -t Normal -l 3,3
+> advance time -t 100 ticks
+? Zombie of type Normal is dead

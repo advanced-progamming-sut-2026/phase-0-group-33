@@ -9,14 +9,21 @@
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
 # --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   The code announces 'started draining your sun', it never prints 'stole'
+#   (that wording belongs to the Ra zombie).
+# --------------------------------------------------------------------------
 
-> menu enter chapter -c Egypt -l 1
+> menu scoring-game
+? Scoring game started
 > add plant -t Sunflower
 > start game
 ? The battle begins
 > cheat add -n 9000 suns
 > cheat remove-cooldown
-> plant plant -t Sunflower -l (5,3)
-> cheat spawn-zombie -t Turquoise -l 8,3
-> advance time -t 200 ticks
-? stole
+> plant plant -t Sunflower -l (1,5)
+> cheat spawn-zombie -t Turquoise -l 4,5
+> advance time -t 80 ticks
+? The Turquoise zombie started draining your sun!
+? The Turquoise laser vaporized Sunflower at (1, 5)!

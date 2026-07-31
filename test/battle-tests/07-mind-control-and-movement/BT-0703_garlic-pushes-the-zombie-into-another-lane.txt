@@ -9,6 +9,10 @@
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
 # --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   The push direction is random, so the target lane cannot be hard-coded.
+# --------------------------------------------------------------------------
 
 > menu scoring-game
 ? Scoring game started
@@ -20,6 +24,4 @@
 > plant plant -t Garlic -l (2,3)
 > cheat spawn-zombie -t Normal -l 3,3
 > advance time -t 200 ticks
-> zombies info
-? Normal:
-?     position: 2.4, 2
+? The garlic pushed the Normal to lane 

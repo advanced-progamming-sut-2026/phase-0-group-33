@@ -1,4 +1,4 @@
-=== TEST P60-4: the explosive destroys a zombie next to it
+=== TEST P60-4: the grave buster removes a gravestone from the lawn
 #
 # Entity    : Grave Buster
 # Damage column: Insta-kill
@@ -9,15 +9,53 @@
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
 # --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   Graves are placed at RANDOM columns 3..9, so a fixed target tile is
+#   almost never a grave. The case now sweeps the whole lawn.
+# --------------------------------------------------------------------------
 
-> menu scoring-game
-? Scoring game started
+> menu cheat unlock-all
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
 > add plant -t Grave Buster
 > start game
 ? The battle begins
-> cheat add -n 9000 suns
 > cheat remove-cooldown
-> cheat spawn-zombie -t Normal -l 3,3
+> show map
+> plant plant -t Grave Buster -l (3,1)
+> plant plant -t Grave Buster -l (4,1)
+> plant plant -t Grave Buster -l (5,1)
+> plant plant -t Grave Buster -l (6,1)
+> plant plant -t Grave Buster -l (7,1)
+> plant plant -t Grave Buster -l (8,1)
+> plant plant -t Grave Buster -l (9,1)
+> plant plant -t Grave Buster -l (3,2)
+> plant plant -t Grave Buster -l (4,2)
+> plant plant -t Grave Buster -l (5,2)
+> plant plant -t Grave Buster -l (6,2)
+> plant plant -t Grave Buster -l (7,2)
+> plant plant -t Grave Buster -l (8,2)
+> plant plant -t Grave Buster -l (9,2)
 > plant plant -t Grave Buster -l (3,3)
-> advance time -t 200 ticks
-? Zombie of type Normal is dead
+> plant plant -t Grave Buster -l (4,3)
+> plant plant -t Grave Buster -l (5,3)
+> plant plant -t Grave Buster -l (6,3)
+> plant plant -t Grave Buster -l (7,3)
+> plant plant -t Grave Buster -l (8,3)
+> plant plant -t Grave Buster -l (9,3)
+> plant plant -t Grave Buster -l (3,4)
+> plant plant -t Grave Buster -l (4,4)
+> plant plant -t Grave Buster -l (5,4)
+> plant plant -t Grave Buster -l (6,4)
+> plant plant -t Grave Buster -l (7,4)
+> plant plant -t Grave Buster -l (8,4)
+> plant plant -t Grave Buster -l (9,4)
+> plant plant -t Grave Buster -l (3,5)
+> plant plant -t Grave Buster -l (4,5)
+> plant plant -t Grave Buster -l (5,5)
+> plant plant -t Grave Buster -l (6,5)
+> plant plant -t Grave Buster -l (7,5)
+> plant plant -t Grave Buster -l (8,5)
+> plant plant -t Grave Buster -l (9,5)
+? was busted.

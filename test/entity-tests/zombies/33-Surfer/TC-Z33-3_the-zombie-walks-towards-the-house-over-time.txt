@@ -9,17 +9,18 @@
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
 # --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   A Surfer moves 2.2x faster than a Normal and is off the lawn within 10s.
+# --------------------------------------------------------------------------
 
 > menu scoring-game
 ? Scoring game started
-> add plant -t Sunflower
+> add plant -t Peashooter
 > start game
 ? The battle begins
-> cheat add -n 9000 suns
-> cheat remove-cooldown
-> cheat spawn-zombie -t Surfer -l 9,3
-> zombies info
-?     position: 9, 3
-> advance time -t 150 ticks
+> cheat spawn-zombie -t Surfer -l 9,1
+> advance time -t 30 ticks
 > zombies info
 ? Surfer:
+?     position: 5.4, 1

@@ -1,4 +1,4 @@
-=== TEST P41-7: one hit is enough to destroy a normal zombie
+=== TEST P41-7: one bite is enough to destroy a normal zombie
 #
 # Entity    : Chomper
 # Category  : Melee
@@ -10,6 +10,10 @@
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
 # --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   Chomper only swallows an ADJACENT zombie.
+# --------------------------------------------------------------------------
 
 > menu scoring-game
 ? Scoring game started
@@ -18,7 +22,7 @@
 ? The battle begins
 > cheat add -n 9000 suns
 > cheat remove-cooldown
-> plant plant -t Chomper -l (1,3)
-> cheat spawn-zombie -t Normal -l 5,3
-> advance time -t 200 ticks
+> plant plant -t Chomper -l (2,3)
+> cheat spawn-zombie -t Normal -l 3,3
+> advance time -t 60 ticks
 ? Zombie of type Normal is dead

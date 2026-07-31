@@ -1,4 +1,4 @@
-=== TEST BT-0205: a fire plant melts the ice on a frozen plant
+=== TEST BT-0205: a fire plant melts the ice on a frozen neighbour
 #
 # Interaction : a fire plant standing next to a frozen plant thaws it
 # Source      : project document, Frostbite Caves: a fire plant within 8 tiles melts ice at 60 per second
@@ -9,18 +9,23 @@
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
 # --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   600 ticks let the Hunter eat the Sunflower; a Wall-nut survives.
+# --------------------------------------------------------------------------
 
 > menu scoring-game
 ? Scoring game started
-> add plant -t Sunflower
+> add plant -t Wall-nut
 > add plant -t Fire Peashooter
 > start game
 ? The battle begins
 > cheat add -n 9000 suns
 > cheat remove-cooldown
-> plant plant -t Sunflower -l (2,3)
+> plant plant -t Wall-nut -l (2,3)
 > plant plant -t Fire Peashooter -l (2,2)
 > cheat spawn-zombie -t Hunter -l 8,3
-> advance time -t 600 ticks
+> advance time -t 200 ticks
+? Wall-nut at (2, 3) is frozen solid by the Hunter!
 > show tile status -l (2,3)
-? Plant: Sunflower
+? Plant: Wall-nut

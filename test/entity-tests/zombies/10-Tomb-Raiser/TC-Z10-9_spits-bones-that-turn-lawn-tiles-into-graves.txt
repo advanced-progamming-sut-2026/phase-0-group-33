@@ -9,8 +9,14 @@
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
 # --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   The map prints '#', never the word GRAVE; the ability announces itself.
+# --------------------------------------------------------------------------
 
+> menu cheat unlock-all
 > menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
 > add plant -t Sunflower
 > start game
 ? The battle begins
@@ -18,5 +24,4 @@
 > cheat remove-cooldown
 > cheat spawn-zombie -t Tomb Raiser -l 7,3
 > advance time -t 400 ticks
-> show map
-? GRAVE
+? The Tomb Raiser raised a grave at (

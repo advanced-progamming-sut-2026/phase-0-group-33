@@ -9,6 +9,10 @@
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
 # --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   The loss message is 'The zombie ate your brain; LOSER!!!'.
+# --------------------------------------------------------------------------
 
 > menu scoring-game
 ? Scoring game started
@@ -23,4 +27,4 @@
 ? The lawn mower in the row 3 is triggered
 > cheat spawn-zombie -t Normal -l 2,3
 > advance time -t 300 ticks
-? You lost
+? The zombie ate your brain; LOSER!!!

@@ -9,6 +9,11 @@
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
 # --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   The tile keeps reporting the plant underneath plus a 'pumpkin shield'
+#   line; it never becomes 'Plant: Pumpkin'.
+# --------------------------------------------------------------------------
 
 > menu scoring-game
 ? Scoring game started
@@ -20,5 +25,7 @@
 > cheat remove-cooldown
 > plant plant -t Sunflower -l (2,3)
 > plant plant -t Pumpkin -l (2,3)
+? Sunflower at (2, 3) is now protected by a Pumpkin.
 > show tile status -l (2,3)
-? Plant: Pumpkin
+? Plant: Sunflower
+?     pumpkin shield: 4000

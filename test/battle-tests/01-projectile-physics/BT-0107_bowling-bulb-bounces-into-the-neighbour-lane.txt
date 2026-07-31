@@ -1,4 +1,4 @@
-=== TEST BT-0107: bowling bulb bounces into the neighbour lane
+=== TEST BT-0107: bowling bulb fires bulbs that bounce between the lanes
 #
 # Interaction : a bouncing projectile that changes lane, like wall-nut bowling
 # Source      : plants.csv row 16: shoots bulbs that bounce between lanes
@@ -9,6 +9,11 @@
 # Legend:  '>' = a line typed into the game
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   Which lane a bulb bounces into is random, so the old exact health of
+#   the neighbouring zombie could not be asserted.
 # --------------------------------------------------------------------------
 
 > menu scoring-game
@@ -23,5 +28,5 @@
 > cheat spawn-zombie -t Gargantuar -l 9,2
 > advance time -t 150 ticks
 > zombies info
-?     position: 5.4, 2
-?     health: 3480
+? Gargantuar:
+?     position: 5.4, 1

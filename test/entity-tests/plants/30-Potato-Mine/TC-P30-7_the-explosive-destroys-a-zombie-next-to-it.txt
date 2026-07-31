@@ -1,4 +1,4 @@
-=== TEST P30-7: the explosive destroys a zombie next to it
+=== TEST P30-7: the mine destroys a zombie once it is armed
 #
 # Entity    : Potato Mine
 # Damage column: 1800
@@ -9,6 +9,10 @@
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
 # --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   A Potato Mine needs 15s to arm. The old case spawned the zombie first.
+# --------------------------------------------------------------------------
 
 > menu scoring-game
 ? Scoring game started
@@ -17,7 +21,8 @@
 ? The battle begins
 > cheat add -n 9000 suns
 > cheat remove-cooldown
-> cheat spawn-zombie -t Normal -l 3,3
-> plant plant -t Potato Mine -l (3,3)
+> plant plant -t Potato Mine -l (2,3)
 > advance time -t 200 ticks
+> cheat spawn-zombie -t Normal -l 2,3
+> advance time -t 20 ticks
 ? Zombie of type Normal is dead
