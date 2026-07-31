@@ -1,0 +1,25 @@
+=== TEST BT-0703: garlic pushes the zombie into another lane
+#
+# Interaction : the moveZombies tag: being eaten sends the zombie to a neighbour row
+# Source      : plants.csv row 47
+# Rule        : after eating the garlic the zombie must not be in row 3 any more
+# Note        : a failure means the lane change is missing
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Garlic
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Garlic -l (2,3)
+> cheat spawn-zombie -t Normal -l 3,3
+> advance time -t 200 ticks
+> zombies info
+? Normal:
+?     position: 2.4, 2

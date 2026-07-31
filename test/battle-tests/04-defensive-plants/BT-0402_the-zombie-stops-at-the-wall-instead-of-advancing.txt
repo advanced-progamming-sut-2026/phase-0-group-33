@@ -1,0 +1,24 @@
+=== TEST BT-0402: the zombie stops at the wall instead of advancing
+#
+# Interaction : a wall holds the zombie in place while it eats
+# Source      : project document, Wall-nut family
+# Rule        : after 20 seconds the zombie must still be next to the wall, not past it
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Wall-nut
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Wall-nut -l (2,3)
+> cheat spawn-zombie -t Normal -l 3,3
+> advance time -t 200 ticks
+> zombies info
+? Normal:
+?     position: 2.4, 3

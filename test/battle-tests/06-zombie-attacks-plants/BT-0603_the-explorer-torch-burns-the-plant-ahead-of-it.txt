@@ -1,0 +1,22 @@
+=== TEST BT-0603: the explorer torch burns the plant ahead of it
+#
+# Interaction : a zombie ability that destroys plants without eating them
+# Source      : project document, Ancient Egypt: the torch burns plants less than one tile ahead
+# Note        : a failure means the torch is not modelled
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (4,3)
+> cheat spawn-zombie -t Explorer -l 5,3
+> advance time -t 200 ticks
+? Plant Sunflower at (4, 3) is destroyed.

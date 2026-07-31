@@ -1,0 +1,26 @@
+=== TEST BT-0104: threepeater covers three lanes at once
+#
+# Interaction : one plant attacking its own row and both neighbour rows
+# Source      : plants.csv row 8, base ability
+# Setup       : Threepeater in row 4, one Gargantuar in row 4 and one in row 5
+# Arithmetic  : 20 damage every 1.5s = 10 shots = 200 damage per lane
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Threepeater
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Threepeater -l (1,4)
+> cheat spawn-zombie -t Gargantuar -l 9,4
+> cheat spawn-zombie -t Gargantuar -l 9,5
+> advance time -t 150 ticks
+> zombies info
+?     health: 3400
+?     health: 3400

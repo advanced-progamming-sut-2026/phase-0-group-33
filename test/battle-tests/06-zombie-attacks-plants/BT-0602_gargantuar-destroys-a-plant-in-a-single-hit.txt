@@ -1,0 +1,22 @@
+=== TEST BT-0602: gargantuar destroys a plant in a single hit
+#
+# Interaction : a zombie that one-shots plants instead of eating them
+# Source      : project document: the Gargantuar destroys any plant it reaches with one hit
+# Rule        : even a 4000 hit point Wall-nut must fall at once
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Wall-nut
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Wall-nut -l (2,3)
+> cheat spawn-zombie -t Gargantuar -l 3,3
+> advance time -t 100 ticks
+? Plant Wall-nut at (2, 3) is destroyed.

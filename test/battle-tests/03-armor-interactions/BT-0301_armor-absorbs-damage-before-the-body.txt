@@ -1,0 +1,26 @@
+=== TEST BT-0301: armor absorbs damage before the body
+#
+# Interaction : damage ordering between an armor layer and the body
+# Source      : zombies.xlsx armor table
+# Arithmetic  : 200 damage against a 1100 point bucket leaves 900
+# Rule        : the body must still read its full 190 hit points
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Peashooter
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Peashooter -l (1,3)
+> cheat spawn-zombie -t Bucket Head -l 9,3
+> advance time -t 150 ticks
+> zombies info
+? Bucket Head:
+?     health: 190
+?         bucket: 900

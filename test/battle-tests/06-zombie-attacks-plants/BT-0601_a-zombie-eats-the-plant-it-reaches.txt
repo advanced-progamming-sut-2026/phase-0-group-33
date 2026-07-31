@@ -1,0 +1,22 @@
+=== TEST BT-0601: a zombie eats the plant it reaches
+#
+# Interaction : the basic zombie attack against a plant
+# Source      : zombies.xlsx eat damage column
+# Rule        : a 300 hit point Sunflower must be gone after enough chewing
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (2,3)
+> cheat spawn-zombie -t Normal -l 3,3
+> advance time -t 200 ticks
+? Plant Sunflower at (2, 3) is destroyed.

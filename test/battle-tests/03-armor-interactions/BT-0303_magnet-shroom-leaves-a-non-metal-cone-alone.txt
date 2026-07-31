@@ -1,0 +1,24 @@
+=== TEST BT-0303: magnet-shroom leaves a non metal cone alone
+#
+# Interaction : the magnet must ignore armor that is not metallic
+# Source      : zombies.xlsx: the cone is marked metallic = no
+# Rule        : after the magnet has been standing next to it the cone still reads 370
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Magnet-shroom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Magnet-shroom -l (4,3)
+> cheat spawn-zombie -t Cone Head -l 6,3
+> advance time -t 100 ticks
+> zombies info
+? Cone Head:
+?         cone: 370

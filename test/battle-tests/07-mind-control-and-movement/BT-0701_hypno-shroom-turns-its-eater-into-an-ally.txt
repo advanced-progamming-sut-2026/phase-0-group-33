@@ -1,0 +1,24 @@
+=== TEST BT-0701: hypno-shroom turns its eater into an ally
+#
+# Interaction : mind control: the zombie that eats the shroom fights for the player
+# Source      : plants.csv row 54
+# Rule        : the zombie must be reported as hypnotized after it eats the shroom
+# Note        : a failure means hypnosis on being eaten is not wired
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Hypno-shroom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Hypno-shroom -l (2,3)
+> cheat spawn-zombie -t Normal -l 3,3
+> advance time -t 200 ticks
+> zombies info
+? hypnotized

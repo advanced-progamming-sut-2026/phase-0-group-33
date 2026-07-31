@@ -1,0 +1,22 @@
+=== TEST BT-0702: chomper swallows a zombie whole
+#
+# Interaction : an instant kill melee plant with a digest pause
+# Source      : plants.csv row 41: instant kill then 40 seconds of digesting
+# Rule        : the adjacent zombie must die at once
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Chomper
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Chomper -l (2,3)
+> cheat spawn-zombie -t Normal -l 3,3
+> advance time -t 100 ticks
+? Zombie of type Normal is dead

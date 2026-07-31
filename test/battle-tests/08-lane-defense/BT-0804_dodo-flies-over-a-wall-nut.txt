@@ -1,0 +1,24 @@
+=== TEST BT-0804: dodo flies over a wall-nut
+#
+# Interaction : a flying zombie ignoring a wall
+# Source      : project document, Frostbite Caves: the Dodo flies over obstacles such as Wall-nut
+# Rule        : the wall must survive because the Dodo passes over it
+# Note        : a failure means the flying behaviour is not modelled
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Wall-nut
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Wall-nut -l (4,3)
+> cheat spawn-zombie -t Dodo -l 6,3
+> advance time -t 300 ticks
+> show tile status -l (4,3)
+? Plant: Wall-nut | HP: 4000/4000

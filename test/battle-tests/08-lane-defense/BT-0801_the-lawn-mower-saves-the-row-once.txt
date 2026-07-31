@@ -1,0 +1,22 @@
+=== TEST BT-0801: the lawn mower saves the row once
+#
+# Interaction : the last line of defense
+# Source      : project document, lawn mower rule
+# Rule        : a zombie reaching column 1 with no plant in the way triggers the mower
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (1,1)
+> cheat spawn-zombie -t Normal -l 2,3
+> advance time -t 300 ticks
+? The lawn mower in the row 3 is triggered

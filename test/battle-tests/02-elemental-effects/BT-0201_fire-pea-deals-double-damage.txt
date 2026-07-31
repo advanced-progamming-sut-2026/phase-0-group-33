@@ -1,0 +1,25 @@
+=== TEST BT-0201: fire pea deals double damage
+#
+# Interaction : the fire tag doubles projectile damage
+# Source      : project document, tag list: fire shots deal double damage
+# Arithmetic  : Fire Peashooter 40 damage every 1.5s = 10 shots = 400 damage
+# Compare     : a plain Peashooter deals 200 in the same window, see BT-0101
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Fire Peashooter
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Fire Peashooter -l (1,3)
+> cheat spawn-zombie -t Gargantuar -l 9,3
+> advance time -t 150 ticks
+> zombies info
+? Gargantuar:
+?     health: 3200

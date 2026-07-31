@@ -1,0 +1,24 @@
+=== TEST BT-0204: poison ignores armor and hits the body
+#
+# Interaction : the poison tag bypasses armor completely
+# Source      : project document, tag list: poison ignores buckets and cones
+# Setup       : Goo Peashooter against a Bucket Head
+# Arithmetic  : body is 190 hit points, 200 poison damage arrives in 150 ticks
+# Rule        : the zombie must die even though the 1100 point bucket is untouched
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Goo Peashooter
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Goo Peashooter -l (1,3)
+> cheat spawn-zombie -t Bucket Head -l 9,3
+> advance time -t 150 ticks
+? Zombie of type Bucket Head is dead

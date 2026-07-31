@@ -1,0 +1,25 @@
+=== TEST BT-0502: jalapeno burns the whole lane
+#
+# Interaction : a consumable that hits every zombie of one row
+# Source      : plants.csv row 35: burns all zombies of a lane instantly
+# Setup       : two zombies far apart in the same row
+# Rule        : both must die, whatever their distance from the Jalapeno
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Jalapeno
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Normal -l 3,3
+> cheat spawn-zombie -t Normal -l 7,3
+> plant plant -t Jalapeno -l (5,3)
+? Zombie of type Normal is dead at (3, 3)
+? Zombie of type Normal is dead at (7, 3)
+? Jalapeno exploded at (5, 3).

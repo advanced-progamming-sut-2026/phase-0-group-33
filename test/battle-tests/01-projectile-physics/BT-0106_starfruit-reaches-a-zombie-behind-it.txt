@@ -1,0 +1,27 @@
+=== TEST BT-0106: starfruit reaches a zombie behind it
+#
+# Interaction : a shooter firing in several directions including backward
+# Source      : plants.csv row 19: shoots in 5 star directions including backward
+# Setup       : Starfruit at column 5 with a King behind it at column 2
+# Arithmetic  : one backward shot of 20 damage every 1.5s = 10 actions = 200 damage
+# Rule        : the King must drop from 1000 to 800
+# Compare     : Split Pea sends two peas backward and reaches 600, see BT-0105
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Starfruit
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Starfruit -l (5,3)
+> cheat spawn-zombie -t King -l 2,3
+> advance time -t 150 ticks
+> zombies info
+? King:
+?     health: 800

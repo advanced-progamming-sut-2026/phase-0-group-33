@@ -1,0 +1,23 @@
+=== TEST BT-0606: the octopus disables the plant it hits
+#
+# Interaction : a thrown octopus that works like ice on a plant
+# Source      : project document, Big Wave Beach
+# Note        : a failure means the octopus effect is missing
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (2,3)
+> cheat spawn-zombie -t Octopus -l 8,3
+> advance time -t 400 ticks
+> show tile status -l (2,3)
+? octopus

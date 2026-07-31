@@ -1,0 +1,24 @@
+=== TEST BT-0304: the knight carries two separate armor layers
+#
+# Interaction : a zombie with more than one armor layer
+# Source      : project document: crown and shoulder plate, 1600 hit points each
+# Rule        : zombies info must list both layers
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (1,1)
+> cheat spawn-zombie -t Knight -l 6,3
+> zombies info
+? Knight:
+?         crown: 1600
+?         shoulderArmor: 1600

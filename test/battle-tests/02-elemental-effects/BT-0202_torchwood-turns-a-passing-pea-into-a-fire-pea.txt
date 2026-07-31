@@ -1,0 +1,28 @@
+=== TEST BT-0202: torchwood turns a passing pea into a fire pea
+#
+# Interaction : a modifier plant changing a projectile that flies through it
+# Source      : plants.csv row 52 and the Pea tag description
+# Setup       : Peashooter at column 1, Torchwood at column 3, zombie further right
+# Arithmetic  : 20 damage doubled to 40, 10 shots = 400 damage
+# Rule        : without the Torchwood the same setup would leave 3400
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Peashooter
+> add plant -t Torchwood
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Peashooter -l (1,3)
+> plant plant -t Torchwood -l (3,3)
+> cheat spawn-zombie -t Gargantuar -l 9,3
+> advance time -t 150 ticks
+> zombies info
+? Gargantuar:
+?     health: 3200

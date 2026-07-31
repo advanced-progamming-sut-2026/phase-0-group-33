@@ -1,0 +1,25 @@
+=== TEST BT-0704: sweet potato pulls zombies into its own lane
+#
+# Interaction : the moveZombies tag used to attract instead of repel
+# Source      : plants.csv row 48
+# Rule        : a zombie in the neighbour row must be dragged into row 3
+# Note        : a failure means the attraction is missing
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sweet Potato
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sweet Potato -l (4,3)
+> cheat spawn-zombie -t Normal -l 5,2
+> advance time -t 200 ticks
+> zombies info
+? Normal:
+?     position: 4.4, 3

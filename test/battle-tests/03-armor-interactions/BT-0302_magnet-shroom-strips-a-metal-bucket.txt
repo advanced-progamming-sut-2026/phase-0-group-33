@@ -1,0 +1,22 @@
+=== TEST BT-0302: magnet-shroom strips a metal bucket
+#
+# Interaction : Magnet-shroom removing metallic armor
+# Source      : plants.csv row 53 and the metallic column of zombies.xlsx
+# Rule        : the bucket is metallic so the magnet must pull it off
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Magnet-shroom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Magnet-shroom -l (4,3)
+> cheat spawn-zombie -t Bucket Head -l 6,3
+> advance time -t 200 ticks
+? Magnet-shroom pulled the metal armor off the Bucket Head!

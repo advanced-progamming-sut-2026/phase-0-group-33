@@ -1,0 +1,26 @@
+=== TEST BT-0506: doom-shroom clears the whole lawn
+#
+# Interaction : the largest explosion in the game
+# Source      : plants.csv row 36: huge explosion over the whole garden
+# Setup       : three zombies spread over three different rows
+# Rule        : no zombie may survive
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Doom-shroom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Normal -l 4,1
+> cheat spawn-zombie -t Normal -l 5,3
+> cheat spawn-zombie -t Normal -l 6,5
+> plant plant -t Doom-shroom -l (5,3)
+> advance time -t 50 ticks
+> zombies info
+? There are no zombies on the map.

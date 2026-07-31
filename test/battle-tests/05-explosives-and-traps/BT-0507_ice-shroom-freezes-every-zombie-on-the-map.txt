@@ -1,0 +1,25 @@
+=== TEST BT-0507: ice-shroom freezes every zombie on the map
+#
+# Interaction : a consumable that applies an effect to every zombie
+# Source      : plants.csv row 57: freezes and stops all zombies on the map
+# Rule        : zombies in different rows must all show the frozen effect
+# Note        : a failure means the global freeze is missing
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Ice-shroom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Normal -l 6,1
+> cheat spawn-zombie -t Normal -l 6,5
+> plant plant -t Ice-shroom -l (3,3)
+> advance time -t 20 ticks
+> zombies info
+? frozen

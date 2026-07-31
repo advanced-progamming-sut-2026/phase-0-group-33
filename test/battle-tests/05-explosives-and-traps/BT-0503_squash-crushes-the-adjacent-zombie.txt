@@ -1,0 +1,22 @@
+=== TEST BT-0503: squash crushes the adjacent zombie
+#
+# Interaction : a trap that resolves against the first zombie next to it
+# Source      : plants.csv row 33: crushes the first adjacent zombie
+# Rule        : the zombie next to the Squash must die
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Squash
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Normal -l 4,3
+> plant plant -t Squash -l (3,3)
+> advance time -t 50 ticks
+? Zombie of type Normal is dead

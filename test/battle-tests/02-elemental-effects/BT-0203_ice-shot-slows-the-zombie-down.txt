@@ -1,0 +1,27 @@
+=== TEST BT-0203: ice shot slows the zombie down
+#
+# Interaction : the ice tag reduces zombie movement speed
+# Source      : project document, tag list: ice slows zombies down
+# Setup       : Snow Pea against a Gargantuar, compared with the plain Peashooter run
+# Rule        : after 15 seconds the chilled zombie must still be further right than 5.4
+# Measured    : plain Peashooter leaves it at 5.4, Snow Pea leaves it at 7.2
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Snow Pea
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Snow Pea -l (1,3)
+> cheat spawn-zombie -t Gargantuar -l 9,3
+> advance time -t 150 ticks
+> zombies info
+? Gargantuar:
+?     position: 7.2, 3
+?     health: 3400

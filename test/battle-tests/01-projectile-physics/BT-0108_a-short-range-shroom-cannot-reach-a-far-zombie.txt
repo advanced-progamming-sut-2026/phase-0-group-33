@@ -1,0 +1,25 @@
+=== TEST BT-0108: a short range shroom cannot reach a far zombie
+#
+# Interaction : range limit of the small shrooms
+# Source      : plants.csv rows 22 and 23: short range shot
+# Setup       : Puff-shroom at column 1, zombie parked at column 9
+# Rule        : the far zombie must stay at full health
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Puff-shroom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Puff-shroom -l (1,3)
+> cheat spawn-zombie -t King -l 9,3
+> advance time -t 150 ticks
+> zombies info
+? King:
+?     health: 1000

@@ -1,0 +1,27 @@
+=== TEST BT-0501: cherry bomb clears a three by three area
+#
+# Interaction : area damage that reaches the neighbour rows
+# Source      : plants.csv row 32: 3x3 explosion, 1800 damage
+# Setup       : three normal zombies, two in the target row and one in the row below
+# Rule        : all three must die from a single Cherry Bomb
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Cherry Bomb
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Normal -l 4,1
+> cheat spawn-zombie -t Normal -l 5,1
+> cheat spawn-zombie -t Normal -l 4,2
+> plant plant -t Cherry Bomb -l (4,1)
+? Zombie of type Normal is dead at (4, 1)
+? Zombie of type Normal is dead at (5, 1)
+? Zombie of type Normal is dead at (4, 2)
+? Cherry Bomb exploded at (4, 1).

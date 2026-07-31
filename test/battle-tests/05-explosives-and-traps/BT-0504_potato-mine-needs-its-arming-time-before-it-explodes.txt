@@ -1,0 +1,24 @@
+=== TEST BT-0504: potato mine needs its arming time before it explodes
+#
+# Interaction : a trap with a 15 second arming delay
+# Source      : plants.csv row 30: arms after 15 seconds, then explodes on contact
+# Setup       : the mine is planted first and given 16 seconds before a zombie arrives
+# Rule        : the armed mine must destroy the zombie that walks onto it
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Potato Mine
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Potato Mine -l (3,3)
+> advance time -t 160 ticks
+> cheat spawn-zombie -t Normal -l 5,3
+> advance time -t 120 ticks
+? Zombie of type Normal is dead

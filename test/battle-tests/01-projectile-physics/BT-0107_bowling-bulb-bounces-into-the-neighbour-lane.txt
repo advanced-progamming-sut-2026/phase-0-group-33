@@ -1,0 +1,27 @@
+=== TEST BT-0107: bowling bulb bounces into the neighbour lane
+#
+# Interaction : a bouncing projectile that changes lane, like wall-nut bowling
+# Source      : plants.csv row 16: shoots bulbs that bounce between lanes
+# Setup       : Bowling Bulb in row 1, one zombie in row 1 and one in row 2
+# Rule        : the bulb must bounce and also reach the zombie in row 2
+# Note        : a failure means the bouncing behaviour is not modelled yet
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Bowling Bulb
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Bowling Bulb -l (1,1)
+> cheat spawn-zombie -t Gargantuar -l 9,1
+> cheat spawn-zombie -t Gargantuar -l 9,2
+> advance time -t 150 ticks
+> zombies info
+?     position: 5.4, 2
+?     health: 3480

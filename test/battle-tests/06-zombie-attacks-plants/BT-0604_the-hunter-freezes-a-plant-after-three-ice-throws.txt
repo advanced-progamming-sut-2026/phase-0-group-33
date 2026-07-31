@@ -1,0 +1,23 @@
+=== TEST BT-0604: the hunter freezes a plant after three ice throws
+#
+# Interaction : a zombie applying a freeze level to a plant
+# Source      : project document, Frostbite Caves: three ice hits freeze the plant
+# Note        : a failure means the plant freeze levels are not modelled
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (2,3)
+> cheat spawn-zombie -t Hunter -l 8,3
+> advance time -t 600 ticks
+> show tile status -l (2,3)
+? frozen

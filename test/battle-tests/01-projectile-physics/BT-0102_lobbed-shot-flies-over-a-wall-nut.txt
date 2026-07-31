@@ -1,0 +1,28 @@
+=== TEST BT-0102: lobbed shot flies over a wall-nut
+#
+# Interaction : Lobber projectile ignores an obstacle standing in front of it
+# Source      : project document: lobber shots ignore obstacles
+# Setup       : Cabbage-pult at column 1, Wall-nut at column 2, zombie further right
+# Arithmetic  : Cabbage-pult 40 damage every 2.9s = 5 shots in 150 ticks = 200 damage
+# Rule        : the wall must not stop the lobbed cabbage
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Cabbage-pult
+> add plant -t Wall-nut
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Cabbage-pult -l (1,3)
+> plant plant -t Wall-nut -l (2,3)
+> cheat spawn-zombie -t Gargantuar -l 9,3
+> advance time -t 150 ticks
+> zombies info
+? Gargantuar:
+?     health: 3400

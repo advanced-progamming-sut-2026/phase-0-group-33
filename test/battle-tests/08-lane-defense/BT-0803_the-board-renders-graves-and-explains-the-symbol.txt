@@ -1,0 +1,26 @@
+=== TEST BT-0803: the board renders graves and explains the symbol
+#
+# Interaction : terrain that blocks straight shots
+# Source      : project document, Ancient Egypt: graves stop straight shots and have 700 hit points
+# Setup       : the Egypt chapter is the one that places graves on the board
+# Rule        : show map must draw the board and document the grave symbol in its legend
+# Note        : grave positions are random, so this case checks the rendering contract, not a fixed tile
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> menu enter chapter -c Egypt -l 1
+> add plant -t Peashooter
+> start game
+> cheat add -n 9000 suns
+> show map
+? Legend:
+? # grave

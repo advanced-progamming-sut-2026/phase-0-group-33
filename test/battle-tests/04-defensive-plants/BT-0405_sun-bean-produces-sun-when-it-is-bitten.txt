@@ -1,0 +1,26 @@
+=== TEST BT-0405: sun bean produces sun when it is bitten
+#
+# Interaction : a defensive plant that pays sun for every hit it takes
+# Source      : plants.csv row 51: 5 sun on every hit
+# Rule        : the sun balance must be higher than the 9050 the arena starts with
+# Note        : a failure means the sun on hit mechanic is missing
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sun Bean
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sun Bean -l (2,3)
+> show sun amount
+? Sun: 9000
+> cheat spawn-zombie -t Normal -l 3,3
+> advance time -t 200 ticks
+> show sun amount
+? Sun: 9005

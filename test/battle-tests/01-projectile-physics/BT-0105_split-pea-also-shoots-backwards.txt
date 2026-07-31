@@ -1,0 +1,27 @@
+=== TEST BT-0105: split pea also shoots backwards
+#
+# Interaction : a shooter that fires forward and backward at the same time
+# Source      : plants.csv row 12: one pea forward, two peas backward
+# Setup       : Split Pea at column 5 with a King behind it at column 2
+# Why a King  : the King never moves, so it stays in place for the whole measurement
+# Arithmetic  : two backward peas of 20 damage every 1.5s = 10 actions = 400 damage
+# Rule        : the King must drop from 1000 to 600
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Split Pea
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Split Pea -l (5,3)
+> cheat spawn-zombie -t King -l 2,3
+> advance time -t 150 ticks
+> zombies info
+? King:
+?     health: 600

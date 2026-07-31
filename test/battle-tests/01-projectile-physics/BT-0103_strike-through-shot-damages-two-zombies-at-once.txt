@@ -1,0 +1,27 @@
+=== TEST BT-0103: strike-through shot damages two zombies at once
+#
+# Interaction : Strike-through projectile passes through the first zombie
+# Source      : project document, Strike-through section
+# Setup       : two Gargantuars in the same row, one behind the other
+# Arithmetic  : Cactus 30 damage every 1.5s = 10 shots = 300 damage
+# Rule        : both zombies must take the full 300, not only the front one
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Cactus
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Cactus -l (1,3)
+> cheat spawn-zombie -t Gargantuar -l 7,3
+> cheat spawn-zombie -t Gargantuar -l 9,3
+> advance time -t 150 ticks
+> zombies info
+?     health: 3300
+?     health: 3300

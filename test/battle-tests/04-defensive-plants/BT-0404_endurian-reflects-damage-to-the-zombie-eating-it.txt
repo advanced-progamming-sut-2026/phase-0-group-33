@@ -1,0 +1,25 @@
+=== TEST BT-0404: endurian reflects damage to the zombie eating it
+#
+# Interaction : a wall that hurts the zombie chewing on it
+# Source      : plants.csv row 46: reflects damage to the attacking zombie
+# Rule        : the eater must lose health without any other plant on the lawn
+# Note        : a failure means the reflect mechanic is not modelled
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Endurian
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Endurian -l (2,3)
+> cheat spawn-zombie -t Gargantuar -l 3,3
+> advance time -t 200 ticks
+> zombies info
+? Gargantuar:
+?     health: 3400

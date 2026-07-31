@@ -1,0 +1,24 @@
+=== TEST BT-0406: pumpkin shields the plant underneath it
+#
+# Interaction : the stack tag: one plant planted on top of another
+# Source      : plants.csv row 50 and the stack tag description
+# Rule        : planting a Pumpkin on an occupied tile must be accepted
+# Note        : a failure means stacking is not implemented
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sunflower
+> add plant -t Pumpkin
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (2,3)
+> plant plant -t Pumpkin -l (2,3)
+> show tile status -l (2,3)
+? Plant: Pumpkin

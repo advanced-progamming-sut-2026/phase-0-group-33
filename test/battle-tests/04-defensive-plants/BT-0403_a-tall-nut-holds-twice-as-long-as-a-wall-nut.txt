@@ -1,0 +1,23 @@
+=== TEST BT-0403: a tall-nut holds twice as long as a wall-nut
+#
+# Interaction : comparing the two walls under the same attack
+# Source      : plants.csv rows 44 and 45: 4000 against 8000 hit points
+# Rule        : after the same 20 seconds the Tall-nut must report more health than the Wall-nut does in BT-0401
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Tall-nut
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Tall-nut -l (2,3)
+> cheat spawn-zombie -t Normal -l 3,3
+> advance time -t 200 ticks
+> show tile status -l (2,3)
+? Plant: Tall-nut | HP: 6330/8000

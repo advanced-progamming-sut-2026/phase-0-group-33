@@ -1,0 +1,24 @@
+=== TEST BT-0505: iceberg lettuce freezes the zombie that steps on it
+#
+# Interaction : a trap that freezes instead of damaging
+# Source      : plants.csv row 38: freezes the first zombie that steps on it
+# Rule        : the zombie must show a frozen effect in zombies info
+# Note        : a failure means the freeze on contact is missing
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Iceberg Lettuce
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Iceberg Lettuce -l (3,3)
+> cheat spawn-zombie -t Normal -l 4,3
+> advance time -t 100 ticks
+> zombies info
+? frozen

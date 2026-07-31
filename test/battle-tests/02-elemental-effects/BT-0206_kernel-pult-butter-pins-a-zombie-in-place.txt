@@ -1,0 +1,23 @@
+=== TEST BT-0206: kernel-pult butter pins a zombie in place
+#
+# Interaction : a chance based effect that stops a zombie moving
+# Source      : plants.csv row 26: corn kernel or butter that stops the zombie
+# Rule        : over 60 seconds at least one butter must land
+# Note        : the butter chance is 25 percent per shot in the current code
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Kernel-pult
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Kernel-pult -l (1,3)
+> cheat spawn-zombie -t Gargantuar -l 9,3
+> advance time -t 600 ticks
+? Butter pinned the Gargantuar in place!

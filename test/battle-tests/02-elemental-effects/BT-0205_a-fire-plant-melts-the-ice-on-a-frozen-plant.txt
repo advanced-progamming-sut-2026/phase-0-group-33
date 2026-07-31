@@ -1,0 +1,26 @@
+=== TEST BT-0205: a fire plant melts the ice on a frozen plant
+#
+# Interaction : a fire plant standing next to a frozen plant thaws it
+# Source      : project document, Frostbite Caves: a fire plant within 8 tiles melts ice at 60 per second
+# Setup       : Hunter freezes a Sunflower, a Fire Peashooter stands next to it
+# Note        : a failure means the warmth mechanic is not wired to the Hunter ice
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sunflower
+> add plant -t Fire Peashooter
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (2,3)
+> plant plant -t Fire Peashooter -l (2,2)
+> cheat spawn-zombie -t Hunter -l 8,3
+> advance time -t 600 ticks
+> show tile status -l (2,3)
+? Plant: Sunflower
