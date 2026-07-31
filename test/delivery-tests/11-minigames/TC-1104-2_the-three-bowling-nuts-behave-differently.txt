@@ -1,0 +1,45 @@
+=== TEST TC-1104-2: the three bowling nuts behave differently
+#
+# Rubric (Phase 1) : مینی‌گیم ها > بولینگ گردویی > عملکرد مناسب گردوها
+# Group            : 11 - Minigames
+# Kind             : automatic (RANDOM: which nuts the belt delivers)
+# Goal             : Wall-nut bounces, Explode-o-nut blows a 3x3, Tall-nut ploughs through.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   A nut may only be placed in columns 1..3 (behind the red line).
+#   Once placed it rolls to the right, bounces 90 degrees off a zombie
+#   and off the top/bottom walls, and deals one normal zombie of damage
+#   per hit.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n wallnut-bowling -d 1
+? (stage 1) started!
+> advance time -t 400 ticks
+? The conveyor belt delivered a
+> show plants status
+? Your plants:
+> plant plant -t Wall-nut -l (5, 3)
+? You may only bowl from behind the red line (columns 1-3).
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   The conveyor belt delivered a Wall-nut.
+#   > plant plant -t Wall-nut -l (1, 3)
+#   Wall-nut planted at (1, 3).
+#   > advance time -t 50 ticks
+#   The rolling Wall-nut hit a Normal at (4, 3) and bounced!

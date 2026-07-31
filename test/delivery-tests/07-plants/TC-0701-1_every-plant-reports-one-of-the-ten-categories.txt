@@ -1,0 +1,43 @@
+=== TEST TC-0701-1: every plant reports one of the ten categories
+#
+# Rubric (Phase 1) : گیاهان > پیاده سازی > پیاده سازی طبقه بندی گیاهان
+# Group            : 07 - Plants
+# Kind             : automatic (deterministic)
+# Goal             : Sun Producer / Shooter / Lobber / Explosive / Melee / Wall-nut / Modifier / Strike-through / Homing / Mint.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> menu enter collection
+? Redirected to collection menu
+> menu collection show-plant -p Sunflower
+? category: SUN_PRODUCER
+> menu collection show-plant -p Peashooter
+? category: SHOOTER
+> menu collection show-plant -p Cabbage-pult
+? category: LOBBER
+> menu collection show-plant -p Cherry Bomb
+? category: EXPLOSIVE
+> menu collection show-plant -p Bonk Choy
+? category: MELEE
+> menu collection show-plant -p Wall-nut
+? category: WALL_NUT
+> menu collection show-plant -p Torchwood
+? category: MODIFIER
+> menu collection show-plant -p Cactus
+? category: STRIKE_THROUGH
+> menu collection show-plant -p Cat-tail
+? category: HOMING
+> menu collection show-plant -p Magnet-shroom
+? category: HOMING

@@ -1,0 +1,30 @@
+=== TEST TC-0205-1: stay-logged-in survives a restart of the program
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی ورود > stay logged in
+# Group            : 02 - Game start & menus
+# Kind             : automatic (deterministic)
+# Goal             : After -stay-logged-in the next start of the program is already logged in.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   '>> RESTART' closes the game and starts it again on the SAME data folder.
+#   That is exactly what the TA does by hand: quit, run again.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123! -stay-logged-in
+? Login successful.
+> menu show current
+? Main menu
+>> RESTART
+> menu show current
+? Main menu
+> menu enter profile
+? Redirected to profile menu
+> menu profile show-info
+? Username: tester

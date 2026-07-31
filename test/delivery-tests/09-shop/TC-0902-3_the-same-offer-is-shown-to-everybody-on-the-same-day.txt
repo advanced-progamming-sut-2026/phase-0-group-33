@@ -1,0 +1,41 @@
+=== TEST TC-0902-3: the same offer is shown to everybody on the same day
+#
+# Rubric (Phase 1) : فروشگاه > کالاها > پیشنهاد روزانه
+# Group            : 09 - Shop
+# Kind             : automatic (deterministic)
+# Goal             : The offer is derived from the date, not from a per-user roll.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Repeat the case with a second account: the plant name is the same
+#   for every player on the same calendar day.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu greenhouse
+? Redirected to greenhouse menu
+> enter shop
+? Redirected to Shop menu
+> shop daily
+? 10 seed packets of
+> shop daily
+? 10 seed packets of
+> menu exit
+? Redirected to Greenhouse menu
+> menu exit
+? Redirected to Main menu
+> menu greenhouse
+? Redirected to greenhouse menu
+> enter shop
+? Redirected to Shop menu
+> shop daily
+? 10 seed packets of

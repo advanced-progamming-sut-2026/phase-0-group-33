@@ -1,0 +1,79 @@
+=== TEST TC-0402-2: the Frostbite board has slider tiles
+#
+# Rubric (Phase 1) : مراحل > مراحل adventure > غارهای یخی
+# Group            : 04 - Adventure levels & special levels
+# Kind             : automatic (slider positions are random)
+# Goal             : '^' pushes a zombie one lane up, 'v' one lane down; nothing grows there.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   The scan proves the slider tiles exist: they answer
+#   'Slider tiles cannot hold plants.'
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Frost Bite -l 1
+? Entered Frost Bite, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 5000 suns
+? Sun: 5050
+> cheat remove-cooldown
+? All cooldown limits removed.
+> show map
+? Wave: 0/3
+
+> plant plant -t Peashooter -l (3, 1)
+> plant plant -t Peashooter -l (4, 1)
+> plant plant -t Peashooter -l (5, 1)
+> plant plant -t Peashooter -l (6, 1)
+> plant plant -t Peashooter -l (7, 1)
+> plant plant -t Peashooter -l (8, 1)
+> plant plant -t Peashooter -l (9, 1)
+> plant plant -t Peashooter -l (3, 2)
+> plant plant -t Peashooter -l (4, 2)
+> plant plant -t Peashooter -l (5, 2)
+> plant plant -t Peashooter -l (6, 2)
+> plant plant -t Peashooter -l (7, 2)
+> plant plant -t Peashooter -l (8, 2)
+> plant plant -t Peashooter -l (9, 2)
+> plant plant -t Peashooter -l (3, 3)
+> plant plant -t Peashooter -l (4, 3)
+> plant plant -t Peashooter -l (5, 3)
+> plant plant -t Peashooter -l (6, 3)
+> plant plant -t Peashooter -l (7, 3)
+> plant plant -t Peashooter -l (8, 3)
+> plant plant -t Peashooter -l (9, 3)
+> plant plant -t Peashooter -l (3, 4)
+> plant plant -t Peashooter -l (4, 4)
+> plant plant -t Peashooter -l (5, 4)
+> plant plant -t Peashooter -l (6, 4)
+> plant plant -t Peashooter -l (7, 4)
+> plant plant -t Peashooter -l (8, 4)
+> plant plant -t Peashooter -l (9, 4)
+> plant plant -t Peashooter -l (3, 5)
+> plant plant -t Peashooter -l (4, 5)
+> plant plant -t Peashooter -l (5, 5)
+> plant plant -t Peashooter -l (6, 5)
+> plant plant -t Peashooter -l (7, 5)
+> plant plant -t Peashooter -l (8, 5)
+> plant plant -t Peashooter -l (9, 5)
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   [M] .   .   .   ^   .   .   .   .   .
+#   [M] .   .   .   .   .   .   .   v   .
+#   Slider tiles cannot hold plants.

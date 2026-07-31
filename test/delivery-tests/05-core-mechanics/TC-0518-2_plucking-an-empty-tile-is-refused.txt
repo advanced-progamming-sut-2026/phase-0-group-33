@@ -1,0 +1,31 @@
+=== TEST TC-0518-2: plucking an empty tile is refused
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > محیط باغ > امکان کندن گیاه با بیل
+# Group            : 05 - Core game mechanics
+# Kind             : automatic (deterministic)
+# Goal             : The command answers instead of failing silently.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 500 suns
+? Sun: 550
+> cheat remove-cooldown
+? All cooldown limits removed.
+> pluck plant -l (2, 3)
+? There is no plant at (2, 3).

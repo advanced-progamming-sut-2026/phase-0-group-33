@@ -1,0 +1,60 @@
+=== TEST TC-0510-1: each wave is 25 percent more expensive than the previous
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > ظهور زامبی‌ها > سختی موج
+# Group            : 05 - Core game mechanics
+# Kind             : automatic (RANDOM: the exact zombies differ)
+# Goal             : The 'which costed <n>' number grows from wave to wave.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   wave 1 budget = 100 + 100 x levelNumber, then x1.25 per wave and
+#   x2 for the final wave (the doc's flag wave).
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 5000 suns
+? Sun: 5050
+> cheat remove-cooldown
+? All cooldown limits removed.
+> start zombie waves
+? which costed
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+? Wave 2 started.
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   Wave 1 started.
+#   Zombie Normal spawned at wave 1 in lane 2 which costed 100.
+#   Zombie Normal spawned at wave 1 in lane 3 which costed 100.
+#   Wave 2 started.
+#   Zombie Cone Head spawned at wave 2 in lane 2 which costed 200.

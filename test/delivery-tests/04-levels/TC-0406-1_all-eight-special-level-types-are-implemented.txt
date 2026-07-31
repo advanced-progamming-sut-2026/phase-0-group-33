@@ -1,0 +1,49 @@
+=== TEST TC-0406-1: all eight special level types are implemented
+#
+# Rubric (Phase 1) : مراحل > مراحل ویژه > مرحله‌ی بیشتر (امتیازی)
+# Group            : 04 - Adventure levels & special levels
+# Kind             : automatic (deterministic)
+# Goal             : The doc asks for at least 4; the project has all 8 - the extra ones are bonus.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 2
+? Entered Egypt, level 2 [special: CONVEYOR_BELT]
+> menu exit
+? Redirected to Main menu
+> menu enter chapter -c Egypt -l 3
+? Entered Egypt, level 3 [special: LOCKED_PLANTS]
+> menu exit
+? Redirected to Main menu
+> menu enter chapter -c Frost Bite -l 2
+? Entered Frost Bite, level 2 [special: SAVE_OUR_SEEDS]
+> menu exit
+? Redirected to Main menu
+> menu enter chapter -c Frost Bite -l 3
+? Entered Frost Bite, level 3 [special: TIMED_WAR]
+> menu exit
+? Redirected to Main menu
+> menu enter chapter -c Wavey Beach -l 2
+? Entered Wavey Beach, level 2 [special: DEAD_LINE]
+> menu exit
+? Redirected to Main menu
+> menu enter chapter -c Wavey Beach -l 3
+? Entered Wavey Beach, level 3 [special: LOVE_YOUR_PLANTS]
+> menu exit
+? Redirected to Main menu
+> menu enter chapter -c Dark Ages -l 2
+? Entered Dark Ages, level 2 [special: NIGHT_OPS]
+> menu exit
+? Redirected to Main menu
+> menu enter chapter -c Dark Ages -l 3
+? Entered Dark Ages, level 3 [special: PLANT_WHAT_YOU_GET]

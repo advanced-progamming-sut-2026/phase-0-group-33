@@ -1,0 +1,49 @@
+=== TEST TC-07P-37: plant Tangle Kelp
+#
+# Rubric (Phase 1) : گیاهان > پیاده سازی > گیاهان امتیازی
+# Group            : 07 - Plants
+# Kind             : automatic (deterministic)
+# Goal             : Tangle Kelp exists, can be selected, placed and used as the doc describes.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Category : Explosive
+#   Tags     : Trap, Water
+#   Cost     : 25 sun   |   base HP: 300   |   damage: Insta-kill
+#   Recharge : 15s
+#   
+#   The account is opened with 'menu cheat unlock-all', so every plant is
+#   unlocked AND at level 5 - that is why the HP on the lawn is higher than
+#   the base HP of plants.csv (the level 2..5 bonuses are applied).
+#   
+#   Tangle Kelp is a water-only trap: it drags the first water zombie
+#   under the surface and kills it instantly.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Wavey Beach -l 1
+? Entered Wavey Beach, level 1
+> add plant -t Tangle Kelp
+? Tangle Kelp added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 9000 suns
+? Sun: 9050
+> cheat remove-cooldown
+? All cooldown limits removed.
+> plant plant -t Tangle Kelp -l (2, 3)
+? Tangle Kelp can only be planted in water.
+> plant plant -t Tangle Kelp -l (8, 2)
+? Tangle Kelp planted at (8, 2).
+> show tile status -l (8, 2)
+? Tile (8, 2) | terrain: WATER
+? Plant: Tangle Kelp | HP: 300/300

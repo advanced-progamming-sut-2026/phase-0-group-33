@@ -1,0 +1,23 @@
+=== TEST TC-0219-1: an unknown command is reported not ignored
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی بازی > بررسی خطاها
+# Group            : 02 - Game start & menus
+# Kind             : automatic (deterministic)
+# Goal             : Garbage input prints 'Invalid command!' and the game keeps running.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> banana
+? Invalid command!
+> menu enter
+? Invalid command!
+> menu show current
+? Main menu

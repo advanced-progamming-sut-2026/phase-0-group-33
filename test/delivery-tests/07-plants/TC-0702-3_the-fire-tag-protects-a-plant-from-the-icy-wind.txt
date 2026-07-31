@@ -1,0 +1,45 @@
+=== TEST TC-0702-3: the FIRE tag protects a plant from the icy wind
+#
+# Rubric (Phase 1) : گیاهان > پیاده سازی > تگ ها
+# Group            : 07 - Plants
+# Kind             : automatic (deterministic)
+# Goal             : Fire plants cannot be frozen, exactly as the Frostbite section of the doc says.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   The Hunter freezes the Wall-nut but a FIRE plant is skipped:
+#   the card of (2, 2) never shows a 'frozen'/'freeze level' line.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Frost Bite -l 1
+? Entered Frost Bite, level 1
+> add plant -t Fire Peashooter
+? Fire Peashooter added to your selection.
+> add plant -t Wall-nut
+? Wall-nut added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 5000 suns
+? Sun: 5050
+> cheat remove-cooldown
+? All cooldown limits removed.
+> plant plant -t Fire Peashooter -l (2, 2)
+? Fire Peashooter planted at (2, 2).
+> plant plant -t Wall-nut -l (2, 3)
+? Wall-nut planted at (2, 3).
+> cheat spawn-zombie -t Hunter -l 8, 3
+? Hunter spawned at (8, 3).
+> advance time -t 200 ticks
+? Wall-nut at (2, 3) is frozen solid by the Hunter!
+> show tile status -l (2, 2)
+? Plant: Fire Peashooter

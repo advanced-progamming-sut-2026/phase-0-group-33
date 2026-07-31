@@ -1,0 +1,26 @@
+=== TEST TC-0211-2: show-info reflects the current wallet
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی پروفایل > نمایش اطلاعات کاربر
+# Group            : 02 - Game start & menus
+# Kind             : automatic (deterministic)
+# Goal             : Money added by the cheat is visible in the profile.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat add 750 coin
+? 750 coins added. Total: 750
+> menu cheat add 12 diamond
+? 12 diamonds added. Total: 12
+> menu enter profile
+? Redirected to profile menu
+> menu profile show-info
+? Coins: 750
+? Diamonds: 12

@@ -1,0 +1,47 @@
+=== TEST TC-0602-2: the extra chapter zombies we added exist
+#
+# Rubric (Phase 1) : زامبی ها > پیاده سازی تمام زامبی ها > زامبی‌های امتیازی
+# Group            : 06 - Zombies
+# Kind             : automatic (deterministic)
+# Goal             : Pharaoh, Camel, Weasel Hoarder, Weasel, Surfer and Fast Swimmer are implemented.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat spawn-zombie -t Pharaoh -l 9, 1
+? Pharaoh spawned
+> cheat spawn-zombie -t Camel -l 9, 2
+? Camel spawned
+> cheat spawn-zombie -t Weasel Hoarder -l 9, 3
+? Weasel Hoarder spawned
+> cheat spawn-zombie -t Weasel -l 9, 4
+? Weasel spawned
+> cheat spawn-zombie -t Surfer -l 8, 5
+? Surfer spawned
+> cheat spawn-zombie -t Fast Swimmer -l 7, 5
+? Fast Swimmer spawned
+> zombies info
+? Pharaoh:
+? sarcophagus: 1000
+? Camel:
+? health: 1140
+? Weasel Hoarder:
+? Weasel:
+? health: 60
+? Surfer:
+? Fast Swimmer:

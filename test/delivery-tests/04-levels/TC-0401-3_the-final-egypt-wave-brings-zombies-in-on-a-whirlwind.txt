@@ -1,0 +1,70 @@
+=== TEST TC-0401-3: the final Egypt wave brings zombies in on a whirlwind
+#
+# Rubric (Phase 1) : مراحل > مراحل adventure > مصر باستان
+# Group            : 04 - Adventure levels & special levels
+# Kind             : automatic (RANDOM: the whirlwind only picks some zombies)
+# Goal             : The doc's گردباد: on the last wave some zombies enter 1-4 columns ahead.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   The whirlwind only happens on the FINAL wave and only for some of
+#   the zombies, so the message is not asserted - see the sample.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> start zombie waves
+? Wave 1 started.
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+? The final wave has come.
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   The final wave has come.
+#   Zombie Bucket Head spawned at wave 3 in lane 3 which costed 400.
+#   Zombie Imp spawned at wave 3 in lane 3 which costed 100.
+#   A whirlwind carried the Bucket Head 4 columns ahead!
+#   A whirlwind carried the Imp 4 columns ahead!

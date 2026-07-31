@@ -1,0 +1,40 @@
+=== TEST TC-0506-3: a radioactive sun that lands becomes a normal sun
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > تولید خورشید > خورشید رادیواکتیو
+# Group            : 05 - Core game mechanics
+# Kind             : automatic (RANDOM)
+# Goal             : If it is not caught in the air it is worth 25 like a normal one.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Wait for the 'Sun reached the ground' line of a radioactive sun and
+#   then collect it: the balance grows by 25, not by 100.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> advance time -t 900 ticks
+? Sun reached the ground at position (
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   New radioactive sun is dropping at position (3, 4)
+#   Sun reached the ground at position (3, 4)
+#   > collect sun -l (2, 4)
+#   Collected 25 sun. Balance: 75

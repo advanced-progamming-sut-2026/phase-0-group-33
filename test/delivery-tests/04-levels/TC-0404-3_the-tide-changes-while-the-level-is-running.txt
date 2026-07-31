@@ -1,0 +1,44 @@
+=== TEST TC-0404-3: the tide changes while the level is running
+#
+# Rubric (Phase 1) : مراحل > مراحل adventure > ساحل موج بزرگ
+# Group            : 04 - Adventure levels & special levels
+# Kind             : automatic (RANDOM: the tide roll happens per wave)
+# Goal             : Each wave the number of water columns can change.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Compare the two maps: the number of '~' columns may grow or shrink.
+#   A land plant that ends up under water is swept away.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Wavey Beach -l 1
+? Entered Wavey Beach, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> show map
+? Wave: 0/3
+> start zombie waves
+? Wave 1 started.
+> advance time -t 300 ticks
+? Time advanced by 300 ticks
+> show map
+? Wave:
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   The tide rises: 3 columns are under water now.
+#   The sea swallowed the Peashooter at (7, 2)!

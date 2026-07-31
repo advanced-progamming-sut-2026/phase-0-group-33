@@ -1,0 +1,45 @@
+=== TEST TC-1102-3: vasebreaker has three stages of growing difficulty
+#
+# Rubric (Phase 1) : مینی‌گیم ها > کوزه شکن > وجود چند مرحله
+# Group            : 11 - Minigames
+# Kind             : automatic (deterministic)
+# Goal             : -d 1 / 2 / 3 all start and get harder.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   The number of waves in the header grows with the stage, and so does
+#   the number of vases on the board.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n vasebreaker -d 1
+? VASEBREAKER (stage 1) started!
+> show map
+? Wave: 0/3
+> menu exit
+? Redirected to Main menu
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n vasebreaker -d 2
+? VASEBREAKER (stage 2) started!
+> show map
+? Wave: 0/4
+> menu exit
+? Redirected to Main menu
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n vasebreaker -d 3
+? VASEBREAKER (stage 3) started!
+> show map
+? Wave: 0/5

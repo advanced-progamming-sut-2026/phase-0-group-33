@@ -1,0 +1,26 @@
+=== TEST TC-0222-2: show-all-plants lists every plant of the game
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی کلکسیون > نمایش گیاهان
+# Group            : 02 - Game start & menus
+# Kind             : automatic (deterministic)
+# Goal             : All 69 plants of plants.csv are listed, owned or not.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu enter collection
+? Redirected to collection menu
+> menu collection show-all-plants
+? Sunflower
+? Mega Gatling Pea
+? Winter Melon
+? Doom-shroom
+? Grave Buster
+? catTail-mint

@@ -1,0 +1,26 @@
+=== TEST TC-0301-1: the travel log shows the critical quests
+#
+# Rubric (Phase 1) : کوئست‌ها > منوی ترول لاگ > نمایش کوئست‌ها
+# Group            : 03 - Quests
+# Kind             : automatic (deterministic)
+# Goal             : Page 'critical' lists the story quests of the four chapters.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu travel-log
+? Redirected to travel-log menu
+> travel log page critical
+? Travel log - critical quests:
+? - Complete the first level of Egypt
+? - Complete the first level of Frost Bite
+? - Complete the first level of Wavey Beach
+? - Complete the first level of Dark Ages
+? - Defense master: finish a level with exactly 0 sun | reward: 200 gems

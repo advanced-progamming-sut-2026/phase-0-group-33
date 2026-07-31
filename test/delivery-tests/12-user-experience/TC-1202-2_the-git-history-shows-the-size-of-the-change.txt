@@ -1,0 +1,22 @@
+=== TEST TC-1202-2: the git history shows the size of the change
+#
+# Rubric (Phase 1) : تغییرات > میزان تغییرات با گیت
+# Group            : 12 - User experience
+# Kind             : manual (inspection by the TA)
+# Goal             : Lines added / removed / changed between phase-0 and phase-1.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# STEPS
+#   1. Run: git diff --shortstat phase-0 phase-1
+#   2. Run: git diff --stat phase-0 phase-1 | tail -20
+#
+# EXPECTED RESULT
+#   - The summary shows the number of files, insertions and deletions.
+#   - The work is spread over many files, not one giant commit.
+#
+# (No '>' lines: this case is verified by looking at the repository /
+#  by watching the program, not by the automatic runner.)

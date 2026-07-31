@@ -1,0 +1,91 @@
+=== TEST TC-0703-2: every plant can really be taken into a level
+#
+# Rubric (Phase 1) : گیاهان > پیاده سازی > پیاده سازی تمام گیاهان
+# Group            : 07 - Plants
+# Kind             : automatic (deterministic)
+# Goal             : show available plants lists all of them after unlock-all.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> show available plants
+? Sunflower
+? Twin Sunflower
+? Sun-shroom
+? Primal Sunflower
+? Gold Bloom
+? Peashooter
+? Repeater
+? Threepeater
+? Snow Pea
+? Rotobaga
+? Pea Pod
+? Split Pea
+? Citron
+? Caulipower
+? Electric Blueberry
+? Bowling Bulb
+? Cactus
+? Fire Peashooter
+? Starfruit
+? Goo Peashooter
+? Mega Gatling Pea
+? Sea-shroom
+? Puff-shroom
+? Fume-shroom
+? Cabbage-pult
+? Kernel-pult
+? Melon-pult
+? Winter Melon
+? Pepper-pult
+? Potato Mine
+? Primal Potato Mine
+? Cherry Bomb
+? Squash
+? Grapeshot
+? Jalapeno
+? Doom-shroom
+? Tangle Kelp
+? Iceberg Lettuce
+? Bonk Choy
+? Phat Beet
+? Chomper
+? Wasabi Whip
+? Kiwibeast
+? Wall-nut
+? Tall-nut
+? Endurian
+? Garlic
+? Sweet Potato
+? Explode-o-nut
+? Pumpkin
+? Sun Bean
+? Torchwood
+? Magnet-shroom
+? Hypno-shroom
+? Cat-tail
+? Imitater
+? Ice-shroom
+? Lily Pad
+? Hot Potato
+? Grave Buster
+? Enlighten-mint
+? Appease-mint
+? Arma-mint
+? Bombard-mint
+? Enforce-mint
+? Reinforce-mint
+? Enchant-mint
+? Pierce-mint
+? catTail-mint

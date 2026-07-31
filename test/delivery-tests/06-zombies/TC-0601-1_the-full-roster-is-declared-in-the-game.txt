@@ -1,0 +1,56 @@
+=== TEST TC-0601-1: the full roster is declared in the game
+#
+# Rubric (Phase 1) : زامبی ها > پیاده سازی تمام زامبی ها > زامبی‌های اجباری
+# Group            : 06 - Zombies
+# Kind             : automatic (deterministic)
+# Goal             : show-all-zombies lists every zombie the doc asks for.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   The per-zombie cases live in 06-zombies/all-zombies/.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> menu enter collection
+? Redirected to collection menu
+> menu collection show-all-zombies
+? All zombies defined in the game:
+? - Normal
+? - Cone Head
+? - Bucket Head
+? - Brick Head
+? - Knight
+? - Gargantuar
+? - Imp
+? - Ra
+? - Explorer
+? - Tomb Raiser
+? - Dodo
+? - Hunter
+? - Troglobite
+? - Fisherman
+? - Octopus
+? - Snorkel
+? - Juggler
+? - Wizard
+? - King
+? - Imp Dragon
+? - All Star
+? - Arcade
+? - Umbrella
+? - Turquoise
+? - Prospector
+? - Piano
+? - Newspaper
+? - Barrel Roller

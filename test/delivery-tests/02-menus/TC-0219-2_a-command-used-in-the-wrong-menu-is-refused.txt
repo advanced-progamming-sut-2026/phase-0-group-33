@@ -1,0 +1,27 @@
+=== TEST TC-0219-2: a command used in the wrong menu is refused
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی بازی > بررسی خطاها
+# Group            : 02 - Game start & menus
+# Kind             : automatic (deterministic)
+# Goal             : Battle commands do not work in the main menu and vice versa.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> show map
+? Invalid command!
+> collect sun -l (1, 1)
+? Invalid command!
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> menu cheat rich
+? Invalid command!

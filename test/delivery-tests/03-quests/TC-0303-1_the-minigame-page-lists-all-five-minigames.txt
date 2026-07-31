@@ -1,0 +1,28 @@
+=== TEST TC-0303-1: the minigame page lists all five minigames
+#
+# Rubric (Phase 1) : کوئست‌ها > منوی ترول لاگ > نمایش مینی‌گیم‌ها
+# Group            : 03 - Quests
+# Kind             : automatic (deterministic)
+# Goal             : Vasebreaker, Wallnut Bowling, I Zombie, Beghouled, Zombotany.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu travel-log
+? Redirected to travel-log menu
+> travel log page minigame
+? Travel log - minigames (won so far: 0):
+? - Vasebreaker
+? - Wallnut Bowling
+? - I Zombie
+? - Beghouled
+? - Zombotany
+? Each minigame has 3 stages; start one with:
+? play minigame -n <name> -d <1|2|3>

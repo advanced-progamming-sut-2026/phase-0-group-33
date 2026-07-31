@@ -1,0 +1,25 @@
+=== TEST TC-1202-3: the program is comfortable to drive from a terminal
+#
+# Rubric (Phase 1) : تجربه ی کاربری UX > راحتی، زیبایی، روان بودن، کرش نکردن
+# Group            : 12 - User experience
+# Kind             : manual (inspection by the TA)
+# Goal             : The overall feel that the TA grades by hand.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# STEPS
+#   1. Play a full level from the main menu without reading the README.
+#   2. Use 'show map', 'show plants status' and 'zombies info' while playing.
+#   3. Try a minigame and the greenhouse.
+#
+# EXPECTED RESULT
+#   - Each menu says where you are and what you can do.
+#   - Errors explain the reason, not just 'error'.
+#   - The map is readable and the legend explains every symbol.
+#   - No freeze, no stack trace, no lost progress.
+#
+# (No '>' lines: this case is verified by looking at the repository /
+#  by watching the program, not by the automatic runner.)

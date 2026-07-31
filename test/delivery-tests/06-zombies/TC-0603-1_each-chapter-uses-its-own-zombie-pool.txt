@@ -1,0 +1,44 @@
+=== TEST TC-0603-1: each chapter uses its own zombie pool
+#
+# Rubric (Phase 1) : زامبی ها > زامبی ها در طی مراحل
+# Group            : 06 - Zombies
+# Kind             : automatic (the SET of zombies is random - see the sample below)
+# Goal             : A wave of Egypt only contains zombies that belong to Egypt.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Which zombie of the pool is drawn is random, so only the wave
+#   message itself is asserted. The sample shows a real Egypt wave.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> start zombie waves
+? Wave 1 started.
+? spawned at wave 1 in lane
+> zombies info
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   Wave 1 started.
+#   Zombie Umbrella spawned at wave 1 in lane 5 which costed 200.
+#   The horde is on its way!
+#   
+#   Egypt pool = the common zombies + Ra, Explorer, Tomb Raiser,
+#   Pharaoh and Camel. A Dodo or an Octopus can never appear here.

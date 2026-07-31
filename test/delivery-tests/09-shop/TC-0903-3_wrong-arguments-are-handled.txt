@@ -1,0 +1,31 @@
+=== TEST TC-0903-3: wrong arguments are handled
+#
+# Rubric (Phase 1) : فروشگاه > خرید
+# Group            : 09 - Shop
+# Kind             : automatic (deterministic)
+# Goal             : Unknown id and the missing -t of the choice bundle.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu greenhouse
+? Redirected to greenhouse menu
+> enter shop
+? Redirected to Shop menu
+> shop buy -i 9 -n 1
+? No shop item with id 9.
+> shop buy -i 4 -n 1
+? Choose a plant with -t <plant_type> for this bundle.
+> shop buy -i 4 -n 1 -t Banana
+? You can only buy packets for plants you have unlocked.
+> shop buy -i 4 -n 1 -t Peashooter
+? You got 10 seed packets of Peashooter

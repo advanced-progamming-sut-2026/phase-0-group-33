@@ -1,0 +1,44 @@
+=== TEST TC-0806-1: harvesting a Marigold pays 500 coins
+#
+# Rubric (Phase 1) : گلخانه > برداشت گیاه
+# Group            : 08 - Greenhouse
+# Kind             : automatic (RANDOM: Marigold -> 500 coins, a plant -> a stored boost)
+# Goal             : The exact reward of the doc.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu greenhouse
+? Redirected to greenhouse menu
+> menu exit
+? Redirected to Main menu
+> menu cheat add 0 coin
+? 0 coins added.
+> menu greenhouse
+? Redirected to greenhouse menu
+> plant pot at (1, 1)
+? planted at (1, 1)
+> grow (1, 1)
+? is now fully grown (paid
+> collect (1, 1)
+? collected
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   Marigold planted at (1, 1); it needs 2 hours to grow.
+#   Marigold is now fully grown (paid 2 diamonds).
+#   Marigold collected: +500 coins.
+#   ---- the other branch ----
+#   Cactus is now fully grown (paid 8 diamonds).
+#   Cactus collected: a boost is stored for your next level.

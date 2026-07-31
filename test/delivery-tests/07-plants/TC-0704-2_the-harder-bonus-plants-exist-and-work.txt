@@ -1,0 +1,51 @@
+=== TEST TC-0704-2: the harder bonus plants exist and work
+#
+# Rubric (Phase 1) : گیاهان > پیاده سازی > گیاهان امتیازی
+# Group            : 07 - Plants
+# Kind             : automatic (deterministic)
+# Goal             : Caulipower, Electric Blueberry, Rotobaga, Bowling Bulb, Kiwibeast, Cat-tail.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Caulipower
+? Caulipower added to your selection.
+> add plant -t Electric Blueberry
+? Electric Blueberry added to your selection.
+> add plant -t Rotobaga
+? Rotobaga added to your selection.
+> add plant -t Bowling Bulb
+? Bowling Bulb added to your selection.
+> add plant -t Kiwibeast
+? Kiwibeast added to your selection.
+> add plant -t Cat-tail
+? Cat-tail added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 9000 suns
+? Sun: 9050
+> cheat remove-cooldown
+? All cooldown limits removed.
+> plant plant -t Caulipower -l (1, 1)
+? Caulipower planted at (1, 1).
+> plant plant -t Electric Blueberry -l (1, 2)
+? Electric Blueberry planted at (1, 2).
+> plant plant -t Rotobaga -l (1, 3)
+? Rotobaga planted at (1, 3).
+> plant plant -t Bowling Bulb -l (1, 4)
+? Bowling Bulb planted at (1, 4).
+> plant plant -t Kiwibeast -l (1, 5)
+? Kiwibeast planted at (1, 5).
+> plant plant -t Cat-tail -l (2, 1)
+? Cat-tail planted at (2, 1).

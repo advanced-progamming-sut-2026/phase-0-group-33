@@ -1,0 +1,73 @@
+=== TEST TC-1108-3: the plants fall down and refill the board
+#
+# Rubric (Phase 1) : مینی‌گیم ها > Beghouled > فروریختن گیاهان
+# Group            : 11 - Minigames
+# Kind             : automatic (RANDOM: the board layout)
+# Goal             : After a match the plants above drop and new ones are created on top.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Compare the two maps: the board is FULL in both of them - no hole
+#   is left behind after a match, because the column collapses and is
+#   refilled from the top (cascades can chain further matches).
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n beghouled -d 1
+? (stage 1) started!
+> show map
+? Wave: 0/3
+
+> swap -l (1, 1) (2, 1)
+> swap -l (2, 1) (3, 1)
+> swap -l (3, 1) (4, 1)
+> swap -l (4, 1) (5, 1)
+> swap -l (5, 1) (6, 1)
+> swap -l (6, 1) (7, 1)
+> swap -l (7, 1) (8, 1)
+> swap -l (8, 1) (9, 1)
+> swap -l (1, 2) (2, 2)
+> swap -l (2, 2) (3, 2)
+> swap -l (3, 2) (4, 2)
+> swap -l (4, 2) (5, 2)
+> swap -l (5, 2) (6, 2)
+> swap -l (6, 2) (7, 2)
+> swap -l (7, 2) (8, 2)
+> swap -l (8, 2) (9, 2)
+> swap -l (1, 3) (2, 3)
+> swap -l (2, 3) (3, 3)
+> swap -l (3, 3) (4, 3)
+> swap -l (4, 3) (5, 3)
+> swap -l (5, 3) (6, 3)
+> swap -l (6, 3) (7, 3)
+> swap -l (7, 3) (8, 3)
+> swap -l (8, 3) (9, 3)
+> swap -l (1, 4) (2, 4)
+> swap -l (2, 4) (3, 4)
+> swap -l (3, 4) (4, 4)
+> swap -l (4, 4) (5, 4)
+> swap -l (5, 4) (6, 4)
+> swap -l (6, 4) (7, 4)
+> swap -l (7, 4) (8, 4)
+> swap -l (8, 4) (9, 4)
+> swap -l (1, 5) (2, 5)
+> swap -l (2, 5) (3, 5)
+> swap -l (3, 5) (4, 5)
+> swap -l (4, 5) (5, 5)
+> swap -l (5, 5) (6, 5)
+> swap -l (6, 5) (7, 5)
+> swap -l (7, 5) (8, 5)
+> swap -l (8, 5) (9, 5)
+> show map
+? Wave: 0/3

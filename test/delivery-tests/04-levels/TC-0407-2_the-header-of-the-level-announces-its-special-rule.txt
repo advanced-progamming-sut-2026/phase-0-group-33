@@ -1,0 +1,30 @@
+=== TEST TC-0407-2: the header of the level announces its special rule
+#
+# Rubric (Phase 1) : مراحل > مراحل ویژه > وجود مراحل ویژه در adventure
+# Group            : 04 - Adventure levels & special levels
+# Kind             : automatic (deterministic)
+# Goal             : The player is told which restriction applies, as the doc asks.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Wavey Beach -l 2
+? Entered Wavey Beach, level 2 [special: DEAD_LINE]
+? Pick your plants, then use 'start game'.
+> menu exit
+? Redirected to Main menu
+> menu enter chapter -c Frost Bite -l 2
+? Entered Frost Bite, level 2 [special: SAVE_OUR_SEEDS]
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? Protect the plant at (1, 2) or you lose!

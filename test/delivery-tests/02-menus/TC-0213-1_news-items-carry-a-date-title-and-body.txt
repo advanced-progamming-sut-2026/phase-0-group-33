@@ -1,0 +1,23 @@
+=== TEST TC-0213-1: news items carry a date title and body
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی اخبار > نمایش عکس اخبار
+# Group            : 02 - Game start & menus
+# Kind             : manual (inspection by the TA)
+# Goal             : Phase 1 is a text program: the 'picture' column is the phase-2 form of this item.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# STEPS
+#   1. Log in, buy a plant, then open the news menu.
+#   2. Run: menu news show-all
+#
+# EXPECTED RESULT
+#   - Every line carries the event text produced by the game.
+#   - In phase 2 this same list is drawn with the matching plant/zombie picture.
+#   - See src/utils/NewsStore.java - the item already stores what the picture needs.
+#
+# (No '>' lines: this case is verified by looking at the repository /
+#  by watching the program, not by the automatic runner.)

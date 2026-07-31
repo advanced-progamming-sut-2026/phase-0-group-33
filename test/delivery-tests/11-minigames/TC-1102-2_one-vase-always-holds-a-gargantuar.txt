@@ -1,0 +1,83 @@
+=== TEST TC-1102-2: one vase always holds a Gargantuar
+#
+# Rubric (Phase 1) : مینی‌گیم ها > کوزه شکن > کوزه غول
+# Group            : 11 - Minigames
+# Kind             : automatic (RANDOM: which vase holds it)
+# Goal             : The doc's guaranteed 'giant vase'.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   After the scan, 'zombies info' lists everything that came out of the
+#   vases. Exactly one Gargantuar is guaranteed by the level generator.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n vasebreaker -d 1
+? (stage 1) started!
+> break vase -l (1, 1)
+> break vase -l (2, 1)
+> break vase -l (3, 1)
+> break vase -l (4, 1)
+> break vase -l (5, 1)
+> break vase -l (6, 1)
+> break vase -l (7, 1)
+> break vase -l (8, 1)
+> break vase -l (9, 1)
+> break vase -l (1, 2)
+> break vase -l (2, 2)
+> break vase -l (3, 2)
+> break vase -l (4, 2)
+> break vase -l (5, 2)
+> break vase -l (6, 2)
+> break vase -l (7, 2)
+> break vase -l (8, 2)
+> break vase -l (9, 2)
+> break vase -l (1, 3)
+> break vase -l (2, 3)
+> break vase -l (3, 3)
+> break vase -l (4, 3)
+> break vase -l (5, 3)
+> break vase -l (6, 3)
+> break vase -l (7, 3)
+> break vase -l (8, 3)
+> break vase -l (9, 3)
+> break vase -l (1, 4)
+> break vase -l (2, 4)
+> break vase -l (3, 4)
+> break vase -l (4, 4)
+> break vase -l (5, 4)
+> break vase -l (6, 4)
+> break vase -l (7, 4)
+> break vase -l (8, 4)
+> break vase -l (9, 4)
+> break vase -l (1, 5)
+> break vase -l (2, 5)
+> break vase -l (3, 5)
+> break vase -l (4, 5)
+> break vase -l (5, 5)
+> break vase -l (6, 5)
+> break vase -l (7, 5)
+> break vase -l (8, 5)
+> break vase -l (9, 5)
+> zombies info
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   A Gargantuar jumped out of the vase at (6, 3)!
+#   > zombies info
+#   Gargantuar:
+#       position: 6, 3
+#       health: 3600

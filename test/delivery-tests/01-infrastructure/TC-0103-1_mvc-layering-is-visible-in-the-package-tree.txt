@@ -1,0 +1,23 @@
+=== TEST TC-0103-1: MVC layering is visible in the package tree
+#
+# Rubric (Phase 1) : زیرساخت > معماری مشخص
+# Group            : 01 - Infrastructure
+# Kind             : manual (inspection by the TA)
+# Goal             : Model, View and Controller live in separate packages.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# STEPS
+#   1. Run: ls src
+#   2. Run: ls src/models src/views src/controllers
+#
+# EXPECTED RESULT
+#   - src/models (data + game rules), src/views (printing / menus),
+#   - src/controllers (menuControllers + managers) are separate.
+#   - No printing logic inside src/models/entities.
+#
+# (No '>' lines: this case is verified by looking at the repository /
+#  by watching the program, not by the automatic runner.)

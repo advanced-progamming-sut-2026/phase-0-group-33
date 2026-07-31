@@ -1,0 +1,41 @@
+=== TEST TC-1110-1: beghouled has three stages with a growing target
+#
+# Rubric (Phase 1) : مینی‌گیم ها > Beghouled > وجود چند مرحله
+# Group            : 11 - Minigames
+# Kind             : automatic (deterministic)
+# Goal             : -d 1 / 2 / 3 all start.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n beghouled -d 1
+? BEGHOULED (stage 1) started!
+> show map
+? Wave: 0/3
+> menu exit
+? Redirected to Main menu
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n beghouled -d 2
+? BEGHOULED (stage 2) started!
+> show map
+? Wave: 0/4
+> menu exit
+? Redirected to Main menu
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n beghouled -d 3
+? BEGHOULED (stage 3) started!
+> show map
+? Wave: 0/5

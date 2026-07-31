@@ -1,0 +1,22 @@
+=== TEST TC-0213-3: the unread flag is shown at login
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی اخبار > نمایش عکس اخبار
+# Group            : 02 - Game start & menus
+# Kind             : manual (inspection by the TA)
+# Goal             : The red-flag notice of the doc exists as a login message.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# STEPS
+#   1. Log in, buy a plant (creates news), log out.
+#   2. Log in again and read the first lines.
+#
+# EXPECTED RESULT
+#   - The login output tells the user that unread news is waiting.
+#   - After 'menu news show-unread' the notice disappears.
+#
+# (No '>' lines: this case is verified by looking at the repository /
+#  by watching the program, not by the automatic runner.)

@@ -1,0 +1,88 @@
+=== TEST TC-1101-3: a seed packet from a vase must be planted quickly
+#
+# Rubric (Phase 1) : مینی‌گیم ها > کوزه شکن > خواص seed packet
+# Group            : 11 - Minigames
+# Kind             : automatic (RANDOM: which packets drop)
+# Goal             : The packet is single-use and fades after a while.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   The packets that fell are listed by 'show plants status'.
+#   They can be planted with the normal 'plant plant' command and they
+#   disappear if the player waits too long (30s).
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n vasebreaker -d 1
+? (stage 1) started!
+> break vase -l (1, 1)
+> break vase -l (2, 1)
+> break vase -l (3, 1)
+> break vase -l (4, 1)
+> break vase -l (5, 1)
+> break vase -l (6, 1)
+> break vase -l (7, 1)
+> break vase -l (8, 1)
+> break vase -l (9, 1)
+> break vase -l (1, 2)
+> break vase -l (2, 2)
+> break vase -l (3, 2)
+> break vase -l (4, 2)
+> break vase -l (5, 2)
+> break vase -l (6, 2)
+> break vase -l (7, 2)
+> break vase -l (8, 2)
+> break vase -l (9, 2)
+> break vase -l (1, 3)
+> break vase -l (2, 3)
+> break vase -l (3, 3)
+> break vase -l (4, 3)
+> break vase -l (5, 3)
+> break vase -l (6, 3)
+> break vase -l (7, 3)
+> break vase -l (8, 3)
+> break vase -l (9, 3)
+> break vase -l (1, 4)
+> break vase -l (2, 4)
+> break vase -l (3, 4)
+> break vase -l (4, 4)
+> break vase -l (5, 4)
+> break vase -l (6, 4)
+> break vase -l (7, 4)
+> break vase -l (8, 4)
+> break vase -l (9, 4)
+> break vase -l (1, 5)
+> break vase -l (2, 5)
+> break vase -l (3, 5)
+> break vase -l (4, 5)
+> break vase -l (5, 5)
+> break vase -l (6, 5)
+> break vase -l (7, 5)
+> break vase -l (8, 5)
+> break vase -l (9, 5)
+> show plants status
+? Your plants:
+> advance time -t 100 ticks
+? Time advanced by 100 ticks
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   The vase at (7, 4) dropped a Peashooter seed packet - plant it before it fades!
+#   > show plants status
+#   Your plants:
+#   - Peashooter | cost: 0 | ready to plant
+#   > plant plant -t Peashooter -l (1, 4)
+#   Peashooter planted at (1, 4).

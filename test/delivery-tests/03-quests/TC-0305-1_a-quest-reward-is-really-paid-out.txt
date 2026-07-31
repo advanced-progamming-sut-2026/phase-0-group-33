@@ -1,0 +1,88 @@
+=== TEST TC-0305-1: a quest reward is really paid out
+#
+# Rubric (Phase 1) : کوئست‌ها > عملکرد کوئست > دریافت جایزه‌ی کوئست
+# Group            : 03 - Quests
+# Kind             : automatic (which quest pays out depends on the random waves)
+# Goal             : The reward text is printed together with the completion.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> start zombie waves
+? Wave 1 started.
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+? Dear humanz, zis is not done yet
+> menu enter profile
+? Redirected to profile menu
+> menu profile show-info
+? Games played: 1
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   [QUEST] Economical gardener quest complete: won losing at most 2 plants | reward: 18 seed packets of Jalapeno

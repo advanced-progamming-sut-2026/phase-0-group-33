@@ -1,0 +1,36 @@
+=== TEST TC-0502-2: planting takes the sun out of the balance
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > تولید خورشید > مشاهده میزان خورشید فعلی
+# Group            : 05 - Core game mechanics
+# Kind             : automatic (deterministic)
+# Goal             : A 100-sun Peashooter lowers the balance by exactly 100.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   This case uses a BRAND NEW account on purpose: 'menu cheat unlock-all'
+#   would set every plant to level 5, where the upgrade column of
+#   plants.csv gives Peashooter 'Cost -25' and the price would be 75.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> show sun amount
+? Sun: 50
+> cheat add -n 150 suns
+? Sun: 200
+> plant plant -t Peashooter -l (1, 3)
+? Peashooter planted at (1, 3).
+> show sun amount
+? Sun: 100

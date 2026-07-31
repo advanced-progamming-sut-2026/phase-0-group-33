@@ -1,0 +1,25 @@
+=== TEST TC-0224-3: a plant cannot go past level 5
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی کلکسیون > ارتقای گیاهان
+# Group            : 02 - Game start & menus
+# Kind             : automatic (deterministic)
+# Goal             : max-plants sets level 5 and a further upgrade is refused.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat max-plants
+? plants set to max level (5).
+> menu enter collection
+? Redirected to collection menu
+> menu collection show-plants
+? Peashooter | level 5
+> menu collection upgrade-plant -p Peashooter
+? Peashooter is already at max level (5).

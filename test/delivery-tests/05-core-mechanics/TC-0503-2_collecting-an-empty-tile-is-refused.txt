@@ -1,0 +1,33 @@
+=== TEST TC-0503-2: collecting an empty tile is refused
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > تولید خورشید > برداشتن خورشید
+# Group            : 05 - Core game mechanics
+# Kind             : automatic (deterministic)
+# Goal             : A clear message instead of a silent failure.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 5000 suns
+? Sun: 5050
+> cheat remove-cooldown
+? All cooldown limits removed.
+> collect sun -l (4, 4)
+? There is no sun to collect at (4, 4).
+> collect sun -l (9, 5)
+? There is no sun to collect at (9, 5).

@@ -1,0 +1,36 @@
+=== TEST TC-0603-3: a zombie that reaches the house triggers the mower then the loss
+#
+# Rubric (Phase 1) : زامبی ها > زامبی ها در طی مراحل
+# Group            : 06 - Zombies
+# Kind             : automatic (deterministic)
+# Goal             : First contact uses the free lawn mower, the second one ends the game.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat spawn-zombie -t Normal -l 2, 3
+? Normal spawned at (2, 3).
+> advance time -t 120 ticks
+? The lawn mower in the row 3 is triggered and killed these zombies:
+? - Normal
+> show map
+? [ ]
+> cheat spawn-zombie -t Normal -l 2, 3
+? Normal spawned at (2, 3).
+> advance time -t 200 ticks
+? The zombie ate your brain; LOSER!!!

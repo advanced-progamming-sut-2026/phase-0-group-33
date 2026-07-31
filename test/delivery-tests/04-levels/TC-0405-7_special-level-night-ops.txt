@@ -1,0 +1,36 @@
+=== TEST TC-0405-7: special level night ops
+#
+# Rubric (Phase 1) : مراحل > مراحل ویژه > پیاده سازی حداقل ۴ مرحله ویژه
+# Group            : 04 - Adventure levels & special levels
+# Kind             : automatic (deterministic)
+# Goal             : شب عملیات (Night Ops) behaves as the doc describes.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Persian name : شب عملیات (Night Ops)
+#   Where        : Dark Ages level 2
+#   Rule         : no sun falls from the sky: only plant-produced sun keeps you alive
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Dark Ages -l 2
+? Entered Dark Ages, level 2
+> add plant -t Sunflower
+? Sunflower added to your selection.
+> start game
+? The battle begins!
+> show sun amount
+? Sun: 50
+> advance time -t 300 ticks
+? Time advanced by 300 ticks
+> show sun amount
+? Sun: 50

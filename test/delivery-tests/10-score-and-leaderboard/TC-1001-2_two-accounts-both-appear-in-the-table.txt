@@ -1,0 +1,27 @@
+=== TEST TC-1001-2: two accounts both appear in the table
+#
+# Rubric (Phase 1) : امتیاز > لیدربورد > مشاهده لیدربورد
+# Group            : 10 - Scoring game & leaderboard
+# Kind             : automatic (deterministic)
+# Goal             : The board is global, not per user.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u alpha -p Abcd123! Abcd123! -n Alpha -e a@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully.
+> menu exit
+? Redirected to Signup menu
+> register -u beta -p Abcd123! Abcd123! -n Beta -e b@mail.com -g female
+> pick question -q 1 -a blue -c blue
+? Account created successfully.
+> login -u beta -p Abcd123!
+? Login successful.
+> menu leaderboard
+? Redirected to leaderboard menu
+> show leaderboard
+? alpha
+? beta

@@ -1,0 +1,55 @@
+=== TEST TC-07P-28: plant Winter Melon
+#
+# Rubric (Phase 1) : گیاهان > پیاده سازی > پیاده سازی تمام گیاهان
+# Group            : 07 - Plants
+# Kind             : automatic (deterministic)
+# Goal             : Winter Melon exists, can be selected, placed and used as the doc describes.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Category : Lobber
+#   Tags     : Ice, AoE
+#   Cost     : 500 sun   |   base HP: 300   |   damage: 80
+#   Recharge : 5s
+#   
+#   The account is opened with 'menu cheat unlock-all', so every plant is
+#   unlocked AND at level 5 - that is why the HP on the lawn is higher than
+#   the base HP of plants.csv (the level 2..5 bonuses are applied).
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Winter Melon
+? Winter Melon added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 9000 suns
+? Sun: 9050
+> cheat remove-cooldown
+? All cooldown limits removed.
+> cheat spawn-zombie -t Normal -l 6, 3
+? Normal spawned at (6, 3).
+> plant plant -t Winter Melon -l (2, 3)
+? Winter Melon planted at (2, 3).
+> show tile status -l (2, 3)
+? Tile (2, 3) | terrain: NORMAL
+? Plant: Winter Melon | HP: 300/300
+> feed plant -l (2, 3)
+? Winter Melon unleashed its plant food power. Plant foods left: 2
+> menu enter collection
+? Redirected to collection menu
+> menu collection show-plant -p Winter Melon
+? Winter Melon:
+? sun cost: 500
+? hp: 300
+? recharge: 5s

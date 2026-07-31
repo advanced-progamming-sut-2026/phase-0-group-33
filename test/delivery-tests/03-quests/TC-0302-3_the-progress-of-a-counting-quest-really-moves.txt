@@ -1,0 +1,98 @@
+=== TEST TC-0302-3: the progress of a counting quest really moves
+#
+# Rubric (Phase 1) : کوئست‌ها > منوی ترول لاگ > نمایش میزان پیشرفت
+# Group            : 03 - Quests
+# Kind             : automatic (the number of wave zombies killed is random)
+# Goal             : Killing Egypt zombies advances 'Hunter of Egypt'.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Only the presence of the moving counter is asserted; the exact
+#   number depends on how many zombies the random waves produced.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat spawn-zombie -t Normal -l 9, 1
+? Normal spawned
+> cheat spawn-zombie -t Normal -l 9, 2
+? Normal spawned
+> cheat spawn-zombie -t Ra -l 9, 3
+? Ra spawned
+> release the nuke
+? The nuke wiped out 3 zombies.
+> start zombie waves
+? Wave 1 started.
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+? Dear humanz, zis is not done yet
+> menu travel-log
+? Redirected to travel-log menu
+> travel log page high
+? - Hunter of Egypt:
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   - Hunter of Egypt: defeat 50 of its zombies | reward: 10 seed packets [8/50]

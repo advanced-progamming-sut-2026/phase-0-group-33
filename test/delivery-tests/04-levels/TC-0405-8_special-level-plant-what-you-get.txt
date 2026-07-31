@@ -1,0 +1,38 @@
+=== TEST TC-0405-8: special level plant what you get
+#
+# Rubric (Phase 1) : مراحل > مراحل ویژه > پیاده سازی حداقل ۴ مرحله ویژه
+# Group            : 04 - Adventure levels & special levels
+# Kind             : automatic (deterministic)
+# Goal             : هرچه رسد بکار (Plant What You Get) behaves as the doc describes.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Persian name : هرچه رسد بکار (Plant What You Get)
+#   Where        : Dark Ages level 3
+#   Rule         : 800 starting sun, no more sun falls and no Sunflower
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Dark Ages -l 3
+? Entered Dark Ages, level 3
+> show sun amount
+? Sun: 800
+> add plant -t Sunflower
+? This plant is locked in this level.
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> advance time -t 300 ticks
+? Time advanced by 300 ticks
+> show sun amount
+? Sun: 800

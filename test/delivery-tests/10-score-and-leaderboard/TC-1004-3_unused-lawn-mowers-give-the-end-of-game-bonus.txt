@@ -1,0 +1,90 @@
+=== TEST TC-1004-3: unused lawn mowers give the end-of-game bonus
+#
+# Rubric (Phase 1) : امتیاز > بازی امتیازی > الگوهای محاسبه امتیاز (امتیازی)
+# Group            : 10 - Scoring game & leaderboard
+# Kind             : automatic (RANDOM: the score value)
+# Goal             : +150 per mower that was never used.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   All five mowers survive this run, so 5 x 150 = 750 of the final
+#   score come from the untouched-defense pattern.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu scoring-game
+? Scoring game started!
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> show map
+? [M]
+> start zombie waves
+? Wave 1 started.
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+? Your miopoint score was recorded:

@@ -1,0 +1,55 @@
+=== TEST TC-07P-18: plant Fire Peashooter
+#
+# Rubric (Phase 1) : گیاهان > پیاده سازی > پیاده سازی تمام گیاهان
+# Group            : 07 - Plants
+# Kind             : automatic (deterministic)
+# Goal             : Fire Peashooter exists, can be selected, placed and used as the doc describes.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Category : Shooter
+#   Tags     : Fire, Pea
+#   Cost     : 175 sun   |   base HP: 300   |   damage: 40
+#   Recharge : 5s
+#   
+#   The account is opened with 'menu cheat unlock-all', so every plant is
+#   unlocked AND at level 5 - that is why the HP on the lawn is higher than
+#   the base HP of plants.csv (the level 2..5 bonuses are applied).
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Fire Peashooter
+? Fire Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 9000 suns
+? Sun: 9050
+> cheat remove-cooldown
+? All cooldown limits removed.
+> cheat spawn-zombie -t Normal -l 6, 3
+? Normal spawned at (6, 3).
+> plant plant -t Fire Peashooter -l (2, 3)
+? Fire Peashooter planted at (2, 3).
+> show tile status -l (2, 3)
+? Tile (2, 3) | terrain: NORMAL
+? Plant: Fire Peashooter | HP: 500/500
+> feed plant -l (2, 3)
+? Fire Peashooter unleashed its plant food power. Plant foods left: 2
+> menu enter collection
+? Redirected to collection menu
+> menu collection show-plant -p Fire Peashooter
+? Fire Peashooter:
+? sun cost: 175
+? hp: 300
+? recharge: 5s

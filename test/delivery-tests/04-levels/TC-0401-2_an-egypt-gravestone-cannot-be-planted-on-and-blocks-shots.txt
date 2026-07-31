@@ -1,0 +1,84 @@
+=== TEST TC-0401-2: an Egypt gravestone cannot be planted on and blocks shots
+#
+# Rubric (Phase 1) : مراحل > مراحل adventure > مصر باستان
+# Group            : 04 - Adventure levels & special levels
+# Kind             : automatic (grave positions are random)
+# Goal             : 700 HP graves block straight shooters; only Grave Buster removes them.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   The scan tries to plant on every tile of columns 3..9. Grave tiles
+#   answer 'You cannot plant on a gravestone.' - that message proves the
+#   grave really blocks planting.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> add plant -t Grave Buster
+? Grave Buster added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 5000 suns
+? Sun: 5050
+> cheat remove-cooldown
+? All cooldown limits removed.
+> show map
+? Wave: 0/3
+
+> plant plant -t Peashooter -l (3, 1)
+> plant plant -t Peashooter -l (4, 1)
+> plant plant -t Peashooter -l (5, 1)
+> plant plant -t Peashooter -l (6, 1)
+> plant plant -t Peashooter -l (7, 1)
+> plant plant -t Peashooter -l (8, 1)
+> plant plant -t Peashooter -l (9, 1)
+> plant plant -t Peashooter -l (3, 2)
+> plant plant -t Peashooter -l (4, 2)
+> plant plant -t Peashooter -l (5, 2)
+> plant plant -t Peashooter -l (6, 2)
+> plant plant -t Peashooter -l (7, 2)
+> plant plant -t Peashooter -l (8, 2)
+> plant plant -t Peashooter -l (9, 2)
+> plant plant -t Peashooter -l (3, 3)
+> plant plant -t Peashooter -l (4, 3)
+> plant plant -t Peashooter -l (5, 3)
+> plant plant -t Peashooter -l (6, 3)
+> plant plant -t Peashooter -l (7, 3)
+> plant plant -t Peashooter -l (8, 3)
+> plant plant -t Peashooter -l (9, 3)
+> plant plant -t Peashooter -l (3, 4)
+> plant plant -t Peashooter -l (4, 4)
+> plant plant -t Peashooter -l (5, 4)
+> plant plant -t Peashooter -l (6, 4)
+> plant plant -t Peashooter -l (7, 4)
+> plant plant -t Peashooter -l (8, 4)
+> plant plant -t Peashooter -l (9, 4)
+> plant plant -t Peashooter -l (3, 5)
+> plant plant -t Peashooter -l (4, 5)
+> plant plant -t Peashooter -l (5, 5)
+> plant plant -t Peashooter -l (6, 5)
+> plant plant -t Peashooter -l (7, 5)
+> plant plant -t Peashooter -l (8, 5)
+> plant plant -t Peashooter -l (9, 5)
+> show map
+? Wave: 0/3
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   Peashooter planted at (3, 1).
+#   You cannot plant on a gravestone.
+#   Peashooter planted at (5, 1).

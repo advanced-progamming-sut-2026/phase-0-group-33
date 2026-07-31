@@ -1,0 +1,42 @@
+=== TEST TC-0903-1: every shop item can really be bought
+#
+# Rubric (Phase 1) : فروشگاه > خرید
+# Group            : 09 - Shop
+# Kind             : automatic (deterministic)
+# Goal             : Items 1..6 all work with enough money.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   A plain account is used on purpose: after 'menu cheat unlock-all' the
+#   player already owns 20 pots and 3 plant foods, so items 1 and 2 would
+#   answer with their 'you are already at the maximum' message.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat add 20000 coin
+? 20000 coins added.
+> menu cheat add 100 diamond
+? 100 diamonds added.
+> menu greenhouse
+? Redirected to greenhouse menu
+> enter shop
+? Redirected to Shop menu
+> shop buy -i 1 -n 1
+? 1 pots added. Total: 1
+> shop buy -i 2 -n 1
+? Plant food purchased. Stored for your next level: 1
+> shop buy -i 3 -n 1
+? You got 5 seed packets of
+> shop buy -i 4 -n 1 -t Peashooter
+? You got 10 seed packets of Peashooter
+> shop buy -i 5 -n 1
+? 500 coins added.
+> shop buy -i 6 -n 1
+? Daily bundle: 10 seed packets of

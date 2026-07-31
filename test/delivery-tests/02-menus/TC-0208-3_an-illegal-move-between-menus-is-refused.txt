@@ -1,0 +1,23 @@
+=== TEST TC-0208-3: an illegal move between menus is refused
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی اصلی > ورود به منوها
+# Group            : 02 - Game start & menus
+# Kind             : automatic (deterministic)
+# Goal             : You cannot jump to a menu that is not connected to the current one.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu enter kitchen
+? No menu with the given name
+> menu enter game
+? Enter a chapter to play: menu enter chapter -c <chaptername>
+> menu enter signup
+? You can't move to signup from the main menu

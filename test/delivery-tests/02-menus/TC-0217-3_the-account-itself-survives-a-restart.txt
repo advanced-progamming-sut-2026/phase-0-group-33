@@ -1,0 +1,22 @@
+=== TEST TC-0217-3: the account itself survives a restart
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی بازی > نگه داشتن پیشرفت
+# Group            : 02 - Game start & menus
+# Kind             : automatic (deterministic)
+# Goal             : No re-registration is needed after closing the program.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+>> RESTART
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+? Username already exists.
+> menu enter login
+? Redirected to login menu
+> login -u tester -p Abcd123!
+? Login successful.

@@ -1,0 +1,37 @@
+=== TEST TC-0605-2: release the nuke kills every zombie on the map
+#
+# Rubric (Phase 1) : زامبی ها > cheat code
+# Group            : 06 - Zombies
+# Kind             : automatic (deterministic)
+# Goal             : The count in the message equals the number of zombies.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat spawn-zombie -t Normal -l 9, 1
+? Normal spawned
+> cheat spawn-zombie -t Imp -l 9, 2
+? Imp spawned
+> cheat spawn-zombie -t Ra -l 9, 3
+? Ra spawned
+> cheat spawn-zombie -t Knight -l 9, 4
+? Knight spawned
+> release the nuke
+? The nuke wiped out 4 zombies.
+> zombies info
+? There are no zombies on the map.

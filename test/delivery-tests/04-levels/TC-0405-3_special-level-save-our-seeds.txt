@@ -1,0 +1,36 @@
+=== TEST TC-0405-3: special level save our seeds
+#
+# Rubric (Phase 1) : مراحل > مراحل ویژه > پیاده سازی حداقل ۴ مرحله ویژه
+# Group            : 04 - Adventure levels & special levels
+# Kind             : automatic (deterministic)
+# Goal             : محافظ دانه‌ها (Save Our Seeds) behaves as the doc describes.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Persian name : محافظ دانه‌ها (Save Our Seeds)
+#   Where        : Frost Bite level 2
+#   Rule         : pre-placed Wall-nuts must survive; losing one loses the level
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Frost Bite -l 2
+? Entered Frost Bite, level 2
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? Protect the plant at (1, 2) or you lose!
+? Protect the plant at (1, 4) or you lose!
+? The battle begins!
+> show tile status -l (1, 2)
+? Plant: Wall-nut
+> show tile status -l (1, 4)
+? Plant: Wall-nut

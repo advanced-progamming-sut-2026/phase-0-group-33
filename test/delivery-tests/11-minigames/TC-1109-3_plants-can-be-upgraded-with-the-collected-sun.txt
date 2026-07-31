@@ -1,0 +1,43 @@
+=== TEST TC-1109-3: plants can be upgraded with the collected sun
+#
+# Rubric (Phase 1) : مینی‌گیم ها > Beghouled > ارتقای گیاهان
+# Group            : 11 - Minigames
+# Kind             : automatic (deterministic)
+# Goal             : Every plant of one type is converted into the next tier.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Our upgrade table (as the doc lets us choose):
+#     Peashooter   -> Repeater            500 sun
+#     Repeater     -> Mega Gatling Pea   1500 sun
+#     Wall-nut     -> Tall-nut            500 sun
+#     Puff-shroom  -> Fume-shroom         250 sun
+#     Cabbage-pult -> Melon-pult         1000 sun
+#     Melon-pult   -> Winter Melon        750 sun
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n beghouled -d 1
+? (stage 1) started!
+> upgrade -t Peashooter
+? This upgrade costs 500 sun and you have 50.
+> upgrade -t Banana
+? No upgrade exists for this plant.
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   > upgrade -t Peashooter
+#   Every Peashooter became a Repeater! Sun left: 120

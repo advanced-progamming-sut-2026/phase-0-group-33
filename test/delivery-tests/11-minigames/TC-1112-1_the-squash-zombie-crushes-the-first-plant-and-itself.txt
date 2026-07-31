@@ -1,0 +1,44 @@
+=== TEST TC-1112-1: the squash zombie crushes the first plant and itself
+#
+# Rubric (Phase 1) : مینی‌گیم ها > زامبی گیاهی > زامبی کدو
+# Group            : 11 - Minigames
+# Kind             : automatic (deterministic)
+# Goal             : Very fast, one plant, then both are gone.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   After the crush the tile is empty AND the Squash Zombie is gone -
+#   exactly the behaviour the doc describes.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n zombotany -d 1
+? ZOMBOTANY (stage 1) started!
+> add plant -t Sunflower
+? Sunflower added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 900 suns
+? Sun: 950
+> cheat remove-cooldown
+? All cooldown limits removed.
+> plant plant -t Sunflower -l (2, 3)
+? Sunflower planted at (2, 3).
+> cheat spawn-zombie -t Squash Zombie -l 4, 3
+? Squash Zombie spawned at (4, 3).
+> advance time -t 200 ticks
+? Time advanced by 200 ticks
+> show tile status -l (2, 3)
+? Tile (2, 3)
+> zombies info

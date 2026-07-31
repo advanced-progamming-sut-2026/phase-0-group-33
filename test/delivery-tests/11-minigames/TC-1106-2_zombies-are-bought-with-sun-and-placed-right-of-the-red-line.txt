@@ -1,0 +1,37 @@
+=== TEST TC-1106-2: zombies are bought with sun and placed right of the red line
+#
+# Rubric (Phase 1) : مینی‌گیم ها > من زامبی > امکان گذاشتن زامبی
+# Group            : 11 - Minigames
+# Kind             : automatic (deterministic)
+# Goal             : place zombie costs sun and only works in columns 6-9.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   The last line shows that only the 5 zombies of THIS level's roster
+#   can be used; asking for another one prints the roster again.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n i-zombie -d 1
+? (stage 1) started!
+> place zombie -t Gargantuar -l (7, 1)
+? Available zombies:
+> place zombie -t Normal -l (1, 1)
+? Zombies must be placed right of the red line (columns 6-9).
+> place zombie -t Normal -l (7, 3)
+? Normal placed at (7, 3). Sun left:
+> show map
+? .1
+> place zombie -t Gargantuar -l (7, 3)
+? Available zombies:

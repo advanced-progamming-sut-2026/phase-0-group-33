@@ -1,0 +1,30 @@
+=== TEST TC-0405-2: special level locked plants
+#
+# Rubric (Phase 1) : مراحل > مراحل ویژه > پیاده سازی حداقل ۴ مرحله ویژه
+# Group            : 04 - Adventure levels & special levels
+# Kind             : automatic (deterministic)
+# Goal             : گیاهان زندانی (Locked Plants) behaves as the doc describes.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Persian name : گیاهان زندانی (Locked Plants)
+#   Where        : Egypt level 3
+#   Rule         : some of the selection slots are locked for this level
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 3
+? Entered Egypt, level 3
+> show available plants
+? Plants you can pick for this level:
+> show all plants
+? Sunflower

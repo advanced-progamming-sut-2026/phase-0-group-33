@@ -1,0 +1,38 @@
+=== TEST TC-0304-3: the daily quests are the same all day for everybody
+#
+# Rubric (Phase 1) : کوئست‌ها > عملکرد کوئست > عملکرد کوئست‌ها
+# Group            : 03 - Quests
+# Kind             : automatic (deterministic)
+# Goal             : Their variable part is derived from the date, so two accounts see the same text.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Both accounts get the same 4000-sun target because the number is
+#   derived from today's date, not from a per-user random.
+#
+> register -u alpha -p Abcd123! Abcd123! -n Alpha -e a@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully.
+> login -u alpha -p Abcd123!
+? Login successful.
+> menu travel-log
+? Redirected to travel-log menu
+> travel log page daily
+? - Daily sun collector: gather 4000 sun today
+> menu exit
+? Redirected to Main menu
+> menu logout
+? Logged out.
+> register -u beta -p Abcd123! Abcd123! -n Beta -e b@mail.com -g female
+> pick question -q 1 -a blue -c blue
+? Account created successfully.
+> login -u beta -p Abcd123!
+? Login successful.
+> menu travel-log
+? Redirected to travel-log menu
+> travel log page daily
+? - Daily sun collector: gather 4000 sun today

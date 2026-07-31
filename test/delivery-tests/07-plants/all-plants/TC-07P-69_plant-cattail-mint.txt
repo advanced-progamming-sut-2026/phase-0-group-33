@@ -1,0 +1,59 @@
+=== TEST TC-07P-69: plant catTail-mint
+#
+# Rubric (Phase 1) : گیاهان > پیاده سازی > پیاده سازی تمام گیاهان
+# Group            : 07 - Plants
+# Kind             : automatic (deterministic)
+# Goal             : catTail-mint exists, can be selected, placed and used as the doc describes.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Category : Homing
+#   Tags     : -
+#   Cost     : 0 sun   |   base HP: 0   |   damage: 0
+#   Recharge : 85s
+#   
+#   The account is opened with 'menu cheat unlock-all', so every plant is
+#   unlocked AND at level 5 - that is why the HP on the lawn is higher than
+#   the base HP of plants.csv (the level 2..5 bonuses are applied).
+#   
+#   A mint gives the plant-food effect to every plant of ITS OWN family
+#   and then vanishes. The number in the message is the number of plants of
+#   that family currently on the lawn.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> add plant -t catTail-mint
+? catTail-mint added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 9000 suns
+? Sun: 9050
+> cheat remove-cooldown
+? All cooldown limits removed.
+> plant plant -t Peashooter -l (1, 3)
+? Peashooter planted at (1, 3).
+> plant plant -t catTail-mint -l (2, 3)
+? catTail-mint empowered
+? plants of its family and vanished.
+> show tile status -l (2, 3)
+? Tile (2, 3) | terrain: NORMAL
+> menu enter collection
+? Redirected to collection menu
+> menu collection show-plant -p catTail-mint
+? catTail-mint:
+? sun cost: 0
+? hp: 0
+? recharge: 85s

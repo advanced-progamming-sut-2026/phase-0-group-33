@@ -1,0 +1,27 @@
+=== TEST TC-0707-3: the unlock cheat opens every plant at once
+#
+# Rubric (Phase 1) : گیاهان > مکانیزم ها > آنلاک کردن
+# Group            : 07 - Plants
+# Kind             : automatic (deterministic)
+# Goal             : menu cheat unlock-plants makes all 69 selectable.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-plants
+? All 69 plants unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Winter Melon
+? Winter Melon added to your selection.
+> add plant -t Doom-shroom
+? Doom-shroom added to your selection.
+> add plant -t catTail-mint
+? catTail-mint added to your selection.

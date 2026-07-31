@@ -1,0 +1,48 @@
+=== TEST TC-06Z-33: zombie King
+#
+# Rubric (Phase 1) : زامبی ها > پیاده سازی تمام زامبی ها > زامبی‌های اجباری
+# Group            : 06 - Zombies
+# Kind             : automatic (deterministic)
+# Goal             : King exists, spawns, reports the right stats and can be killed.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Where it belongs : Dark Ages
+#   What it does     : sits at the right-most column and never moves; it promotes zombies to Knights
+#   Base health      : 1000
+#   Armor            : none
+#   
+#   Health is shown at difficulty 3 (the default), where the dl/3
+#   factor of the document is exactly 1.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat spawn-zombie -t King -l 8, 3
+? King spawned at (8, 3).
+> zombies info
+? King:
+? position: 8, 3
+? health: 1000
+> show tile status -l (8, 3)
+? Zombie: King | HP: 1000 | armor: 0
+> show map
+? Wave: 0/3
+> release the nuke
+? The nuke wiped out 1 zombies.
+> zombies info
+? There are no zombies on the map.

@@ -1,0 +1,102 @@
+=== TEST TC-1004-2: the five scoring patterns of the doc are implemented
+#
+# Rubric (Phase 1) : امتیاز > بازی امتیازی > الگوهای محاسبه امتیاز (امتیازی)
+# Group            : 10 - Scoring game & leaderboard
+# Kind             : automatic (RANDOM: which patterns fire depends on the kills)
+# Goal             : multi-kill / speed kill / mass kill / streak / untouched defense.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Base 10 per kill, plus:
+#     multi-kill        several zombies die in the same tick     +50
+#     speed kill        a zombie dies within 5s of spawning      +20
+#     mass kill         4+ zombies die within one second        +100
+#     streak            5 kills without losing a plant           +75
+#     untouched defense per unused lawn mower at the end        +150
+#   'release the nuke' kills the whole wave at once, so the multi-kill
+#   and mass-kill patterns are guaranteed to fire in this run.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu scoring-game
+? Scoring game started!
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> start zombie waves
+? Wave 1 started.
+> release the nuke
+? The nuke wiped out
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+> release the nuke
+> advance time -t 60 ticks
+? Your miopoint score was recorded:
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   Your miopoint score: 1180
+#   Your miopoint score was recorded: 1180

@@ -1,0 +1,29 @@
+=== TEST TC-0901-1: the shop lists all five permanent items
+#
+# Rubric (Phase 1) : فروشگاه > کالاها > کالاهای دائمی
+# Group            : 09 - Shop
+# Kind             : automatic (deterministic)
+# Goal             : Pot, Plant Food, Random bundle, Choice bundle, Exchange.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu greenhouse
+? Redirected to greenhouse menu
+> enter shop
+? Redirected to Shop menu
+> shop list
+? Shop items:
+? 1. Pot | 2000 coins | unlocks one greenhouse pot (max 20)
+? 2. Plant Food | 3 diamonds | +1 plant food for the start of your next level (max 3)
+? 3. Random Seed Packet Bundle | 1000 coins | 5 seed packets of a random unlocked plant
+? 4. Choice Seed Packet Bundle | 5 diamonds | 10 seed packets of a chosen plant (-t)
+? 5. Currency Exchange | 5 diamonds | 500 coins
+? 6. Daily Offer | see 'shop daily'

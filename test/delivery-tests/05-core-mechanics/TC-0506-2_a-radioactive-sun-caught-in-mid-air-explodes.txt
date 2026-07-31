@@ -1,0 +1,42 @@
+=== TEST TC-0506-2: a radioactive sun caught in mid air explodes
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > تولید خورشید > خورشید رادیواکتیو
+# Group            : 05 - Core game mechanics
+# Kind             : manual-ish (RANDOM: needs a radioactive sun in flight)
+# Goal             : 150 damage to zombies in a 5x5 and 80 to plants in a 3x3, per the doc.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   1. advance time until 'New radioactive sun is dropping at (x, y)'
+#   2. IMMEDIATELY run  collect sun -l (x, y)  - before the
+#      'Sun reached the ground' line appears
+#   3. the sun explodes instead of being collected
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> advance time -t 900 ticks
+? sun is dropping at position (
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   New radioactive sun is dropping at position (5, 3)
+#   > collect sun -l (5, 3)
+#   The radioactive sun exploded at (5, 3)!
+#   Zombie of type Normal is dead at (6, 3)

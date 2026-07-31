@@ -1,0 +1,23 @@
+=== TEST TC-0102-1: gradle build succeeds from a clean state
+#
+# Rubric (Phase 1) : زیرساخت > پروژه dependency management
+# Group            : 01 - Infrastructure
+# Kind             : manual (inspection by the TA)
+# Goal             : The project is a real Gradle project and builds with one command.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# STEPS
+#   1. Run: gradlew.bat clean   (Linux/macOS: ./gradlew clean)
+#   2. Run: gradlew.bat build
+#
+# EXPECTED RESULT
+#   - BUILD SUCCESSFUL is printed.
+#   - build/classes contains the compiled classes.
+#   - No manual javac step was needed.
+#
+# (No '>' lines: this case is verified by looking at the repository /
+#  by watching the program, not by the automatic runner.)

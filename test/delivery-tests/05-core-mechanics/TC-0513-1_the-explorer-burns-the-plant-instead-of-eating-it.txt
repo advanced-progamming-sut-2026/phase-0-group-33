@@ -1,0 +1,35 @@
+=== TEST TC-0513-1: the Explorer burns the plant instead of eating it
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > خوردن گیاهان > سایر استراتژی حمله به گیاهان
+# Group            : 05 - Core game mechanics
+# Kind             : automatic (deterministic)
+# Goal             : Its torch destroys the plant in front of it.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Sunflower
+? Sunflower added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 500 suns
+? Sun: 550
+> cheat remove-cooldown
+? All cooldown limits removed.
+> plant plant -t Sunflower -l (2, 3)
+? Sunflower planted at (2, 3).
+> cheat spawn-zombie -t Explorer -l 4, 3
+? Explorer spawned at (4, 3).
+> advance time -t 150 ticks
+? The Explorer's torch burnt Sunflower at (2, 3)!

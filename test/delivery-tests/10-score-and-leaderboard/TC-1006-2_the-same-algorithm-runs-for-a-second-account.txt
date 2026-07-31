@@ -1,0 +1,46 @@
+=== TEST TC-1006-2: the same algorithm runs for a second account
+#
+# Rubric (Phase 1) : امتیاز > بازی امتیازی > الگوریتم ثابت ظهور زامبی در این مرحله
+# Group            : 10 - Scoring game & leaderboard
+# Kind             : automatic (deterministic)
+# Goal             : Every player of the day meets the same zombies.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Compare the two wave blocks: they are identical, because the seed
+#   is the calendar date and not the user.
+#
+> register -u alpha -p Abcd123! Abcd123! -n Alpha -e a@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully.
+> login -u alpha -p Abcd123!
+? Login successful.
+> menu scoring-game
+? Scoring game started!
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> start zombie waves
+? Wave 1 started.
+> menu exit
+? Redirected to Main menu
+> menu logout
+? Logged out.
+> register -u beta -p Abcd123! Abcd123! -n Beta -e b@mail.com -g female
+> pick question -q 1 -a blue -c blue
+? Account created successfully.
+> login -u beta -p Abcd123!
+? Login successful.
+> menu scoring-game
+? Scoring game started!
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> start zombie waves
+? Wave 1 started.

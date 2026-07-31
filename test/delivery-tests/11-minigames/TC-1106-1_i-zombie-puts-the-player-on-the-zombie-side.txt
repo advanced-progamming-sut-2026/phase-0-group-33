@@ -1,0 +1,44 @@
+=== TEST TC-1106-1: i-zombie puts the player on the zombie side
+#
+# Rubric (Phase 1) : مینی‌گیم ها > من زامبی > وجود مینی‌گیم
+# Group            : 11 - Minigames
+# Kind             : automatic (RANDOM: the plant layout)
+# Goal             : Plants are pre-placed on the left and every row holds a brain.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   '[B]' at the left edge is a brain instead of a lawn mower - the
+#   player has to eat them all.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n i-zombie -d 1
+? (stage 1) started!
+> show map
+? [B]
+> show available plants
+? Plants you can pick for this level:
+> place zombie -t Gargantuar -l (7, 1)
+? Available zombies:
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   Available zombies: Normal (100 sun), Cone Head (200 sun), Bucket Head (400 sun), Imp (100 sun), Newspaper (700 sun)
+#   [B] .   C   B   .   .   .   .   .   .
+#   [B] B   .   C   .   .   .   .   .   .
+#   [B] .   P   .   .   .   .   .   .   .
+#   [B] .   .   .   .   .   .   .   .   .
+#   [B] S   C   P   .   .   .   .   .   .

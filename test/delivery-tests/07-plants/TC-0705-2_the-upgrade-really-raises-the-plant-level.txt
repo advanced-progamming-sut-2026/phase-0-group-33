@@ -1,0 +1,39 @@
+=== TEST TC-0705-2: the upgrade really raises the plant level
+#
+# Rubric (Phase 1) : گیاهان > مکانیزم ها > ارتقای گیاه
+# Group            : 07 - Plants
+# Kind             : automatic (deterministic)
+# Goal             : A level-1 plant becomes level 2 and then level 3.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat add 50000 coin
+? 50000 coins added.
+> menu cheat add 100 diamond
+? 100 diamonds added.
+> menu greenhouse
+? Redirected to greenhouse menu
+> enter shop
+? Redirected to Shop menu
+> shop buy -i 4 -n 2 -t Peashooter
+? You got 20 seed packets of Peashooter (total 20).
+> menu exit
+? Redirected to Greenhouse menu
+> menu exit
+? Redirected to Main menu
+> menu enter collection
+? Redirected to collection menu
+> menu collection upgrade-plant -p Peashooter
+? Peashooter upgraded to level 2.
+> menu collection upgrade-plant -p Peashooter
+? Peashooter upgraded to level 3.
+> menu collection show-plants
+? Peashooter | level 3 | seed packets: 5

@@ -1,0 +1,40 @@
+=== TEST TC-1111-2: the wall-nut zombie is tanky and slow
+#
+# Rubric (Phase 1) : مینی‌گیم ها > زامبی گیاهی > زامبی گردو
+# Group            : 11 - Minigames
+# Kind             : automatic (deterministic)
+# Goal             : 1100 HP and a low speed.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Compare its position after 10s with a Normal zombie: the Wall-nut
+#   Zombie has barely moved.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n zombotany -d 1
+? ZOMBOTANY (stage 1) started!
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat spawn-zombie -t Wall-nut Zombie -l 8, 3
+? Wall-nut Zombie spawned at (8, 3).
+> zombies info
+? Wall-nut Zombie:
+? health: 1100
+> advance time -t 100 ticks
+? Time advanced by 100 ticks
+> zombies info
+? Wall-nut Zombie:

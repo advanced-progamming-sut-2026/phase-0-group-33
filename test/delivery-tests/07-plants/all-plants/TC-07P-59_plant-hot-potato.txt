@@ -1,0 +1,59 @@
+=== TEST TC-07P-59: plant Hot Potato
+#
+# Rubric (Phase 1) : گیاهان > پیاده سازی > پیاده سازی تمام گیاهان
+# Group            : 07 - Plants
+# Kind             : automatic (deterministic)
+# Goal             : Hot Potato exists, can be selected, placed and used as the doc describes.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Category : Explosive
+#   Tags     : Fire
+#   Cost     : 0 sun   |   base HP: 0   |   damage: 0
+#   Recharge : 5s
+#   
+#   The account is opened with 'menu cheat unlock-all', so every plant is
+#   unlocked AND at level 5 - that is why the HP on the lawn is higher than
+#   the base HP of plants.csv (the level 2..5 bonuses are applied).
+#   
+#   The Hunter of Frostbite Caves throws ice at the nearest plant of its
+#   lane; the 3rd hit encases the plant in 600 HP of ice. Hot Potato is the
+#   only way to melt it instantly - exactly what the document asks for.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Frost Bite -l 1
+? Entered Frost Bite, level 1
+> add plant -t Wall-nut
+? Wall-nut added to your selection.
+> add plant -t Hot Potato
+? Hot Potato added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 900 suns
+? Sun: 950
+> cheat remove-cooldown
+? All cooldown limits removed.
+> plant plant -t Hot Potato -l (2, 3)
+? Hot Potato can only be used on frozen tiles or frozen plants.
+> plant plant -t Wall-nut -l (2, 3)
+? Wall-nut planted at (2, 3).
+> cheat spawn-zombie -t Hunter -l 8, 3
+? Hunter spawned at (8, 3).
+> advance time -t 200 ticks
+? Wall-nut at (2, 3) is frozen solid by the Hunter!
+> show tile status -l (2, 3)
+?     frozen: 600 ice HP
+> plant plant -t Hot Potato -l (2, 3)
+? The ice at (2, 3) melted away.
+> show tile status -l (2, 3)
+? Plant: Wall-nut | HP: 6500/6500

@@ -1,0 +1,29 @@
+=== TEST TC-0703-3: plant names ignore case spaces and dashes
+#
+# Rubric (Phase 1) : گیاهان > پیاده سازی > پیاده سازی تمام گیاهان
+# Group            : 07 - Plants
+# Kind             : automatic (deterministic)
+# Goal             : wall-nut / Wall Nut / wallnut all resolve to the same plant.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t wallnut
+? Wall-nut added to your selection.
+> remove plant -t Wall Nut
+? Wall-nut removed from your selection.
+> add plant -t WALL-NUT
+? Wall-nut added to your selection.
+> add plant -t Banana Tree
+? No plant with this name exists.

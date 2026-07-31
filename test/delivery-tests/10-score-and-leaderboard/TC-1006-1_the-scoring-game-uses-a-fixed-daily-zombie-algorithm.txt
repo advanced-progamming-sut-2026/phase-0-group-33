@@ -1,0 +1,57 @@
+=== TEST TC-1006-1: the scoring game uses a fixed daily zombie algorithm
+#
+# Rubric (Phase 1) : امتیاز > بازی امتیازی > الگوریتم ثابت ظهور زامبی در این مرحله
+# Group            : 10 - Scoring game & leaderboard
+# Kind             : automatic (deterministic)
+# Goal             : Two runs on the same day produce the same wave.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Compare the two 'Wave 1' blocks: same types, same lanes, same costs.
+#   The RNG of the scoring game is seeded with the date, so the run is
+#   identical for every player on that day (the doc's requirement).
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu scoring-game
+? Scoring game started!
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> start zombie waves
+? Wave 1 started.
+? spawned at wave 1 in lane
+> menu exit
+? Redirected to Main menu
+> menu scoring-game
+? Scoring game started!
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> start zombie waves
+? Wave 1 started.
+? spawned at wave 1 in lane
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   --- first run ---
+#   Zombie Cone Head spawned at wave 1 in lane 2 which costed 200.
+#   Zombie Normal spawned at wave 1 in lane 2 which costed 100.
+#   Zombie Imp spawned at wave 1 in lane 2 which costed 100.
+#   --- second run, same day ---
+#   Zombie Cone Head spawned at wave 1 in lane 2 which costed 200.
+#   Zombie Normal spawned at wave 1 in lane 2 which costed 100.
+#   Zombie Imp spawned at wave 1 in lane 2 which costed 100.

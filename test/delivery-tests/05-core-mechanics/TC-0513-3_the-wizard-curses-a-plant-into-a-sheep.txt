@@ -1,0 +1,46 @@
+=== TEST TC-0513-3: the Wizard curses a plant into a sheep
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > خوردن گیاهان > سایر استراتژی حمله به گیاهان
+# Group            : 05 - Core game mechanics
+# Kind             : automatic (RANDOM: which plant the Wizard picks)
+# Goal             : The plant is not eaten, it is turned into a sheep.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Dark Ages -l 1
+? Entered Dark Ages, level 1
+> add plant -t Sunflower
+? Sunflower added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 500 suns
+? Sun: 550
+> cheat remove-cooldown
+? All cooldown limits removed.
+> plant plant -t Sunflower -l (2, 3)
+? Sunflower planted at (2, 3).
+> cheat spawn-zombie -t Wizard -l 6, 3
+? Wizard spawned at (6, 3).
+> advance time -t 200 ticks
+? Time advanced by 200 ticks
+> show tile status -l (2, 3)
+? Tile (2, 3)
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   Sunflower at (2, 3) was cursed into a sheep!
+#   > show tile status -l (2, 3)
+#   Plant: Sunflower | HP: 450/450
+#       cursed into a sheep

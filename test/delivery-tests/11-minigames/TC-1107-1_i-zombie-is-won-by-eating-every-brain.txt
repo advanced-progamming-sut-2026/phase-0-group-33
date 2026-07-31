@@ -1,0 +1,51 @@
+=== TEST TC-1107-1: i-zombie is won by eating every brain
+#
+# Rubric (Phase 1) : مینی‌گیم ها > من زامبی > امکان برد و باخت
+# Group            : 11 - Minigames
+# Kind             : automatic (RANDOM: the plant layout decides how far the zombies get)
+# Goal             : Losing happens when there is neither sun nor a zombie left.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Each row whose brain has been eaten loses its '[B]' marker.
+#   The sun of this minigame is produced by your own zombies:
+#   'Your sun-producer zombie in lane N made 25 sun.'
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n i-zombie -d 1
+? (stage 1) started!
+> show sun amount
+? Sun: 150
+> place zombie -t Normal -l (9, 1)
+? Normal placed at (9, 1).
+> advance time -t 400 ticks
+? Your sun-producer zombie in lane
+? made 25 sun. Balance:
+> place zombie -t Normal -l (9, 2)
+? Normal placed at (9, 2).
+> place zombie -t Normal -l (9, 3)
+? Normal placed at (9, 3).
+> advance time -t 400 ticks
+? Time advanced by 400 ticks
+> show map
+? Wave:
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   Your sun-producer zombie in lane 1 made 25 sun. Balance: 425
+#   [B] C   C   .   .   .   .   .   .   .
+#   You won the minigame!

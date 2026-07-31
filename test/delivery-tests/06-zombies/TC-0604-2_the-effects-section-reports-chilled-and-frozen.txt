@@ -1,0 +1,45 @@
+=== TEST TC-0604-2: the effects section reports chilled and frozen
+#
+# Rubric (Phase 1) : زامبی ها > نمایش اطلاعات زامبی ها
+# Group            : 06 - Zombies
+# Kind             : automatic (deterministic)
+# Goal             : A Snow Pea chills a zombie, Ice-shroom freezes everyone.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Snow Pea
+? Snow Pea added to your selection.
+> add plant -t Ice-shroom
+? Ice-shroom added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 900 suns
+? Sun: 950
+> cheat remove-cooldown
+? All cooldown limits removed.
+> plant plant -t Snow Pea -l (1, 3)
+? Snow Pea planted at (1, 3).
+> cheat spawn-zombie -t Gargantuar -l 6, 3
+? Gargantuar spawned at (6, 3).
+> advance time -t 30 ticks
+? Time advanced by 30 ticks
+> zombies info
+? Gargantuar:
+?     effects:
+?         chilled:
+> plant plant -t Ice-shroom -l (1, 1)
+? Ice-shroom froze every zombie on the map.
+> zombies info
+?         frozen:

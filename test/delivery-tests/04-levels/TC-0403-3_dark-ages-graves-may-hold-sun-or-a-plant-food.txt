@@ -1,0 +1,84 @@
+=== TEST TC-0403-3: Dark Ages graves may hold sun or a plant food
+#
+# Rubric (Phase 1) : مراحل > مراحل adventure > قرون وسطی
+# Group            : 04 - Adventure levels & special levels
+# Kind             : automatic (RANDOM: grave kind and position)
+# Goal             : '$' = grave with 50 sun, '%' = grave with a plant food.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Busting a '$' grave gives 50 sun, busting a '%' grave gives a plant
+#   food. Both are printed the moment the grave is broken.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Dark Ages -l 1
+? Entered Dark Ages, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> add plant -t Grave Buster
+? Grave Buster added to your selection.
+> start game
+? The battle begins!
+> cheat remove-cooldown
+? All cooldown limits removed.
+> start zombie waves
+? Wave 1 started.
+> show map
+? Legend: [M] mower | letter = plant initial | digit = zombies | * sun | ~ water | # grave | $ grave with sun | % grave with plant food | + necromancy | _ low tide
+
+> plant plant -t Grave Buster -l (3, 1)
+> plant plant -t Grave Buster -l (4, 1)
+> plant plant -t Grave Buster -l (5, 1)
+> plant plant -t Grave Buster -l (6, 1)
+> plant plant -t Grave Buster -l (7, 1)
+> plant plant -t Grave Buster -l (8, 1)
+> plant plant -t Grave Buster -l (9, 1)
+> plant plant -t Grave Buster -l (3, 2)
+> plant plant -t Grave Buster -l (4, 2)
+> plant plant -t Grave Buster -l (5, 2)
+> plant plant -t Grave Buster -l (6, 2)
+> plant plant -t Grave Buster -l (7, 2)
+> plant plant -t Grave Buster -l (8, 2)
+> plant plant -t Grave Buster -l (9, 2)
+> plant plant -t Grave Buster -l (3, 3)
+> plant plant -t Grave Buster -l (4, 3)
+> plant plant -t Grave Buster -l (5, 3)
+> plant plant -t Grave Buster -l (6, 3)
+> plant plant -t Grave Buster -l (7, 3)
+> plant plant -t Grave Buster -l (8, 3)
+> plant plant -t Grave Buster -l (9, 3)
+> plant plant -t Grave Buster -l (3, 4)
+> plant plant -t Grave Buster -l (4, 4)
+> plant plant -t Grave Buster -l (5, 4)
+> plant plant -t Grave Buster -l (6, 4)
+> plant plant -t Grave Buster -l (7, 4)
+> plant plant -t Grave Buster -l (8, 4)
+> plant plant -t Grave Buster -l (9, 4)
+> plant plant -t Grave Buster -l (3, 5)
+> plant plant -t Grave Buster -l (4, 5)
+> plant plant -t Grave Buster -l (5, 5)
+> plant plant -t Grave Buster -l (6, 5)
+> plant plant -t Grave Buster -l (7, 5)
+> plant plant -t Grave Buster -l (8, 5)
+> plant plant -t Grave Buster -l (9, 5)
+> show map
+? Wave: 1/3
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   The grave at (6, 2) was busted.
+#   The grave gave you 50 sun!
+#   The grave at (4, 5) was busted.
+#   The grave held a plant food!

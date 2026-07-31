@@ -1,0 +1,29 @@
+=== TEST TC-0221-3: spending diamonds lowers the wallet
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی بازی > نمایش تعداد الماس
+# Group            : 02 - Game start & menus
+# Kind             : automatic (deterministic)
+# Goal             : Boosting a plant costs 2 diamonds.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat add 10 diamond
+? 10 diamonds added. Total: 10
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> boost plant -t Peashooter
+? Peashooter is boosted
+> menu exit
+? Redirected to Main menu
+> menu gem-wallet
+? Diamonds: 8

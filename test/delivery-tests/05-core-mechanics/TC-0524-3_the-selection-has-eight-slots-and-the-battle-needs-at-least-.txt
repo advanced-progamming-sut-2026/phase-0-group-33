@@ -1,0 +1,43 @@
+=== TEST TC-0524-3: the selection has eight slots and the battle needs at least one
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > صفحه انتخاب گیاهان > انتخاب یا عدم انتخاب گیاه
+# Group            : 05 - Core game mechanics
+# Kind             : automatic (deterministic)
+# Goal             : The default of the doc is 8 cards.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> start game
+? Pick at least one plant first.
+> add plant -t Sunflower
+? Sunflower added to your selection.
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> add plant -t Wall-nut
+? Wall-nut added to your selection.
+> add plant -t Potato Mine
+? Potato Mine added to your selection.
+> add plant -t Cactus
+? Cactus added to your selection.
+> add plant -t Squash
+? Squash added to your selection.
+> add plant -t Chomper
+? Chomper added to your selection.
+> add plant -t Torchwood
+? Torchwood added to your selection.
+> add plant -t Repeater
+? All 8 plant slots are full.
+> start game
+? The battle begins!

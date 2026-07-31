@@ -1,0 +1,45 @@
+=== TEST TC-1201-1: the game never crashes on bad input
+#
+# Rubric (Phase 1) : تجربه ی کاربری UX > راحتی، زیبایی، روان بودن، کرش نکردن
+# Group            : 12 - User experience
+# Kind             : automatic (deterministic)
+# Goal             : Garbage in every menu is answered, not thrown.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   The last 'show map' proves the game is still alive and consistent
+#   after ten malformed commands.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> banana
+? Invalid command!
+> menu enter
+? Invalid command!
+> plant plant -t -l
+? Invalid command!
+> advance time -t abc ticks
+? Invalid command!
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t
+? Invalid command!
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> show tile status -l (0, 0)
+? Coordinates are outside the lawn.
+> collect sun -l (99, 99)
+? Coordinates are outside the lawn.
+> show map
+? Wave: 0/3

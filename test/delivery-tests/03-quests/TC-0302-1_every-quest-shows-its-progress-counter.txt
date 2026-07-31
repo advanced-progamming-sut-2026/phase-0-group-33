@@ -1,0 +1,24 @@
+=== TEST TC-0302-1: every quest shows its progress counter
+#
+# Rubric (Phase 1) : کوئست‌ها > منوی ترول لاگ > نمایش میزان پیشرفت
+# Group            : 03 - Quests
+# Kind             : automatic (deterministic)
+# Goal             : The [done/target] counter is printed next to each quest.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu travel-log
+? Redirected to travel-log menu
+> travel log page high
+? - Only Cactus: kill 10 zombies with Cactus today | reward: 20 gems [0/10]
+? - Hunter of Egypt: defeat 50 of its zombies | reward: 10 seed packets [0/50]
+> travel log page daily
+? - Daily sun collector: gather 4000 sun today | reward: 40 coins [0/4000]

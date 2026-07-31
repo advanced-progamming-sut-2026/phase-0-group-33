@@ -1,0 +1,49 @@
+=== TEST TC-06Z-14: zombie Newspaper
+#
+# Rubric (Phase 1) : زامبی ها > پیاده سازی تمام زامبی ها > زامبی‌های اجباری
+# Group            : 06 - Zombies
+# Kind             : automatic (deterministic)
+# Goal             : Newspaper exists, spawns, reports the right stats and can be killed.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Where it belongs : common
+#   What it does     : the newspaper (190) must go first; afterwards it gets angry and much faster
+#   Base health      : 460
+#   Armor            : newspaper: 190
+#   
+#   Health is shown at difficulty 3 (the default), where the dl/3
+#   factor of the document is exactly 1.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat spawn-zombie -t Newspaper -l 8, 3
+? Newspaper spawned at (8, 3).
+> zombies info
+? Newspaper:
+? position: 8, 3
+? health: 460
+? newspaper: 190
+> show tile status -l (8, 3)
+? Zombie: Newspaper | HP: 460 | armor: 190
+> show map
+? Wave: 0/3
+> release the nuke
+? The nuke wiped out 1 zombies.
+> zombies info
+? There are no zombies on the map.

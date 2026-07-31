@@ -1,0 +1,35 @@
+=== TEST TC-0705-1: an upgrade costs coins plus five seed packets
+#
+# Rubric (Phase 1) : گیاهان > مکانیزم ها > ارتقای گیاه
+# Group            : 07 - Plants
+# Kind             : automatic (deterministic)
+# Goal             : The exact price of the doc is enforced.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu greenhouse
+? Redirected to greenhouse menu
+> enter shop
+? Redirected to Shop menu
+> shop buy -i 4 -n 1 -t Peashooter
+? You got 10 seed packets of Peashooter (total 10).
+> menu exit
+? Redirected to Greenhouse menu
+> menu exit
+? Redirected to Main menu
+> menu enter collection
+? Redirected to collection menu
+> menu collection show-plants
+? Peashooter | level 5 | seed packets: 10
+> menu collection upgrade-plant -p Peashooter
+? Peashooter is already at max level (5).

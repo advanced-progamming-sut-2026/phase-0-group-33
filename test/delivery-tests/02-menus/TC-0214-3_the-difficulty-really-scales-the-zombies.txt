@@ -1,0 +1,56 @@
+=== TEST TC-0214-3: the difficulty really scales the zombies
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی تنظیمات > امکان تغییر سختی بازی
+# Group            : 02 - Game start & menus
+# Kind             : automatic (deterministic)
+# Goal             : dl/3 is applied to zombie health: the same zombie is tougher on level 5.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   190 * 5/3 = 317 -> the health factor of the doc (dl/3) is applied.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter settings
+? Redirected to settings menu
+> menu settings change-difficulty -l 3
+? Difficulty set to
+> menu exit
+? Redirected to Main menu
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat spawn-zombie -t Normal -l 8, 3
+? Normal spawned at (8, 3).
+> zombies info
+? health: 190
+> menu exit
+? Redirected to Main menu
+> menu enter settings
+? Redirected to settings menu
+> menu settings change-difficulty -l 5
+? Difficulty set to EXTREME.
+> menu exit
+? Redirected to Main menu
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat spawn-zombie -t Normal -l 8, 3
+? Normal spawned at (8, 3).
+> zombies info
+? health: 317

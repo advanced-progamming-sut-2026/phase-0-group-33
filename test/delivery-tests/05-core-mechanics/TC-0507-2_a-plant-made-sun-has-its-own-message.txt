@@ -1,0 +1,33 @@
+=== TEST TC-0507-2: a plant-made sun has its own message
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > تولید خورشید > پیغام سقوط خورشید از آسمان
+# Group            : 05 - Core game mechanics
+# Kind             : automatic (deterministic)
+# Goal             : 'plant <type> produced a sun at (x, y)' as the doc requires.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Sunflower
+? Sunflower added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 500 suns
+? Sun: 550
+> cheat remove-cooldown
+? All cooldown limits removed.
+> plant plant -t Sunflower -l (2, 4)
+? Sunflower planted at (2, 4).
+> advance time -t 250 ticks
+? plant Sunflower produced a sun at (2, 4)

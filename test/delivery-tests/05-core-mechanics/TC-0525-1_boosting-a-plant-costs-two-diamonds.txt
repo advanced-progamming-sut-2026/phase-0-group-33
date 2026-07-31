@@ -1,0 +1,31 @@
+=== TEST TC-0525-1: boosting a plant costs two diamonds
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > صفحه انتخاب گیاهان > امکان بوست گیاهان
+# Group            : 05 - Core game mechanics
+# Kind             : automatic (deterministic)
+# Goal             : The wallet drops by exactly 2.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat add 10 diamond
+? 10 diamonds added. Total: 10
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Sunflower
+? Sunflower added to your selection.
+> boost plant -t Sunflower
+? Sunflower is boosted
+> show plants status
+? | boosted
+> menu exit
+? Redirected to Main menu
+> menu gem-wallet
+? Diamonds: 8

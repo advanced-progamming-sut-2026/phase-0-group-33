@@ -1,0 +1,57 @@
+=== TEST TC-07P-58: plant Lily Pad
+#
+# Rubric (Phase 1) : گیاهان > پیاده سازی > گیاهان امتیازی
+# Group            : 07 - Plants
+# Kind             : automatic (deterministic)
+# Goal             : Lily Pad exists, can be selected, placed and used as the doc describes.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Category : Modifier
+#   Tags     : Water, stack
+#   Cost     : 25 sun   |   base HP: 300   |   damage: 0
+#   Recharge : 5s
+#   
+#   The account is opened with 'menu cheat unlock-all', so every plant is
+#   unlocked AND at level 5 - that is why the HP on the lawn is higher than
+#   the base HP of plants.csv (the level 2..5 bonuses are applied).
+#   
+#   Columns 8 and 9 of Big Wave Beach are water. A land plant needs a
+#   Lily Pad under it; the map still prints '~' for that tile, only
+#   'show tile status' reveals the '(lily pad)'.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Wavey Beach -l 1
+? Entered Wavey Beach, level 1
+> add plant -t Lily Pad
+? Lily Pad added to your selection.
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 9000 suns
+? Sun: 9050
+> cheat remove-cooldown
+? All cooldown limits removed.
+> show map
+? Wave: 0/3
+> plant plant -t Lily Pad -l (2, 3)
+? Lily Pads can only be placed on water.
+> plant plant -t Lily Pad -l (9, 3)
+? Lily Pad placed on the water at (9, 3).
+> show tile status -l (9, 3)
+? Tile (9, 3) | terrain: WATER (lily pad)
+> plant plant -t Peashooter -l (9, 3)
+? Peashooter planted at (9, 3).
+> show tile status -l (9, 3)
+? Plant: Peashooter

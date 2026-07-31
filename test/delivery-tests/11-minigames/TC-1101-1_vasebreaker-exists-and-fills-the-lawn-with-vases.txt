@@ -1,0 +1,40 @@
+=== TEST TC-1101-1: vasebreaker exists and fills the lawn with vases
+#
+# Rubric (Phase 1) : مینی‌گیم ها > کوزه شکن > وجود مینی‌گیم
+# Group            : 11 - Minigames
+# Kind             : automatic (RANDOM: the vase positions are random)
+# Goal             : The minigame starts and the board is covered with 'U' vases.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu travel-log
+? Redirected to travel-log menu
+> play minigame -n vasebreaker -d 1
+? (stage 1) started!
+> show map
+? Wave: 0/3
+? U
+> show sun amount
+? Sun: 50
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   VASEBREAKER (stage 1) started!
+#   Wave: 0/3 | Sun: 50 | Plant foods: 0
+#   [M] .   .   .   .   .   U   U   .   .
+#   [M] .   .   .   .   U   U   U   .   .
+#   [M] .   .   .   .   .   .   .   .   .
+#   [M] .   .   .   .   U   U   U   .   U
+#   [M] .   .   .   .   U   .   U   U   .

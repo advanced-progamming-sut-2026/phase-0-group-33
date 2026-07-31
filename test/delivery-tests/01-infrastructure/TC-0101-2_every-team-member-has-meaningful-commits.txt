@@ -1,0 +1,22 @@
+=== TEST TC-0101-2: every team member has meaningful commits
+#
+# Rubric (Phase 1) : زیرساخت > github tag
+# Group            : 01 - Infrastructure
+# Kind             : manual (inspection by the TA)
+# Goal             : All three members contributed continuously, not in one dump.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# STEPS
+#   1. Run: git shortlog -sne --no-merges
+#   2. Run: git log --pretty='%h %an %ad %s' --date=short | head -40
+#
+# EXPECTED RESULT
+#   - All 3 members of group-33 appear with a non-trivial commit count.
+#   - Commit dates are spread over several weeks, not a single day.
+#
+# (No '>' lines: this case is verified by looking at the repository /
+#  by watching the program, not by the automatic runner.)

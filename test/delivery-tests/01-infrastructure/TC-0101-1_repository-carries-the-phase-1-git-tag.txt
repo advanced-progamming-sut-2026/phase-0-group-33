@@ -1,0 +1,25 @@
+=== TEST TC-0101-1: repository carries the phase-1 git tag
+#
+# Rubric (Phase 1) : زیرساخت > github tag
+# Group            : 01 - Infrastructure
+# Kind             : manual (inspection by the TA)
+# Goal             : The delivered commit is tagged phase-1 and pushed to HamGit/GitHub.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# STEPS
+#   1. Open a terminal in the project root.
+#   2. Run: git tag --list
+#   3. Run: git show phase-1 --stat --no-patch
+#   4. Run: git ls-remote --tags origin
+#
+# EXPECTED RESULT
+#   - 'phase-1' appears in the tag list.
+#   - The tag points at the last commit of the phase-1 work.
+#   - The same tag exists on the remote.
+#
+# (No '>' lines: this case is verified by looking at the repository /
+#  by watching the program, not by the automatic runner.)

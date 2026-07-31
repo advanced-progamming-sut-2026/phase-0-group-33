@@ -1,0 +1,42 @@
+=== TEST TC-0601-2: every armored zombie really carries its armor
+#
+# Rubric (Phase 1) : زامبی ها > پیاده سازی تمام زامبی ها > زامبی‌های اجباری
+# Group            : 06 - Zombies
+# Kind             : automatic (deterministic)
+# Goal             : Cone/Bucket/Brick/Knight/Newspaper/Pharaoh report their armor separately.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat spawn-zombie -t Cone Head -l 9, 1
+? Cone Head spawned
+> cheat spawn-zombie -t Bucket Head -l 9, 2
+? Bucket Head spawned
+> cheat spawn-zombie -t Brick Head -l 9, 3
+? Brick Head spawned
+> cheat spawn-zombie -t Knight -l 9, 4
+? Knight spawned
+> cheat spawn-zombie -t Newspaper -l 9, 5
+? Newspaper spawned
+> zombies info
+? cone: 370
+? bucket: 1100
+? block: 2200
+? crown: 1600
+? shoulderArmor: 1600
+? newspaper: 190

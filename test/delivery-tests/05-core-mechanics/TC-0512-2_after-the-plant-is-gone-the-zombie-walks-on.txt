@@ -1,0 +1,44 @@
+=== TEST TC-0512-2: after the plant is gone the zombie walks on
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > خوردن گیاهان > مکانیزم خوردن گیاه
+# Group            : 05 - Core game mechanics
+# Kind             : automatic (deterministic)
+# Goal             : Eating is only a pause, not the end of the zombie.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   The zombie is no longer standing on the tile it ate: its position
+#   is now smaller than 2, i.e. it walked on towards the house.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Sunflower
+? Sunflower added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 500 suns
+? Sun: 550
+> cheat remove-cooldown
+? All cooldown limits removed.
+> plant plant -t Sunflower -l (2, 3)
+? Sunflower planted at (2, 3).
+> cheat spawn-zombie -t Normal -l 6, 3
+? Normal spawned at (6, 3).
+> advance time -t 250 ticks
+? Plant Sunflower at (2, 3) is destroyed.
+> advance time -t 20 ticks
+? Time advanced by 20 ticks
+> zombies info
+? Normal:
+?     position:

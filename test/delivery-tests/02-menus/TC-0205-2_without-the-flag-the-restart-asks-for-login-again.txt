@@ -1,0 +1,22 @@
+=== TEST TC-0205-2: without the flag the restart asks for login again
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی ورود > stay logged in
+# Group            : 02 - Game start & menus
+# Kind             : automatic (deterministic)
+# Goal             : A plain login is not remembered across restarts.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu show current
+? Main menu
+>> RESTART
+> menu show current
+? Signup menu

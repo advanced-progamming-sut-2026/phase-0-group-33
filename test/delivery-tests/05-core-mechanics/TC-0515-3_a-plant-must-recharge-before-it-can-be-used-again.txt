@@ -1,0 +1,37 @@
+=== TEST TC-0515-3: a plant must recharge before it can be used again
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > محیط باغ > امکان کاشت گیاه
+# Group            : 05 - Core game mechanics
+# Kind             : automatic (deterministic)
+# Goal             : The recharge of the doc is enforced (and the cheat removes it).
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 900 suns
+? Sun: 950
+> plant plant -t Peashooter -l (1, 1)
+? Peashooter planted at (1, 1).
+> plant plant -t Peashooter -l (1, 2)
+? recharging
+> show plants status
+? recharging, ready in
+> cheat remove-cooldown
+? All cooldown limits removed.
+> plant plant -t Peashooter -l (1, 2)
+? Peashooter planted at (1, 2).

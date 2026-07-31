@@ -1,0 +1,39 @@
+=== TEST TC-0224-2: a plant is upgraded once coins and packets are there
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی کلکسیون > ارتقای گیاهان
+# Group            : 02 - Game start & menus
+# Kind             : automatic (deterministic)
+# Goal             : Buying a seed bundle then upgrading raises the plant to level 2.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat add 20000 coin
+? 20000 coins added.
+> menu cheat add 100 diamond
+? 100 diamonds added.
+> menu greenhouse
+? Redirected to greenhouse menu
+> enter shop
+? Redirected to Shop menu
+> shop buy -i 4 -n 1 -t Peashooter
+? You got 10 seed packets of Peashooter (total 10).
+> menu exit
+? Redirected to Greenhouse menu
+> menu exit
+? Redirected to Main menu
+> menu enter collection
+? Redirected to collection menu
+> menu collection show-plants
+? Peashooter | level 1 | seed packets: 10
+> menu collection upgrade-plant -p Peashooter
+? Peashooter upgraded to level 2.
+> menu collection show-plants
+? Peashooter | level 2 | seed packets: 5

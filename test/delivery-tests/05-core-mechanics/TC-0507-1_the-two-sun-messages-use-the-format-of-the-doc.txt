@@ -1,0 +1,28 @@
+=== TEST TC-0507-1: the two sun messages use the format of the doc
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > تولید خورشید > پیغام سقوط خورشید از آسمان
+# Group            : 05 - Core game mechanics
+# Kind             : automatic (RANDOM: tile and type)
+# Goal             : 'New <type> sun is dropping at position (x, y)' then 'Sun reached the ground'.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> advance time -t 400 ticks
+? sun is dropping at position (
+? Sun reached the ground at position (

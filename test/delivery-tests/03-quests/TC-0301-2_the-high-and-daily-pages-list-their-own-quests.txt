@@ -1,0 +1,45 @@
+=== TEST TC-0301-2: the high and daily pages list their own quests
+#
+# Rubric (Phase 1) : کوئست‌ها > منوی ترول لاگ > نمایش کوئست‌ها
+# Group            : 03 - Quests
+# Kind             : automatic (deterministic)
+# Goal             : All 20 quests of Quests.csv are reachable through the pages.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu travel-log
+? Redirected to travel-log menu
+> travel log page high
+? Travel log - high quests:
+? - Only Cactus:
+? - Plant specialist:
+? - Economical gardener:
+? - Blooming in limits:
+? - Night or morning:
+? - Cloudy day:
+? - One column less:
+? - Defenseless row:
+? - Defenseless cross:
+? - Hunter of Egypt:
+? - Hunter of Frost Bite:
+? - Hunter of Wavey Beach:
+? - Hunter of Dark Ages:
+> travel log page daily
+? Travel log - daily quests:
+? - Daily sun collector:
+? - Quick trigger:
+? - Demolition expert:
+? - Symmetry:
+? - No OCD:
+? - Family killer:
+? - Almost winner:
+? - Back-to-back:
+? - Buy the shop's daily offer

@@ -1,0 +1,24 @@
+=== TEST TC-0102-2: gradle run starts the game
+#
+# Rubric (Phase 1) : زیرساخت > پروژه dependency management
+# Group            : 01 - Infrastructure
+# Kind             : manual (inspection by the TA)
+# Goal             : The application plugin is configured, `gradlew run` launches Main.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# STEPS
+#   1. Open build.gradle and check the `application { mainClass }` block.
+#   2. Run: gradlew.bat run
+#   3. Type: menu show current
+#
+# EXPECTED RESULT
+#   - The game starts and prints the signup menu banner.
+#   - `menu show current` answers 'Signup menu'.
+#   - stdin is wired through, so the CLI is usable.
+#
+# (No '>' lines: this case is verified by looking at the repository /
+#  by watching the program, not by the automatic runner.)

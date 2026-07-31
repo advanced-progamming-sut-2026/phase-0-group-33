@@ -1,0 +1,35 @@
+=== TEST TC-0201-2: register rejects every invalid field
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی ثبت‌نام > قابلیت ساخت کاربر جدید
+# Group            : 02 - Game start & menus
+# Kind             : automatic (deterministic)
+# Goal             : Each validation rule of the doc prints its own error and creates nothing.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   The last line proves that none of the 8 rejected attempts created a user.
+#
+> register -u bad! -p Abcd123! Abcd123! -n Nick -e a@b.com -g male
+? Username can only contain letters, digits, and hyphens.
+> register -u u1 -p abc abc -n Nick -e a@b.com -g male
+? Weak password: it must be at least 8 characters and contain a lowercase letter, an uppercase letter, a digit, and a special character.
+> register -u u1 -p Abcd123! Xbcd123! -n Nick -e a@b.com -g male
+? Passwords do not match.
+> register -u u1 -p Abcd123! Abcd123! -n No -e a@b.com -g male
+? Nickname must be between 3 and 30 characters.
+> register -u u1 -p Abcd123! Abcd123! -n Nick -e john..doe@example.com -g male
+? Invalid email format.
+> register -u u1 -p Abcd123! Abcd123! -n Nick -e user@domain -g male
+? Invalid email format.
+> register -u u1 -p Abcd123! Abcd123! -n Nick -e user@domain.c -g male
+? Invalid email format.
+> register -u u1 -p Abcd123! Abcd123! -n Nick -e a@b.com -g other
+? Gender must be 'male' or 'female'.
+> menu enter login
+? Redirected to login menu
+> login -u u1 -p Abcd123!
+? Username does not exist.

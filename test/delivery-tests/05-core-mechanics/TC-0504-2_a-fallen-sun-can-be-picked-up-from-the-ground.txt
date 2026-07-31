@@ -1,0 +1,44 @@
+=== TEST TC-0504-2: a fallen sun can be picked up from the ground
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > تولید خورشید > سقوط خورشید از آسمان
+# Group            : 05 - Core game mechanics
+# Kind             : automatic (RANDOM: the landing tile is random)
+# Goal             : The '*' on the map marks a collectable sun.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Read the '(x, y)' of the 'Sun reached the ground' line and then run
+#       collect sun -l (x, y)
+#   The answer is 'Collected 25 sun. Balance: ...' for a normal sun
+#   and 'Collected 100 sun. ...' for a special one.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> advance time -t 400 ticks
+? Sun reached the ground at position (
+> show map
+? *
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   New normal sun is dropping at position (4, 3)
+#   Sun reached the ground at position (4, 3)
+#   > collect sun -l (4, 3)
+#   Collected 25 sun. Balance: 75

@@ -1,0 +1,29 @@
+=== TEST TC-0807-3: an already grown or empty pot cannot be sped up
+#
+# Rubric (Phase 1) : گلخانه > تسریع رشد
+# Group            : 08 - Greenhouse
+# Kind             : automatic (deterministic)
+# Goal             : Both error cases of the doc.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu greenhouse
+? Redirected to greenhouse menu
+> grow (2, 1)
+? There is nothing growing in this pot.
+> plant pot at (1, 1)
+? planted at (1, 1)
+> grow (1, 1)
+? is now fully grown
+> grow (1, 1)
+? This plant is already fully grown.

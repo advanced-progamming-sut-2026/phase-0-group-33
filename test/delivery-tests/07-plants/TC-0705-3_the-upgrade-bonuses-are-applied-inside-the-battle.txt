@@ -1,0 +1,49 @@
+=== TEST TC-0705-3: the upgrade bonuses are applied inside the battle
+#
+# Rubric (Phase 1) : گیاهان > مکانیزم ها > ارتقای گیاه
+# Group            : 07 - Plants
+# Kind             : automatic (deterministic)
+# Goal             : A level-5 Peashooter has more HP on the lawn than a level-1 one.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   300 -> 450: the 'HP +150' bonus of the plants.csv upgrade column
+#   is really applied to the plant on the lawn.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 500 suns
+? Sun: 550
+> plant plant -t Peashooter -l (1, 3)
+? Peashooter planted at (1, 3).
+> show tile status -l (1, 3)
+? Plant: Peashooter | HP: 300/300
+> menu exit
+? Redirected to Main menu
+> menu cheat max-plants
+? plants set to max level (5).
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 500 suns
+? Sun: 550
+> plant plant -t Peashooter -l (1, 3)
+? Peashooter planted at (1, 3).
+> show tile status -l (1, 3)
+? Plant: Peashooter | HP: 450/450

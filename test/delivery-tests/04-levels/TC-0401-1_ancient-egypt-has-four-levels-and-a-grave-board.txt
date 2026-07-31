@@ -1,0 +1,50 @@
+=== TEST TC-0401-1: Ancient Egypt has four levels and a grave board
+#
+# Rubric (Phase 1) : مراحل > مراحل adventure > مصر باستان
+# Group            : 04 - Adventure levels & special levels
+# Kind             : automatic (grave positions are random)
+# Goal             : All 4 levels open and the lawn carries gravestones.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Graves are the '#' cells of 'show map'; their positions are drawn
+#   at random in columns 3..9, so only the header is asserted.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> show map
+? Wave: 0/3
+> menu exit
+? Redirected to Main menu
+> menu enter chapter -c Egypt -l 2
+? Entered Egypt, level 2
+> menu exit
+? Redirected to Main menu
+> menu enter chapter -c Egypt -l 3
+? Entered Egypt, level 3
+> menu exit
+? Redirected to Main menu
+> menu enter chapter -c Egypt -l 4
+? Entered Egypt, level 4
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   Wave: 0/3 | Sun: 50 | Plant foods: 3
+#   [M] .   .   .   .   #   .   .   .   .
+#   [M] .   .   .   .   .   .   .   .   .
+#   [M] .   .   .   .   .   .   .   .   .
+#   [M] .   .   .   .   .   .   .   .   .
+#   [M] .   .   .   .   .   #   .   .   .

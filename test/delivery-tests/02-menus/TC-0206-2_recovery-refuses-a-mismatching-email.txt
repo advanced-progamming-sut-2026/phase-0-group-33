@@ -1,0 +1,19 @@
+=== TEST TC-0206-2: recovery refuses a mismatching email
+#
+# Rubric (Phase 1) : شروع بازی و منوها > منوی ورود > فراموشی رمز عبور
+# Group            : 02 - Game start & menus
+# Kind             : automatic (deterministic)
+# Goal             : The email must belong to the username.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> forget password -u tester -e someone@else.com
+? The email does not match this username.
+> forget password -u tester -e tester@mail.com
+? What's your pet's name?

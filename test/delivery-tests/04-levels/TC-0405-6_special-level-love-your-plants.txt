@@ -1,0 +1,58 @@
+=== TEST TC-0405-6: special level love your plants
+#
+# Rubric (Phase 1) : مراحل > مراحل ویژه > پیاده سازی حداقل ۴ مرحله ویژه
+# Group            : 04 - Adventure levels & special levels
+# Kind             : automatic (deterministic)
+# Goal             : از دست نده (Love Your Plants) behaves as the doc describes.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Persian name : از دست نده (Love Your Plants)
+#   Where        : Wavey Beach level 3
+#   Rule         : losing 5 plants loses the level
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Wavey Beach -l 3
+? Entered Wavey Beach, level 3
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> add plant -t Sunflower
+? Sunflower added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 5000 suns
+? Sun: 5050
+> cheat remove-cooldown
+? All cooldown limits removed.
+> plant plant -t Sunflower -l (1, 1)
+? Sunflower planted at (1, 1).
+> plant plant -t Sunflower -l (1, 2)
+? Sunflower planted at (1, 2).
+> plant plant -t Sunflower -l (1, 3)
+? Sunflower planted at (1, 3).
+> plant plant -t Sunflower -l (1, 4)
+? Sunflower planted at (1, 4).
+> plant plant -t Sunflower -l (1, 5)
+? Sunflower planted at (1, 5).
+> cheat spawn-zombie -t Gargantuar -l 2, 1
+? Gargantuar spawned
+> cheat spawn-zombie -t Gargantuar -l 2, 2
+? Gargantuar spawned
+> cheat spawn-zombie -t Gargantuar -l 2, 3
+? Gargantuar spawned
+> cheat spawn-zombie -t Gargantuar -l 2, 4
+? Gargantuar spawned
+> cheat spawn-zombie -t Gargantuar -l 2, 5
+? Gargantuar spawned
+> advance time -t 60 ticks
+? You lost 5 plants. The garden mourns; you lose!

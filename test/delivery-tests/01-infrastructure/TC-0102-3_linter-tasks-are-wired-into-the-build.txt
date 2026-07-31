@@ -1,0 +1,24 @@
+=== TEST TC-0102-3: linter tasks are wired into the build
+#
+# Rubric (Phase 1) : زیرساخت > پروژه dependency management
+# Group            : 01 - Infrastructure
+# Kind             : manual (inspection by the TA)
+# Goal             : Checkstyle + PMD are declared as dependencies of the build.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# STEPS
+#   1. Open build.gradle and find the checkstyle / pmd plugins.
+#   2. Open config/checkstyle/checkstyle.xml and config/pmd/ruleset.xml.
+#   3. Run: gradlew.bat lint
+#
+# EXPECTED RESULT
+#   - Both plugins are applied and point at the config/ files.
+#   - The rules match exactly the ones listed in the course document.
+#   - The task finishes with 0 violations.
+#
+# (No '>' lines: this case is verified by looking at the repository /
+#  by watching the program, not by the automatic runner.)

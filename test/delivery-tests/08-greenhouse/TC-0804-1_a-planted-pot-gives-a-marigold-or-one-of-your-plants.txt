@@ -1,0 +1,46 @@
+=== TEST TC-0804-1: a planted pot gives a Marigold or one of your plants
+#
+# Rubric (Phase 1) : گلخانه > کاشت گیاه در گلخانه > گل یا گیاه تصادفی
+# Group            : 08 - Greenhouse
+# Kind             : automatic (RANDOM: 50% Marigold / 50% an unlocked plant)
+# Goal             : 50/50 between a Marigold and an unlocked plant.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Five pots are planted so that both branches show up in one run.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu greenhouse
+? Redirected to greenhouse menu
+> plant pot at (1, 1)
+? planted at (1, 1); it needs
+> plant pot at (2, 1)
+? planted at (2, 1); it needs
+> plant pot at (3, 1)
+? planted at (3, 1); it needs
+> plant pot at (4, 1)
+? planted at (4, 1); it needs
+> plant pot at (5, 1)
+? planted at (5, 1); it needs
+> show greenhouse
+? Greenhouse (20/20 pots unlocked):
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   Marigold planted at (1, 1); it needs 2 hours to grow.
+#   Winter Melon planted at (2, 1); it needs 8 hours to grow.
+#   Marigold planted at (3, 1); it needs 2 hours to grow.
+#   Marigold planted at (4, 1); it needs 2 hours to grow.
+#   Cactus planted at (5, 1); it needs 8 hours to grow.

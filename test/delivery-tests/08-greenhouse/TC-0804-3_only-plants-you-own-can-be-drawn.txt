@@ -1,0 +1,42 @@
+=== TEST TC-0804-3: only plants you own can be drawn
+#
+# Rubric (Phase 1) : گلخانه > کاشت گیاه در گلخانه > گل یا گیاه تصادفی
+# Group            : 08 - Greenhouse
+# Kind             : automatic (RANDOM)
+# Goal             : A new account can only get a Marigold or a starter plant.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   A new account owns Sunflower / Peashooter / Wall-nut / Potato Mine,
+#   so the only names that may appear are these four plus Marigold.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu greenhouse
+? Redirected to greenhouse menu
+> plant pot at (1, 1)
+? planted at (1, 1)
+> plant pot at (2, 1)
+? planted at (2, 1)
+> plant pot at (3, 1)
+? planted at (3, 1)
+> plant pot at (4, 1)
+? planted at (4, 1)
+> plant pot at (5, 1)
+? planted at (5, 1)
+> show greenhouse
+? Greenhouse (5/20 pots unlocked):
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   Marigold planted at (1, 1); it needs 2 hours to grow.
+#   Wall-nut planted at (2, 1); it needs 8 hours to grow.

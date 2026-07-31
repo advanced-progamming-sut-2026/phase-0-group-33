@@ -1,0 +1,32 @@
+=== TEST TC-0802-2: a pot bought in the shop becomes usable
+#
+# Rubric (Phase 1) : گلخانه > وضعیت کلی گلخانه > گلدان های قفل
+# Group            : 08 - Greenhouse
+# Kind             : automatic (deterministic)
+# Goal             : 2000 coins unlock one more pot.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat add 2000 coin
+? 2000 coins added.
+> menu greenhouse
+? Redirected to greenhouse menu
+> enter shop
+? Redirected to Shop menu
+> shop buy -i 1 -n 1
+? 1 pots added. Total: 1
+> menu exit
+? Redirected to Greenhouse menu
+> show greenhouse
+? Greenhouse (6/20 pots unlocked):
+? (1, 2): empty
+> plant pot at (1, 2)
+? planted at (1, 2)

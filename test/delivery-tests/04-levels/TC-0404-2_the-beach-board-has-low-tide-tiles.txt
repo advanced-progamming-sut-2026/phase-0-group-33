@@ -1,0 +1,36 @@
+=== TEST TC-0404-2: the beach board has low-tide tiles
+#
+# Rubric (Phase 1) : مراحل > مراحل adventure > ساحل موج بزرگ
+# Group            : 04 - Adventure levels & special levels
+# Kind             : automatic (low-tide positions are random)
+# Goal             : '_' marks a tile the water has receded from.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Wavey Beach -l 1
+? Entered Wavey Beach, level 1
+> add plant -t Peashooter
+? Peashooter added to your selection.
+> start game
+? The battle begins!
+> show map
+? Legend: [M] mower
+? _ low tide
+
+# ---------------------------------------------------------------------------
+# SAMPLE RUN - real output recorded from this project. This part of the game
+# is random, so your numbers/positions will differ; the SHAPE must match.
+# ---------------------------------------------------------------------------
+#   [M] .   .   .   .   .   _   _   ~   ~
+#   [M] .   .   .   .   .   .   .   ~   ~
+#   [M] .   .   .   _   .   .   .   ~   ~

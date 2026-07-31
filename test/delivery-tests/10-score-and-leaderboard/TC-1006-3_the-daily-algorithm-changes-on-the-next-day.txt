@@ -1,0 +1,24 @@
+=== TEST TC-1006-3: the daily algorithm changes on the next day
+#
+# Rubric (Phase 1) : امتیاز > بازی امتیازی > الگوریتم ثابت ظهور زامبی در این مرحله
+# Group            : 10 - Scoring game & leaderboard
+# Kind             : manual (inspection by the TA)
+# Goal             : A new day means a new (but again shared) zombie stream.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# STEPS
+#   1. Run the scoring game today and write down the wave-1 zombies.
+#   2. Change the system date to tomorrow (or come back the next day).
+#   3. Run the scoring game again and compare the wave-1 zombies.
+#
+# EXPECTED RESULT
+#   - The two streams are different.
+#   - Every run of the SAME day is identical - see TC-1006-1 and TC-1006-2.
+#   - The seed is derived from the calendar date in GameSetup.scoring().
+#
+# (No '>' lines: this case is verified by looking at the repository /
+#  by watching the program, not by the automatic runner.)

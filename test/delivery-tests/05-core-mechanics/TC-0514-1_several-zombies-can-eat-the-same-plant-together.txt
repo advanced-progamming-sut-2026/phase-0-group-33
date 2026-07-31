@@ -1,0 +1,45 @@
+=== TEST TC-0514-1: several zombies can eat the same plant together
+#
+# Rubric (Phase 1) : مکانیزم‌های ثابت بازی > خوردن گیاهان > خورده شدن توسط چند زامبی
+# Group            : 05 - Core game mechanics
+# Kind             : automatic (deterministic)
+# Goal             : Three zombies on one tile chew three times faster.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment / explanation for the TA (ignored by the runner)
+# ---------------------------------------------------------------------------
+
+# NOTES
+#   Compare with TC-0512-3, where a single zombie leaves the Wall-nut
+#   almost untouched after the same amount of time.
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+> pick question -q 1 -a blue -c blue
+? Account created successfully. Please log in.
+> login -u tester -p Abcd123!
+? Login successful.
+> menu cheat unlock-all
+? CHEAT: everything unlocked.
+> menu enter chapter -c Egypt -l 1
+? Entered Egypt, level 1
+> add plant -t Wall-nut
+? Wall-nut added to your selection.
+> start game
+? The battle begins!
+> cheat add -n 500 suns
+? Sun: 550
+> cheat remove-cooldown
+? All cooldown limits removed.
+> plant plant -t Wall-nut -l (2, 3)
+? Wall-nut planted at (2, 3).
+> cheat spawn-zombie -t Normal -l 3, 3
+? Normal spawned at (3, 3).
+> cheat spawn-zombie -t Normal -l 3, 3
+? Normal spawned at (3, 3).
+> cheat spawn-zombie -t Normal -l 3, 3
+? Normal spawned at (3, 3).
+> advance time -t 200 ticks
+? Time advanced by 200 ticks
+> show tile status -l (2, 3)
+? Tile (2, 3)
