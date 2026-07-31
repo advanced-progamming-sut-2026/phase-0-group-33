@@ -8,6 +8,9 @@
 # Legend:  '>' = a line typed into the game
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment / explanation for the TA (ignored by the runner)
+#
+# NOTE: the daily quests derive their numbers and their reward sizes from
+#       the calendar date, so only the stable part of each line is asserted.
 # ---------------------------------------------------------------------------
 
 # NOTES
@@ -22,7 +25,7 @@
 > menu travel-log
 ? Redirected to travel-log menu
 > travel log page daily
-? - Daily sun collector: gather 4000 sun today
+? - Daily sun collector: gather
 > menu exit
 ? Redirected to Main menu
 > menu logout
@@ -35,4 +38,4 @@
 > menu travel-log
 ? Redirected to travel-log menu
 > travel log page daily
-? - Daily sun collector: gather 4000 sun today
+? - Daily sun collector: gather

@@ -1,136 +1,100 @@
-# Phase-1 delivery test cases (تست‌های تحویل فاز ۱)
+# Delivery Tests
 
-این پوشه یک مجموعه‌ی **جدید** از تست‌کیس‌هاست که مخصوص **جلسه‌ی تحویل فاز ۱ به TA**
-ساخته شده است. تست‌های قبلی پروژه در `test/testcases.txt` دست‌نخورده باقی مانده‌اند؛
-این پوشه چیزی از آن‌ها را تغییر نمی‌دهد.
-
-هر تست‌کیس **یک فایل `.txt` جداگانه** است و دقیقاً به **یک ردیف از شیت نمره‌دهی فاز ۱**
-وصل شده است (نام آن ردیف در هدر فایل، جلوی `Rubric (Phase 1)` نوشته شده).
-
----
-
-## چیدمان پوشه‌ها
-
-| پوشه | بخش شیت نمره‌دهی |
-|------|-------------------|
-| `01-infrastructure/` | زیرساخت (github tag، dependency management، معماری مشخص) |
-| `02-menus/` | شروع بازی و منوها (ثبت‌نام، ورود، اصلی، پروفایل، اخبار، تنظیمات، بازی، کلکسیون) |
-| `03-quests/` | کوئست‌ها (ترول‌لاگ، عملکرد کوئست، جایزه، اولویت) |
-| `04-levels/` | مراحل adventure و ۸ مرحله‌ی ویژه |
-| `05-core-mechanics/` | مکانیزم‌های ثابت بازی (گذر زمان، خورشید، موج‌ها، خوردن، باغ، انتخاب گیاه، برد/باخت) |
-| `06-zombies/` | زامبی‌ها + پوشه‌ی `all-zombies/` با **یک تست برای هر ۳۸ زامبی** |
-| `07-plants/` | گیاهان + پوشه‌ی `all-plants/` با **یک تست برای هر ۶۹ گیاه** |
-| `08-greenhouse/` | گلخانه |
-| `09-shop/` | فروشگاه |
-| `10-score-and-leaderboard/` | لیدربورد و بازی امتیازی |
-| `11-minigames/` | هر ۵ مینی‌گیم |
-| `12-user-experience/` | UX، لینتر و میزان تغییرات گیت |
-
----
-
-## قالب یک فایل تست
+One case per row of the phase-1 grading sheet. Each file names the row it covers
+in its header, so the suite can be walked in the same order as the sheet during
+the delivery session.
 
 ```
-=== TEST TC-0201-1: a valid register creates the account
-#
-# Rubric (Phase 1) : شروع بازی و منوها > منوی ثبت‌نام > قابلیت ساخت کاربر جدید
-# Group            : 02 - Game start & menus
-# Kind             : automatic (deterministic)
-# Goal             : ...
-# ---------------------------------------------------------------------------
-> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
-? Validation passed. Please pick a security question.
-> pick question -q 1 -a blue -c blue
-? Account created successfully. Please log in.
+test/delivery-tests/
+├── run_delivery_tests.py
+├── 01-infrastructure/            git tag, dependency management, architecture
+├── 02-menus/                     signup, login, main, profile, news, settings, collection
+├── 03-quests/                    travel log, quest logic, rewards, priority
+├── 04-levels/                    the four chapters and the eight special levels
+├── 05-core-mechanics/            time, sun, waves, eating, garden, selection, win/lose
+├── 06-zombies/                   plus all-zombies/ with one case per zombie
+├── 07-plants/                    plus all-plants/ with one case per plant
+├── 08-greenhouse/
+├── 09-shop/
+├── 10-score-and-leaderboard/
+├── 11-minigames/                 all five minigames
+└── 12-user-experience/           UX, linter, git diff size
 ```
 
-| نشانه | معنی |
-|-------|------|
-| `>`   | خطی که در بازی تایپ می‌شود |
-| `?`   | زیررشته‌ای که **باید** در خروجی بیاید (ترتیب مهم است) |
-| `#`   | توضیح برای TA (اجراکننده نادیده می‌گیرد) |
-| `>> RESTART` | بازی بسته و **روی همان پوشه‌ی data دوباره باز** می‌شود (برای تست `stay logged in` و «نگه داشتن پیشرفت») |
+## How to run
 
-### تست‌های تصادفی
-
-بخش‌هایی از بازی تصادفی‌اند: اسپاون زامبی‌ها، جای قبرها، نوع خورشیدی که می‌افتد،
-گیاه گلخانه، محتوای کوزه‌ها و … . در این تست‌ها:
-
-* فقط چیزی assert می‌شود که **قطعی** است (مثلاً خودِ پیام موج)،
-* در هدر فایل نوشته شده `Kind: automatic (RANDOM: ...)`,
-* و در انتهای فایل یک بخش **`SAMPLE RUN`** هست که **خروجی واقعی اجرا شده روی همین
-  پروژه** را نشان می‌دهد تا TA بداند شکل درست خروجی چیست.
-
-مثال (از `05-core-mechanics/TC-0504-1_...`):
-
-```
-# SAMPLE RUN - real output recorded from this project. This part of the game
-# is random, so your numbers/positions will differ; the SHAPE must match.
-#   New special sun is dropping at position (8, 5)
-#   Sun reached the ground at position (8, 5)
-#   New normal sun is dropping at position (7, 1)
-```
-
-### تست‌های دستی
-
-چند تست (تگ گیت، gradle، SHA-256 روی فایل، لینتر، UX) با اجرای خودکار قابل بررسی
-نیستند. آن‌ها هیچ خط `>` ندارند و به‌جایش `# STEPS` و `# EXPECTED RESULT` دارند.
-اجراکننده آن‌ها را با برچسب **MANUAL** فهرست می‌کند.
-
----
-
-## اجرا
+Run everything (423 automatic cases plus 17 manual ones):
 
 ```bash
 python test/delivery-tests/run_delivery_tests.py
 ```
+
+Run one group:
 
 ```bash
 python test/delivery-tests/run_delivery_tests.py 05
 ```
 
+Run a single case and print the whole game session:
+
 ```bash
 python test/delivery-tests/run_delivery_tests.py TC-0201-1 -v
 ```
 
-* بدون آرگومان: کل مجموعه.
-* با شماره‌ی گروه (`02`, `07`, …): فقط آن پوشه.
-* با شناسه‌ی تست: فقط همان تست؛ `-v` کل خروجی بازی را هم چاپ می‌کند.
+Every case runs in its own temporary `data/` folder, so cases never affect each
+other or your real save. A case that fails is retried once automatically, which
+absorbs the random parts of the game.
 
-هر تست در یک پوشه‌ی `data/` موقت و مستقل اجرا می‌شود، پس نه روی سیو واقعی شما اثر
-می‌گذارد و نه تست‌ها روی هم اثر می‌گذارند. اگر یک تست به‌خاطر تصادفی‌بودن بازی رد شود،
-اجراکننده خودش یک‌بار دیگر امتحان می‌کند.
+## What the output means
 
----
+The runner prints one line per case, grouped by folder:
 
-## وضعیت فعلی
-
-همه‌ی تست‌های خودکار این پوشه روی کد فعلی پروژه **پاس می‌شوند**.
-
-| گروه | خودکار | دستی |
-|------|:------:|:----:|
-| 01 - Infrastructure | 0 | 9 |
-| 02 - Menus | 71 | 4 |
-| 03 - Quests | 31 | 0 |
-| 04 - Levels | 40 | 0 |
-| 05 - Core mechanics | 108 | 0 |
-| 06 - Zombies (+38 per-zombie) | 56 | 0 |
-| 07 - Plants (+69 per-plant) | 94 | 0 |
-| 08 - Greenhouse | 29 | 0 |
-| 09 - Shop | 17 | 0 |
-| 10 - Score & leaderboard | 25 | 1 |
-| 11 - Minigames | 37 | 0 |
-| 12 - User experience | 14 | 3 |
-
----
-
-## نکته برای جلسه‌ی تحویل
-
-سریع‌ترین مسیر دمو این است:
-
-```bash
-python test/delivery-tests/run_delivery_tests.py
+```
+--- 02-menus
+  ok    TC-0201-1    a valid register creates the account
+  FAIL  TC-0204-2    login refuses an unknown username
+      - after 'login -u ghost -p Abcd123!': expected output was not found
+        expected: Username does not exist.
 ```
 
-و بعد برای هر ردیفی از شیت که TA پرسید، فایل مربوط به آن ردیف را باز کنید و
-دستورهای `>` را دستی داخل بازی تایپ کنید — همان خروجی‌های `?` باید بیاید.
+The run ends with the totals and, when something failed, the list of files to
+open:
+
+```
+AUTOMATIC : 423 passed / 423
+MANUAL    : 17 case(s) for the TA to check by hand
+```
+
+`MANUAL` cases have no `>` lines. They are repository or user-experience checks
+(git tag, `gradlew build`, linter report, password hashing on disk) and the runner
+only lists them, with the steps written inside the file.
+
+The exit code is `0` when every automatic case passed and `1` otherwise.
+
+## Reading a case file
+
+```
+=== TEST TC-0201-1: a valid register creates the account
+#
+# Rubric (Phase 1) : signup menu > create a new user
+# Group            : 02 - Game start & menus
+# Kind             : automatic (deterministic)
+#
+> register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
+? Validation passed. Please pick a security question.
+```
+
+| Prefix | Meaning |
+|--------|---------|
+| `>` | a line typed into the game |
+| `?` | a substring that must appear in the output, checked in order |
+| `#` | a comment for the reader; the runner ignores it |
+| `>> RESTART` | closes the game and starts it again on the same `data/` folder |
+
+`>> RESTART` is what makes "stay logged in" and "progress is kept" testable: it is
+exactly the quit-and-relaunch a grader would do by hand.
+
+Cases whose header says `Kind: automatic (RANDOM: ...)` assert only the part of
+the output that is deterministic. They end with a `SAMPLE RUN` block holding real
+output recorded from this project, so the expected shape of a random result — a
+wave roll, a grave position, a sun type, a vase content — is still documented.

@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Set;
 
 public class CombatManager {
+    private static final int SUN_BEAN_SUN_PER_BITE = 5;
+    private static final int SWEET_POTATO_RANGE = 3;
     static final int INSTANT_KILL_DAMAGE = 9999;
     private static final double MOWER_LINE = 0.5;
 
@@ -66,6 +68,10 @@ public class CombatManager {
         if (type == PlantType.MAGNET_SHROOM) {
             session.getPlantActionManager().magnet(plant);
             plant.setActionCooldownTicks((int) Math.round(interval * GameSession.TICKS_PER_SECOND));
+            return;
+        }
+        if (type == PlantType.SWEET_POTATO) {
+            sweetPotatoPull(plant);
             return;
         }
         if (shotPatterns.specialShot(plant, type)) {
@@ -399,7 +405,7 @@ public class CombatManager {
         int column = (int) Math.round(zombie.getPosition().getX());
         PlacedPlant plant = session.plantAt(column, (int) zombie.getPosition().getY());
         if (plant != null && zombie.getPosition().getX() - column <= 0.4
-                && zombie.getPosition().getX() >= column - 0.4) {
+                && zombie.getPosition().getX() - column >= 0) {
             return plant;
         }
         return null;
@@ -429,6 +435,12 @@ public class CombatManager {
             }
             if (plant.getType() == PlantType.ENDURIAN) {
                 damageZombie(zombie, plant.getType().getDamage() / GameSession.TICKS_PER_SECOND + 1);
+            }
+            if (plant.getType() == PlantType.SUN_BEAN
+                    && session.getTickCount() % GameSession.TICKS_PER_SECOND == 0) {
+                session.getSunManager().addSun(SUN_BEAN_SUN_PER_BITE);
+                System.out.printf("The Sun Bean at (%d, %d) released %d sun!%n",
+                        plant.getX(), plant.getY(), SUN_BEAN_SUN_PER_BITE);
             }
         }
         if (plant.isDead()) {
@@ -492,14 +504,28 @@ public class CombatManager {
                 !session.hasLawnMower((int) zombie.getPosition().getY()));
     }
 
+    private void sweetPotatoPull(PlacedPlant potato) {
+        if (session.getTickCount() % GameSession.TICKS_PER_SECOND != 0) {
+            return;
+        }
+        for (Zombie zombie : session.getZombies()) {
+            int row = (int) zombie.getPosition().getY();
+            if (Math.abs(row - potato.getY()) != 1
+                    || zombie.getPosition().getX() < potato.getX()
+                    || zombie.getPosition().getX() - potato.getX() > SWEET_POTATO_RANGE) {
+                continue;
+            }
+            zombie.getPosition().setY(potato.getY());
+            System.out.printf("The Sweet Potato pulled the %s into lane %d!%n",
+                    zombie.getType().getName(), potato.getY());
+        }
+    }
+
     public void onPlantEaten(PlacedPlant plant) {
         if (plant.getType() == PlantType.GARLIC) {
             moveZombiesOffLane(plant);
         } else if (plant.getType() == PlantType.HYPNO_SHROOM) {
             hypnotizeEater(plant);
-        } else if (plant.getType() == PlantType.SUN_BEAN) {
-            session.getSunManager().addSun(50);
-            System.out.println("The digested Sun Bean released 50 sun!");
         } else if (plant.getType().getTags().contains(PlantTag.EXPLOSIVE)) {
             damageArea(plant.getX(), plant.getY(), 1, PlantType.EXPLODE_O_NUT);
             System.out.printf("%s exploded as it died!%n", plant.getType().getName());

@@ -9,15 +9,19 @@
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
 # --------------------------------------------------------------------------
+#
+# FIX (test-side only, game code untouched):
+#   The graves it raises block straight shots, so a lobbed shot is measured.
+# --------------------------------------------------------------------------
 
 > menu scoring-game
 ? Scoring game started
-> add plant -t Peashooter
+> add plant -t Cabbage-pult
 > start game
 ? The battle begins
 > cheat add -n 9000 suns
 > cheat remove-cooldown
-> plant plant -t Peashooter -l (1,3)
+> plant plant -t Cabbage-pult -l (1,3)
 > cheat spawn-zombie -t Tomb Raiser -l 9,3
 > advance time -t 150 ticks
 > zombies info

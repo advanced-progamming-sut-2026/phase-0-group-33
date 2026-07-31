@@ -12,20 +12,31 @@
 #
 # FIX (test-side only, game code untouched):
 #   A weasel is released with a 20% roll per hit, so one hit is not enough.
+# --------------------------------------------------------------------------#   A weasel is released on a 20% roll per hit, so the case fires at ten
+#   hoarders across all five lanes for 400 ticks to make the roll certain.
 # --------------------------------------------------------------------------
 
-> menu cheat unlock-all
-> menu enter chapter -c Frost Bite -l 1
-? Entered Frost Bite, level 1
-> add plant -t Mega Gatling Pea
+> menu scoring-game
+? Scoring game started
+> add plant -t Peashooter
 > start game
 ? The battle begins
 > cheat add -n 9000 suns
 > cheat remove-cooldown
-> plant plant -t Mega Gatling Pea -l (1,3)
+> plant plant -t Peashooter -l (1,1)
+> cheat spawn-zombie -t Weasel Hoarder -l 9,1
+> cheat spawn-zombie -t Weasel Hoarder -l 8,1
+> plant plant -t Peashooter -l (1,2)
+> cheat spawn-zombie -t Weasel Hoarder -l 9,2
+> cheat spawn-zombie -t Weasel Hoarder -l 8,2
+> plant plant -t Peashooter -l (1,3)
 > cheat spawn-zombie -t Weasel Hoarder -l 9,3
-> cheat spawn-zombie -t Weasel Hoarder -l 9,3
-> cheat spawn-zombie -t Weasel Hoarder -l 9,3
-> cheat spawn-zombie -t Weasel Hoarder -l 9,3
-> advance time -t 200 ticks
+> cheat spawn-zombie -t Weasel Hoarder -l 8,3
+> plant plant -t Peashooter -l (1,4)
+> cheat spawn-zombie -t Weasel Hoarder -l 9,4
+> cheat spawn-zombie -t Weasel Hoarder -l 8,4
+> plant plant -t Peashooter -l (1,5)
+> cheat spawn-zombie -t Weasel Hoarder -l 9,5
+> cheat spawn-zombie -t Weasel Hoarder -l 8,5
+> advance time -t 400 ticks
 ? A weasel burst out of the Weasel Hoarder's coat!

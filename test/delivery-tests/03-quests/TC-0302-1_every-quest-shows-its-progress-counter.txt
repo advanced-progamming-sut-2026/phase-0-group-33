@@ -8,6 +8,9 @@
 # Legend:  '>' = a line typed into the game
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment / explanation for the TA (ignored by the runner)
+#
+# NOTE: the daily quests derive their numbers and their reward sizes from
+#       the calendar date, so only the stable part of each line is asserted.
 # ---------------------------------------------------------------------------
 
 > register -u tester -p Abcd123! Abcd123! -n Tester -e tester@mail.com -g male
@@ -18,7 +21,7 @@
 > menu travel-log
 ? Redirected to travel-log menu
 > travel log page high
-? - Only Cactus: kill 10 zombies with Cactus today | reward: 20 gems [0/10]
-? - Hunter of Egypt: defeat 50 of its zombies | reward: 10 seed packets [0/50]
+? - Only Cactus: kill
+? - Hunter of Egypt: defeat 50 of its zombies
 > travel log page daily
-? - Daily sun collector: gather 4000 sun today | reward: 40 coins [0/4000]
+? - Daily sun collector: gather

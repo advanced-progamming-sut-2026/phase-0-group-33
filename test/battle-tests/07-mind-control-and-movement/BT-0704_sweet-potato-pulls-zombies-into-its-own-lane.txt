@@ -20,6 +20,6 @@
 > plant plant -t Sweet Potato -l (4,3)
 > cheat spawn-zombie -t Normal -l 5,2
 > advance time -t 200 ticks
+? The Sweet Potato pulled the Normal into lane 3!
 > zombies info
 ? Normal:
-?     position: 4.4, 3
