@@ -1,0 +1,20 @@
+=== TEST P51-1: catalogue entry matches the plant database
+#
+# Entity    : Sun Bean
+# Source    : src/database/csv/plants.csv row 51
+# Category  : Wall-nut
+# Tags      : Sun
+# Checks    : cost=50, hp=1000, recharge=20s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Sun Bean
+? Sun Bean:
+?     sun cost: 50
+?     hp: 1000
+?     recharge: 20s
+> menu exit

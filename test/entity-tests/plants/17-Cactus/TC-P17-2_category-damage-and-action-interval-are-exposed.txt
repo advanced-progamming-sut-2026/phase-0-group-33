@@ -1,0 +1,20 @@
+=== TEST P17-2: category damage and action interval are exposed
+#
+# Entity    : Cactus
+# Source    : src/database/csv/plants.csv row 17
+# Category  : Strike-through
+# Damage column: 30
+# Interval  : 1.5
+# Note      : database value 30 resolves to 30 damage per action
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Cactus
+?     category: STRIKE_THROUGH
+?     damage: 30
+?     action interval: 1.5
+> menu exit

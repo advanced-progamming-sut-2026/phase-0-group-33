@@ -1,0 +1,23 @@
+=== TEST Z06-4: a plant in the same row engages the zombie
+#
+# Entity    : Gargantuar
+# Total effective health: 3600
+# Checks    : a Peashooter in the same row acts on the zombie
+# Documented ability: Walks slowly with a huge health pool and one-shots any plant it reaches; at half health it throws an Imp to the third column of its row.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Peashooter
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Peashooter -l (1,3)
+> cheat spawn-zombie -t Gargantuar -l 9,3
+> advance time -t 150 ticks
+> zombies info

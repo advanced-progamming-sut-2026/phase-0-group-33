@@ -1,0 +1,20 @@
+=== TEST P58-1: catalogue entry matches the plant database
+#
+# Entity    : Lily Pad
+# Source    : src/database/csv/plants.csv row 58
+# Category  : Modifier
+# Tags      : Water, stack
+# Checks    : cost=25, hp=300, recharge=5s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Lily Pad
+? Lily Pad:
+?     sun cost: 25
+?     hp: 300
+?     recharge: 5s
+> menu exit

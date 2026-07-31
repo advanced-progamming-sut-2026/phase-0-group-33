@@ -1,0 +1,20 @@
+=== TEST P03-1: catalogue entry matches the plant database
+#
+# Entity    : Sun-shroom
+# Source    : src/database/csv/plants.csv row 3
+# Category  : Sun Producer
+# Tags      : Shroom, wramp-up, night
+# Checks    : cost=25, hp=300, recharge=5s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Sun-shroom
+? Sun-shroom:
+?     sun cost: 25
+?     hp: 300
+?     recharge: 5s
+> menu exit

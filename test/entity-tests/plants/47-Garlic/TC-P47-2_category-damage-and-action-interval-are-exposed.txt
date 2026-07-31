@@ -1,0 +1,20 @@
+=== TEST P47-2: category damage and action interval are exposed
+#
+# Entity    : Garlic
+# Source    : src/database/csv/plants.csv row 47
+# Category  : Wall-nut
+# Damage column: 0
+# Interval  : -
+# Note      : database value 0 resolves to 0 damage per action
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Garlic
+?     category: WALL_NUT
+?     damage: 0
+?     action interval: -1.0
+> menu exit

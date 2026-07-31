@@ -1,0 +1,26 @@
+=== TEST Z12-1: spawns with the documented health pool
+#
+# Entity    : Hunter
+# Source    : src/database/csv/zombies.xlsx
+# Hitpoints : 700
+# Speed     : 0.12
+# EatDPS    : 100
+# Wave cost : 500
+# Checks    : zombies info reports health 700 right after spawning
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Frost Bite -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Hunter -l 6,3
+? Hunter spawned at (6, 3).
+> zombies info
+? Hunter:
+?     health: 700

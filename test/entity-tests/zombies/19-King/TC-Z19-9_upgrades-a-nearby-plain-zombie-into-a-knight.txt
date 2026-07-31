@@ -1,0 +1,23 @@
+=== TEST Z19-9: upgrades a nearby plain zombie into a knight
+#
+# Entity    : King
+# Documented ability: The King stands still in the rightmost column and every few seconds gives a crown and a shoulder plate to a plain zombie next to it.
+# Source    : phase-1 project document
+# Note      : a failure here means the documented ability is not modelled yet
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Dark Ages -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t King -l 9,3
+> cheat spawn-zombie -t Normal -l 8,3
+> advance time -t 400 ticks
+> zombies info
+? Knight:

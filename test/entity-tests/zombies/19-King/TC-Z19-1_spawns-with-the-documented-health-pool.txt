@@ -1,0 +1,26 @@
+=== TEST Z19-1: spawns with the documented health pool
+#
+# Entity    : King
+# Source    : src/database/csv/zombies.xlsx
+# Hitpoints : 1000
+# Speed     : 0.0
+# EatDPS    : 100
+# Wave cost : 750
+# Checks    : zombies info reports health 1000 right after spawning
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Dark Ages -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t King -l 6,3
+? King spawned at (6, 3).
+> zombies info
+? King:
+?     health: 1000

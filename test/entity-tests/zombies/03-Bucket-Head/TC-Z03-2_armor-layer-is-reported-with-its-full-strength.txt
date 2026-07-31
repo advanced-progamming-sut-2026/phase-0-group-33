@@ -1,0 +1,22 @@
+=== TEST Z03-2: armor layer is reported with its full strength
+#
+# Entity    : Bucket Head
+# Armor     : bucket = 1100 hp
+# Metallic  : yes
+# Checks    : zombies info lists the bucket layer at 1100 hit points
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Bucket Head -l 6,3
+> zombies info
+?     armor:
+?         bucket: 1100

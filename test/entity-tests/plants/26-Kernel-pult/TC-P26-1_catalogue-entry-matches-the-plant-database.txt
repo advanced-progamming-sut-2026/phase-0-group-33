@@ -1,0 +1,20 @@
+=== TEST P26-1: catalogue entry matches the plant database
+#
+# Entity    : Kernel-pult
+# Source    : src/database/csv/plants.csv row 26
+# Category  : Lobber
+# Tags      : -
+# Checks    : cost=100, hp=300, recharge=5s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Kernel-pult
+? Kernel-pult:
+?     sun cost: 100
+?     hp: 300
+?     recharge: 5s
+> menu exit

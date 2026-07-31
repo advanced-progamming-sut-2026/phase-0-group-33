@@ -1,0 +1,20 @@
+=== TEST P54-1: catalogue entry matches the plant database
+#
+# Entity    : Hypno-shroom
+# Source    : src/database/csv/plants.csv row 54
+# Category  : Modifier
+# Tags      : Shroom, Magic
+# Checks    : cost=125, hp=300, recharge=20s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Hypno-shroom
+? Hypno-shroom:
+?     sun cost: 125
+?     hp: 300
+?     recharge: 20s
+> menu exit

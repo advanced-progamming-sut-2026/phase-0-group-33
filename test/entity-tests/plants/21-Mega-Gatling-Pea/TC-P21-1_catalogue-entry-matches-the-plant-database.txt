@@ -1,0 +1,20 @@
+=== TEST P21-1: catalogue entry matches the plant database
+#
+# Entity    : Mega Gatling Pea
+# Source    : src/database/csv/plants.csv row 21
+# Category  : Shooter
+# Tags      : Pea
+# Checks    : cost=400, hp=300, recharge=5s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Mega Gatling Pea
+? Mega Gatling Pea:
+?     sun cost: 400
+?     hp: 300
+?     recharge: 5s
+> menu exit

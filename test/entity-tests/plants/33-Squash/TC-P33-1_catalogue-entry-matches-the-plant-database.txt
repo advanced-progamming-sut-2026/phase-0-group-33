@@ -1,0 +1,20 @@
+=== TEST P33-1: catalogue entry matches the plant database
+#
+# Entity    : Squash
+# Source    : src/database/csv/plants.csv row 33
+# Category  : Explosive
+# Tags      : Trap
+# Checks    : cost=50, hp=300, recharge=20s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Squash
+? Squash:
+?     sun cost: 50
+?     hp: 300
+?     recharge: 20s
+> menu exit

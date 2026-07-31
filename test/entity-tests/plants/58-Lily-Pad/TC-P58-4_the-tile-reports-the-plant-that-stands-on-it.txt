@@ -1,0 +1,21 @@
+=== TEST P58-4: the tile reports the plant that stands on it
+#
+# Entity    : Lily Pad
+# HP        : 300
+# Tile      : (9, 3)
+# Checks    : show tile status names the plant on the tile
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Wavey Beach -l 1
+> add plant -t Lily Pad
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Lily Pad -l (9,3)
+> show tile status -l (9,3)
+? Plant: Lily Pad

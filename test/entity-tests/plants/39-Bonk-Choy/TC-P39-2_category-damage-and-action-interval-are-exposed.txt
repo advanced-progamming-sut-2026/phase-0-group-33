@@ -1,0 +1,20 @@
+=== TEST P39-2: category damage and action interval are exposed
+#
+# Entity    : Bonk Choy
+# Source    : src/database/csv/plants.csv row 39
+# Category  : Melee
+# Damage column: 15
+# Interval  : 0.25
+# Note      : database value 15 resolves to 15 damage per action
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Bonk Choy
+?     category: MELEE
+?     damage: 15
+?     action interval: 0.25
+> menu exit

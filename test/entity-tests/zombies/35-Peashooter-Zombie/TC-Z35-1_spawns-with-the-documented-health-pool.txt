@@ -1,0 +1,26 @@
+=== TEST Z35-1: spawns with the documented health pool
+#
+# Entity    : Peashooter Zombie
+# Source    : src/database/csv/zombies.xlsx
+# Hitpoints : 190
+# Speed     : 0.185
+# EatDPS    : 100
+# Wave cost : 200
+# Checks    : zombies info reports health 190 right after spawning
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Peashooter Zombie -l 6,3
+? Peashooter Zombie spawned at (6, 3).
+> zombies info
+? Peashooter Zombie:
+?     health: 190

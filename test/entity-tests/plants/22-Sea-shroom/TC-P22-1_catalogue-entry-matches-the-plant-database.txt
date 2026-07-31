@@ -1,0 +1,20 @@
+=== TEST P22-1: catalogue entry matches the plant database
+#
+# Entity    : Sea-shroom
+# Source    : src/database/csv/plants.csv row 22
+# Category  : Shooter
+# Tags      : Shroom, Water
+# Checks    : cost=0, hp=300, recharge=15s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Sea-shroom
+? Sea-shroom:
+?     sun cost: 0
+?     hp: 300
+?     recharge: 15s
+> menu exit

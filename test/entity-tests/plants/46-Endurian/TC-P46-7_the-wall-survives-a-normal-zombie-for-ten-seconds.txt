@@ -1,0 +1,24 @@
+=== TEST P46-7: the wall survives a normal zombie for ten seconds
+#
+# Entity    : Endurian
+# HP        : 3000
+# Base ability (database): سد دفاعی با قابلیت بازتاب دمیج به زامبی مهاجم.
+# Checks    : a 3000 hp wall is still on its tile after 10 seconds of chewing
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Endurian
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Endurian -l (2,3)
+> cheat spawn-zombie -t Normal -l 3,3
+> advance time -t 100 ticks
+> show tile status -l (2,3)
+? Plant: Endurian

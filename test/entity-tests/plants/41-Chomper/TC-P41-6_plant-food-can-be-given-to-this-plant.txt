@@ -1,0 +1,20 @@
+=== TEST P41-6: plant food can be given to this plant
+#
+# Entity    : Chomper
+# Plant food effect (database): بلعیدن همزمان ۳ زامبی از فاصله دور.
+# Checks    : feed plant is accepted on a tile holding this plant
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Chomper
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Chomper -l (2,3)
+> feed plant -l (2,3)

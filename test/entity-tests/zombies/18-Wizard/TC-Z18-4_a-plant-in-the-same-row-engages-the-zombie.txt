@@ -1,0 +1,23 @@
+=== TEST Z18-4: a plant in the same row engages the zombie
+#
+# Entity    : Wizard
+# Total effective health: 490
+# Checks    : a Peashooter in the same row acts on the zombie
+# Documented ability: Turns a plant on the lawn into a sheep every few seconds; sheep plants neither attack nor get eaten until the wizard dies.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Peashooter
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Peashooter -l (1,3)
+> cheat spawn-zombie -t Wizard -l 9,3
+> advance time -t 150 ticks
+> zombies info

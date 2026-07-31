@@ -1,0 +1,22 @@
+=== TEST P37-7: the explosive destroys a zombie next to it
+#
+# Entity    : Tangle Kelp
+# Damage column: Insta-kill
+# Base ability (database): کشیدن اولین زامبی آبی به زیر آب و نابودی آن (مخصوص ساحل).
+# Checks    : a normal zombie on the target tile does not survive
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Wavey Beach -l 1
+> add plant -t Tangle Kelp
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Normal -l 3,3
+> plant plant -t Tangle Kelp -l (3,3)
+> advance time -t 200 ticks
+? Zombie of type Normal is dead

@@ -1,0 +1,27 @@
+=== TEST Z02-7: armor absorbs the first damage before the body
+#
+# Entity    : Cone Head
+# Armor     : cone = 370 hp
+# Body hit points: 190
+# Damage dealt: 200 (one level 1 Peashooter for 150 ticks)
+# Checks    : armor reads 170 while the body is still 190
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Peashooter
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Peashooter -l (1,3)
+> cheat spawn-zombie -t Cone Head -l 9,3
+> advance time -t 150 ticks
+> zombies info
+? Cone Head:
+?     health: 190
+?         cone: 170

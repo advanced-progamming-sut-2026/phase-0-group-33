@@ -1,0 +1,20 @@
+=== TEST P09-1: catalogue entry matches the plant database
+#
+# Entity    : Snow Pea
+# Source    : src/database/csv/plants.csv row 9
+# Category  : Shooter
+# Tags      : Ice, Pea
+# Checks    : cost=150, hp=300, recharge=5s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Snow Pea
+? Snow Pea:
+?     sun cost: 150
+?     hp: 300
+?     recharge: 5s
+> menu exit

@@ -1,0 +1,22 @@
+=== TEST Z24-9: steals stored sun and then fires a laser
+#
+# Entity    : Turquoise
+# Documented ability: When a plant is within four tiles the Turquoise steals 25 sun per second for five seconds and then fires a laser that clears four tiles ahead of it.
+# Source    : phase-1 project document
+# Note      : a failure here means the documented ability is not modelled yet
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (5,3)
+> cheat spawn-zombie -t Turquoise -l 8,3
+> advance time -t 200 ticks
+? stole

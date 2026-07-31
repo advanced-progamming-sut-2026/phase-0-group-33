@@ -1,0 +1,22 @@
+=== TEST Z26-9: the piano destroys plants it walks into
+#
+# Entity    : Piano
+# Documented ability: The Pianist enters with a piano, moves slowly and destroys plants on contact while zombies randomly swap rows.
+# Source    : phase-1 project document
+# Note      : a failure here means the documented ability is not modelled yet
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (4,3)
+> cheat spawn-zombie -t Piano -l 7,3
+> advance time -t 500 ticks
+? Plant Sunflower at (4, 3) is destroyed.

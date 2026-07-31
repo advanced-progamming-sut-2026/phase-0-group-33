@@ -1,0 +1,23 @@
+=== TEST Z29-8: magnet-shroom cannot remove this non metal armor
+#
+# Entity    : Pharaoh
+# Armor     : sarcophagus = 1000 hp
+# Metallic  : no
+# Rule      : the sarcophagus layer is not metallic, so it must survive the magnet untouched
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Magnet-shroom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Magnet-shroom -l (4,3)
+> cheat spawn-zombie -t Pharaoh -l 6,3
+> advance time -t 200 ticks
+> zombies info
+?         sarcophagus: 1000

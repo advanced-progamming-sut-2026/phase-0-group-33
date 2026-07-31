@@ -1,0 +1,20 @@
+=== TEST P61-1: catalogue entry matches the plant database
+#
+# Entity    : Enlighten-mint
+# Source    : src/database/csv/plants.csv row 61
+# Category  : Sun Producer
+# Tags      : -
+# Checks    : cost=0, hp=0, recharge=85s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Enlighten-mint
+? Enlighten-mint:
+?     sun cost: 0
+?     hp: 0
+?     recharge: 85s
+> menu exit

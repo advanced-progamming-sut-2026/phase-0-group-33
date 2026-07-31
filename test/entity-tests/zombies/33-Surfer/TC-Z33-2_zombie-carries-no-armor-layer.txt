@@ -1,0 +1,21 @@
+=== TEST Z33-2: zombie carries no armor layer
+#
+# Entity    : Surfer
+# Armor     : none
+# Checks    : the armor block of zombies info stays empty
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Wavey Beach -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Surfer -l 6,3
+> zombies info
+?     armor:
+?     effects:

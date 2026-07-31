@@ -1,0 +1,20 @@
+=== TEST P05-2: category damage and action interval are exposed
+#
+# Entity    : Gold Bloom
+# Source    : src/database/csv/plants.csv row 5
+# Category  : Sun Producer
+# Damage column: 0
+# Interval  : 0
+# Note      : database value 0 resolves to 0 damage per action
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Gold Bloom
+?     category: SUN_PRODUCER
+?     damage: 0
+?     action interval: 0
+> menu exit

@@ -1,0 +1,20 @@
+=== TEST P20-1: catalogue entry matches the plant database
+#
+# Entity    : Goo Peashooter
+# Source    : src/database/csv/plants.csv row 20
+# Category  : Shooter
+# Tags      : Poison
+# Checks    : cost=125, hp=300, recharge=5s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Goo Peashooter
+? Goo Peashooter:
+?     sun cost: 125
+?     hp: 300
+?     recharge: 5s
+> menu exit

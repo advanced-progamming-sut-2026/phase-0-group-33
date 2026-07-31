@@ -1,0 +1,20 @@
+=== TEST P27-1: catalogue entry matches the plant database
+#
+# Entity    : Melon-pult
+# Source    : src/database/csv/plants.csv row 27
+# Category  : Lobber
+# Tags      : AoE
+# Checks    : cost=325, hp=300, recharge=5s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Melon-pult
+? Melon-pult:
+?     sun cost: 325
+?     hp: 300
+?     recharge: 5s
+> menu exit

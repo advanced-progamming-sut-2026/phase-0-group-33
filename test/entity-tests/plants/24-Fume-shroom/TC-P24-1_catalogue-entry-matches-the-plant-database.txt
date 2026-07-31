@@ -1,0 +1,20 @@
+=== TEST P24-1: catalogue entry matches the plant database
+#
+# Entity    : Fume-shroom
+# Source    : src/database/csv/plants.csv row 24
+# Category  : Strike-through
+# Tags      : Shroom
+# Checks    : cost=125, hp=300, recharge=5s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Fume-shroom
+? Fume-shroom:
+?     sun cost: 125
+?     hp: 300
+?     recharge: 5s
+> menu exit

@@ -1,0 +1,25 @@
+=== TEST Z07-7: dies once its full effective health is spent
+#
+# Entity    : Imp
+# Body hit points: 190
+# Armor hit points: 0
+# Total to destroy: 190
+# Damage dealt: 200 (one level 1 Peashooter for 150 ticks)
+# Checks    : 200 damage exceeds the 190 needed, so the zombie must die
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Peashooter
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Peashooter -l (1,3)
+> cheat spawn-zombie -t Imp -l 9,3
+> advance time -t 150 ticks
+? Zombie of type Imp is dead

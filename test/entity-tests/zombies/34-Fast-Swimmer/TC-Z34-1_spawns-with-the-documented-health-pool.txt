@@ -1,0 +1,26 @@
+=== TEST Z34-1: spawns with the documented health pool
+#
+# Entity    : Fast Swimmer
+# Source    : src/database/csv/zombies.xlsx
+# Hitpoints : 300
+# Speed     : 0.12
+# EatDPS    : 100
+# Wave cost : 350
+# Checks    : zombies info reports health 300 right after spawning
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Wavey Beach -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Fast Swimmer -l 6,3
+? Fast Swimmer spawned at (6, 3).
+> zombies info
+? Fast Swimmer:
+?     health: 300

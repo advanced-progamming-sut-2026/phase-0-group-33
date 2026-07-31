@@ -1,0 +1,20 @@
+=== TEST P15-6: plant food can be given to this plant
+#
+# Entity    : Electric Blueberry
+# Plant food effect (database): نابودی کامل ۳ زامبی تصادفی.
+# Checks    : feed plant is accepted on a tile holding this plant
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Electric Blueberry
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Electric Blueberry -l (2,3)
+> feed plant -l (2,3)

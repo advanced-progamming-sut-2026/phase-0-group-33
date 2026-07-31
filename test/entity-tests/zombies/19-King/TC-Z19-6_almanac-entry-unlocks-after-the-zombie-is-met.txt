@@ -1,0 +1,29 @@
+=== TEST Z19-6: almanac entry unlocks after the zombie is met
+#
+# Entity    : King
+# Hitpoints : 1000
+# Speed     : 0.0
+# EatDPS    : 100
+# Wave cost : 750
+# Checks    : the collection entry reports every documented statistic
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Dark Ages -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t King -l 6,3
+> menu enter collection
+> menu collection show-zombie -z King
+? King:
+?     hp: 1000
+?     speed: 0.0 tiles/s
+?     eat damage: 100/s
+?     wave cost: 750
+> menu exit

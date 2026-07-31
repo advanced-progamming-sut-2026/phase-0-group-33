@@ -1,0 +1,25 @@
+=== TEST P47-3: planting costs exactly the documented sun price
+#
+# Entity    : Garlic
+# Cost      : 50
+# Tile      : (2, 3)
+# Arena     : scoring game, empty lawn
+# Checks    : the sun balance drops by exactly 50
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Garlic
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> show sun amount
+? Sun: 9050
+> plant plant -t Garlic -l (2,3)
+> show sun amount
+? Sun: 9000

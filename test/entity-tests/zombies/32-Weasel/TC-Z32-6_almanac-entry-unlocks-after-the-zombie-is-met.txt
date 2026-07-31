@@ -1,0 +1,29 @@
+=== TEST Z32-6: almanac entry unlocks after the zombie is met
+#
+# Entity    : Weasel
+# Hitpoints : 60
+# Speed     : 0.5
+# EatDPS    : 50
+# Wave cost : 50
+# Checks    : the collection entry reports every documented statistic
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Weasel -l 6,3
+> menu enter collection
+> menu collection show-zombie -z Weasel
+? Weasel:
+?     hp: 60
+?     speed: 0.5 tiles/s
+?     eat damage: 50/s
+?     wave cost: 50
+> menu exit

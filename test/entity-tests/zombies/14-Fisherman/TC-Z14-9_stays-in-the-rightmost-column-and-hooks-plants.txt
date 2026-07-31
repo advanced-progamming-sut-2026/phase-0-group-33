@@ -1,0 +1,23 @@
+=== TEST Z14-9: stays in the rightmost column and hooks plants
+#
+# Entity    : Fisherman
+# Documented ability: The Fisherman never leaves the rightmost column; every few seconds it hooks a plant of its row one tile closer to itself.
+# Source    : phase-1 project document
+# Note      : a failure here means the documented ability is not modelled yet
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Wavey Beach -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (3,3)
+> cheat spawn-zombie -t Fisherman -l 9,3
+> advance time -t 300 ticks
+> zombies info
+?     position: 9, 3

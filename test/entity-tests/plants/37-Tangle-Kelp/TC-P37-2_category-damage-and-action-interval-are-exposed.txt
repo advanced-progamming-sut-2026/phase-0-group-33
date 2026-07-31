@@ -1,0 +1,20 @@
+=== TEST P37-2: category damage and action interval are exposed
+#
+# Entity    : Tangle Kelp
+# Source    : src/database/csv/plants.csv row 37
+# Category  : Explosive
+# Damage column: Insta-kill
+# Interval  : -
+# Note      : the database marks this plant as an instant kill
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Tangle Kelp
+?     category: EXPLOSIVE
+?     damage: instant kill
+?     action interval: -1.0
+> menu exit

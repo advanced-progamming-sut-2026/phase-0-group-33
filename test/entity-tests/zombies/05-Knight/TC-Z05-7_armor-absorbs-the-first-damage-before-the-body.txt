@@ -1,0 +1,27 @@
+=== TEST Z05-7: armor absorbs the first damage before the body
+#
+# Entity    : Knight
+# Armor     : crown = 1600 hp
+# Body hit points: 190
+# Damage dealt: 200 (one level 1 Peashooter for 150 ticks)
+# Checks    : armor reads 1400 while the body is still 190
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Peashooter
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Peashooter -l (1,3)
+> cheat spawn-zombie -t Knight -l 9,3
+> advance time -t 150 ticks
+> zombies info
+? Knight:
+?     health: 190
+?         crown: 1400

@@ -1,0 +1,20 @@
+=== TEST P07-2: category damage and action interval are exposed
+#
+# Entity    : Repeater
+# Source    : src/database/csv/plants.csv row 7
+# Category  : Shooter
+# Damage column: 20x2
+# Interval  : 1.5
+# Note      : database value 20x2 resolves to 40 damage per action
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Repeater
+?     category: SHOOTER
+?     damage: 40
+?     action interval: 1.5
+> menu exit

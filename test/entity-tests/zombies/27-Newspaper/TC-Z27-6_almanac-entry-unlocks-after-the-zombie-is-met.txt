@@ -1,0 +1,29 @@
+=== TEST Z27-6: almanac entry unlocks after the zombie is met
+#
+# Entity    : Newspaper
+# Hitpoints : 460
+# Speed     : 0.22
+# EatDPS    : 200
+# Wave cost : 700
+# Checks    : the collection entry reports every documented statistic
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Newspaper -l 6,3
+> menu enter collection
+> menu collection show-zombie -z Newspaper
+? Newspaper:
+?     hp: 460
+?     speed: 0.22 tiles/s
+?     eat damage: 200/s
+?     wave cost: 700
+> menu exit

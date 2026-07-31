@@ -1,0 +1,23 @@
+=== TEST Z19-3: the zombie never leaves its column
+#
+# Entity    : King
+# Speed     : 0 (stationary)
+# Checks    : after 15 seconds the reported column is still 6
+# Documented ability: Stands still in the rightmost column and every few seconds upgrades a nearby plain zombie into a Knight.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t King -l 6,3
+> advance time -t 150 ticks
+> zombies info
+?     position: 6, 3

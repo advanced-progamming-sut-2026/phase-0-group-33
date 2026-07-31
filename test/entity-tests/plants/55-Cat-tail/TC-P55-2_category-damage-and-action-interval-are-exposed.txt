@@ -1,0 +1,20 @@
+=== TEST P55-2: category damage and action interval are exposed
+#
+# Entity    : Cat-tail
+# Source    : src/database/csv/plants.csv row 55
+# Category  : Homing
+# Damage column: 15
+# Interval  : 1.5
+# Note      : database value 15 resolves to 15 damage per action
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Cat-tail
+?     category: HOMING
+?     damage: 15
+?     action interval: 1.5
+> menu exit

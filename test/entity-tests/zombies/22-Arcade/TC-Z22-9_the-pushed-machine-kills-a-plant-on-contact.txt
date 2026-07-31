@@ -1,0 +1,22 @@
+=== TEST Z22-9: the pushed machine kills a plant on contact
+#
+# Entity    : Arcade
+# Documented ability: The Arcade zombie pushes an arcade machine with bucket-head health that instantly kills any plant it touches.
+# Source    : phase-1 project document
+# Note      : a failure here means the documented ability is not modelled yet
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (3,3)
+> cheat spawn-zombie -t Arcade -l 7,3
+> advance time -t 400 ticks
+? Plant Sunflower at (3, 3) is destroyed.

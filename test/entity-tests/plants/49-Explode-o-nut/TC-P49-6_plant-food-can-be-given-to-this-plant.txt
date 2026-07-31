@@ -1,0 +1,20 @@
+=== TEST P49-6: plant food can be given to this plant
+#
+# Entity    : Explode-o-nut
+# Plant food effect (database): دریافت زره فلزی (هنگام نابودی زره نیز منفجر می‌شود).
+# Checks    : feed plant is accepted on a tile holding this plant
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Explode-o-nut
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Explode-o-nut -l (2,3)
+> feed plant -l (2,3)

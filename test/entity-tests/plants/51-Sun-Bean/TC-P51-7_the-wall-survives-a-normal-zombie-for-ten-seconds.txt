@@ -1,0 +1,24 @@
+=== TEST P51-7: the wall survives a normal zombie for ten seconds
+#
+# Entity    : Sun Bean
+# HP        : 1000
+# Base ability (database): مثل دیوار دفاعی عمل می‌کند و با هر ضربه 5 خورشید تولید می‌کند.
+# Checks    : a 1000 hp wall is still on its tile after 10 seconds of chewing
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sun Bean
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sun Bean -l (2,3)
+> cheat spawn-zombie -t Normal -l 3,3
+> advance time -t 100 ticks
+> show tile status -l (2,3)
+? Plant: Sun Bean

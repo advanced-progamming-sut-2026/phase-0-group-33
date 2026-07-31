@@ -1,0 +1,26 @@
+=== TEST Z14-1: spawns with the documented health pool
+#
+# Entity    : Fisherman
+# Source    : src/database/csv/zombies.xlsx
+# Hitpoints : 1000
+# Speed     : 0.185
+# EatDPS    : 100
+# Wave cost : 700
+# Checks    : zombies info reports health 1000 right after spawning
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Wavey Beach -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Fisherman -l 6,3
+? Fisherman spawned at (6, 3).
+> zombies info
+? Fisherman:
+?     health: 1000

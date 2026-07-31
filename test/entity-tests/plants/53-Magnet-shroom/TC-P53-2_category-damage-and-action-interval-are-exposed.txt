@@ -1,0 +1,20 @@
+=== TEST P53-2: category damage and action interval are exposed
+#
+# Entity    : Magnet-shroom
+# Source    : src/database/csv/plants.csv row 53
+# Category  : Homing
+# Damage column: 0
+# Interval  : 10
+# Note      : database value 0 resolves to 0 damage per action
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Magnet-shroom
+?     category: HOMING
+?     damage: 0
+?     action interval: 10
+> menu exit

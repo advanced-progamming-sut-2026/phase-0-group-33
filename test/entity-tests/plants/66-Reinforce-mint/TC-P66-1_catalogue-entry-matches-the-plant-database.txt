@@ -1,0 +1,20 @@
+=== TEST P66-1: catalogue entry matches the plant database
+#
+# Entity    : Reinforce-mint
+# Source    : src/database/csv/plants.csv row 66
+# Category  : Wall-nut
+# Tags      : -
+# Checks    : cost=0, hp=0, recharge=85s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Reinforce-mint
+? Reinforce-mint:
+?     sun cost: 0
+?     hp: 0
+?     recharge: 85s
+> menu exit

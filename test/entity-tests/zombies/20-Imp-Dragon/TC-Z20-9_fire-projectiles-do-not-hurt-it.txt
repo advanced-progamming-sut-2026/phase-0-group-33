@@ -1,0 +1,24 @@
+=== TEST Z20-9: fire projectiles do not hurt it
+#
+# Entity    : Imp Dragon
+# Documented ability: The Imp Dragon behaves like the other imps except that fire projectiles have no effect on it.
+# Source    : phase-1 project document
+# Note      : a failure here means the documented ability is not modelled yet
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Dark Ages -l 1
+> add plant -t Fire Peashooter
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Fire Peashooter -l (1,3)
+> cheat spawn-zombie -t Imp Dragon -l 6,3
+> advance time -t 200 ticks
+> zombies info
+? Imp Dragon:
+?     health: 190

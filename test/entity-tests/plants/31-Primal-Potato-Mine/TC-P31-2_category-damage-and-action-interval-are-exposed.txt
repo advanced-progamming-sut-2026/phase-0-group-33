@@ -1,0 +1,20 @@
+=== TEST P31-2: category damage and action interval are exposed
+#
+# Entity    : Primal Potato Mine
+# Source    : src/database/csv/plants.csv row 31
+# Category  : Explosive
+# Damage column: 2400
+# Interval  : -
+# Note      : database value 2400 resolves to 2400 damage per action
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Primal Potato Mine
+?     category: EXPLOSIVE
+?     damage: 2400
+?     action interval: -1.0
+> menu exit

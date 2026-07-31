@@ -1,0 +1,20 @@
+=== TEST P49-1: catalogue entry matches the plant database
+#
+# Entity    : Explode-o-nut
+# Source    : src/database/csv/plants.csv row 49
+# Category  : Wall-nut
+# Tags      : Explosive
+# Checks    : cost=50, hp=4000, recharge=20s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Explode-o-nut
+? Explode-o-nut:
+?     sun cost: 50
+?     hp: 4000
+?     recharge: 20s
+> menu exit

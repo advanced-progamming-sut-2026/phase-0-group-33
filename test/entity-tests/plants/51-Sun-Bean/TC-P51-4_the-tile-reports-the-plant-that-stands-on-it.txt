@@ -1,0 +1,22 @@
+=== TEST P51-4: the tile reports the plant that stands on it
+#
+# Entity    : Sun Bean
+# HP        : 1000
+# Tile      : (2, 3)
+# Checks    : show tile status names the plant on the tile
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sun Bean
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sun Bean -l (2,3)
+> show tile status -l (2,3)
+? Plant: Sun Bean

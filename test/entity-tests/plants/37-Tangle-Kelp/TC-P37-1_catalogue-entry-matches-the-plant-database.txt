@@ -1,0 +1,20 @@
+=== TEST P37-1: catalogue entry matches the plant database
+#
+# Entity    : Tangle Kelp
+# Source    : src/database/csv/plants.csv row 37
+# Category  : Explosive
+# Tags      : Trap, Water
+# Checks    : cost=25, hp=300, recharge=15s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Tangle Kelp
+? Tangle Kelp:
+?     sun cost: 25
+?     hp: 300
+?     recharge: 15s
+> menu exit

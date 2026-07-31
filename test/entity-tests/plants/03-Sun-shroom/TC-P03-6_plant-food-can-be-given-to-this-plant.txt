@@ -1,0 +1,20 @@
+=== TEST P03-6: plant food can be given to this plant
+#
+# Entity    : Sun-shroom
+# Plant food effect (database): رشد آنی به سایز آخر و تولید ۲۲۵ خورشید.
+# Checks    : feed plant is accepted on a tile holding this plant
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sun-shroom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sun-shroom -l (2,3)
+> feed plant -l (2,3)

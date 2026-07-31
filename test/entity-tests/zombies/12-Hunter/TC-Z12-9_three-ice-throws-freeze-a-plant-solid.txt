@@ -1,0 +1,23 @@
+=== TEST Z12-9: three ice throws freeze a plant solid
+#
+# Entity    : Hunter
+# Documented ability: The Hunter throws ice at the nearest plant in its row; after three hits the plant freezes and can do nothing.
+# Source    : phase-1 project document
+# Note      : a failure here means the documented ability is not modelled yet
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Frost Bite -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (2,3)
+> cheat spawn-zombie -t Hunter -l 8,3
+> advance time -t 600 ticks
+> show tile status -l (2,3)
+? frozen

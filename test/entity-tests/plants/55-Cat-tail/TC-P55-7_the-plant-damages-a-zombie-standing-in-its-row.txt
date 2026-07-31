@@ -1,0 +1,29 @@
+=== TEST P55-7: the plant damages a zombie standing in its row
+#
+# Entity    : Cat-tail
+# Category  : Homing
+# Damage column: 15
+# Damage per action: 15
+# Action interval: 1.5s = 15 ticks
+# Target    : Gargantuar, 3600 hit points, no armor
+# Arithmetic: 150 ticks / 15 = 10 actions x 15 damage = 150 dealt
+# Checks    : the target reports health 3450
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Cat-tail
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Cat-tail -l (1,3)
+> cheat spawn-zombie -t Gargantuar -l 9,3
+> advance time -t 150 ticks
+> zombies info
+? Gargantuar:
+?     health: 3450

@@ -1,0 +1,20 @@
+=== TEST P45-5: the plant appears in the battlefield status list
+#
+# Entity    : Tall-nut
+# Checks    : show plants status lists the planted Tall-nut
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Tall-nut
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Tall-nut -l (2,3)
+> show plants status
+? Tall-nut

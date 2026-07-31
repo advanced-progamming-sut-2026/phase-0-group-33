@@ -1,0 +1,20 @@
+=== TEST P43-6: plant food can be given to this plant
+#
+# Entity    : Kiwibeast
+# Plant food effect (database): پرش و کوبیدن محکم به زمین با دمیج مساحتی.
+# Checks    : feed plant is accepted on a tile holding this plant
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Kiwibeast
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Kiwibeast -l (2,3)
+> feed plant -l (2,3)

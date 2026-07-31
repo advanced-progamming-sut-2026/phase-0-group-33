@@ -1,0 +1,21 @@
+=== TEST P01-7: the plant produces sun on the lawn
+#
+# Entity    : Sunflower
+# Base ability (database): تولید ۵۰ خورشید هر ۲۴ ثانیه.
+# Checks    : a sun appears on the plant tile within 30 seconds
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (1,1)
+> advance time -t 300 ticks
+? produced a sun at (1, 1)

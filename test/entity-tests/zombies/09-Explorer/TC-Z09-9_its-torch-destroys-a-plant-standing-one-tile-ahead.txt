@@ -1,0 +1,22 @@
+=== TEST Z09-9: its torch destroys a plant standing one tile ahead
+#
+# Entity    : Explorer
+# Documented ability: The torch of the Explorer destroys plants that are less than one tile ahead of it in the same row.
+# Source    : phase-1 project document
+# Note      : a failure here means the documented ability is not modelled yet
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (4,3)
+> cheat spawn-zombie -t Explorer -l 5,3
+> advance time -t 200 ticks
+? Plant Sunflower at (4, 3) is destroyed.

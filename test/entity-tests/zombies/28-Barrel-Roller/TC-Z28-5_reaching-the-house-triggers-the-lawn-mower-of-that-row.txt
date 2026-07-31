@@ -1,0 +1,22 @@
+=== TEST Z28-5: reaching the house triggers the lawn mower of that row
+#
+# Entity    : Barrel Roller
+# Speed     : 0.185
+# EatDPS    : 100
+# Checks    : an unopposed zombie reaches column 1 and sets off the mower
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Barrel Roller -l 2,3
+> advance time -t 400 ticks
+? The lawn mower in the row 3 is triggered

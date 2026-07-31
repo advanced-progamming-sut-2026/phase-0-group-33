@@ -1,0 +1,20 @@
+=== TEST P50-1: catalogue entry matches the plant database
+#
+# Entity    : Pumpkin
+# Source    : src/database/csv/plants.csv row 50
+# Category  : Wall-nut
+# Tags      : stack
+# Checks    : cost=150, hp=4000, recharge=20s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Pumpkin
+? Pumpkin:
+?     sun cost: 150
+?     hp: 4000
+?     recharge: 20s
+> menu exit

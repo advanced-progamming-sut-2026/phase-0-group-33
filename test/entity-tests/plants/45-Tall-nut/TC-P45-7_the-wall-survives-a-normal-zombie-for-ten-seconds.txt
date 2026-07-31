@@ -1,0 +1,24 @@
+=== TEST P45-7: the wall survives a normal zombie for ten seconds
+#
+# Entity    : Tall-nut
+# HP        : 8000
+# Base ability (database): سد بلند؛ جلوگیری از پریدن زامبی‌ها از روی آن.
+# Checks    : a 8000 hp wall is still on its tile after 10 seconds of chewing
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Tall-nut
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Tall-nut -l (2,3)
+> cheat spawn-zombie -t Normal -l 3,3
+> advance time -t 100 ticks
+> show tile status -l (2,3)
+? Plant: Tall-nut

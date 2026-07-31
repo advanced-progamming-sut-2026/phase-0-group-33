@@ -1,0 +1,26 @@
+=== TEST P40-7: the plant reaches a zombie inside its own range
+#
+# Entity    : Phat Beet
+# Category  : Melee
+# Damage column: 15
+# Action interval: 2s = 20 ticks
+# Range     : this plant only reaches an adjacent tile, so the target is spawned next to it
+# Checks    : a Gargantuar placed inside the range is engaged
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Phat Beet
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Phat Beet -l (1,3)
+> cheat spawn-zombie -t Gargantuar -l 4,3
+> advance time -t 20 ticks
+> zombies info
+? Gargantuar:

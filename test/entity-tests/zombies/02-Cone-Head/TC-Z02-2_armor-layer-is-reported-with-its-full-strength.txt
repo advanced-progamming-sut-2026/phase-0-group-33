@@ -1,0 +1,22 @@
+=== TEST Z02-2: armor layer is reported with its full strength
+#
+# Entity    : Cone Head
+# Armor     : cone = 370 hp
+# Metallic  : no
+# Checks    : zombies info lists the cone layer at 370 hit points
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Cone Head -l 6,3
+> zombies info
+?     armor:
+?         cone: 370

@@ -1,0 +1,24 @@
+=== TEST P41-7: one hit is enough to destroy a normal zombie
+#
+# Entity    : Chomper
+# Category  : Melee
+# Damage column: Insta-kill
+# Base ability (database): بلعیدن آنی؛ نابودی یک زامبی درجا و سپس توقف برای هضم به مدت ۴۰ ثانیه.
+# Note      : database damage Insta-kill is at least the 190 hit points of a normal zombie
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Chomper
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Chomper -l (1,3)
+> cheat spawn-zombie -t Normal -l 5,3
+> advance time -t 200 ticks
+? Zombie of type Normal is dead

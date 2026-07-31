@@ -1,0 +1,20 @@
+=== TEST P41-2: category damage and action interval are exposed
+#
+# Entity    : Chomper
+# Source    : src/database/csv/plants.csv row 41
+# Category  : Melee
+# Damage column: Insta-kill
+# Interval  : 40
+# Note      : the database marks this plant as an instant kill
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Chomper
+?     category: MELEE
+?     damage: instant kill
+?     action interval: 40
+> menu exit

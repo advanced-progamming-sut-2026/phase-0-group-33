@@ -1,0 +1,25 @@
+=== TEST Z15-3: the zombie walks towards the house over time
+#
+# Entity    : Octopus
+# Speed     : 0.12 tiles per second
+# Checks    : after 15 seconds it has left column 9
+# Documented ability: Throws octopuses at plants in its row; an octopus works like ice, blocking shots and disabling the plant until removed.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Octopus -l 9,3
+> zombies info
+?     position: 9, 3
+> advance time -t 150 ticks
+> zombies info
+? Octopus:

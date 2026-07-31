@@ -1,0 +1,21 @@
+=== TEST P03-7: the plant produces sun on the lawn
+#
+# Entity    : Sun-shroom
+# Base ability (database): رشد در ۳ مرحله و تولید خورشید بیشتر(۲۵/۵۰/۷۵). To Stg2: 24s | To Stg3: 72s
+# Checks    : a sun appears on the plant tile within 30 seconds
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sun-shroom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sun-shroom -l (1,1)
+> advance time -t 300 ticks
+? produced a sun at (1, 1)

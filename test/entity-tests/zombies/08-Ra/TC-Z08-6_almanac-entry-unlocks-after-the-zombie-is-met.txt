@@ -1,0 +1,29 @@
+=== TEST Z08-6: almanac entry unlocks after the zombie is met
+#
+# Entity    : Ra
+# Hitpoints : 190
+# Speed     : 0.2
+# EatDPS    : 100
+# Wave cost : 100
+# Checks    : the collection entry reports every documented statistic
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Ra -l 6,3
+> menu enter collection
+> menu collection show-zombie -z Ra
+? Ra:
+?     hp: 190
+?     speed: 0.2 tiles/s
+?     eat damage: 100/s
+?     wave cost: 100
+> menu exit

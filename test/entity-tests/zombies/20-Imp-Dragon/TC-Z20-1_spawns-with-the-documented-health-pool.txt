@@ -1,0 +1,26 @@
+=== TEST Z20-1: spawns with the documented health pool
+#
+# Entity    : Imp Dragon
+# Source    : src/database/csv/zombies.xlsx
+# Hitpoints : 190
+# Speed     : 0.185
+# EatDPS    : 100
+# Wave cost : 150
+# Checks    : zombies info reports health 190 right after spawning
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Dark Ages -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Imp Dragon -l 6,3
+? Imp Dragon spawned at (6, 3).
+> zombies info
+? Imp Dragon:
+?     health: 190

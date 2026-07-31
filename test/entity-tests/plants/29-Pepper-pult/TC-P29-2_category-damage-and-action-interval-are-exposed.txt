@@ -1,0 +1,20 @@
+=== TEST P29-2: category damage and action interval are exposed
+#
+# Entity    : Pepper-pult
+# Source    : src/database/csv/plants.csv row 29
+# Category  : Lobber
+# Damage column: 50
+# Interval  : 2.9
+# Note      : database value 50 resolves to 50 damage per action
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Pepper-pult
+?     category: LOBBER
+?     damage: 50
+?     action interval: 2.9
+> menu exit

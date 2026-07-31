@@ -1,0 +1,21 @@
+=== TEST P66-3: a free plant does not change the sun balance
+#
+# Entity    : Reinforce-mint
+# Cost      : 0
+# Checks    : planting a plant whose database cost is 0 leaves the balance untouched
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Reinforce-mint
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Reinforce-mint -l (2,3)
+> show sun amount
+? Sun: 9050

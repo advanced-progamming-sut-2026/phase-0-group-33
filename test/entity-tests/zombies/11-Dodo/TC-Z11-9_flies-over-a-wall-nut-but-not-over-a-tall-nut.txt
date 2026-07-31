@@ -1,0 +1,23 @@
+=== TEST Z11-9: flies over a wall-nut but not over a tall-nut
+#
+# Entity    : Dodo
+# Documented ability: The Dodo Rider flies over obstacles such as Wall-nut, but never over Tall-nut.
+# Source    : phase-1 project document
+# Note      : a failure here means the documented ability is not modelled yet
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Frost Bite -l 1
+> add plant -t Wall-nut
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Wall-nut -l (4,3)
+> cheat spawn-zombie -t Dodo -l 6,3
+> advance time -t 400 ticks
+> show tile status -l (4,3)
+? Wall-nut

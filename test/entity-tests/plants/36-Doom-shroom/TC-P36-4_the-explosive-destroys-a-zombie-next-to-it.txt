@@ -1,0 +1,23 @@
+=== TEST P36-4: the explosive destroys a zombie next to it
+#
+# Entity    : Doom-shroom
+# Damage column: 1800
+# Base ability (database): انفجار مهیب در کل باغچه و ایجاد یک گودال غیرقابل کشت.
+# Checks    : a normal zombie on the target tile does not survive
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Doom-shroom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Normal -l 3,3
+> plant plant -t Doom-shroom -l (3,3)
+> advance time -t 200 ticks
+? Zombie of type Normal is dead

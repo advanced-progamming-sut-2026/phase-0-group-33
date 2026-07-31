@@ -1,0 +1,20 @@
+=== TEST P15-2: category damage and action interval are exposed
+#
+# Entity    : Electric Blueberry
+# Source    : src/database/csv/plants.csv row 15
+# Category  : Homing
+# Damage column: 5000
+# Interval  : 12
+# Note      : database value 5000 resolves to 5000 damage per action
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Electric Blueberry
+?     category: HOMING
+?     damage: 5000
+?     action interval: 12
+> menu exit

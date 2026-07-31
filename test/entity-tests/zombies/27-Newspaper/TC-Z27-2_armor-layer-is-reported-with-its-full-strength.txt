@@ -1,0 +1,22 @@
+=== TEST Z27-2: armor layer is reported with its full strength
+#
+# Entity    : Newspaper
+# Armor     : newspaper = 190 hp
+# Metallic  : no
+# Checks    : zombies info lists the newspaper layer at 190 hit points
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Newspaper -l 6,3
+> zombies info
+?     armor:
+?         newspaper: 190

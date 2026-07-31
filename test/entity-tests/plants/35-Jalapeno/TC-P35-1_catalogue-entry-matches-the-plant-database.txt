@@ -1,0 +1,20 @@
+=== TEST P35-1: catalogue entry matches the plant database
+#
+# Entity    : Jalapeno
+# Source    : src/database/csv/plants.csv row 35
+# Category  : Explosive
+# Tags      : Fire
+# Checks    : cost=125, hp=0, recharge=35s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Jalapeno
+? Jalapeno:
+?     sun cost: 125
+?     hp: 0
+?     recharge: 35s
+> menu exit

@@ -1,0 +1,22 @@
+=== TEST Z05-8: magnet-shroom pulls off the metal armor
+#
+# Entity    : Knight
+# Armor     : crown = 1600 hp
+# Metallic  : yes
+# Rule      : the crown layer is metallic, so the magnet must remove it
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Magnet-shroom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Magnet-shroom -l (4,3)
+> cheat spawn-zombie -t Knight -l 6,3
+> advance time -t 200 ticks
+? Magnet-shroom pulled the metal armor off the Knight!

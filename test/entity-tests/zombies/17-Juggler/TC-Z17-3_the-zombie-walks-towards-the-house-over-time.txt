@@ -1,0 +1,25 @@
+=== TEST Z17-3: the zombie walks towards the house over time
+#
+# Entity    : Juggler
+# Speed     : 0.2 tiles per second
+# Checks    : after 15 seconds it has left column 9
+# Documented ability: Starts spinning when a projectile arrives, moves faster while spinning and reflects straight shots back at the plants.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Juggler -l 9,3
+> zombies info
+?     position: 9, 3
+> advance time -t 150 ticks
+> zombies info
+? Juggler:

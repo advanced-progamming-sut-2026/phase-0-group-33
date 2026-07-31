@@ -1,0 +1,20 @@
+=== TEST P48-1: catalogue entry matches the plant database
+#
+# Entity    : Sweet Potato
+# Source    : src/database/csv/plants.csv row 48
+# Category  : Wall-nut
+# Tags      : moveZombies
+# Checks    : cost=150, hp=3000, recharge=20s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Sweet Potato
+? Sweet Potato:
+?     sun cost: 150
+?     hp: 3000
+?     recharge: 20s
+> menu exit

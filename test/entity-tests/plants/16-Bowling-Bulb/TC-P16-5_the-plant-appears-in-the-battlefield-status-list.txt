@@ -1,0 +1,20 @@
+=== TEST P16-5: the plant appears in the battlefield status list
+#
+# Entity    : Bowling Bulb
+# Checks    : show plants status lists the planted Bowling Bulb
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Bowling Bulb
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Bowling Bulb -l (2,3)
+> show plants status
+? Bowling Bulb

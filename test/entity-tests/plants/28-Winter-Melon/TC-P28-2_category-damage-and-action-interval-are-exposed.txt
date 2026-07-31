@@ -1,0 +1,20 @@
+=== TEST P28-2: category damage and action interval are exposed
+#
+# Entity    : Winter Melon
+# Source    : src/database/csv/plants.csv row 28
+# Category  : Lobber
+# Damage column: 80
+# Interval  : 2.9
+# Note      : database value 80 resolves to 80 damage per action
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Winter Melon
+?     category: LOBBER
+?     damage: 80
+?     action interval: 2.9
+> menu exit

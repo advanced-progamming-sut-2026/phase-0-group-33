@@ -1,0 +1,26 @@
+=== TEST Z27-1: spawns with the documented health pool
+#
+# Entity    : Newspaper
+# Source    : src/database/csv/zombies.xlsx
+# Hitpoints : 460
+# Speed     : 0.22
+# EatDPS    : 200
+# Wave cost : 700
+# Checks    : zombies info reports health 460 right after spawning
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Newspaper -l 6,3
+? Newspaper spawned at (6, 3).
+> zombies info
+? Newspaper:
+?     health: 460

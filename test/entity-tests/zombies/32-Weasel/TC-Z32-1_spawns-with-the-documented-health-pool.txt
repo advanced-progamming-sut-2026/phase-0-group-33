@@ -1,0 +1,26 @@
+=== TEST Z32-1: spawns with the documented health pool
+#
+# Entity    : Weasel
+# Source    : src/database/csv/zombies.xlsx
+# Hitpoints : 60
+# Speed     : 0.5
+# EatDPS    : 50
+# Wave cost : 50
+# Checks    : zombies info reports health 60 right after spawning
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Weasel -l 6,3
+? Weasel spawned at (6, 3).
+> zombies info
+? Weasel:
+?     health: 60

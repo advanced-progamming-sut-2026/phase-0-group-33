@@ -1,0 +1,22 @@
+=== TEST Z31-9: summons weasels during the level
+#
+# Entity    : Weasel Hoarder
+# Documented ability: The Weasel Hoarder summons weasels while the level runs instead of bringing them with the wave.
+# Source    : phase-1 project document
+# Note      : a failure here means the documented ability is not modelled yet
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Frost Bite -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Weasel Hoarder -l 8,3
+> advance time -t 400 ticks
+> zombies info
+? Weasel:

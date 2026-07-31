@@ -1,0 +1,26 @@
+=== TEST Z21-1: spawns with the documented health pool
+#
+# Entity    : All Star
+# Source    : src/database/csv/zombies.xlsx
+# Hitpoints : 1100
+# Speed     : 0.16
+# EatDPS    : 100
+# Wave cost : 1000
+# Checks    : zombies info reports health 1100 right after spawning
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t All Star -l 6,3
+? All Star spawned at (6, 3).
+> zombies info
+? All Star:
+?     health: 1100

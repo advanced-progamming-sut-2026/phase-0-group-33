@@ -1,0 +1,23 @@
+=== TEST Z06-9: at half health it throws an imp onto the lawn
+#
+# Entity    : Gargantuar
+# Documented ability: Once the Gargantuar drops to half of its 3600 hit points it must throw an Imp to the third column of its own row.
+# Source    : phase-1 project document
+# Note      : a failure here means the documented ability is not modelled yet
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Egypt -l 1
+> add plant -t Peashooter
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat spawn-zombie -t Gargantuar -l 8,3
+> plant plant -t Peashooter -l (1,3)
+> advance time -t 900 ticks
+> zombies info
+? Imp:

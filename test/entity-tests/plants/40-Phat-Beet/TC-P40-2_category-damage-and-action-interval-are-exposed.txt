@@ -1,0 +1,20 @@
+=== TEST P40-2: category damage and action interval are exposed
+#
+# Entity    : Phat Beet
+# Source    : src/database/csv/plants.csv row 40
+# Category  : Melee
+# Damage column: 15
+# Interval  : 2
+# Note      : database value 15 resolves to 15 damage per action
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Phat Beet
+?     category: MELEE
+?     damage: 15
+?     action interval: 2
+> menu exit

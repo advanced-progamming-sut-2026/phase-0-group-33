@@ -1,0 +1,20 @@
+=== TEST P56-1: catalogue entry matches the plant database
+#
+# Entity    : Imitater
+# Source    : src/database/csv/plants.csv row 56
+# Category  : Modifier
+# Tags      : -
+# Checks    : cost=0, hp=0, recharge=0s
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter collection
+> menu collection show-plant -p Imitater
+? Imitater:
+?     sun cost: 0
+?     hp: 0
+?     recharge: 0s
+> menu exit

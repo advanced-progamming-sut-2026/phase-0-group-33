@@ -1,0 +1,25 @@
+=== TEST P12-3: planting costs exactly the documented sun price
+#
+# Entity    : Split Pea
+# Cost      : 125
+# Tile      : (2, 3)
+# Arena     : scoring game, empty lawn
+# Checks    : the sun balance drops by exactly 125
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Split Pea
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> show sun amount
+? Sun: 9050
+> plant plant -t Split Pea -l (2,3)
+> show sun amount
+? Sun: 8925
