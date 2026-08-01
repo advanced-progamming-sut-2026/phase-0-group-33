@@ -5,6 +5,7 @@ import models.entities.zombie.Zombie;
 import models.game.GameSession;
 import models.game.PlacedPlant;
 import models.game.PlantSlot;
+import models.game.Vase;
 import models.map.Tile;
 
 import java.util.Map;
@@ -30,16 +31,16 @@ public final class GameBoardPrinter {
         }
         result.addMessage("Legend: [M] mower | letter = plant initial | digit = zombies | * sun | "
                 + "~ water | # grave | $ grave with sun | % grave with plant food | "
-                + "+ necromancy | _ low tide");
+                + "+ necromancy | _ low tide | ? vase | & plant vase | @ gargantuar vase");
         return result;
     }
 
     private static String renderTile(GameSession session, int col, int row) {
         Tile tile = session.getGrid().getTile(col - 1, row - 1);
         char terrain = terrainChar(tile);
-        for (models.game.Vase vase : session.getMinigameManager().getVases()) {
+        for (Vase vase : session.getMinigameManager().getVases()) {
             if (vase.getX() == col && vase.getY() == row) {
-                terrain = 'U';
+                terrain = vaseChar(vase.getKind());
             }
         }
         PlacedPlant plant = session.plantAt(col, row);
@@ -54,6 +55,17 @@ public final class GameBoardPrinter {
         char zombieChar = zombieCount == 0 ? ' ' : Character.forDigit(Math.min(9, zombieCount), 10);
         char sunChar = session.getSunManager().hasSunAt(col, row) ? '*' : ' ';
         return "" + plantChar + zombieChar + sunChar;
+    }
+
+    private static char vaseChar(Vase.VaseKind kind) {
+        switch (kind) {
+            case PLANT:
+                return '&';
+            case GHOUL:
+                return '@';
+            default:
+                return '?';
+        }
     }
 
     private static char terrainChar(Tile tile) {

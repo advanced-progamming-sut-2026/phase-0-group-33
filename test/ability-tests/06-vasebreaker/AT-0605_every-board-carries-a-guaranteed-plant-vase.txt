@@ -1,0 +1,51 @@
+=== TEST AT-0605: every board carries a guaranteed plant vase
+#
+# Feature      : one vase of the board always drops a seed packet
+# Source       : project document page 55: the plant vase always gives a random seed packet
+# Method       : the same sweep over columns 3 to 9
+# Order        : only one substring is asserted, so the random vase order cannot affect the result
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu travel-log
+> play minigame -n vasebreaker -d 1
+? VASEBREAKER (stage 1) started!
+> break vase -l (3,1)
+> break vase -l (3,2)
+> break vase -l (3,3)
+> break vase -l (3,4)
+> break vase -l (3,5)
+> break vase -l (4,1)
+> break vase -l (4,2)
+> break vase -l (4,3)
+> break vase -l (4,4)
+> break vase -l (4,5)
+> break vase -l (5,1)
+> break vase -l (5,2)
+> break vase -l (5,3)
+> break vase -l (5,4)
+> break vase -l (5,5)
+> break vase -l (6,1)
+> break vase -l (6,2)
+> break vase -l (6,3)
+> break vase -l (6,4)
+> break vase -l (6,5)
+> break vase -l (7,1)
+> break vase -l (7,2)
+> break vase -l (7,3)
+> break vase -l (7,4)
+> break vase -l (7,5)
+> break vase -l (8,1)
+> break vase -l (8,2)
+> break vase -l (8,3)
+> break vase -l (8,4)
+> break vase -l (8,5)
+> break vase -l (9,1)
+> break vase -l (9,2)
+> break vase -l (9,3)
+> break vase -l (9,4)
+> break vase -l (9,5)
+? seed packet; plant it before it fades!

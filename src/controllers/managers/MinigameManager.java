@@ -85,15 +85,33 @@ public class MinigameManager {
 
     private void buildVases() {
         List<int[]> spots = new ArrayList<>();
-        for (int col = 5; col <= GameSession.COLS; col++) {
+        for (int col = 3; col <= GameSession.COLS; col++) {
             for (int row = 1; row <= GameSession.ROWS; row++) {
                 spots.add(new int[] { col, row });
             }
         }
         Collections.shuffle(spots, session.getRandom());
         int count = Math.min(spots.size(), 10 + 2 * tier);
-        for (int i = 0; i < count; i++) {
-            int[] spot = spots.get(i);
+        List<int[]> chosen = new ArrayList<>();
+        for (int col = 3; col <= GameSession.COLS; col++) {
+            for (int[] spot : spots) {
+                if (spot[0] == col) {
+                    chosen.add(spot);
+                    break;
+                }
+            }
+        }
+        for (int[] spot : spots) {
+            if (chosen.size() >= count) {
+                break;
+            }
+            if (!chosen.contains(spot)) {
+                chosen.add(spot);
+            }
+        }
+        Collections.shuffle(chosen, session.getRandom());
+        for (int i = 0; i < chosen.size(); i++) {
+            int[] spot = chosen.get(i);
             vases.add(createVase(i, spot[0], spot[1]));
         }
     }

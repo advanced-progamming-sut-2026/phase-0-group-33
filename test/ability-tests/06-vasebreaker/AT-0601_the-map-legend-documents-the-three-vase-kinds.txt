@@ -1,0 +1,16 @@
+=== TEST AT-0601: the map legend documents the three vase kinds
+#
+# Feature      : an ordinary vase, a guaranteed plant vase and a guaranteed gargantuar vase
+# Source       : project document page 55: besides ordinary vases marked with a question mark there are two special kinds
+# Rule         : show map must explain all three symbols
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu travel-log
+> play minigame -n vasebreaker -d 1
+? VASEBREAKER (stage 1) started!
+> show map
+? ? vase | & plant vase | @ gargantuar vase

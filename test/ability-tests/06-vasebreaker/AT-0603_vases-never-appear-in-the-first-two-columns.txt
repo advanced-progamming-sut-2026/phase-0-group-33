@@ -1,0 +1,21 @@
+=== TEST AT-0603: vases never appear in the first two columns
+#
+# Feature      : the vase field spans columns 3 to 9 only
+# Rule         : every tile of column 1 and column 2 must report that there is no vase
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu travel-log
+> play minigame -n vasebreaker -d 1
+? VASEBREAKER (stage 1) started!
+> break vase -l (1,1)
+? There is no vase at (1, 1).
+> break vase -l (1,5)
+? There is no vase at (1, 5).
+> break vase -l (2,1)
+? There is no vase at (2, 1).
+> break vase -l (2,5)
+? There is no vase at (2, 5).

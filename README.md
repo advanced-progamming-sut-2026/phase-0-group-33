@@ -325,7 +325,9 @@ So `S *` = a **S**unflower with a sun ready on it. `.1 ` = empty ground with **1
 | `+` | **necromancy tile** — a zombie can crawl out of here at wave start (Dark Ages) |
 | `^` | **slider up** — a zombie stepping here is pushed one lane up (Frostbite) |
 | `v` | **slider down** — a zombie stepping here is pushed one lane down (Frostbite) |
-| `U` | **vase** — Vasebreaker minigame only; break it with `break vase` |
+| `?` | **ordinary vase** — Vasebreaker only; contents unknown until you break it (empty, a zombie, or a seed packet) |
+| `&` | **plant vase** — Vasebreaker only; **guaranteed** to drop a random seed packet |
+| `@` | **gargantuar vase** — Vasebreaker only; **guaranteed** to release a Gargantuar |
 
 ### Slot 1 — plant letters
 
@@ -537,7 +539,23 @@ The daily zombie stream uses a date-seeded RNG, so the run is the same for every
 
 All 5 minigames run at 3 escalating stages (`-d 1|2|3`). The command set and the free parameters below are **our** choices, as the doc allows.
 
-**Vasebreaker** — no plant selection, no sky sun; everything comes from vases. Break a vase with `break vase -l (<x>, <y>)`. A vase may be empty, hide a zombie (Normal/Cone/Bucket, plus one guaranteed Gargantuar vase and one guaranteed plant vase), or drop a seed-packet you must plant before it fades (30s). Win by clearing all vases and surviving.
+**Vasebreaker** — no plant selection, no sky sun; everything comes from vases. Win by clearing all vases and surviving whatever came out of them.
+
+| Command | What it does |
+|---------|--------------|
+| `break vase -l (<x>, <y>)` | Breaks the vase on that tile and resolves its contents. |
+| `plant plant -t <type> -l (<x>, <y>)` | Plants a seed packet that a vase dropped, before it fades. |
+| `show map` | Shows where the vases are and which kind each one is. |
+
+Vases are scattered over **columns 3–9**, at least one in every one of those columns, and there are `10 + 2 × stage` of them. The map tells the three kinds apart:
+
+| Symbol | Vase | Contents |
+|--------|------|----------|
+| `?` | ordinary vase | random: empty, a zombie (Normal / Cone Head / Bucket Head), or a seed packet |
+| `&` | plant vase | **guaranteed** random seed packet |
+| `@` | gargantuar vase | **guaranteed** Gargantuar |
+
+Exactly one `&` and one `@` are placed in every board, so you always know where the giant is hiding and where a free plant is waiting — the risk is in the `?` vases. A dropped seed packet is single-use and fades after **30 seconds**, so plant it quickly.
 
 **Wallnut Bowling** — a conveyor belt hands you bowling nuts (Wall-nut / Explode-o-nut / Tall-nut). Plant one from behind the red line (columns 1–3) with `plant plant`; it rolls right, bounces 90° off zombies and the top/bottom walls, deals ~one-normal-zombie of damage per hit. Explode-o-nut blows a 3×3 on first contact; Tall-nut (giant) crushes straight through.
 

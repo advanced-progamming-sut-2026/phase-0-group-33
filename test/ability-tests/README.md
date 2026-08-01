@@ -10,12 +10,13 @@ test/ability-tests/
 ├── 02-plant-food/        filling the reserve, spending it, what it changes
 ├── 03-plant-lifecycle/   limited lifespan, plucking, tile reporting
 ├── 04-range-and-area/    magnet range, area splash, multi-lane, charged shots
-└── 05-command-guards/    refusals when a command cannot apply
+├── 05-command-guards/    refusals when a command cannot apply
+└── 06-vasebreaker/       the three vase kinds and the vase field
 ```
 
 ## How to run
 
-Run everything (23 cases):
+Run everything (28 cases):
 
 ```bash
 python test/ability-tests/run_ability_tests.py
@@ -52,8 +53,8 @@ PER ABILITY GROUP
 OK   01-sun-economy                       5 passed   0 failed
 OK   04-range-and-area                    6 passed   0 failed
 
-PASSED: 23 / 23
-FAILED: 0 / 23
+PASSED: 28 / 28
+FAILED: 0 / 28
 ```
 
 The exit code is `0` when everything passed and `1` otherwise.
@@ -158,6 +159,21 @@ sun costs and the damage numbers.
 | `AT-0502` | collecting sun from an empty tile is refused |
 | `AT-0503` | plucking an empty tile is refused |
 | `AT-0504` | a tile cannot hold two plants |
+
+### 06 — vasebreaker
+
+| Case | Rule |
+|------|------|
+| `AT-0601` | the map legend documents `?`, `&` and `@` |
+| `AT-0602` | every board carries a guaranteed gargantuar vase |
+| `AT-0603` | vases never appear in columns 1 and 2 |
+| `AT-0604` | a broken vase is gone and cannot be broken again |
+| `AT-0605` | every board carries a guaranteed plant vase |
+
+These cases sweep every tile of columns 3 to 9 instead of aiming at a fixed tile,
+because the vase positions are shuffled on every run. Each case asserts a single
+substring, so the order in which the vases happen to break can never change the
+result.
 
 ## Relation to the other suites
 

@@ -1,0 +1,25 @@
+=== TEST AT-0604: breaking the same vase twice is refused
+#
+# Feature      : a vase is removed from the board once it is broken
+# Rule         : the second attempt on the same tile must be refused
+# Note         : column 3 always holds at least one vase, so the sweep finds one to break
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu travel-log
+> play minigame -n vasebreaker -d 1
+? VASEBREAKER (stage 1) started!
+> break vase -l (3,1)
+> break vase -l (3,2)
+> break vase -l (3,3)
+> break vase -l (3,4)
+> break vase -l (3,5)
+> break vase -l (3,1)
+> break vase -l (3,2)
+> break vase -l (3,3)
+> break vase -l (3,4)
+> break vase -l (3,5)
+? There is no vase at (3,
