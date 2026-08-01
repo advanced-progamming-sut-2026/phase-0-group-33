@@ -1,0 +1,23 @@
+=== TEST AT-0204: a sun producer can also be fed
+#
+# Ability      : plants.csv row 1 plant food effect: produce sun immediately
+# Rule         : the power message must name the plant that was fed
+# Measured     : Sunflower unleashed its plant food power. Plant foods left: 0
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat add-plant-food
+? Plant foods: 1
+> plant plant -t Sunflower -l (1,2)
+> feed plant -l (1,2)
+? Sunflower unleashed its plant food power. Plant foods left: 0

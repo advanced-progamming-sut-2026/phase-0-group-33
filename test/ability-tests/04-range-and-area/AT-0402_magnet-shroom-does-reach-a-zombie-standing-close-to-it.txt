@@ -1,0 +1,23 @@
+=== TEST AT-0402: magnet-shroom does reach a zombie standing close to it
+#
+# Ability      : plants.csv row 53
+# Setup        : the same magnet, this time with the zombie only a few tiles away
+# Rule         : the metal bucket must be pulled off
+# Compare      : AT-0401 shows the same plant failing at six tiles
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Magnet-shroom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Magnet-shroom -l (4,3)
+> cheat spawn-zombie -t Bucket Head -l 6,3
+> advance time -t 200 ticks
+? Magnet-shroom pulled the metal armor off the Bucket Head!

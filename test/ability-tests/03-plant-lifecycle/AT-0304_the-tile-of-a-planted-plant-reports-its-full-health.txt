@@ -1,0 +1,21 @@
+=== TEST AT-0304: the tile of a planted plant reports its full health
+#
+# Ability      : show tile status reports the plant standing on a tile and its health
+# Rule         : a freshly planted Wall-nut must read 4000 out of 4000
+# Source       : plants.csv row 44: base HP 4000
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Wall-nut
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Wall-nut -l (2,3)
+> show tile status -l (2,3)
+? Plant: Wall-nut | HP: 4000/4000

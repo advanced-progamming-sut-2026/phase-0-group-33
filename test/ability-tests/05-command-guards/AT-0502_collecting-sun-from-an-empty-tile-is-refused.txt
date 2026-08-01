@@ -1,0 +1,19 @@
+=== TEST AT-0502: collecting sun from an empty tile is refused
+#
+# Guard        : collect sun must report that there is nothing to pick up
+# Measured     : There is no sun to collect at (5, 5).
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Peashooter
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> collect sun -l (5,5)
+? There is no sun to collect at (5, 5).

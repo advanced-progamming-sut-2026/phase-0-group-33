@@ -1,0 +1,27 @@
+=== TEST AT-0401: magnet-shroom cannot reach a zombie six tiles away
+#
+# Ability      : plants.csv row 53: the magnet pulls metal from nearby zombies
+# Range        : the magnet works within 4 tiles, measured as a manhattan distance
+# Setup        : magnet at column 1, Bucket Head starting at column 9
+# Rule         : after 10 seconds the zombie is still around column 7, so the bucket must be untouched
+# Measured     : bucket: 1100 and health: 190
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Magnet-shroom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Magnet-shroom -l (1,1)
+> cheat spawn-zombie -t Bucket Head -l 9,1
+> advance time -t 100 ticks
+> zombies info
+? Bucket Head:
+?     health: 190
+?         bucket: 1100

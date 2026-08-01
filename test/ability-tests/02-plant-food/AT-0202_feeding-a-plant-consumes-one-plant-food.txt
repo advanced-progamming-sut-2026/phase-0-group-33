@@ -1,0 +1,24 @@
+=== TEST AT-0202: feeding a plant consumes one plant food
+#
+# Ability      : feed plant triggers the plant food power and decreases the reserve
+# Setup        : two plant foods are granted, one plant is fed
+# Measured     : Peashooter unleashed its plant food power. Plant foods left: 1
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Peashooter
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat add-plant-food
+> cheat add-plant-food
+? Plant foods: 2
+> plant plant -t Peashooter -l (1,3)
+> feed plant -l (1,3)
+? Peashooter unleashed its plant food power. Plant foods left: 1

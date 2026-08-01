@@ -1,0 +1,23 @@
+=== TEST AT-0504: a tile cannot hold two plants at once
+#
+# Guard        : planting on an occupied tile must be refused
+# Rule         : the first planting succeeds and the tile keeps the first plant
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Peashooter
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Peashooter -l (2,3)
+? Peashooter planted at (2, 3).
+> plant plant -t Sunflower -l (2,3)
+> show tile status -l (2,3)
+? Plant: Peashooter

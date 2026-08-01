@@ -1,0 +1,28 @@
+=== TEST AT-0203: plant food doubles what a peashooter deals in the same window
+#
+# Ability      : plants.csv row 6 plant food effect: a fast burst of peas
+# Baseline     : a plain Peashooter deals 200 damage in 150 ticks, leaving a Gargantuar at 3400
+# Rule         : with plant food the same window must leave 3200, so 400 damage
+# Measured     : health: 3200
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Peashooter
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> cheat add-plant-food
+> plant plant -t Peashooter -l (1,1)
+> cheat spawn-zombie -t Gargantuar -l 9,1
+> feed plant -l (1,1)
+? Peashooter unleashed its plant food power.
+> advance time -t 150 ticks
+> zombies info
+? Gargantuar:
+?     health: 3200

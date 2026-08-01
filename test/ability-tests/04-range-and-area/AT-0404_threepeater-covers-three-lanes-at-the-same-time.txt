@@ -1,0 +1,29 @@
+=== TEST AT-0404: threepeater covers three lanes at the same time
+#
+# Ability      : plants.csv row 8: fires into three parallel lanes at once
+# Setup        : Threepeater in row 3 with one Gargantuar in row 2, row 3 and row 4
+# Arithmetic   : 20 damage every 1.5s = 10 actions in 150 ticks = 200 damage per lane
+# Rule         : all three zombies must lose the same 200
+# Measured     : every lane reads health 3400
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Threepeater
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Threepeater -l (1,3)
+> cheat spawn-zombie -t Gargantuar -l 9,2
+> cheat spawn-zombie -t Gargantuar -l 9,3
+> cheat spawn-zombie -t Gargantuar -l 9,4
+> advance time -t 150 ticks
+> zombies info
+?     health: 3400
+?     health: 3400
+?     health: 3400

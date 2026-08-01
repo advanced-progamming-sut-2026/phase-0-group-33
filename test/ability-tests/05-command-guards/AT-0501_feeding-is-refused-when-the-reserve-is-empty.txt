@@ -1,0 +1,21 @@
+=== TEST AT-0501: feeding is refused when the reserve is empty
+#
+# Guard        : feed plant must not work without plant food in store
+# Arena        : the scoring game starts with zero plant food
+# Measured     : You have no plant food.
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Peashooter
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Peashooter -l (1,3)
+> feed plant -l (1,3)
+? You have no plant food.

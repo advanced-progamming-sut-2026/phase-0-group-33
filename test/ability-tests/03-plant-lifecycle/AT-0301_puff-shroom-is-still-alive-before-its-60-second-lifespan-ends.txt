@@ -1,0 +1,22 @@
+=== TEST AT-0301: puff-shroom is still alive before its 60 second lifespan ends
+#
+# Ability      : plants.csv row 23: the shroom has a limited lifespan of 60 seconds
+# Rule         : after 55 seconds it must still stand on its tile at full health
+# Measured     : Plant: Puff-shroom | HP: 300/300 after 550 ticks
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Puff-shroom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Puff-shroom -l (1,4)
+> advance time -t 550 ticks
+> show tile status -l (1,4)
+? Plant: Puff-shroom | HP: 300/300

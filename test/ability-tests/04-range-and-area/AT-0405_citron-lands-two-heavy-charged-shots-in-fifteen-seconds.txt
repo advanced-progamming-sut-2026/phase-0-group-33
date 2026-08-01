@@ -1,0 +1,25 @@
+=== TEST AT-0405: citron lands two heavy charged shots in fifteen seconds
+#
+# Ability      : plants.csv row 13: a heavy single shot that needs charge time
+# Arithmetic   : 800 damage with a 9 second interval, so two shots fit in 150 ticks
+# Rule         : 1600 damage must be taken off a Gargantuar
+# Measured     : health: 2000
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Citron
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Citron -l (1,1)
+> cheat spawn-zombie -t Gargantuar -l 9,1
+> advance time -t 150 ticks
+> zombies info
+? Gargantuar:
+?     health: 2000

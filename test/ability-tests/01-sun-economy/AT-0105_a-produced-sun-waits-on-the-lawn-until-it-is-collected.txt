@@ -1,0 +1,28 @@
+=== TEST AT-0105: a produced sun waits on the lawn until it is collected
+#
+# Ability      : sun produced by a plant is dropped on its tile, not added to the balance
+# Arena        : Dark Ages is a night chapter, so no sun falls from the sky and every sun on the lawn can only come from the plant under test
+# Rule         : the balance must stay at 9000 while the sun lies on the tile
+# Measured     : 9000 before collecting, 9050 after
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Dark Ages -l 1
+? Entered Dark Ages, level 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (1,1)
+> advance time -t 250 ticks
+? produced a sun at (1, 1)
+> show sun amount
+? Sun: 9000
+> collect sun -l (1,1)
+? Collected 50 sun. Balance: 9050
+> show sun amount
+? Sun: 9050

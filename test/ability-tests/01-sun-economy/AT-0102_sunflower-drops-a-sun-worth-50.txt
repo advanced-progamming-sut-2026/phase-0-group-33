@@ -1,0 +1,27 @@
+=== TEST AT-0102: sunflower drops a sun worth 50
+#
+# Ability      : plants.csv: this producer creates a sun on its own tile
+# Arena        : Dark Ages is a night chapter, so no sun falls from the sky and every sun on the lawn can only come from the plant under test
+# Cost         : 50 sun, so the balance is 9050 - 50 = 9000 after planting
+# Rule         : collecting the produced sun adds exactly 50
+# Measured     : Collected 50 sun. Balance: 9050
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Dark Ages -l 1
+? Entered Dark Ages, level 1
+> add plant -t Sunflower
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Sunflower -l (1,1)
+> show sun amount
+? Sun: 9000
+> advance time -t 250 ticks
+? plant Sunflower produced a sun at (1, 1)
+> collect sun -l (1,1)
+? Collected 50 sun. Balance: 9050

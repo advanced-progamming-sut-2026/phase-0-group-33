@@ -1,0 +1,27 @@
+=== TEST AT-0406: winter melon damages and chills with the same shot
+#
+# Ability      : plants.csv row 28: heavy lobbed area shot that also slows
+# Tags         : Ice and AoE together
+# Setup        : Winter Melon in row 5 with a Gargantuar starting at column 6
+# Rule         : the zombie loses health and is left further right than an unchilled one
+# Measured     : health 3200 and position 4.1 instead of 2.4
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Winter Melon
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Winter Melon -l (1,5)
+> cheat spawn-zombie -t Gargantuar -l 6,5
+> advance time -t 150 ticks
+> zombies info
+? Gargantuar:
+?     position: 4.1, 5
+?     health: 3200

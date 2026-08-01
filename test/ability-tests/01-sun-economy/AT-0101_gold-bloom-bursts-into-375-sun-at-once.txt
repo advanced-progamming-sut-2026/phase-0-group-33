@@ -1,0 +1,25 @@
+=== TEST AT-0101: gold bloom bursts into 375 sun at once
+#
+# Ability      : plants.csv row 5: produces a large amount of sun at once and then disappears
+# Arena        : Dark Ages is a night chapter, so no sun falls from the sky and every sun on the lawn can only come from the plant under test
+# Cost         : Gold Bloom costs 0 sun, so the balance only moves by the burst
+# Measured     : 9050 before, 9425 after
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu enter chapter -c Dark Ages -l 1
+? Entered Dark Ages, level 1
+> add plant -t Gold Bloom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> show sun amount
+? Sun: 9050
+> plant plant -t Gold Bloom -l (1,1)
+? Gold Bloom burst into 375 sun!
+> show sun amount
+? Sun: 9425

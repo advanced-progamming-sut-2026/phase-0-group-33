@@ -1,0 +1,23 @@
+=== TEST AT-0302: puff-shroom withers away once its lifespan is over
+#
+# Ability      : plants.csv row 23: limited lifespan of 60 seconds
+# Rule         : past 60 seconds the plant announces that it withered and leaves the tile empty
+# Measured     : Puff-shroom at (1, 4) withered away., then the tile shows terrain only
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Puff-shroom
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Puff-shroom -l (1,4)
+> advance time -t 650 ticks
+? Puff-shroom at (1, 4) withered away.
+> show tile status -l (1,4)
+? Tile (1, 4) | terrain: NORMAL

@@ -1,0 +1,27 @@
+=== TEST AT-0403: melon-pult splashes into the neighbouring lane
+#
+# Ability      : plants.csv row 27: heavy lobbed shot with area damage, tag AoE
+# Setup        : Melon-pult in row 3, one Gargantuar in row 3 and one in row 2
+# Arithmetic   : 80 damage every 2.9s, four actions inside 100 ticks = 320 damage
+# Rule         : the zombie in the neighbouring row must take the same 320
+# Measured     : both zombies read health 3280
+#
+# Legend:  '>' = a line typed into the game
+#          '?' = a substring that must appear in the output (checked in order)
+#          '#' = comment for the reader (ignored by the runner)
+# --------------------------------------------------------------------------
+
+> menu scoring-game
+? Scoring game started
+> add plant -t Melon-pult
+> start game
+? The battle begins
+> cheat add -n 9000 suns
+> cheat remove-cooldown
+> plant plant -t Melon-pult -l (1,3)
+> cheat spawn-zombie -t Gargantuar -l 6,3
+> cheat spawn-zombie -t Gargantuar -l 6,2
+> advance time -t 100 ticks
+> zombies info
+?     health: 3280
+?     health: 3280
