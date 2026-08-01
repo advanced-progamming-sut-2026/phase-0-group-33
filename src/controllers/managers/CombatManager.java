@@ -18,6 +18,8 @@ public class CombatManager {
     private static final int SUN_BEAN_SUN_PER_BITE = 5;
     private static final int SWEET_POTATO_RANGE = 3;
     static final int INSTANT_KILL_DAMAGE = 9999;
+    private static final int POISON_TICKS = 5 * GameSession.TICKS_PER_SECOND;
+    private static final int POISON_DAMAGE_PER_SECOND = 5;
     private static final double MOWER_LINE = 0.5;
 
     private final GameSession session;
@@ -113,9 +115,6 @@ public class CombatManager {
         int value = productionValue(plant);
         session.getSunManager().addProducedSun(plant.getX(), plant.getY(), value);
         plant.setSunPending(true);
-        if (plant.getType().getTags().contains(PlantTag.WRAMP_UP) && plant.getGrowthStage() < 3) {
-            plant.setGrowthStage(plant.getGrowthStage() + 1);
-        }
         System.out.printf("plant %s produced a sun at (%d, %d)%n",
                 plant.getType().getName(), plant.getX(), plant.getY());
     }
@@ -221,7 +220,7 @@ public class CombatManager {
     private void meleeHit(PlacedPlant plant) {
         for (Zombie zombie : zombiesInRowAfter(plant.getY(), plant.getX() - 0.5)) {
             if (zombie.getPosition().getX() <= plant.getX() + 1.5) {
-                hitZombie(zombie, plant.getType());
+                damageZombie(zombie, plantDamage(plant), plant.getType());
                 if (!plant.getType().getTags().contains(PlantTag.AOE)) {
                     return;
                 }
@@ -288,6 +287,7 @@ public class CombatManager {
             zombie.setChilledTicks(0);
         }
         if (source.getTags().contains(PlantTag.POISON)) {
+            zombie.getBattle().setPoisonTicksLeft(POISON_TICKS);
             zombie.damageHealthDirectly(plantDamage(source));
             if (zombie.isDead() && session.getZombies().remove(zombie)) {
                 announceDeath(zombie);
@@ -299,6 +299,33 @@ public class CombatManager {
             return;
         }
         damageZombie(zombie, plantDamage(source), source);
+    }
+
+    private void tickPoison(Zombie zombie) {
+        int left = zombie.getBattle().getPoisonTicksLeft();
+        if (left <= 0) {
+            return;
+        }
+        zombie.getBattle().setPoisonTicksLeft(left - 1);
+        if (left % GameSession.TICKS_PER_SECOND != 0) {
+            return;
+        }
+        zombie.damageHealthDirectly(POISON_DAMAGE_PER_SECOND);
+        if (zombie.isDead() && session.getZombies().remove(zombie)) {
+            announceDeath(zombie);
+            session.countKill(zombie);
+            session.getBehaviorManager().onZombieDeath(zombie);
+            handleDrops(zombie);
+        }
+    }
+
+    int plantDamage(PlacedPlant plant) {
+        int damage = plantDamage(plant.getType());
+        if (damage < INSTANT_KILL_DAMAGE
+                && plant.getType().getTags().contains(PlantTag.WRAMP_UP)) {
+            damage *= plant.getGrowthStage();
+        }
+        return damage;
     }
 
     int plantDamage(PlantType type) {
@@ -346,6 +373,7 @@ public class CombatManager {
     }
 
     private void actZombie(Zombie zombie) {
+        tickPoison(zombie);
         if (session.getBehaviorManager().handleSpecial(zombie)) {
             return;
         }

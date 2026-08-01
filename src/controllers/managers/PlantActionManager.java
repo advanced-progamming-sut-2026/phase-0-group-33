@@ -13,6 +13,8 @@ import java.util.Map;
 public class PlantActionManager {
     private static final int SHROOM_LIFESPAN_TICKS = 60 * GameSession.TICKS_PER_SECOND;
     private static final int MELT_PER_TICK = 6;
+    private static final int STAGE_TWO_TICKS = 24 * GameSession.TICKS_PER_SECOND;
+    private static final int STAGE_THREE_TICKS = 72 * GameSession.TICKS_PER_SECOND;
 
     private final GameSession session;
     private final CombatManager combatManager;
@@ -28,7 +30,9 @@ public class PlantActionManager {
             if (plant.getArmTicks() > 0) {
                 plant.setArmTicks(plant.getArmTicks() - 1);
             }
-            tickLifespan(plant);
+            int age = ages.merge(plant, 1, Integer::sum);
+            tickGrowth(plant, age);
+            tickLifespan(plant, age);
             if (plant.getType().getTags().contains(PlantTag.FIRE) && !plant.isDisabled()) {
                 radiateWarmth(plant);
             }
@@ -36,11 +40,22 @@ public class PlantActionManager {
         ages.keySet().removeIf(plant -> !session.getPlants().contains(plant));
     }
 
-    private void tickLifespan(PlacedPlant plant) {
+    private void tickGrowth(PlacedPlant plant, int age) {
+        if (!plant.getType().getTags().contains(PlantTag.WRAMP_UP)) {
+            return;
+        }
+        int stage = age >= STAGE_THREE_TICKS ? 3 : age >= STAGE_TWO_TICKS ? 2 : 1;
+        if (stage > plant.getGrowthStage()) {
+            plant.setGrowthStage(stage);
+            System.out.printf("%s at (%d, %d) grew to stage %d.%n",
+                    plant.getType().getName(), plant.getX(), plant.getY(), stage);
+        }
+    }
+
+    private void tickLifespan(PlacedPlant plant, int age) {
         if (plant.getType() != PlantType.SEA_SHROOM && plant.getType() != PlantType.PUFF_SHROOM) {
             return;
         }
-        int age = ages.merge(plant, 1, Integer::sum);
         if (age >= SHROOM_LIFESPAN_TICKS) {
             session.removePlant(plant, false);
             System.out.printf("%s at (%d, %d) withered away.%n",

@@ -8,6 +8,7 @@ import java.util.List;
 public class ZombieBattleState {
     private int stolenSun;
     private int stealTicksLeft;
+    private int poisonTicksLeft;
     private boolean laserFired;
     private int dynamiteTicks = -1;
     private boolean reversed;
@@ -35,6 +36,14 @@ public class ZombieBattleState {
 
     public void setStolenSun(int stolenSun) {
         this.stolenSun = stolenSun;
+    }
+
+    public int getPoisonTicksLeft() {
+        return poisonTicksLeft;
+    }
+
+    public void setPoisonTicksLeft(int poisonTicksLeft) {
+        this.poisonTicksLeft = poisonTicksLeft;
     }
 
     public int getStealTicksLeft() {

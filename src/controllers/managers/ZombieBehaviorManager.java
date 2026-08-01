@@ -68,7 +68,7 @@ public class ZombieBehaviorManager {
         }
         if (zombie.getBattle().isSunProducer()) {
             sunProducerAct(zombie);
-            return true;
+            return false;
         }
         tickCooldown(zombie);
         switch (zombie.getType()) {

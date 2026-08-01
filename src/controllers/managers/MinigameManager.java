@@ -25,6 +25,7 @@ import java.util.Set;
 public class MinigameManager {
     private static final int BELT_INTERVAL_TICKS = 12 * GameSession.TICKS_PER_SECOND;
     private static final int PACKET_LIFETIME_TICKS = 30 * GameSession.TICKS_PER_SECOND;
+    private static final int LANE_STEP_TICKS = 3;
     private static final List<PlantType> BOWLING_NUTS = List.of(
             PlantType.WALL_NUT, PlantType.EXPLODE_O_NUT, PlantType.TALL_NUT);
     private static final List<PlantType> BEGHOULED_TYPES = List.of(
@@ -41,6 +42,7 @@ public class MinigameManager {
     private final List<Vase> vases = new ArrayList<>();
     private final List<RollingNut> nuts = new ArrayList<>();
     private final Map<RollingNut, Integer> nutDirections = new HashMap<>();
+    private final Map<RollingNut, Integer> nutSteps = new HashMap<>();
     private final Map<PlantSlot, Integer> packetExpiry = new HashMap<>();
     private final List<ZombieType> izombieTypes = new ArrayList<>();
     private final Set<Long> craters = new HashSet<>();
@@ -91,27 +93,8 @@ public class MinigameManager {
             }
         }
         Collections.shuffle(spots, session.getRandom());
-        int count = Math.min(spots.size(), 10 + 2 * tier);
-        List<int[]> chosen = new ArrayList<>();
-        for (int col = 3; col <= GameSession.COLS; col++) {
-            for (int[] spot : spots) {
-                if (spot[0] == col) {
-                    chosen.add(spot);
-                    break;
-                }
-            }
-        }
-        for (int[] spot : spots) {
-            if (chosen.size() >= count) {
-                break;
-            }
-            if (!chosen.contains(spot)) {
-                chosen.add(spot);
-            }
-        }
-        Collections.shuffle(chosen, session.getRandom());
-        for (int i = 0; i < chosen.size(); i++) {
-            int[] spot = chosen.get(i);
+        for (int i = 0; i < spots.size(); i++) {
+            int[] spot = spots.get(i);
             vases.add(createVase(i, spot[0], spot[1]));
         }
     }
@@ -144,14 +127,11 @@ public class MinigameManager {
                 PlantType.WALL_NUT, PlantType.CABBAGE_PULT, PlantType.BONK_CHOY,
                 PlantType.POTATO_MINE);
         for (int row = 1; row <= GameSession.ROWS; row++) {
-            for (int col = 1; col <= 3; col++) {
-                if (session.getRandom().nextInt(100) < 60) {
-                    PlantType type = defenders.get(session.getRandom().nextInt(defenders.size()));
-                    session.getPlants().add(new PlacedPlant(type, col, row, type.getBaseHp()));
-                }
+            for (int col = 1; col <= 5; col++) {
+                PlantType type = defenders.get(session.getRandom().nextInt(defenders.size()));
+                session.getPlants().add(new PlacedPlant(type, col, row, type.getBaseHp()));
             }
-            Zombie producer = session.spawnZombie(ZombieType.NORMAL, GameSession.COLS, row, 0);
-            producer.setHealth(1100);
+            Zombie producer = session.spawnZombie(ZombieType.BUCKET_HEAD, GameSession.COLS, row, 0);
             producer.getBattle().setSunProducer(true);
         }
     }
@@ -247,9 +227,11 @@ public class MinigameManager {
     private void moveNuts() {
         for (RollingNut nut : new ArrayList<>(nuts)) {
             nut.setX(nut.getX() + 0.3);
+            driftNut(nut);
             if (nut.getX() > GameSession.COLS + 0.5) {
                 nuts.remove(nut);
                 nutDirections.remove(nut);
+                nutSteps.remove(nut);
                 continue;
             }
             Zombie hit = firstZombieNear(nut);
@@ -290,15 +272,34 @@ public class MinigameManager {
     }
 
     private void bounce(RollingNut nut) {
-        int direction = nutDirections.getOrDefault(nut,
-                session.getRandom().nextBoolean() ? 1 : -1);
+        int direction = nutDirections.getOrDefault(nut, 0);
+        if (direction == 0) {
+            direction = session.getRandom().nextBoolean() ? 1 : -1;
+        } else {
+            direction = 0;
+        }
+        nutDirections.put(nut, direction);
+        nutSteps.put(nut, 0);
+    }
+
+    private void driftNut(RollingNut nut) {
+        int direction = nutDirections.getOrDefault(nut, 0);
+        if (direction == 0) {
+            return;
+        }
+        int steps = nutSteps.merge(nut, 1, Integer::sum);
+        if (steps < LANE_STEP_TICKS) {
+            return;
+        }
+        nutSteps.put(nut, 0);
         int next = nut.getRow() + direction;
         if (next < 1 || next > GameSession.ROWS) {
             direction = -direction;
+            nutDirections.put(nut, direction);
             next = nut.getRow() + direction;
+            System.out.printf("The nut hit the edge of the lawn and turned into lane %d.%n", next);
         }
         nut.setRow(next);
-        nutDirections.put(nut, -direction);
     }
 
     public Result placeBowlingNut(PlantType type, int x, int y) {
@@ -491,47 +492,65 @@ public class MinigameManager {
     }
 
     private boolean hasMatch() {
-        return !findMatchedPlants().isEmpty();
+        return !findMatchedLines().isEmpty();
     }
 
-    private Set<PlacedPlant> findMatchedPlants() {
-        Set<PlacedPlant> matched = new HashSet<>();
+    private List<List<PlacedPlant>> findMatchedLines() {
+        List<List<PlacedPlant>> lines = new ArrayList<>();
         for (int row = 1; row <= GameSession.ROWS; row++) {
-            for (int col = 1; col <= GameSession.COLS - 2; col++) {
-                collectRun(matched, col, row, 1, 0);
-            }
+            collectLines(lines, 1, row, 1, 0, GameSession.COLS);
         }
         for (int col = 1; col <= GameSession.COLS; col++) {
-            for (int row = 1; row <= GameSession.ROWS - 2; row++) {
-                collectRun(matched, col, row, 0, 1);
-            }
+            collectLines(lines, col, 1, 0, 1, GameSession.ROWS);
         }
-        return matched;
+        return lines;
     }
 
-    private void collectRun(Set<PlacedPlant> matched, int x, int y, int dx, int dy) {
-        PlacedPlant a = session.plantAt(x, y);
-        PlacedPlant b = session.plantAt(x + dx, y + dy);
-        PlacedPlant c = session.plantAt(x + 2 * dx, y + 2 * dy);
-        if (a != null && b != null && c != null
-                && a.getType() == b.getType() && b.getType() == c.getType()) {
-            matched.add(a);
-            matched.add(b);
-            matched.add(c);
+    private void collectLines(List<List<PlacedPlant>> lines, int x, int y,
+                              int dx, int dy, int length) {
+        int index = 0;
+        while (index < length) {
+            PlacedPlant first = session.plantAt(x + index * dx, y + index * dy);
+            int run = 1;
+            if (first != null) {
+                while (index + run < length) {
+                    PlacedPlant next = session.plantAt(
+                            x + (index + run) * dx, y + (index + run) * dy);
+                    if (next == null || next.getType() != first.getType()) {
+                        break;
+                    }
+                    run++;
+                }
+            }
+            if (first != null && run >= 3) {
+                List<PlacedPlant> line = new ArrayList<>();
+                for (int step = 0; step < run; step++) {
+                    line.add(session.plantAt(
+                            x + (index + step) * dx, y + (index + step) * dy));
+                }
+                lines.add(line);
+            }
+            index += Math.max(1, run);
         }
     }
 
     private void processMatches() {
         int cascade = 0;
         while (cascade < 10) {
-            Set<PlacedPlant> matched = findMatchedPlants();
-            if (matched.isEmpty()) {
+            List<List<PlacedPlant>> lines = findMatchedLines();
+            if (lines.isEmpty()) {
                 break;
             }
-            combosMade++;
-            int suns = 50 * Math.max(1, matched.size() - 2) + 50 * cascade;
-            session.getSunManager().addSun(suns);
-            for (PlacedPlant plant : matched) {
+            Set<PlacedPlant> cleared = new HashSet<>();
+            for (List<PlacedPlant> line : lines) {
+                combosMade++;
+                int suns = 50 * (line.size() - 2) + 50 * cascade;
+                session.getSunManager().addSun(suns);
+                System.out.printf("A line of %d %s scored %d sun.%n",
+                        line.size(), line.get(0).getType().getName(), suns);
+                cleared.addAll(line);
+            }
+            for (PlacedPlant plant : cleared) {
                 session.removePlant(plant, false);
             }
             refillBoard();

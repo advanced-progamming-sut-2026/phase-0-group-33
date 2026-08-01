@@ -26,4 +26,4 @@
 > advance time -t 150 ticks
 > zombies info
 ? Gargantuar:
-?     health: 3400
+?     health: 3305

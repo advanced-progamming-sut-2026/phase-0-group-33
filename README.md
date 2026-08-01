@@ -547,7 +547,7 @@ All 5 minigames run at 3 escalating stages (`-d 1|2|3`). The command set and the
 | `plant plant -t <type> -l (<x>, <y>)` | Plants a seed packet that a vase dropped, before it fades. |
 | `show map` | Shows where the vases are and which kind each one is. |
 
-Vases are scattered over **columns 3–9**, at least one in every one of those columns, and there are `10 + 2 × stage` of them. The map tells the three kinds apart:
+**Every tile of columns 3–9 carries a vase**, so the field is always the full 7 × 5 = 35 vases. The map tells the three kinds apart:
 
 | Symbol | Vase | Contents |
 |--------|------|----------|
