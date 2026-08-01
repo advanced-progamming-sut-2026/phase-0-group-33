@@ -23,7 +23,7 @@
 ? (stage 1) started!
 > show map
 ? Wave: 0/3
-? U
+? @
 > show sun amount
 ? Sun: 50
 
