@@ -328,6 +328,7 @@ So `S *` = a **S**unflower with a sun ready on it. `.1 ` = empty ground with **1
 | `?` | **ordinary vase** — Vasebreaker only; contents unknown until you break it (empty, a zombie, or a seed packet) |
 | `&` | **plant vase** — Vasebreaker only; **guaranteed** to drop a random seed packet |
 | `@` | **gargantuar vase** — Vasebreaker only; **guaranteed** to release a Gargantuar |
+| `w` `t` `e` | **a rolling nut** — Wallnut Bowling only; the lowercase initial of the nut that is currently rolling (Wall-nut / Tall-nut / Explode-o-nut) |
 
 ### Slot 1 — plant letters
 
@@ -561,7 +562,7 @@ Exactly one `&` and one `@` are placed in every board, so you always know where 
 
 **I, Zombie** — you play the **zombie** side. Plants are pre-placed on the left; a brain sits at the end of each row. Spend sun to place zombies right of the red line (columns 6–9) with `place zombie -t <type> -l (<x>, <y>)`. Each level offers 5 of a 10-zombie roster (any two levels differ by at least one). Win by eating every brain; lose if you run out of zombies and sun. Zombie prices and the per-level roster are our choice.
 
-**Beghouled** — a full 5×9 board of 5 plant types; zombies never stop coming. `swap -l (<x1>, <y1>) (<x2>, <y2>)` swaps two adjacent plants, but only if it forms a 3-in-a-row match. Matches clear, cascade, and grant sun (50 per match, more for 4/5-lines and cascades). Spend sun on `upgrade -t <type>` to convert every plant of a type into the next tier. A zombie eating a plant leaves a permanent crater. Win by making the target number of matches (grows per stage). Upgrade choices & win target are ours.
+**Beghouled** — a full 5×9 board of 5 plant types; zombies never stop coming. `swap -l (<x1>, <y1>) (<x2>, <y2>)` swaps two adjacent plants, but only if it forms a 3-in-a-row match. Each line clears on its own, so two lines formed by the same swap count as two combos and pay separately. When a line clears, the plants above it fall down the column and fresh plants drop in at the top, which can cascade into further matches. Sun is 50 per 3-line, +50 for every extra plant in the line, and +50 per cascade step. Spend sun on `upgrade -t <type>` to convert every plant of a type into the next tier. A zombie eating a plant leaves a permanent crater. Win by making the target number of matches (grows per stage). Upgrade choices & win target are ours.
 
 **Zombotany** — a normal adventure level, but some zombies have plant powers: Peashooter Zombie (shoots left), Wall-nut Zombie (tanky/slow), Jalapeno Zombie (burns its lane after 10s), Squash Zombie (fast, crushes the first plant and itself). Everything else (selection→win/lose) is a normal level.
 

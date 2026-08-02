@@ -42,6 +42,9 @@ public class ShotPatterns {
             case CAULIPOWER:
                 hypnotizeShot();
                 return true;
+            case BOWLING_BULB:
+                bouncingBulb(plant);
+                return true;
             default:
                 return false;
         }
@@ -134,6 +137,25 @@ public class ShotPatterns {
         target.getBattle().setHypnotized(true);
         System.out.printf("Caulipower's magic shot hypnotized the %s!%n",
                 target.getType().getName());
+    }
+
+    private void bouncingBulb(PlacedPlant plant) {
+        int row = plant.getY();
+        double from = plant.getX();
+        int step = session.getRandom().nextBoolean() ? 1 : -1;
+        for (int bounce = 0; bounce < 3; bounce++) {
+            if (row < 1 || row > GameSession.ROWS) {
+                step = -step;
+                row += 2 * step;
+            }
+            Zombie target = combat.firstZombieInRowAfter(row, from);
+            if (target != null) {
+                combat.hitZombie(target, plant.getType());
+                from = target.getPosition().getX();
+                System.out.printf("The bulb bounced into lane %d.%n", row);
+            }
+            row += step;
+        }
     }
 
     private Zombie lastZombieInRowBefore(int row, double x) {

@@ -559,13 +559,32 @@ public class MinigameManager {
     }
 
     private void refillBoard() {
-        for (int row = 1; row <= GameSession.ROWS; row++) {
-            for (int col = 1; col <= GameSession.COLS; col++) {
-                if (session.plantAt(col, row) == null && !craters.contains(key(col, row))) {
-                    PlantType type = BEGHOULED_TYPES.get(
-                            session.getRandom().nextInt(BEGHOULED_TYPES.size()));
-                    session.getPlants().add(new PlacedPlant(type, col, row, type.getBaseHp()));
-                }
+        for (int col = 1; col <= GameSession.COLS; col++) {
+            collapseColumn(col);
+        }
+    }
+
+    private void collapseColumn(int col) {
+        List<Integer> openRows = new ArrayList<>();
+        List<PlacedPlant> survivors = new ArrayList<>();
+        for (int row = GameSession.ROWS; row >= 1; row--) {
+            if (!craters.contains(key(col, row))) {
+                openRows.add(row);
+            }
+            PlacedPlant plant = session.plantAt(col, row);
+            if (plant != null) {
+                survivors.add(plant);
+            }
+        }
+        int taken = 0;
+        for (int row : openRows) {
+            if (taken < survivors.size()) {
+                survivors.get(taken).setY(row);
+                taken++;
+            } else {
+                PlantType type = BEGHOULED_TYPES.get(
+                        session.getRandom().nextInt(BEGHOULED_TYPES.size()));
+                session.getPlants().add(new PlacedPlant(type, col, row, type.getBaseHp()));
             }
         }
     }
@@ -649,6 +668,10 @@ public class MinigameManager {
 
     private long key(int x, int y) {
         return x * 100L + y;
+    }
+
+    public List<RollingNut> getNuts() {
+        return nuts;
     }
 
     public List<Vase> getVases() {

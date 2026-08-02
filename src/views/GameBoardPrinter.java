@@ -5,6 +5,7 @@ import models.entities.zombie.Zombie;
 import models.game.GameSession;
 import models.game.PlacedPlant;
 import models.game.PlantSlot;
+import models.game.RollingNut;
 import models.game.Vase;
 import models.map.Tile;
 
@@ -31,7 +32,8 @@ public final class GameBoardPrinter {
         }
         result.addMessage("Legend: [M] mower | letter = plant initial | digit = zombies | * sun | "
                 + "~ water | # grave | $ grave with sun | % grave with plant food | "
-                + "+ necromancy | _ low tide | ? vase | & plant vase | @ gargantuar vase");
+                + "+ necromancy | _ low tide | ? vase | & plant vase | @ gargantuar vase | "
+                + "lowercase letter = rolling nut");
         return result;
     }
 
@@ -45,6 +47,11 @@ public final class GameBoardPrinter {
         }
         PlacedPlant plant = session.plantAt(col, row);
         char plantChar = plant == null ? terrain : plant.getType().getName().charAt(0);
+        for (RollingNut nut : session.getMinigameManager().getNuts()) {
+            if (nut.getRow() == row && (int) Math.round(nut.getX()) == col) {
+                plantChar = Character.toLowerCase(nut.getType().getName().charAt(0));
+            }
+        }
         int zombieCount = 0;
         for (Zombie zombie : session.getZombies()) {
             if ((int) zombie.getPosition().getY() == row

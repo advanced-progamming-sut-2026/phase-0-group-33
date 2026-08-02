@@ -202,6 +202,10 @@ public class CombatManager {
     }
 
     private void homingShot(PlacedPlant plant) {
+        if (plant.getType() == PlantType.ELECTRIC_BLUEBERRY) {
+            randomLightning(plant);
+            return;
+        }
         Zombie target = null;
         double best = Double.MAX_VALUE;
         for (Zombie zombie : session.getZombies()) {
@@ -263,8 +267,25 @@ public class CombatManager {
             damageArea(plant.getX(), plant.getY(), 0, type);
         } else {
             damageArea(plant.getX(), plant.getY(), 1, type);
+            if (type == PlantType.GRAPESHOT) {
+                scatterGrapes(plant);
+            }
         }
         session.removePlant(plant, false);
+    }
+
+    private void scatterGrapes(PlacedPlant plant) {
+        for (int row : new int[] { plant.getY() - 2, plant.getY() + 2 }) {
+            if (row < 1 || row > GameSession.ROWS) {
+                continue;
+            }
+            Zombie target = firstZombieInRowAfter(row, 0);
+            if (target != null) {
+                System.out.printf("A bouncing grape hit the %s in lane %d.%n",
+                        target.getType().getName(), row);
+                damageZombie(target, plantDamage(PlantType.GRAPESHOT) / 2, PlantType.GRAPESHOT);
+            }
+        }
     }
 
     void damageArea(double centerX, double centerY, int radius, PlantType source) {
@@ -299,6 +320,17 @@ public class CombatManager {
             return;
         }
         damageZombie(zombie, plantDamage(source), source);
+    }
+
+    private void randomLightning(PlacedPlant plant) {
+        List<Zombie> candidates = new ArrayList<>(session.getZombies());
+        if (candidates.isEmpty()) {
+            return;
+        }
+        Zombie target = candidates.get(session.getRandom().nextInt(candidates.size()));
+        System.out.printf("Electric Blueberry struck the %s with lightning!%n",
+                target.getType().getName());
+        damageZombie(target, INSTANT_KILL_DAMAGE, plant.getType());
     }
 
     private void tickPoison(Zombie zombie) {
