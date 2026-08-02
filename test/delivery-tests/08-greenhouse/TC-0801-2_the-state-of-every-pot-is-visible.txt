@@ -25,9 +25,9 @@
 > show greenhouse
 ? (1, 1): empty
 > plant pot at (1, 1)
-? Marigold planted at (1, 1); it needs 2 hours to grow.
+? hours to grow.
 > show greenhouse
-? (1, 1): Marigold [growing, ready in 2h
+? ready in
 
 # ---------------------------------------------------------------------------
 # SAMPLE RUN - real output recorded from this project. This part of the game
