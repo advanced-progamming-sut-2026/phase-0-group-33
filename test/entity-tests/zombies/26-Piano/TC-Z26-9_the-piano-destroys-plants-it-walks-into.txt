@@ -5,6 +5,10 @@
 # Source    : phase-1 project document
 # Note      : a failure here means the documented ability is not modelled yet
 #
+# Note         : the plant sits in column 2 on purpose. Egypt scatters two random
+#                 gravestones from column 3 onwards, and a grave landing on the target
+#                 tile made the planting fail and this case flaky about one run in ten.
+#
 # Legend:  '>' = a line typed into the game
 #          '?' = a substring that must appear in the output (checked in order)
 #          '#' = comment for the reader (ignored by the runner)
@@ -16,7 +20,7 @@
 ? The battle begins
 > cheat add -n 9000 suns
 > cheat remove-cooldown
-> plant plant -t Sunflower -l (4,3)
+> plant plant -t Sunflower -l (2,3)
 > cheat spawn-zombie -t Piano -l 7,3
-> advance time -t 500 ticks
-? Plant Sunflower at (4, 3) is destroyed.
+> advance time -t 700 ticks
+? Plant Sunflower at (2, 3) is destroyed.
