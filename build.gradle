@@ -1,70 +1,45 @@
-plugins {
-    id 'java'
-    id 'application'
-    id 'checkstyle'
-    id 'pmd'
-}
+subprojects {
+    apply plugin: 'java-library'
 
-group = 'ir.sharif.ap'
-version = '1.0'
+    group = 'ir.sharif.ap'
+    version = '1.0'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(24)
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
     }
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src']
-        }
-        resources {
-            srcDirs = ['assets']
-        }
+project(':core') {
+    apply plugin: 'checkstyle'
+    apply plugin: 'pmd'
+
+    checkstyle {
+        toolVersion = '10.20.1'
+        configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+        ignoreFailures = true
+        maxWarnings = Integer.MAX_VALUE
     }
-    test {
-        java {
-            srcDirs = []
-        }
+
+    pmd {
+        toolVersion = '7.7.0'
+        ruleSetFiles = rootProject.files('config/pmd/ruleset.xml')
+        ruleSets = []
+        ignoreFailures = true
     }
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-}
-
-application {
-    mainClass = 'Main'
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-}
-
-tasks.named('run') {
-    standardInput = System.in
-}
-
-checkstyle {
-    toolVersion = '10.20.1'
-    configFile = file('config/checkstyle/checkstyle.xml')
-    ignoreFailures = true
-    maxWarnings = Integer.MAX_VALUE
-}
-
-pmd {
-    toolVersion = '7.7.0'
-    ruleSetFiles = files('config/pmd/ruleset.xml')
-    ruleSets = []
-    ignoreFailures = true
 }
 
 tasks.register('lint') {
     group = 'verification'
-    description = 'Runs Checkstyle and PMD on the main source set.'
-    dependsOn 'checkstyleMain', 'pmdMain'
+    description = 'Runs Checkstyle and PMD on the core source set.'
+    dependsOn ':core:checkstyleMain', ':core:pmdMain'
 }

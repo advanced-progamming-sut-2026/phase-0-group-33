@@ -1,0 +1,3 @@
+Game assets (textures, atlases, sounds, skins, fonts) go here.
+This directory is the working directory at runtime, so Gdx.files.internal("...")
+resolves relative to it.

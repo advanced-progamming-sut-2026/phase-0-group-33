@@ -14,8 +14,10 @@
 
 ## Table of Contents
 
+- [Project Layout](#project-layout)
 - [How to Run](#how-to-run)
-- [How to Test](#how-to-test)
+- [Build & Code Quality](#build--code-quality-gradle)
+- [The Parked Command-Line Build](#the-parked-command-line-build-legacy-cli)
 - [General Menu Rules](#general-menu-rules)
 - [Command Reference by Menu](#command-reference-by-menu)
   - [Signup Menu](#signup-menu)
@@ -45,80 +47,98 @@
 
 ---
 
+## Project Layout
+
+The project is a **libGDX** Gradle build. Requires JDK 21.
+
+```
+core/       game logic + the graphical view layer  (models, controllers, utils, database, views)
+lwjgl3/     desktop launcher (LWJGL3 backend)
+assets/     textures, atlases, sounds, skins — runtime working directory
+config/     Checkstyle + PMD rulesets
+legacy-cli/ the command-line build, parked — see below
+```
+
+`core` holds every rule of the game and knows nothing about the launcher, so the
+same logic can later be driven by another backend.
+
 ## How to Run
 
-The project has no external dependencies — plain Java (JDK 17+).
-
-**Recommended — Gradle:**
-
 ```bash
-./gradlew run          # Linux / macOS
-gradlew.bat run        # Windows
+./gradlew :lwjgl3:run          # Linux / macOS
+gradlew.bat :lwjgl3:run        # Windows
 ```
 
-**Also available (no build tool needed):**
+**IntelliJ:** open the project as a **Gradle** project (point it at `build.gradle`
+in the repo root), then run `Lwjgl3Launcher`.
+
+To build a distributable fat jar:
 
 ```bash
-python run_game.py
+gradlew.bat :lwjgl3:jar        # -> lwjgl3/build/libs/group-33-1.0.jar
 ```
 
-This compiles every `.java` file under `src/` into `out/production/AP/` and then launches the game.
-
-**Manual:**
-
-```bash
-javac -encoding UTF-8 -d out/production/AP $(find src -name "*.java")
-java -cp out/production/AP Main
-```
-
-**IntelliJ:** run `Main.java`. If you ever see `Could not find or load main class Main`, do `Build → Rebuild Project` (a partial/incremental build can miss the default-package `Main` class).
-
-All persistent data (accounts, progress, greenhouse, news, quests) is written to a `data/` folder next to where you launch the program.
+All persistent data (accounts, progress, greenhouse, news, quests) is written to a
+`data/` folder next to the working directory. Gradle runs the game with `assets/`
+as its working directory, so during development saves land in `assets/data/`
+(git-ignored); a packaged jar writes `data/` next to itself.
 
 ---
 
 ## Build & Code Quality (Gradle)
 
-The project is a standard Gradle Java build. The existing `src/` layout is kept as-is (configured via `sourceSets`), so IntelliJ and the scripts above keep working.
-
 | Task | What it does |
 |------|--------------|
-| `gradlew build` | Compiles the project. |
-| `gradlew run` | Compiles and starts the game (stdin is wired up for the CLI). |
-| `gradlew lint` | Runs **Checkstyle + PMD** together. |
-| `gradlew checkstyleMain` | Naming, line length (≤120), method length (≤50), unused imports. |
-| `gradlew pmdMain` | Unused locals/fields/methods/parameters, `NcssCount` (method ≤50, class ≤500). |
+| `gradlew build` | Compiles every module. |
+| `gradlew :lwjgl3:run` | Compiles and starts the game. |
+| `gradlew lint` | Runs **Checkstyle + PMD** on `core` together. |
+| `gradlew :core:checkstyleMain` | Naming, line length (≤120), method length (≤50), unused imports. |
+| `gradlew :core:pmdMain` | Unused locals/fields/methods/parameters, `NcssCount` (method ≤50, class ≤500). |
 
-The linter rules in `config/checkstyle/checkstyle.xml` and `config/pmd/ruleset.xml` mirror exactly the Checkstyle/PMD rules listed in the course document. Reports are written to `build/reports/{checkstyle,pmd}/main.html`.
-
-**Current status: 0 Checkstyle violations, 0 PMD violations.**
+The linters run against `core` only — `lwjgl3` is launcher boilerplate. The rules in
+`config/checkstyle/checkstyle.xml` and `config/pmd/ruleset.xml` mirror exactly the
+Checkstyle/PMD rules listed in the course document. Reports are written to
+`core/build/reports/{checkstyle,pmd}/main.html`.
 
 ---
 
-## How to Test
+## The Parked Command-Line Build (`legacy-cli/`)
 
-A suite of 1000 doc-based test cases lives in `test/`:
+The phase-0 CLI is **not deleted** — it is moved out of the compiled source set so it
+does not interfere with the graphical build:
+
+| Parked path | What it is |
+|-------------|------------|
+| `legacy-cli/src/views/menus/` | the 13 interactive CLI menus |
+| `legacy-cli/src/views/MenuHub.java`, `CommandRouter.java` | the CLI menu loop and command dispatcher |
+| `legacy-cli/src/Main.java` | the CLI entry point |
+| `legacy-cli/test/` | 1226 doc-based test cases + `run_tests.py` |
+| `legacy-cli/run_game.py` | the no-build-tool launcher script |
+| `legacy-cli/AP.iml` | the old IntelliJ module descriptor |
+
+`GameBoardPrinter` stayed in `core` (`core/src/main/java/views/`) — it is a pure
+text formatter with no input handling, and is still useful for debugging.
+
+**To bring the CLI back**, move the sources into `core`'s source set and restore the
+one call that was removed from `App.run()`:
 
 ```bash
-python test/run_tests.py            # run all 1000 tests
-python test/run_tests.py 372        # run a single test by id (prints the full game output)
+git mv legacy-cli/src/views/menus core/src/main/java/views/menus
+git mv legacy-cli/src/views/MenuHub.java core/src/main/java/views/MenuHub.java
+git mv legacy-cli/src/views/CommandRouter.java core/src/main/java/views/CommandRouter.java
 ```
 
-Each test is run in its own isolated temp `data/` folder, so tests never affect each other or your real save. On any mismatch the runner prints the **test id**, **the exact command**, **the expected substring**, and whether the output was **missing** or **appeared out of order**. Current status: **1000 / 1000 passing**.
-
-The test cases themselves are human-readable in `test/testcases.txt`:
-
-```
-=== TEST 0001: signup rejects invalid username 1
-> register -u user! -p Abcd123! Abcd123! -n Nick -e a@b.com -g male
-? Username can only contain letters, digits, and hyphens.
-```
-
-`>` is a command sent to the game, `?` is a substring expected in the output (checked in order).
+Then add an `application` block to `core/build.gradle` with `mainClass = 'Main'` and
+`standardInput = System.in`. `legacy-cli/src/Main.java` already calls
+`MenuHub.getInstance(app).run()` itself, so `App.run()` does not need changing back.
 
 ---
 
 ## General Menu Rules
+
+> The command reference below documents the **parked CLI** build. It is kept as the
+> specification of the game's rules and flows — the graphical screens implement the
+> same behaviour, so this stays the reference for what each action must do.
 
 These commands work in **every** menu:
 

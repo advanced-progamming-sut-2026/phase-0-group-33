@@ -6,7 +6,6 @@ import models.game.GameSession;
 import models.user.User;
 import utils.NewsStore;
 import utils.SessionStore;
-import views.MenuHub;
 
 public class App {
 
@@ -79,8 +78,6 @@ public class App {
 
     public void run() {
         restoreSession();
-        MenuHub menuHub = MenuHub.getInstance(this);
-        menuHub.run();
     }
 
     private void restoreSession() {
