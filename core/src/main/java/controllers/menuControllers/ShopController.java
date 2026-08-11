@@ -13,7 +13,8 @@ import java.util.Random;
 
 public class ShopController extends BaseController {
     private static final int POT_PRICE = 2000;
-    private static final int MAX_POTS = 20;
+    private static final int MAX_POTS = GreenhouseController.MAX_POTS;
+    private static final int BUYABLE_POTS = MAX_POTS - GreenhouseController.FREE_POTS;
     private static final int PLANT_FOOD_DIAMONDS = 3;
     private static final int RANDOM_BUNDLE_COINS = 1000;
     private static final int CHOICE_BUNDLE_DIAMONDS = 5;
@@ -31,7 +32,7 @@ public class ShopController extends BaseController {
 
     public Result handleShopList() {
         return Result.ok("Shop items:",
-                "1. Pot | 2000 coins | unlocks one greenhouse pot (max 20)",
+                "1. Pot | 2000 coins | unlocks one greenhouse pot (max " + MAX_POTS + ")",
                 "2. Plant Food | 3 diamonds | +1 plant food for the start of your next level (max 3)",
                 "3. Random Seed Packet Bundle | 1000 coins | 5 seed packets of a random unlocked plant",
                 "4. Choice Seed Packet Bundle | 5 diamonds | 10 seed packets of a chosen plant (-t)",
@@ -82,7 +83,7 @@ public class ShopController extends BaseController {
 
     private Result buyPots(int count) {
         int owned = app.getCurrentUser().getPots().getAmount();
-        if (owned + count > MAX_POTS - 5) {
+        if (owned + count > BUYABLE_POTS) {
             return Result.fail("The greenhouse only has room for " + MAX_POTS + " pots.");
         }
         Result payment = UserManager.getInstance().spendCoins(POT_PRICE * count);

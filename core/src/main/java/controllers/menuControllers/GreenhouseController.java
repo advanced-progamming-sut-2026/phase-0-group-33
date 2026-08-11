@@ -10,8 +10,10 @@ import java.util.List;
 import java.util.Random;
 
 public class GreenhouseController extends BaseController {
-    private static final int COLS = 5;
-    private static final int ROWS = 4;
+    public static final int COLS = 4;
+    public static final int ROWS = 3;
+    public static final int FREE_POTS = COLS;
+    public static final int MAX_POTS = COLS * ROWS;
     private static final long HOUR_MILLIS = 60L * 60 * 1000;
     private static final String MARIGOLD = "Marigold";
 
@@ -23,17 +25,17 @@ public class GreenhouseController extends BaseController {
         return UserDataStore.forUser(app.getCurrentUser().getUsername());
     }
 
-    private int unlockedSlots() {
-        return Math.min(COLS * ROWS, COLS + app.getCurrentUser().getPots().getAmount());
+    public int unlockedSlots() {
+        return Math.min(MAX_POTS, FREE_POTS + app.getCurrentUser().getPots().getAmount());
     }
 
-    private static int slotIndex(int x, int y) {
+    public static int slotIndex(int x, int y) {
         return (y - 1) * COLS + x;
     }
 
     public Result handleShowGreenhouse() {
         UserDataStore store = store();
-        Result result = Result.ok("Greenhouse (" + unlockedSlots() + "/" + COLS * ROWS
+        Result result = Result.ok("Greenhouse (" + unlockedSlots() + "/" + MAX_POTS
                 + " pots unlocked):");
         for (int y = 1; y <= ROWS; y++) {
             for (int x = 1; x <= COLS; x++) {
@@ -64,6 +66,23 @@ public class GreenhouseController extends BaseController {
         return "gh." + x + "." + y;
     }
 
+    public boolean isPotUnlocked(int x, int y) {
+        return slotIndex(x, y) <= unlockedSlots();
+    }
+
+    public String potPlant(int x, int y) {
+        return store().get(potKey(x, y) + ".plant", null);
+    }
+
+    public long potRemainingMillis(int x, int y) {
+        return Math.max(0L, store().getLong(potKey(x, y) + ".ready", 0) - System.currentTimeMillis());
+    }
+
+    public int potSpeedUpCost(int x, int y) {
+        long remaining = potRemainingMillis(x, y);
+        return (int) ((remaining + HOUR_MILLIS - 1) / HOUR_MILLIS);
+    }
+
     private static List<String> boostablePlants(UserDataStore store) {
         List<String> result = new java.util.ArrayList<>();
         for (String name : MainController.unlockedPlants(store)) {
@@ -77,7 +96,7 @@ public class GreenhouseController extends BaseController {
 
     public Result handlePlantPot(int x, int y) {
         if (x < 1 || x > COLS || y < 1 || y > ROWS) {
-            return Result.fail("Pot coordinates must be x in 1..5 and y in 1..4.");
+            return Result.fail("Pot coordinates must be x in 1.." + COLS + " and y in 1.." + ROWS + ".");
         }
         if (slotIndex(x, y) > unlockedSlots()) {
             return Result.fail("This pot is locked. Buy a pot in the shop to unlock it.");
