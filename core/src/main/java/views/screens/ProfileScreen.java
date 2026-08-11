@@ -33,7 +33,8 @@ public class ProfileScreen extends BaseScreen {
 
     private Table buildSummary() {
         Table panel = Ui.panel(skin);
-        panel.add(Ui.label(skin, "Overview", "h1")).left().padBottom(14f).row();
+        panel.add(Ui.label(skin, "Overview", "h1")).left().padBottom(4f).row();
+        panel.add(Ui.divider(skin, 380f)).left().padBottom(12f).row();
         panel.add(summary).growX();
         refreshSummary();
         return panel;
@@ -49,12 +50,30 @@ public class ProfileScreen extends BaseScreen {
         for (String line : info.getMessages()) {
             int sep = line.indexOf(':');
             if (sep < 0) {
-                summary.add(Ui.label(skin, line, "small")).left().colspan(2).row();
+                summary.add(Ui.label(skin, line, "small")).left().colspan(3).row();
                 continue;
             }
-            summary.add(Ui.label(skin, line.substring(0, sep), "muted")).left().padRight(16f).padBottom(8f);
+            String key = line.substring(0, sep);
+            summary.add(Ui.iconCell(profileIcon(key), 24f)).padRight(10f).padBottom(8f);
+            summary.add(Ui.label(skin, key, "muted")).left().padRight(16f).padBottom(8f);
             summary.add(Ui.label(skin, line.substring(sep + 1).trim(), "h2")).left().padBottom(8f).row();
         }
+    }
+
+    private com.badlogic.gdx.graphics.g2d.TextureRegion profileIcon(String key) {
+        if (key.contains("Coins")) {
+            return art.ui("image_ui_generic_coin_icon_small");
+        }
+        if (key.contains("Diamonds")) {
+            return art.ui("image_ui_generic_gem_icon_small");
+        }
+        if (key.contains("miopoint")) {
+            return art.ui("image_ui_generic_star_icon");
+        }
+        if (key.contains("Levels")) {
+            return art.trophy("Egypt");
+        }
+        return art.statIcon("FAMILY");
     }
 
     private Table buildEditor() {

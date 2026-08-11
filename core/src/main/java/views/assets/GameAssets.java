@@ -17,6 +17,9 @@ public final class GameAssets implements Disposable {
     public static final String ZOMBIES = "ATLASES/UI_ZOMBIEPACKETS_768_00.atlas";
     public static final String MENU_BACKGROUND = "ATLASES/MAINMENU_BACKGROUND_768_00.atlas";
     public static final String GARDEN_BACKGROUND = "ATLASES/DELAYLOAD_BACKGROUND_ZEN_768_00.atlas";
+    public static final String LOGO = "ATLASES/UI_MAINMENULOGO_768_00.atlas";
+    public static final String TROPHIES = "ATLASES/GAMETROPHIES_768_00.atlas";
+    public static final String STAT_ICONS = "ATLASES/UI_ALMANAC_STATICONS_768_00.atlas";
 
     private static final String FONT_BODY = "skin/AVENIRNEXTLTPRO-DEMICN.TTF";
     private static final String FONT_DISPLAY = "skin/HOUSE OF TERROR.TTF";
@@ -24,6 +27,7 @@ public final class GameAssets implements Disposable {
     private final ObjectMap<String, TextureAtlas> atlases = new ObjectMap<>();
     private final ObjectMap<String, BitmapFont> fonts = new ObjectMap<>();
     private Texture blank;
+    private Texture fade;
 
     public TextureAtlas atlas(String path) {
         TextureAtlas cached = atlases.get(path);
@@ -69,6 +73,23 @@ public final class GameAssets implements Disposable {
         fonts.put(key, font);
     }
 
+    public Texture verticalFade() {
+        if (fade == null) {
+            int height = 64;
+            com.badlogic.gdx.graphics.Pixmap pixmap = new com.badlogic.gdx.graphics.Pixmap(
+                    1, height, com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888);
+            for (int y = 0; y < height; y++) {
+                float t = 1f - y / (float) (height - 1);
+                pixmap.setColor(0f, 0f, 0f, t * t * 0.85f);
+                pixmap.drawPixel(0, y);
+            }
+            fade = new Texture(pixmap);
+            fade.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+            pixmap.dispose();
+        }
+        return fade;
+    }
+
     public Texture blank() {
         if (blank == null) {
             com.badlogic.gdx.graphics.Pixmap pixmap =
@@ -94,6 +115,10 @@ public final class GameAssets implements Disposable {
         if (blank != null) {
             blank.dispose();
             blank = null;
+        }
+        if (fade != null) {
+            fade.dispose();
+            fade = null;
         }
     }
 }

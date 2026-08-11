@@ -68,8 +68,9 @@ public class QuestScreen extends BaseScreen {
             if (line.startsWith("- ")) {
                 line = line.substring(2);
             }
-            content.add("minigame".equals(page) ? minigameCard(line) : questCard(line))
-                    .growX().padBottom(8f).row();
+            Table card = "minigame".equals(page) ? minigameCard(line) : questCard(line);
+            Ui.appear(card, i);
+            content.add(card).growX().padBottom(8f).row();
         }
     }
 
@@ -99,7 +100,11 @@ public class QuestScreen extends BaseScreen {
         Table details = new Table();
         details.add(Ui.wrapped(skin, text, "h2")).width(680f).left().row();
         if (!reward.isEmpty()) {
-            details.add(Ui.label(skin, "Reward: " + reward, "gold")).left().padTop(4f).row();
+            String icon = reward.contains("gem") ? "image_ui_generic_gem_icon_small"
+                    : reward.contains("packet") ? "image_ui_almanac_plant_select_pkt"
+                    : reward.contains("plant") ? "image_ui_generic_leaf_backdrop"
+                    : "image_ui_generic_coin_icon_small";
+            details.add(Ui.pill(skin, art.ui(icon), reward, "gold")).left().padTop(4f).row();
         }
         details.add(progressWidget(progress, done)).left().padTop(6f);
         card.add(details).growX();

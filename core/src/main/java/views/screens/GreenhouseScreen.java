@@ -48,7 +48,9 @@ public class GreenhouseScreen extends BaseScreen {
         grid.clear();
         for (int y = 1; y <= GreenhouseController.ROWS; y++) {
             for (int x = 1; x <= GreenhouseController.COLS; x++) {
-                grid.add(pot(x, y)).size(238f, 148f).pad(7f);
+                Table cell = pot(x, y);
+                Ui.appear(cell, (y - 1) * GreenhouseController.COLS + x);
+                grid.add(cell).size(238f, 150f).pad(6f);
             }
             grid.row();
         }
@@ -57,26 +59,30 @@ public class GreenhouseScreen extends BaseScreen {
     private Table pot(final int x, final int y) {
         Table card = Ui.card(skin, "card");
         card.pad(8f);
+        String plant = controller.potPlant(x, y);
+        if (plant != null && controller.isPotUnlocked(x, y)) {
+            return growingPot(card, x, y, plant);
+        }
         if (!controller.isPotUnlocked(x, y)) {
             card.add(Ui.iconCell(art.ui("image_ui_lock_small"), 34f)).padBottom(2f).row();
             card.add(Ui.label(skin, "Locked", "muted")).row();
             card.add(Ui.button(skin, "Buy a pot", "small-brown", () -> router.go(ScreenId.SHOP)))
                     .width(158f).height(40f).padTop(6f);
+            card.setColor(Palette.LOCKED);
             return card;
         }
 
-        String plant = controller.potPlant(x, y);
-        if (plant == null) {
-            card.add(Ui.iconCell(art.ui("image_ui_generic_leaf_backdrop"), 40f)).padBottom(2f).row();
-            card.add(Ui.label(skin, "Empty pot", "muted")).row();
-            card.add(Ui.button(skin, "Plant", "small", () -> {
-                Result result = controller.handlePlantPot(x, y);
-                toasts.show(result);
-                refresh();
-            })).width(158f).height(40f).padTop(6f);
-            return card;
-        }
+        card.add(Ui.iconCell(art.ui("image_ui_generic_leaf_backdrop"), 40f)).padBottom(2f).row();
+        card.add(Ui.label(skin, "Empty pot", "muted")).row();
+        card.add(Ui.button(skin, "Plant", "small", () -> {
+            Result result = controller.handlePlantPot(x, y);
+            toasts.show(result);
+            refresh();
+        })).width(158f).height(40f).padTop(6f);
+        return card;
+    }
 
+    private Table growingPot(Table card, final int x, final int y, String plant) {
         PlantType type = Names.plant(plant);
         card.add(Ui.iconCell(type == null ? art.ui("image_ui_generic_leaf_backdrop") : art.plant(type), 46f))
                 .padBottom(2f).row();
@@ -95,7 +101,13 @@ public class GreenhouseScreen extends BaseScreen {
         }
 
         long minutes = remaining / 60000 + 1;
-        card.add(Ui.label(skin, minutes / 60 + "h " + minutes % 60 + "m left", "muted")).padTop(2f).row();
+        long totalMinutes = "Marigold".equals(plant) ? 120L : 480L;
+        com.badlogic.gdx.scenes.scene2d.ui.ProgressBar growth =
+                new com.badlogic.gdx.scenes.scene2d.ui.ProgressBar(
+                        0f, totalMinutes, 1f, false, skin, "gold-horizontal");
+        growth.setValue(Math.max(0L, totalMinutes - minutes));
+        card.add(growth).width(190f).height(12f).padTop(2f).row();
+        card.add(Ui.label(skin, minutes / 60 + "h " + minutes % 60 + "m left", "muted")).padTop(1f).row();
         int cost = controller.potSpeedUpCost(x, y);
         card.add(Ui.button(skin, "Grow (" + cost + " gems)", "small-brown", () -> {
             Result result = controller.handleGrow(x, y);

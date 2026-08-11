@@ -1,7 +1,9 @@
 package views.screens;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import models.entities.zombie.ZombieType;
 import models.progress.chapter.Chapter;
 import models.progress.level.BossLevel;
 import models.progress.level.Level;
@@ -16,6 +18,7 @@ public class AdventureScreen extends BaseScreen {
 
     private static final String[] CHAPTERS = {"Egypt", "Frost Bite", "Wavey Beach", "Dark Ages"};
 
+    private final Table chapterPane = new Table();
     private final Table levelPane = new Table();
     private String selectedChapter = CHAPTERS[0];
 
@@ -36,71 +39,120 @@ public class AdventureScreen extends BaseScreen {
     @Override
     protected void buildContent(Table body) {
         Table columns = new Table();
-        columns.add(buildChapterList()).width(420f).top().padRight(24f);
-        columns.add(levelPane).width(700f).top();
+        columns.add(chapterPane).width(430f).top().padRight(22f);
+        columns.add(levelPane).width(680f).top();
         body.add(columns).grow().row();
         body.add(Ui.button(skin, "Quests & Minigames", "blue", () -> router.go(ScreenId.QUESTS)))
-                .width(320f).height(58f).padTop(10f);
+                .width(320f).height(56f).padTop(8f);
+        buildChapterList();
         showLevels(selectedChapter);
     }
 
-    private Table buildChapterList() {
+    private void buildChapterList() {
+        chapterPane.clear();
         Table panel = Ui.panel(skin);
-        panel.add(Ui.label(skin, "Chapters", "h1")).left().padBottom(12f).row();
+        panel.add(Ui.label(skin, "Chapters", "h1")).left().padBottom(4f).row();
+        panel.add(Ui.divider(skin, 380f)).left().padBottom(10f).row();
+
         for (int i = 0; i < CHAPTERS.length; i++) {
             final String name = CHAPTERS[i];
             Chapter chapter = Chapter.getByName(name);
             int total = chapter.getLevels().size();
             int done = Math.max(0, progress(name) - 1);
             boolean locked = isLocked(i);
+            boolean active = name.equals(selectedChapter);
 
-            Table card = Ui.card(skin, locked ? "card" : "card-done");
-            card.add(Ui.label(skin, name, "h2")).left().expandX();
-            card.add(Ui.label(skin, done + " / " + total, locked ? "muted" : "gold")).right().row();
+            Table card = new Table(skin);
+            card.setBackground(skin.getDrawable(active ? "card-done" : "card"));
+            card.pad(8f, 12f, 8f, 12f);
+            card.add(Ui.iconCell(art.trophy(name), 52f)).padRight(10f);
+
+            Table info = new Table();
+            Table head = new Table();
+            head.add(Ui.label(skin, name, "h2")).left().expandX();
+            head.add(Ui.label(skin, done + " / " + total, locked ? "muted" : "gold")).right();
+            info.add(head).growX().row();
+
+            ProgressBar bar = new ProgressBar(0f, total, 1f, false, skin, "gold-horizontal");
+            bar.setValue(done);
+            info.add(bar).growX().height(14f).padTop(4f).row();
+
             if (locked) {
-                card.add(Ui.label(skin, "Locked - finish " + CHAPTERS[i - 1] + " first", "bad"))
-                        .colspan(2).left().padTop(4f);
+                info.add(Ui.label(skin, "Finish " + CHAPTERS[i - 1] + " to unlock", "bad"))
+                        .left().padTop(3f);
             }
-            if (!locked) {
+            card.add(info).growX();
+
+            if (locked) {
+                card.setColor(Palette.LOCKED);
+            } else {
+                Ui.hoverLift(card, 1.02f);
                 Ui.onClick(card, () -> {
                     selectedChapter = name;
+                    buildChapterList();
                     showLevels(name);
                 });
             }
-            panel.add(card).growX().padBottom(10f).row();
+            Ui.appear(card, i);
+            panel.add(card).growX().padBottom(9f).row();
         }
-        return panel;
+        chapterPane.add(panel).growX();
     }
 
     private void showLevels(String chapterName) {
         levelPane.clear();
-        Table panel = Ui.panel(skin);
-        panel.add(Ui.label(skin, chapterName, "h1")).left().padBottom(12f).row();
-
         Chapter chapter = Chapter.getByName(chapterName);
         int unlocked = progress(chapterName);
+
+        Table panel = Ui.panel(skin);
+        Table head = new Table();
+        head.add(Ui.iconCell(art.trophy(chapterName), 46f)).padRight(12f);
+        head.add(Ui.label(skin, chapterName, "h1")).left().expandX();
+        head.add(Ui.pill(skin, art.zombie(ZombieType.NORMAL),
+                chapter.getZombiePool().size() + " zombies", "small")).right();
+        panel.add(head).growX().padBottom(4f).row();
+        panel.add(Ui.divider(skin, 620f)).padBottom(12f).row();
+
         Table grid = new Table();
+        int index = 0;
         for (Level level : chapter.getLevels()) {
             boolean open = level.getLevelNumber() <= unlocked;
-            Table card = Ui.card(skin, open ? "card" : "card");
-            card.add(Ui.label(skin, "Level " + level.getLevelNumber(), "h2")).left().row();
-            card.add(Ui.label(skin, describe(level), "muted")).left().padTop(4f).row();
-            card.add(Ui.label(skin, open ? "Unlocked" : "Locked",
-                    open ? "good" : "bad")).left().padTop(4f).row();
+            Table card = new Table(skin);
+            card.setBackground(skin.getDrawable(open ? "card" : "card"));
+            card.pad(10f);
+
+            card.add(Ui.iconCell(levelIcon(level), 54f)).padRight(10f).top();
+            Table info = new Table();
+            info.add(Ui.label(skin, "Level " + level.getLevelNumber(), "h2")).left().row();
+            info.add(Ui.label(skin, describe(level), "muted")).left().padTop(2f).row();
+            info.add(Ui.label(skin, open ? "Ready to play" : "Locked", open ? "good" : "bad"))
+                    .left().padTop(4f);
+            card.add(info).growX().top();
+
             if (open) {
+                Ui.hoverLift(card, 1.03f);
                 Ui.onClick(card, () -> toasts.error("The battle screen is not part of this build yet."));
             } else {
                 card.setColor(Palette.LOCKED);
             }
-            grid.add(card).width(300f).height(150f).pad(8f);
-            if (level.getLevelNumber() % 2 == 0) {
+            Ui.appear(card, index);
+            grid.add(card).width(300f).height(126f).pad(7f);
+            if (++index % 2 == 0) {
                 grid.row();
             }
         }
-        panel.add(grid).growX().row();
-        panel.add(Ui.label(skin, "Zombies in this chapter: " + chapter.getZombiePool().size(), "muted"))
-                .left().padTop(10f);
+        panel.add(grid).growX();
         levelPane.add(panel).growX();
+    }
+
+    private TextureRegion levelIcon(Level level) {
+        if (level instanceof BossLevel) {
+            return art.zombie(ZombieType.GARGANTUAR);
+        }
+        if (level.getSpecialType() == null) {
+            return art.zombie(ZombieType.NORMAL);
+        }
+        return art.ui("image_ui_generic_jalapeno_difficulty_icon");
     }
 
     private String describe(Level level) {

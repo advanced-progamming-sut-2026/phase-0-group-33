@@ -13,6 +13,7 @@ import java.util.List;
 
 public class LeaderboardScreen extends BaseScreen {
 
+    private static final String[] MEDALS = {"Egypt", "Frost Bite", "Wavey Beach"};
     private static final String[] COLUMNS = {"miopoint", "levels", "minigames", "quests", "dailyquests"};
 
     private final LeaderboardController controller;
@@ -80,10 +81,12 @@ public class LeaderboardScreen extends BaseScreen {
             Table row = new Table(skin);
             row.setBackground(skin.getDrawable(header ? "shade" : "row"));
             row.pad(6f, 18f, 6f, 18f);
-            if (!header) {
-                row.add(Ui.label(skin, "#" + i, "gold")).width(60f).left();
+            if (header) {
+                row.add(Ui.label(skin, "Rank", "gold")).width(72f).left();
+            } else if (i <= 3) {
+                row.add(Ui.iconCell(art.trophy(MEDALS[i - 1]), 30f)).width(72f).left();
             } else {
-                row.add(Ui.label(skin, "Rank", "gold")).width(60f).left();
+                row.add(Ui.label(skin, "#" + i, "gold")).width(72f).left();
             }
             for (int c = 0; c < cells.length; c++) {
                 String value = cells[c].trim();
@@ -94,6 +97,7 @@ public class LeaderboardScreen extends BaseScreen {
                 }
                 row.add(label).width(c == 0 ? 240f : 170f).left();
             }
+            Ui.appear(row, i);
             table.add(row).growX().height(46f).padBottom(5f).row();
         }
     }

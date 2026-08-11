@@ -2,6 +2,8 @@ package views.ui;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
@@ -19,6 +21,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
 
 public final class Ui {
+
+    private static final Color RESTING = new Color(0.92f, 0.92f, 0.92f, 1f);
 
     private Ui() {
     }
@@ -52,7 +56,63 @@ public final class Ui {
                 }
             }
         });
+        hoverLift(button, 1.035f);
         return button;
+    }
+
+    public static void hoverLift(final Actor actor, final float scale) {
+        if (actor instanceof com.badlogic.gdx.scenes.scene2d.Group) {
+            ((com.badlogic.gdx.scenes.scene2d.Group) actor).setTransform(true);
+        }
+        actor.addListener(new ClickListener() {
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                if (pointer != -1) {
+                    return;
+                }
+                actor.setOrigin(com.badlogic.gdx.utils.Align.center);
+                actor.addAction(Actions.parallel(
+                        Actions.scaleTo(scale, scale, 0.12f, Interpolation.pow2Out),
+                        Actions.color(Color.WHITE, 0.12f)));
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                if (pointer != -1) {
+                    return;
+                }
+                actor.addAction(Actions.parallel(
+                        Actions.scaleTo(1f, 1f, 0.14f, Interpolation.pow2Out),
+                        Actions.color(RESTING, 0.14f)));
+            }
+        });
+        actor.setColor(RESTING);
+    }
+
+    public static void appear(Actor actor, int index) {
+        actor.getColor().a = 0f;
+        actor.addAction(Actions.sequence(
+                Actions.delay(Math.min(index, 14) * 0.035f),
+                Actions.fadeIn(0.24f, Interpolation.pow2Out)));
+    }
+
+    public static Table pill(Skin skin, TextureRegion icon, String text, String style) {
+        Table box = new Table(skin);
+        box.setBackground(skin.getDrawable("slot"));
+        box.pad(4f, 10f, 4f, 12f);
+        if (icon != null) {
+            box.add(iconCell(icon, 24f)).padRight(6f);
+        }
+        box.add(new Label(text, skin, style));
+        return box;
+    }
+
+    public static Table divider(Skin skin, float width) {
+        Table line = new Table(skin);
+        line.setBackground(skin.getDrawable("slot"));
+        Table holder = new Table();
+        holder.add(line).width(width).height(2f);
+        return holder;
     }
 
     public static ImageButton iconButton(Skin skin, String style, final Runnable action) {

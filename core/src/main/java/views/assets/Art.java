@@ -98,6 +98,39 @@ public final class Art {
         return region == null ? assets.region(GameAssets.UI, "white-pixel") : region;
     }
 
+    public TextureRegion logo() {
+        return assets.region(GameAssets.LOGO, "IMAGE_UI_MAINMENU_PVZ2_LOGO_HORIZONTAL");
+    }
+
+    public TextureRegion statIcon(String name) {
+        TextureRegion region = assets.region(GameAssets.STAT_ICONS,
+                "IMAGE_UI_ALMANAC_ALMANAC_STAT_ICON_" + name);
+        return region == null ? placeholder() : region;
+    }
+
+    public TextureRegion trophy(String chapterName) {
+        String normalized = chapterName == null ? "" : chapterName.replaceAll("[^A-Za-z]", "").toLowerCase();
+        String key;
+        switch (normalized) {
+            case "egypt":
+                key = "EGYPT";
+                break;
+            case "frostbite":
+                key = "ICEAGE";
+                break;
+            case "waveybeach":
+                key = "BEACH";
+                break;
+            case "darkages":
+                key = "DARK";
+                break;
+            default:
+                key = "MODERN";
+                break;
+        }
+        return assets.region(GameAssets.TROPHIES, "IMAGE_WORLDMAP_TROPHY_" + key);
+    }
+
     public TextureRegion menuBackground() {
         return assets.region(GameAssets.MENU_BACKGROUND, "IMAGE_MAINMENU_BACKGROUND");
     }

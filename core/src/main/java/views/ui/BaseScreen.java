@@ -76,6 +76,9 @@ public abstract class BaseScreen extends ScreenAdapter {
             backdrop.setScaling(Scaling.fill);
             backdrop.setFillParent(true);
             stage.addActor(backdrop);
+            backdrop.getColor().a = 0f;
+            backdrop.addAction(com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn(0.45f));
+            addVignette();
         }
 
         Table root = new Table();
@@ -91,17 +94,13 @@ public abstract class BaseScreen extends ScreenAdapter {
         Table body = new Table();
         root.add(body).grow().pad(18f, 34f, 24f, 34f).row();
 
-        if (showsHeader()) {
-            Table header = new Table();
-            header.add(Ui.button(skin, "Back", "brown", this::goBack)).height(52f).left();
-            header.add(Ui.label(skin, title(), "title")).expandX().center();
-            header.add().width(120f);
-            body.add(header).growX().padBottom(14f).row();
-        } else {
-            body.add(Ui.label(skin, title(), "title")).padBottom(14f).row();
-        }
-
+        addHeader(body);
         buildContent(body);
+        body.getColor().a = 0f;
+        body.addAction(com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence(
+                com.badlogic.gdx.scenes.scene2d.actions.Actions.delay(0.06f),
+                com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn(0.3f,
+                        com.badlogic.gdx.math.Interpolation.pow2Out)));
 
         InputMultiplexer multiplexer = new InputMultiplexer(stage, new InputAdapter() {
             @Override
@@ -116,6 +115,36 @@ public abstract class BaseScreen extends ScreenAdapter {
         Gdx.input.setInputProcessor(multiplexer);
         stage.getRoot().getColor().a = 0f;
         stage.getRoot().addAction(com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn(0.22f));
+    }
+
+    private void addHeader(Table body) {
+        if (!showsHeader()) {
+            body.add(Ui.label(skin, title(), "title")).padBottom(14f).row();
+            return;
+        }
+        Table header = new Table();
+        header.add(Ui.button(skin, "Back", "brown", this::goBack)).height(52f).width(130f).left();
+        Table heading = new Table();
+        heading.add(Ui.label(skin, title(), "title")).row();
+        heading.add(Ui.divider(skin, 260f)).padTop(2f);
+        header.add(heading).expandX().center();
+        header.add().width(130f);
+        body.add(header).growX().padBottom(14f).row();
+    }
+
+    private void addVignette() {
+        TextureRegion fade = new TextureRegion(game.getAssets().verticalFade());
+        Image top = new Image(new com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable(fade));
+        top.setScaling(Scaling.stretch);
+        top.setBounds(0f, HEIGHT - 150f, WIDTH, 150f);
+        stage.addActor(top);
+
+        TextureRegion flipped = new TextureRegion(fade);
+        flipped.flip(false, true);
+        Image bottom = new Image(new com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable(flipped));
+        bottom.setScaling(Scaling.stretch);
+        bottom.setBounds(0f, 0f, WIDTH, 110f);
+        stage.addActor(bottom);
     }
 
     protected void goBack() {

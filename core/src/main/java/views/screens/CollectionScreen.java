@@ -131,6 +131,8 @@ public class CollectionScreen extends BaseScreen {
                 card.locked(true).note(PURCHASE_COST + " coins", views.ui.Palette.MUTED);
             }
             card.onClick(() -> showPlantDetail(type));
+            Ui.hoverLift(card, 1.05f);
+            Ui.appear(card, column);
             gridPane.add(card).size(PlantCard.CARD_WIDTH, PlantCard.CARD_HEIGHT).pad(7f);
             if (++column % COLUMNS == 0) {
                 gridPane.row();
@@ -169,18 +171,23 @@ public class CollectionScreen extends BaseScreen {
         int packets = store.getInt("packets." + type.getName(), 0);
 
         Table panel = Ui.panel(skin);
-        panel.add(Ui.iconCell(art.plant(type), 120f)).padBottom(8f).row();
-        panel.add(Ui.label(skin, type.getName(), "h1")).padBottom(10f).row();
+        panel.add(Ui.iconCell(art.plant(type), 120f)).padBottom(6f).row();
+        panel.add(Ui.label(skin, type.getName(), "h1")).padBottom(4f).row();
+        panel.add(Ui.divider(skin, 300f)).padBottom(10f).row();
 
-        stat(panel, "Family", type.getCategory().name().replace('_', ' '));
-        stat(panel, "Health", String.valueOf(type.getBaseHp()));
-        stat(panel, "Sun cost", String.valueOf(type.getCost()));
-        stat(panel, "Damage", type.isInstantKill() ? "instant kill" : String.valueOf(type.getDamage()));
-        stat(panel, "Action every", type.getActionInterval() + "s");
-        stat(panel, "Recharge", type.getRecharge() + "s");
-        stat(panel, "Tags", tagText(type));
-        stat(panel, "Level", owned ? level + " / " + MAX_LEVEL : "-");
-        stat(panel, "Seed packets", owned ? String.valueOf(packets) : "-");
+        stat(panel, art.statIcon("FAMILY"), "Family", type.getCategory().name().replace('_', ' '));
+        stat(panel, art.ui("image_ui_almanac_zombies_zombietoughness_icon"),
+                "Health", String.valueOf(type.getBaseHp()));
+        stat(panel, art.statIcon("SUNCOST"), "Sun cost", String.valueOf(type.getCost()));
+        stat(panel, art.statIcon("SPECIAL"), "Damage",
+                type.isInstantKill() ? "instant kill" : String.valueOf(type.getDamage()));
+        stat(panel, art.statIcon("ARMINGTIME"), "Action every", type.getActionInterval() + "s");
+        stat(panel, art.statIcon("ARMINGTIME"), "Recharge", type.getRecharge() + "s");
+        stat(panel, art.statIcon("PLANTFOOD"), "Tags", tagText(type));
+        stat(panel, art.ui("image_ui_generic_star_icon"), "Level",
+                owned ? level + " / " + MAX_LEVEL : "locked");
+        stat(panel, art.ui("image_ui_almanac_plant_select_pkt"), "Seed packets",
+                owned ? String.valueOf(packets) : "-");
 
         if (owned) {
             panel.add(Ui.button(skin, "Upgrade (" + PACKETS_PER_LEVEL * level + " packets, "
@@ -219,13 +226,24 @@ public class CollectionScreen extends BaseScreen {
 
     private void buildZombieGrid() {
         Set<String> seen = seenZombies();
+        int discoveredCount = 0;
+        for (ZombieType type : ZombieType.values()) {
+            if (seen.contains(type.getName())) {
+                discoveredCount++;
+            }
+        }
+        gridPane.add(Ui.pill(skin, art.ui("image_ui_almanac_zombie_seed_pkt"),
+                "Discovered " + discoveredCount + " of " + ZombieType.values().length, "small"))
+                .colspan(COLUMNS).left().padBottom(8f).row();
         int column = 0;
         for (ZombieType type : ZombieType.values()) {
             boolean discovered = seen.contains(type.getName());
             ZombieCard card = new ZombieCard(skin, art, type, discovered);
             if (discovered) {
                 card.onClick(() -> showZombieDetail(type));
+                Ui.hoverLift(card, 1.05f);
             }
+            Ui.appear(card, column);
             gridPane.add(card).size(ZombieCard.CARD_WIDTH, ZombieCard.CARD_HEIGHT).pad(7f);
             if (++column % COLUMNS == 0) {
                 gridPane.row();
@@ -245,23 +263,30 @@ public class CollectionScreen extends BaseScreen {
     private void showZombieDetail(ZombieType type) {
         detailPane.clear();
         Table panel = Ui.panel(skin);
-        panel.add(Ui.iconCell(art.zombie(type), 130f)).padBottom(8f).row();
-        panel.add(Ui.label(skin, type.getName(), "h1")).padBottom(10f).row();
-        stat(panel, "Health", String.valueOf(type.getHitpoints()));
-        stat(panel, "Speed", type.getSpeed() + " tiles/s");
-        stat(panel, "Eat damage", type.getEatDps() + "/s");
-        stat(panel, "Armor", type.getArmorType() == ZombieType.ArmorType.NONE ? "none"
+        panel.add(Ui.iconCell(art.zombie(type), 130f)).padBottom(6f).row();
+        panel.add(Ui.label(skin, type.getName(), "h1")).padBottom(4f).row();
+        panel.add(Ui.divider(skin, 300f)).padBottom(10f).row();
+        stat(panel, art.ui("image_ui_almanac_zombies_zombietoughness_icon"),
+                "Health", String.valueOf(type.getHitpoints()));
+        stat(panel, art.ui("image_ui_almanac_zombies_zombiespeed_icon"),
+                "Speed", type.getSpeed() + " tiles/s");
+        stat(panel, art.statIcon("SPECIAL"), "Eat damage", type.getEatDps() + "/s");
+        stat(panel, art.ui("image_ui_lock_small"), "Armor",
+                type.getArmorType() == ZombieType.ArmorType.NONE ? "none"
                 : type.getArmorType().name().replace('_', ' ').toLowerCase()
                 + " (" + type.getArmorType().getArmorHitpoints() + " hp)");
-        stat(panel, "Metallic armor", type.getArmorType().isMetallic() ? "yes" : "no");
-        stat(panel, "Wave cost", String.valueOf(type.getWaveCost()));
+        stat(panel, art.ui("image_ui_lock_small_gold"), "Metallic armor",
+                type.getArmorType().isMetallic() ? "yes" : "no");
+        stat(panel, art.statIcon("FAMILY"), "Wave cost", String.valueOf(type.getWaveCost()));
         detailPane.add(panel).growX();
     }
 
-    private void stat(Table panel, String key, String value) {
+    private void stat(Table panel, com.badlogic.gdx.graphics.g2d.TextureRegion icon,
+                      String key, String value) {
         Table row = new Table();
+        row.add(Ui.iconCell(icon, 22f)).padRight(8f);
         row.add(Ui.label(skin, key, "muted")).left().expandX();
-        row.add(Ui.wrapped(skin, value, "small")).width(180f).right();
+        row.add(Ui.wrapped(skin, value, "small")).width(160f).right();
         panel.add(row).growX().padBottom(6f).row();
     }
 }

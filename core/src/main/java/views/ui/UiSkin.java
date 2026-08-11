@@ -81,6 +81,11 @@ public final class UiSkin {
         smallBrown.font = assets.font("small");
         skin.add("small-brown", smallBrown);
 
+        TextButton.TextButtonStyle smallPurple = textButton(atlas, assets,
+                "image_ui_generic_purplebutton", "image_ui_generic_purplebutton_down");
+        smallPurple.font = assets.font("small");
+        skin.add("small-purple", smallPurple);
+
         TextButton.TextButtonStyle tab = new TextButton.TextButtonStyle();
         tab.font = assets.font("h2");
         tab.fontColor = Palette.TEXT;

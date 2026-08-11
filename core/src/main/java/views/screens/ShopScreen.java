@@ -18,6 +18,7 @@ public class ShopScreen extends BaseScreen {
 
     private final ShopController controller;
     private final Table list = new Table();
+    private int rows;
 
     public ShopScreen(PvzGame game) {
         super(game);
@@ -42,6 +43,7 @@ public class ShopScreen extends BaseScreen {
 
     private void refresh() {
         list.clear();
+        rows = 0;
         item("1", "Greenhouse Pot", "Unlocks one greenhouse pot.",
                 "2000 coins", "image_ui_generic_leaf_backdrop", null);
         item("2", "Plant Food", "Adds one plant food to your next level (max 3).",
@@ -71,11 +73,16 @@ public class ShopScreen extends BaseScreen {
         text.add(Ui.wrapped(skin, description, "muted")).width(640f).left().padTop(4f);
         card.add(text).growX();
 
-        card.add(Ui.label(skin, price, "gold")).padRight(18f).right();
-        card.add(Ui.button(skin, "Buy", "small", () -> startPurchase(id, name, price)))
-                .width(140f).height(50f).right();
+        boolean gems = price.contains("diamond") || price.contains("gem");
+        String amount = price.split(" ")[0];
+        card.add(Ui.pill(skin, art.ui(gems ? "image_ui_generic_gem_icon_small"
+                : "image_ui_generic_coin_icon_small"), amount, "gold")).padRight(18f).right();
+        card.add(Ui.button(skin, "Buy", gems ? "small-purple" : "small",
+                () -> startPurchase(id, name, price))).width(140f).height(50f).right();
 
+        Ui.appear(card, rows);
         list.add(card).growX().height(92f).padBottom(9f).row();
+        rows++;
     }
 
     private void startPurchase(final String id, String name, String price) {
