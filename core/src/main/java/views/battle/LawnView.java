@@ -21,6 +21,8 @@ public class LawnView extends Actor {
     private static final Color HOVER = new Color(1f, 1f, 1f, 0.28f);
     private static final Color DANGER = new Color(1f, 0.2f, 0.2f, 0.75f);
     private static final Color PROTECTED = new Color(0.4f, 1f, 0.5f, 0.3f);
+    private static final Color INVALID = new Color(1f, 0.35f, 0.3f, 0.32f);
+    private static final Color SHADOW = new Color(0f, 0f, 0f, 0.26f);
 
     protected final GameSession session;
     protected final Art art;
@@ -36,6 +38,8 @@ public class LawnView extends Actor {
     private int selectRow = -1;
     private float time;
     private boolean frozen;
+    private boolean hoverValid = true;
+    private models.entities.plant.PlantType ghost;
 
     public LawnView(GameSession session, Art art, Skin skin) {
         this.session = session;
@@ -43,7 +47,7 @@ public class LawnView extends Actor {
         this.fill = skin.getDrawable("white");
         this.chapterName = session.getLevel() == null ? null
                 : session.getLevel().getChapter().getName();
-        setBounds(Lawn.LEFT, Lawn.BOTTOM, Lawn.WIDTH, Lawn.HEIGHT);
+        setBounds(Lawn.left(), Lawn.bottom(), Lawn.width(), Lawn.height());
         setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.enabled);
     }
 
@@ -54,6 +58,14 @@ public class LawnView extends Actor {
     public void setHover(int column, int row) {
         this.hoverColumn = column;
         this.hoverRow = row;
+    }
+
+    public void setGhost(models.entities.plant.PlantType ghost) {
+        this.ghost = ghost;
+    }
+
+    public void setHoverValid(boolean hoverValid) {
+        this.hoverValid = hoverValid;
     }
 
     public void setFrozen(boolean frozen) {
@@ -146,7 +158,7 @@ public class LawnView extends Actor {
             return;
         }
         batch.setColor(Color.WHITE);
-        float size = Lawn.CELL_WIDTH * 0.6f;
+        float size = Lawn.cellWidth() * 0.6f;
         batch.draw(region, Lawn.columnCenter(column) - size / 2f,
                 Lawn.rowCenter(row) - size / 2f, size, size);
     }
@@ -158,10 +170,10 @@ public class LawnView extends Actor {
             return;
         }
         batch.setColor(Color.WHITE);
-        float height = Lawn.CELL_HEIGHT * 0.82f;
+        float height = Lawn.cellHeight() * 0.82f;
         float width = height * region.getRegionWidth() / region.getRegionHeight();
         batch.draw(region, Lawn.columnCenter(column) - width / 2f,
-                Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.1f, width, height);
+                Lawn.rowBottom(row) + Lawn.cellHeight() * 0.1f, width, height);
         drawGraveContent(batch, tile, column, row);
     }
 
@@ -175,9 +187,9 @@ public class LawnView extends Actor {
         if (region == null) {
             return;
         }
-        float size = Lawn.CELL_WIDTH * 0.32f;
+        float size = Lawn.cellWidth() * 0.32f;
         batch.draw(region, Lawn.columnCenter(column) - size / 2f,
-                Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.72f, size, size);
+                Lawn.rowBottom(row) + Lawn.cellHeight() * 0.72f, size, size);
     }
 
     private void drawMowers(Batch batch) {
@@ -186,14 +198,14 @@ public class LawnView extends Actor {
             return;
         }
         batch.setColor(Color.WHITE);
-        float height = Lawn.CELL_HEIGHT * 0.72f;
+        float height = Lawn.cellHeight() * 0.72f;
         float width = height * region.getRegionWidth() / region.getRegionHeight();
         for (int row = 1; row <= GameSession.ROWS; row++) {
             if (!session.hasLawnMower(row)) {
                 continue;
             }
-            batch.draw(region, Lawn.LEFT - width - 4f,
-                    Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.12f, width, height);
+            batch.draw(region, Lawn.left() - width - 4f,
+                    Lawn.rowBottom(row) + Lawn.cellHeight() * 0.12f, width, height);
         }
     }
 
@@ -204,31 +216,39 @@ public class LawnView extends Actor {
         if (hoverColumn < 1 || hoverRow < 1) {
             return;
         }
-        paint(batch, HOVER, hoverColumn, hoverRow);
+        paint(batch, hoverValid ? HOVER : INVALID, hoverColumn, hoverRow);
+        if (ghost == null) {
+            return;
+        }
+        float width = Lawn.cellWidth() * 0.78f;
+        float height = Lawn.cellHeight() * 0.8f;
+        batch.setColor(1f, 1f, 1f, hoverValid ? 0.62f : 0.3f);
+        batch.draw(art.plant(ghost), Lawn.columnCenter(hoverColumn) - width / 2f,
+                Lawn.rowBottom(hoverRow) + Lawn.cellHeight() * 0.1f, width, height);
     }
 
     private void drawGrid(Batch batch) {
         batch.setColor(GRID_LINE);
         for (int column = 0; column <= GameSession.COLS; column++) {
-            fill.draw(batch, Lawn.LEFT + column * Lawn.CELL_WIDTH, Lawn.BOTTOM, 2f, Lawn.HEIGHT);
+            fill.draw(batch, Lawn.left() + column * Lawn.cellWidth(), Lawn.bottom(), 2f, Lawn.height());
         }
         for (int row = 0; row <= GameSession.ROWS; row++) {
-            fill.draw(batch, Lawn.LEFT, Lawn.BOTTOM + row * Lawn.CELL_HEIGHT, Lawn.WIDTH, 2f);
+            fill.draw(batch, Lawn.left(), Lawn.bottom() + row * Lawn.cellHeight(), Lawn.width(), 2f);
         }
     }
 
     private void drawSpecialMarkers(Batch batch) {
         if (session.isSpecial(models.progress.level.special.SpecialLevelType.DEAD_LINE)) {
             batch.setColor(DANGER);
-            fill.draw(batch, Lawn.columnLeft(4), Lawn.BOTTOM, 4f, Lawn.HEIGHT);
+            fill.draw(batch, Lawn.columnLeft(4), Lawn.bottom(), 4f, Lawn.height());
         }
         if (session.getMode() == models.game.GameMode.WALLNUT_BOWLING) {
             batch.setColor(DANGER);
-            fill.draw(batch, Lawn.columnLeft(4), Lawn.BOTTOM, 4f, Lawn.HEIGHT);
+            fill.draw(batch, Lawn.columnLeft(4), Lawn.bottom(), 4f, Lawn.height());
         }
         if (session.getMode() == models.game.GameMode.I_ZOMBIE) {
             batch.setColor(DANGER);
-            fill.draw(batch, Lawn.columnLeft(6), Lawn.BOTTOM, 4f, Lawn.HEIGHT);
+            fill.draw(batch, Lawn.columnLeft(6), Lawn.bottom(), 4f, Lawn.height());
         }
         for (models.game.PlacedPlant plant : session.getPlants()) {
             if (plant.isProtectedSeed()) {
@@ -243,13 +263,13 @@ public class LawnView extends Actor {
             return;
         }
         batch.setColor(Color.WHITE);
-        float size = Lawn.CELL_HEIGHT * 0.6f;
+        float size = Lawn.cellHeight() * 0.6f;
         for (int row = 1; row <= GameSession.ROWS; row++) {
             if (!session.hasBrain(row)) {
                 continue;
             }
-            batch.draw(region, Lawn.LEFT - size - 6f,
-                    Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.2f, size, size);
+            batch.draw(region, Lawn.left() - size - 6f,
+                    Lawn.rowBottom(row) + Lawn.cellHeight() * 0.2f, size, size);
         }
     }
 
@@ -260,10 +280,10 @@ public class LawnView extends Actor {
                 continue;
             }
             batch.setColor(Color.WHITE);
-            float height = Lawn.CELL_HEIGHT * 0.8f;
+            float height = Lawn.cellHeight() * 0.8f;
             float width = height * region.getRegionWidth() / region.getRegionHeight();
             batch.draw(region, Lawn.columnCenter(vase.getX()) - width / 2f,
-                    Lawn.rowBottom(vase.getY()) + Lawn.CELL_HEIGHT * 0.1f, width, height);
+                    Lawn.rowBottom(vase.getY()) + Lawn.cellHeight() * 0.1f, width, height);
         }
     }
 
@@ -288,10 +308,10 @@ public class LawnView extends Actor {
             if (shot.getRow() != row) {
                 continue;
             }
-            float size = Lawn.CELL_WIDTH * projectileScale(shot.getSource());
+            float size = Lawn.cellWidth() * projectileScale(shot.getSource());
             float x = Lawn.columnCenter(shot.getX()) - size / 2f;
-            float y = Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.45f
-                    + (float) shot.getHeight() * Lawn.CELL_HEIGHT * 0.5f;
+            float y = Lawn.rowBottom(row) + Lawn.cellHeight() * 0.45f
+                    + (float) shot.getHeight() * Lawn.cellHeight() * 0.5f;
             batch.setColor(projectileTint(shot.getSource()));
             batch.draw(region, x, y, size, size);
         }
@@ -332,10 +352,11 @@ public class LawnView extends Actor {
             }
             float breathe = plant.isDisabled() ? 1f
                     : idlePulse(plant.getX() * 3 + row, 2.4f, 0.05f);
-            float width = Lawn.CELL_WIDTH * 0.74f / breathe;
-            float height = Lawn.CELL_HEIGHT * 0.74f * breathe;
+            float width = Lawn.cellWidth() * 0.78f / breathe;
+            float height = Lawn.cellHeight() * 0.8f * breathe;
             float x = Lawn.columnCenter(plant.getX()) - width / 2f;
-            float y = Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.12f;
+            float y = Lawn.rowBottom(row) + Lawn.cellHeight() * 0.1f;
+            drawShadow(batch, Lawn.columnCenter(plant.getX()), Lawn.rowBottom(row), width * 0.66f);
             batch.setColor(plantTint(plant));
             batch.draw(art.plant(plant.getType()), x, y, width, height);
             drawPlantOverlays(batch, plant, x, y, width, height);
@@ -380,7 +401,7 @@ public class LawnView extends Actor {
                 continue;
             }
             batch.setColor(Color.WHITE);
-            float size = Lawn.CELL_WIDTH * 0.6f;
+            float size = Lawn.cellWidth() * 0.6f;
             TextureRegion region = art.uiOptional("image_ui_generic_leaf_backdrop");
             if (region != null) {
                 batch.draw(region, Lawn.columnCenter(pushed.getX()) - size / 2f,
@@ -392,7 +413,7 @@ public class LawnView extends Actor {
                 continue;
             }
             batch.setColor(Color.WHITE);
-            float size = Lawn.CELL_WIDTH * (nut.isGiant() ? 0.8f : 0.62f);
+            float size = Lawn.cellWidth() * (nut.isGiant() ? 0.8f : 0.62f);
             batch.draw(art.plant(nut.getType()), Lawn.columnCenter(nut.getX()) - size / 2f,
                     Lawn.rowCenter(row) - size / 2f, size, size);
         }
@@ -407,10 +428,12 @@ public class LawnView extends Actor {
             int seed = System.identityHashCode(zombie) & 0xff;
             float bob = still ? 0f : (float) Math.abs(Math.sin(time * 5.2f + seed)) * 4f;
             float lean = still ? 1f : idlePulse(seed, 5.2f, 0.04f);
-            float width = Lawn.CELL_WIDTH * 0.66f * lean;
-            float height = Lawn.CELL_HEIGHT * 0.86f / lean;
+            float width = Lawn.cellWidth() * 0.7f * lean;
+            float height = Lawn.cellHeight() * 0.92f / lean;
             float x = Lawn.columnCenter(zombie.getPosition().getX()) - width / 2f;
-            float y = Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.08f + bob;
+            float y = Lawn.rowBottom(row) + Lawn.cellHeight() * 0.06f + bob;
+            drawShadow(batch, Lawn.columnCenter(zombie.getPosition().getX()),
+                    Lawn.rowBottom(row), width * 0.6f);
             batch.setColor(zombieTint(zombie));
             batch.draw(art.zombie(zombie.getType()), x, y, width, height);
             if (zombie.getFrozenTicks() > 0) {
@@ -469,7 +492,7 @@ public class LawnView extends Actor {
             float targetY = Lawn.rowCenter(sun.getY()) - size / 2f;
             float y = targetY;
             if (sun.isFalling()) {
-                float startY = Lawn.BOTTOM + Lawn.HEIGHT + 60f;
+                float startY = Lawn.bottom() + Lawn.height() + 60f;
                 y = startY + (targetY - startY) * sun.getFallProgress();
             }
             batch.setColor(sunColor(sun));
@@ -479,7 +502,7 @@ public class LawnView extends Actor {
 
     private float sunSize(models.game.Sun sun) {
         return sun.getKind() == models.game.Sun.SunKind.SPECIAL
-                ? Lawn.CELL_WIDTH * 0.58f : Lawn.CELL_WIDTH * 0.42f;
+                ? Lawn.cellWidth() * 0.58f : Lawn.cellWidth() * 0.42f;
     }
 
     private Color sunColor(models.game.Sun sun) {
@@ -487,6 +510,18 @@ public class LawnView extends Actor {
             return new Color(0.82f, 0.45f, 1f, 1f);
         }
         return Color.WHITE;
+    }
+
+    private void drawShadow(Batch batch, float centerX, float rowBottom, float radius) {
+        TextureRegion blob = art.uiOptional("image_ui_generic_shadow");
+        batch.setColor(SHADOW);
+        if (blob == null) {
+            fill.draw(batch, centerX - radius / 2f,
+                    rowBottom + Lawn.cellHeight() * 0.09f, radius, radius * 0.22f);
+            return;
+        }
+        batch.draw(blob, centerX - radius / 2f, rowBottom + Lawn.cellHeight() * 0.06f,
+                radius, radius * 0.34f);
     }
 
     private void drawHealthBar(Batch batch, int health, int max, float x, float y, float width) {
@@ -503,6 +538,6 @@ public class LawnView extends Actor {
     protected void paint(Batch batch, Color color, double column, int row) {
         batch.setColor(color);
         fill.draw(batch, Lawn.columnLeft(column), Lawn.rowBottom(row),
-                Lawn.CELL_WIDTH, Lawn.CELL_HEIGHT);
+                Lawn.cellWidth(), Lawn.cellHeight());
     }
 }

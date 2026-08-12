@@ -68,6 +68,7 @@ public class BattleScreen extends ScreenAdapter {
     private final String levelChapter;
     private final int levelNumber;
     private com.badlogic.gdx.scenes.scene2d.ui.Cell<Table> seedTrayCell;
+    private com.badlogic.gdx.scenes.scene2d.ui.Cell<Table> objectiveCell;
     private LawnView lawnView;
     private Label sunLabel;
     private Label plantFoodLabel;
@@ -119,6 +120,10 @@ public class BattleScreen extends ScreenAdapter {
             router.go(ScreenId.ADVENTURE);
             return;
         }
+
+        com.badlogic.gdx.graphics.g2d.TextureRegion backgroundRegion =
+                art.chapterBackground(chapterName());
+        Lawn.configure(backgroundRegion);
 
         Image underlay = new Image(art.chapterBackground(chapterName()));
         underlay.setScaling(Scaling.fill);
@@ -332,7 +337,8 @@ public class BattleScreen extends ScreenAdapter {
         bar.add(Ui.button(skin, "Menu", "small-brown", this::onEscape)).width(120f).height(46f);
 
         root.add(bar).growX().height(58f).row();
-        root.add(buildObjectivePanel()).left().padLeft(14f).padTop(6f).row();
+        objectiveCell = root.add(buildObjectivePanel()).left().padLeft(14f);
+        root.row();
         seedTrayCell = root.add(buildSeedTray()).growX().height(showsSeedTray() ? 123f : 0f);
         root.row();
         root.add().expand().row();
@@ -484,7 +490,8 @@ public class BattleScreen extends ScreenAdapter {
             int recharge = Math.max(1, session.effectiveRecharge(slot.getType())
                     * GameSession.TICKS_PER_SECOND);
             packets.get(i).cooldown(slot.getCooldownTicks() / (float) recharge)
-                    .affordable(slot.isSingleUse() || sun >= session.effectiveCost(slot.getType()));
+                    .affordable(slot.isSingleUse() || sun >= session.effectiveCost(slot.getType()))
+                    .armed(tool == Tool.PLANT && pending == slot.getType());
         }
     }
 
@@ -492,8 +499,8 @@ public class BattleScreen extends ScreenAdapter {
         lawnView.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ClickListener() {
             @Override
             public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
-                int column = Lawn.columnAt(Lawn.LEFT + x);
-                int row = Lawn.rowAt(Lawn.BOTTOM + y);
+                int column = Lawn.columnAt(Lawn.left() + x);
+                int row = Lawn.rowAt(Lawn.bottom() + y);
                 if (column >= 1 && row >= 1) {
                     useTool(column, row);
                 }
@@ -600,7 +607,24 @@ public class BattleScreen extends ScreenAdapter {
             return;
         }
         lawnView.setHover(tool == Tool.NONE ? -1 : column, tool == Tool.NONE ? -1 : row);
+        lawnView.setGhost(tool == Tool.PLANT ? pending : null);
+        lawnView.setHoverValid(tool != Tool.PLANT || canPlantAt(column, row));
         collectSunUnder(column, row);
+    }
+
+    private boolean canPlantAt(int column, int row) {
+        if (pending == null) {
+            return false;
+        }
+        if (session.plantAt(column, row) != null) {
+            return false;
+        }
+        models.game.PlantSlot slot = session.findSlot(pending);
+        if (slot == null || !slot.isReady()) {
+            return false;
+        }
+        return slot.isSingleUse()
+                || session.getSunManager().getSunBalance() >= session.effectiveCost(pending);
     }
 
     private void collectSunUnder(int column, int row) {
@@ -630,6 +654,13 @@ public class BattleScreen extends ScreenAdapter {
         String status = objectiveStatus();
         objectivePanel.setVisible(status != null);
         objectiveLabel.setText(status == null ? "" : status);
+        if (objectiveCell != null) {
+            float wanted = status == null ? 0f : 34f;
+            if (objectiveCell.getMinHeight() != wanted) {
+                objectiveCell.height(wanted);
+                objectiveCell.getTable().invalidateHierarchy();
+            }
+        }
         sunLabel.setText(String.valueOf(session.getSunManager().getSunBalance()));
         plantFoodLabel.setText(String.valueOf(session.getPlantFoods()));
         int wave = session.getWaveManager().getCurrentWave();
