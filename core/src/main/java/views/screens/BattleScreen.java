@@ -72,6 +72,8 @@ public class BattleScreen extends ScreenAdapter {
     private Label sunLabel;
     private Label plantFoodLabel;
     private Label waveLabel;
+    private Label objectiveLabel;
+    private Table objectivePanel;
     private ProgressBar waveBar;
     private float accumulator;
     private boolean paused;
@@ -330,11 +332,60 @@ public class BattleScreen extends ScreenAdapter {
         bar.add(Ui.button(skin, "Menu", "small-brown", this::onEscape)).width(120f).height(46f);
 
         root.add(bar).growX().height(58f).row();
+        root.add(buildObjectivePanel()).left().padLeft(14f).padTop(6f).row();
         seedTrayCell = root.add(buildSeedTray()).growX().height(showsSeedTray() ? 123f : 0f);
         root.row();
         root.add().expand().row();
         root.add(buildToolBar()).growX().height(66f);
         return root;
+    }
+
+    private Table buildObjectivePanel() {
+        objectivePanel = new Table(skin);
+        objectivePanel.setBackground(skin.getDrawable("panel"));
+        objectivePanel.pad(4f, 12f, 4f, 12f);
+        objectiveLabel = new Label("", skin, "small");
+        objectivePanel.add(objectiveLabel);
+        return objectivePanel;
+    }
+
+    private String objectiveStatus() {
+        if (session.getMode() == GameMode.VASEBREAKER) {
+            return "Vases left: " + session.getMinigameManager().getVases().size();
+        }
+        if (session.getMode() == GameMode.I_ZOMBIE) {
+            int brains = 0;
+            for (int row = 1; row <= GameSession.ROWS; row++) {
+                if (session.hasBrain(row)) {
+                    brains++;
+                }
+            }
+            return "Brains left: " + brains;
+        }
+        if (session.getMode() == GameMode.BEGHOULED) {
+            return "Combos: " + session.getMinigameManager().getCombosMade()
+                    + " / " + session.getMinigameManager().getCombosNeeded();
+        }
+        if (session.isSpecial(SpecialLevelType.TIMED_WAR)) {
+            int seconds = Math.max(0, session.getTimerTicksLeft()) / GameSession.TICKS_PER_SECOND;
+            return "Kills " + session.getZombiesKilled() + " / 12    Time left: " + seconds + "s";
+        }
+        if (session.isSpecial(SpecialLevelType.LOVE_YOUR_PLANTS)) {
+            return "Plants lost: " + session.getPlantsLost() + " / 5";
+        }
+        if (session.isSpecial(SpecialLevelType.SAVE_OUR_SEEDS)) {
+            int guarded = 0;
+            for (models.game.PlacedPlant plant : session.getPlants()) {
+                if (plant.isProtectedSeed()) {
+                    guarded++;
+                }
+            }
+            return "Protected plants: " + guarded;
+        }
+        if (session.isSpecial(SpecialLevelType.DEAD_LINE)) {
+            return "Hold the red line";
+        }
+        return null;
     }
 
     private Table buildSeedTray() {
@@ -576,6 +627,9 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     protected void refreshHud() {
+        String status = objectiveStatus();
+        objectivePanel.setVisible(status != null);
+        objectiveLabel.setText(status == null ? "" : status);
         sunLabel.setText(String.valueOf(session.getSunManager().getSunBalance()));
         plantFoodLabel.setText(String.valueOf(session.getPlantFoods()));
         int wave = session.getWaveManager().getCurrentWave();

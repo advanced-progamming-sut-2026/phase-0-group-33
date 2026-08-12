@@ -674,6 +674,14 @@ public class MinigameManager {
         return nuts;
     }
 
+    public int getCombosMade() {
+        return combosMade;
+    }
+
+    public int getCombosNeeded() {
+        return combosNeeded;
+    }
+
     public List<ZombieType> getIzombieTypes() {
         return izombieTypes;
     }
