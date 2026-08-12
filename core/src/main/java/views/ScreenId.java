@@ -14,7 +14,9 @@ public enum ScreenId {
     NEWS,
     LEADERBOARD,
     SETTINGS,
-    QUESTS;
+    QUESTS,
+    SEED_SELECT,
+    BATTLE;
 
     public static ScreenId from(Menus menu) {
         if (menu == null) {
@@ -42,7 +44,7 @@ public enum ScreenId {
             case TRAVELLOG:
                 return QUESTS;
             case GAME:
-                return ADVENTURE;
+                return BATTLE;
             default:
                 return MAIN;
         }

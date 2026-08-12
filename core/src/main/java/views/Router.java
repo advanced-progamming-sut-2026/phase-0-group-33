@@ -11,6 +11,8 @@ import views.screens.MainMenuScreen;
 import views.screens.NewsScreen;
 import views.screens.ProfileScreen;
 import views.screens.QuestScreen;
+import views.screens.BattleScreen;
+import views.screens.SeedSelectScreen;
 import views.screens.SettingsScreen;
 import views.screens.ShopScreen;
 import views.screens.SignupScreen;
@@ -63,6 +65,10 @@ public final class Router {
                 return new SettingsScreen(game);
             case QUESTS:
                 return new QuestScreen(game);
+            case SEED_SELECT:
+                return new SeedSelectScreen(game);
+            case BATTLE:
+                return new BattleScreen(game);
             default:
                 return new MainMenuScreen(game);
         }

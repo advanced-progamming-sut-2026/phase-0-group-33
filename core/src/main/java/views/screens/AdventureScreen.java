@@ -3,7 +3,11 @@ package views.screens;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import controllers.menuControllers.MainController;
+import models.Result;
 import models.entities.zombie.ZombieType;
+import models.game.GamePhase;
+import models.game.GameSession;
 import models.progress.chapter.Chapter;
 import models.progress.level.BossLevel;
 import models.progress.level.Level;
@@ -131,7 +135,7 @@ public class AdventureScreen extends BaseScreen {
 
             if (open) {
                 Ui.hoverLift(card, 1.03f);
-                Ui.onClick(card, () -> toasts.error("The battle screen is not part of this build yet."));
+                Ui.onClick(card, () -> enterLevel(level.getLevelNumber()));
             } else {
                 card.setColor(Palette.LOCKED);
             }
@@ -143,6 +147,20 @@ public class AdventureScreen extends BaseScreen {
         }
         panel.add(grid).growX();
         levelPane.add(panel).growX();
+    }
+
+    private void enterLevel(int levelNumber) {
+        Result result = new MainController(app).handleEnterChapter(selectedChapter, levelNumber);
+        if (!result.isSuccessfull()) {
+            toasts.show(result);
+            return;
+        }
+        GameSession session = app.getCurrentGameSession();
+        if (session != null && session.getPhase() == GamePhase.BATTLE) {
+            router.go(ScreenId.BATTLE);
+        } else {
+            router.go(ScreenId.SEED_SELECT);
+        }
     }
 
     private TextureRegion levelIcon(Level level) {
