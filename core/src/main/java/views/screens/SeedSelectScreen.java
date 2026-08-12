@@ -92,13 +92,13 @@ public class SeedSelectScreen extends BaseScreen {
 
         Table columns = new Table();
         columns.add(Ui.scroll(skin, pickerGrid)).width(820f).grow().padRight(16f);
-        columns.add(detailPane).width(350f).top();
+        columns.add(Ui.scroll(skin, detailPane)).width(350f).grow();
         body.add(columns).grow().row();
 
         Table footer = new Table();
         footer.add(Ui.label(skin, hint(), "muted")).left().expandX();
         footer.add(Ui.button(skin, "Let's Rock!", "green", this::startBattle)).width(260f).height(62f);
-        body.add(footer).growX().padTop(10f);
+        body.add(footer).growX().height(74f).padTop(8f);
 
         refresh();
     }
