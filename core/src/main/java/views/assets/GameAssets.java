@@ -20,6 +20,7 @@ public final class GameAssets implements Disposable {
     public static final String LOGO = "ATLASES/UI_MAINMENULOGO_768_00.atlas";
     public static final String TROPHIES = "ATLASES/GAMETROPHIES_768_00.atlas";
     public static final String STAT_ICONS = "ATLASES/UI_ALMANAC_STATICONS_768_00.atlas";
+    public static final String PROJECTILES = "ATLASES/PEAEFFECTS_768_00.atlas";
     public static final String MOWERS = "ATLASES/BEACHMOWERGROUP_768_00.atlas";
     public static final String GRAVES_DARK = "ATLASES/TOMBSTONE_DARK_BASE_768_00.atlas";
     public static final String GRAVES_EGYPT = "ATLASES/EGYPT_GRAVESTONE_768_00.atlas";

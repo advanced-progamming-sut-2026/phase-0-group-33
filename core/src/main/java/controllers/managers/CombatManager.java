@@ -161,32 +161,18 @@ public class CombatManager {
             }
         }
         int shots = plant.getType() == PlantType.PEA_POD ? plant.getStackCount() : 1;
-        boolean torched = plant.getType().getTags().contains(PlantTag.PEA)
-                && torchwoodBetween(plant.getY(), plant.getX(), target.getPosition().getX());
         for (int i = 0; i < shots; i++) {
-            hitZombie(target, plant.getType());
-            if (torched) {
-                target.setChilledTicks(0);
-                hitZombie(target, plant.getType());
-            }
+            session.getProjectileManager().launchStraight(plant, plant.getY(), 1);
         }
     }
 
-    private boolean torchwoodBetween(int row, double fromX, double toX) {
-        for (PlacedPlant other : session.getPlants()) {
-            if (other.getType() == PlantType.TORCHWOOD && other.getY() == row
-                    && other.getX() > fromX && other.getX() <= toX && !other.isDisabled()) {
-                return true;
-            }
-        }
-        return false;
+    void launchToward(PlacedPlant plant, int row, int direction) {
+        session.getProjectileManager().launchStraight(plant, row, direction);
     }
 
 
     private void strikeThrough(PlacedPlant plant) {
-        for (Zombie zombie : zombiesInRowAfter(plant.getY(), plant.getX())) {
-            hitZombie(zombie, plant.getType());
-        }
+        session.getProjectileManager().launchPiercing(plant);
     }
 
     private void lob(PlacedPlant plant) {
@@ -194,11 +180,7 @@ public class CombatManager {
         if (target == null) {
             return;
         }
-        if (plant.getType().getTags().contains(PlantTag.AOE)) {
-            damageArea(target.getPosition().getX(), target.getPosition().getY(), 1, plant.getType());
-        } else {
-            hitZombie(target, plant.getType());
-        }
+        session.getProjectileManager().launchLob(plant, target.getPosition().getX());
     }
 
     private void homingShot(PlacedPlant plant) {
@@ -288,7 +270,7 @@ public class CombatManager {
         }
     }
 
-    void damageArea(double centerX, double centerY, int radius, PlantType source) {
+    public void damageArea(double centerX, double centerY, int radius, PlantType source) {
         for (Zombie zombie : new ArrayList<>(session.getZombies())) {
             if (Math.abs(zombie.getPosition().getX() - centerX) <= radius + 0.5
                     && Math.abs(zombie.getPosition().getY() - centerY) <= radius) {
@@ -297,7 +279,7 @@ public class CombatManager {
         }
     }
 
-    void hitZombie(Zombie zombie, PlantType source) {
+    public void hitZombie(Zombie zombie, PlantType source) {
         if (!session.getBehaviorManager().beforeHit(zombie, source)) {
             return;
         }

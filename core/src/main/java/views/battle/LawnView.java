@@ -206,8 +206,55 @@ public class LawnView extends Actor {
             drawPlants(batch, row);
             drawPushed(batch, row);
             drawZombies(batch, row);
+            drawProjectiles(batch, row);
         }
         drawSuns(batch);
+    }
+
+    private void drawProjectiles(Batch batch, int row) {
+        TextureRegion region = art.pea();
+        if (region == null) {
+            return;
+        }
+        for (models.game.Projectile shot : session.getProjectileManager().getProjectiles()) {
+            if (shot.getRow() != row) {
+                continue;
+            }
+            float size = Lawn.CELL_WIDTH * projectileScale(shot.getSource());
+            float x = Lawn.columnCenter(shot.getX()) - size / 2f;
+            float y = Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.45f
+                    + (float) shot.getHeight() * Lawn.CELL_HEIGHT * 0.5f;
+            batch.setColor(projectileTint(shot.getSource()));
+            batch.draw(region, x, y, size, size);
+        }
+    }
+
+    private float projectileScale(models.entities.plant.PlantType source) {
+        if (source.getTags().contains(models.entities.plant.PlantTag.AOE)) {
+            return 0.42f;
+        }
+        return source.getCategory() == models.entities.plant.PlantCategory.STRIKE_THROUGH
+                ? 0.38f : 0.26f;
+    }
+
+    private Color projectileTint(models.entities.plant.PlantType source) {
+        java.util.Set<models.entities.plant.PlantTag> tags = source.getTags();
+        if (tags.contains(models.entities.plant.PlantTag.FIRE)) {
+            return new Color(1f, 0.78f, 0.22f, 1f);
+        }
+        if (tags.contains(models.entities.plant.PlantTag.ICE)) {
+            return new Color(0.55f, 1f, 1f, 1f);
+        }
+        if (tags.contains(models.entities.plant.PlantTag.POISON)) {
+            return new Color(0.7f, 0.35f, 0.9f, 1f);
+        }
+        if (source.getCategory() == models.entities.plant.PlantCategory.STRIKE_THROUGH) {
+            return new Color(0.92f, 0.95f, 0.8f, 0.75f);
+        }
+        if (tags.contains(models.entities.plant.PlantTag.AOE)) {
+            return new Color(0.55f, 0.95f, 0.4f, 1f);
+        }
+        return Color.WHITE;
     }
 
     private void drawPlants(Batch batch, int row) {

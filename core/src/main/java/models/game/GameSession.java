@@ -5,6 +5,7 @@ import controllers.managers.CombatManager;
 import controllers.managers.MinigameManager;
 import controllers.managers.PlantActionManager;
 import controllers.managers.PlantingManager;
+import controllers.managers.ProjectileManager;
 import controllers.managers.SunManager;
 import controllers.managers.WaveManager;
 import controllers.managers.ZombieBehaviorManager;
@@ -48,6 +49,7 @@ public class GameSession {
     private final PlantingManager plantingManager;
     private final BattleCommands battleCommands;
     private final MinigameManager minigameManager;
+    private final ProjectileManager projectileManager;
     private final ScoreTracker scoreTracker = new ScoreTracker();
     private final QuestStats questStats = new QuestStats();
     private GamePhase phase = GamePhase.PREPARATION;
@@ -73,6 +75,7 @@ public class GameSession {
         this.plantingManager = new PlantingManager(this);
         this.battleCommands = new BattleCommands(this);
         this.minigameManager = new MinigameManager(this, setup.getDifficultyTier());
+        this.projectileManager = new ProjectileManager(this, combatManager);
         BoardBuilder.build(grid, setup.getLevel() == null ? null : setup.getLevel().getChapter(), random);
         initModeState();
     }
@@ -435,6 +438,10 @@ public class GameSession {
 
     public MinigameManager getMinigameManager() {
         return minigameManager;
+    }
+
+    public ProjectileManager getProjectileManager() {
+        return projectileManager;
     }
 
     public ScoreTracker getScoreTracker() {

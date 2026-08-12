@@ -47,6 +47,7 @@ public class BattleCommands {
             session.getWaveManager().tick();
         }
         session.getCombatManager().plantsAct();
+        session.getProjectileManager().tick();
         session.getCombatManager().zombiesAct();
         session.getBehaviorManager().tickEnvironment();
         session.getPlantActionManager().tick();

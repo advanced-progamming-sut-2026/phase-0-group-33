@@ -114,6 +114,11 @@ public final class Art {
         return assets.region(GameAssets.UI, name);
     }
 
+    public TextureRegion pea() {
+        return assets.region(GameAssets.PROJECTILES,
+                "IMAGE_EFFECTS_T_PEA_PROJECTILE_T_PEA_PROJECTILE_39X36");
+    }
+
     public TextureRegion mower() {
         return assets.region(GameAssets.MOWERS, "IMAGE_MOWERS_MOWER_BEACH_MOWER_BEACH_166X175");
     }

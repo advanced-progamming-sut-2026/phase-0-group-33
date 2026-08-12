@@ -57,15 +57,15 @@ public class ShotPatterns {
             }
             Zombie target = combat.firstZombieInRowAfter(row, plant.getX());
             if (target != null) {
-                combat.hitZombie(target, plant.getType());
+                combat.launchToward(plant, row, 1);
             }
         }
     }
 
     private void shootBackward(PlacedPlant plant, int shots) {
         Zombie target = lastZombieInRowBefore(plant.getY(), plant.getX());
-        for (int i = 0; i < shots && target != null && !target.isDead(); i++) {
-            combat.hitZombie(target, plant.getType());
+        for (int i = 0; i < shots && target != null; i++) {
+            combat.launchToward(plant, plant.getY(), -1);
         }
     }
 
@@ -105,7 +105,7 @@ public class ShotPatterns {
     private void shortRangeShot(PlacedPlant plant) {
         Zombie target = combat.firstZombieInRowAfter(plant.getY(), plant.getX());
         if (target != null && target.getPosition().getX() - plant.getX() <= 3) {
-            combat.hitZombie(target, plant.getType());
+            combat.launchToward(plant, plant.getY(), 1);
         }
     }
 
