@@ -32,6 +32,8 @@ public class LawnView extends Actor {
     private boolean showGrid;
     private int hoverColumn = -1;
     private int hoverRow = -1;
+    private int selectColumn = -1;
+    private int selectRow = -1;
 
     public LawnView(GameSession session, Art art, Skin skin) {
         this.session = session;
@@ -50,6 +52,11 @@ public class LawnView extends Actor {
     public void setHover(int column, int row) {
         this.hoverColumn = column;
         this.hoverRow = row;
+    }
+
+    public void setSelection(int column, int row) {
+        this.selectColumn = column;
+        this.selectRow = row;
     }
 
     public void clearHover() {
@@ -173,6 +180,9 @@ public class LawnView extends Actor {
     }
 
     private void drawHover(Batch batch) {
+        if (selectColumn >= 1 && selectRow >= 1) {
+            paint(batch, PROTECTED, selectColumn, selectRow);
+        }
         if (hoverColumn < 1 || hoverRow < 1) {
             return;
         }
@@ -194,6 +204,14 @@ public class LawnView extends Actor {
             batch.setColor(DANGER);
             fill.draw(batch, Lawn.columnLeft(4), Lawn.BOTTOM, 4f, Lawn.HEIGHT);
         }
+        if (session.getMode() == models.game.GameMode.WALLNUT_BOWLING) {
+            batch.setColor(DANGER);
+            fill.draw(batch, Lawn.columnLeft(4), Lawn.BOTTOM, 4f, Lawn.HEIGHT);
+        }
+        if (session.getMode() == models.game.GameMode.I_ZOMBIE) {
+            batch.setColor(DANGER);
+            fill.draw(batch, Lawn.columnLeft(6), Lawn.BOTTOM, 4f, Lawn.HEIGHT);
+        }
         for (models.game.PlacedPlant plant : session.getPlants()) {
             if (plant.isProtectedSeed()) {
                 paint(batch, PROTECTED, plant.getX(), plant.getY());
@@ -201,7 +219,39 @@ public class LawnView extends Actor {
         }
     }
 
+    private void drawBrains(Batch batch) {
+        TextureRegion region = art.brain();
+        if (region == null) {
+            return;
+        }
+        batch.setColor(Color.WHITE);
+        float size = Lawn.CELL_HEIGHT * 0.6f;
+        for (int row = 1; row <= GameSession.ROWS; row++) {
+            if (!session.hasBrain(row)) {
+                continue;
+            }
+            batch.draw(region, Lawn.LEFT - size - 6f,
+                    Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.2f, size, size);
+        }
+    }
+
+    private void drawVases(Batch batch) {
+        for (models.game.Vase vase : session.getMinigameManager().getVases()) {
+            TextureRegion region = art.vase(vase.getKind());
+            if (region == null) {
+                continue;
+            }
+            batch.setColor(Color.WHITE);
+            float height = Lawn.CELL_HEIGHT * 0.8f;
+            float width = height * region.getRegionWidth() / region.getRegionHeight();
+            batch.draw(region, Lawn.columnCenter(vase.getX()) - width / 2f,
+                    Lawn.rowBottom(vase.getY()) + Lawn.CELL_HEIGHT * 0.1f, width, height);
+        }
+    }
+
     private void drawEntities(Batch batch) {
+        drawBrains(batch);
+        drawVases(batch);
         for (int row = 1; row <= GameSession.ROWS; row++) {
             drawPlants(batch, row);
             drawPushed(batch, row);

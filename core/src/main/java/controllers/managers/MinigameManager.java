@@ -674,6 +674,10 @@ public class MinigameManager {
         return nuts;
     }
 
+    public List<ZombieType> getIzombieTypes() {
+        return izombieTypes;
+    }
+
     public List<Vase> getVases() {
         return vases;
     }

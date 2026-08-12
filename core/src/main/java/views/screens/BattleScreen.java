@@ -20,7 +20,9 @@ import models.Result;
 import models.entities.plant.PlantType;
 import models.game.GameSession;
 import models.game.PlantSlot;
+import models.game.GameMode;
 import models.game.Sun;
+import models.entities.zombie.ZombieType;
 import models.progress.level.special.SpecialLevelType;
 import models.settings.GamePreferences;
 import views.PvzGame;
@@ -54,6 +56,9 @@ public class BattleScreen extends ScreenAdapter {
     private final java.util.List<SeedPacket> packets = new java.util.ArrayList<>();
     private Tool tool = Tool.NONE;
     private PlantType pending;
+    private ZombieType pendingZombie;
+    private int swapColumn = -1;
+    private int swapRow = -1;
     private String seedSignature = "";
     private float waveDelay;
     private int lastWave;
@@ -62,6 +67,7 @@ public class BattleScreen extends ScreenAdapter {
     private float noticeTimer;
     private final String levelChapter;
     private final int levelNumber;
+    private com.badlogic.gdx.scenes.scene2d.ui.Cell<Table> seedTrayCell;
     private LawnView lawnView;
     private Label sunLabel;
     private Label plantFoodLabel;
@@ -202,6 +208,22 @@ public class BattleScreen extends ScreenAdapter {
 
     private java.util.List<String> objectives() {
         java.util.List<String> lines = new java.util.ArrayList<>();
+        if (session.getMode() == GameMode.VASEBREAKER) {
+            lines.add("Break every vase and survive whatever crawls out.");
+            return lines;
+        }
+        if (session.getMode() == GameMode.WALLNUT_BOWLING) {
+            lines.add("Bowl the nuts from behind the red line.");
+            return lines;
+        }
+        if (session.getMode() == GameMode.I_ZOMBIE) {
+            lines.add("You command the zombies. Eat every brain to win.");
+            return lines;
+        }
+        if (session.getMode() == GameMode.BEGHOULED) {
+            lines.add("Swap neighbouring plants to line up three of a kind.");
+            return lines;
+        }
         lines.add("Do not let the zombies reach your house.");
         SpecialLevelType special = session.getLevel() == null ? null
                 : session.getLevel().getSpecialType();
@@ -263,8 +285,9 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     protected void leave() {
+        boolean minigame = session != null && session.getLevel() == null;
         app.setCurrentGameSession(null);
-        router.go(ScreenId.ADVENTURE);
+        router.go(minigame ? ScreenId.QUESTS : ScreenId.ADVENTURE);
     }
 
     private void startWaveManually() {
@@ -307,7 +330,8 @@ public class BattleScreen extends ScreenAdapter {
         bar.add(Ui.button(skin, "Menu", "small-brown", this::onEscape)).width(120f).height(46f);
 
         root.add(bar).growX().height(58f).row();
-        root.add(buildSeedTray()).growX().height(123f).row();
+        seedTrayCell = root.add(buildSeedTray()).growX().height(showsSeedTray() ? 123f : 0f);
+        root.row();
         root.add().expand().row();
         root.add(buildToolBar()).growX().height(66f);
         return root;
@@ -317,8 +341,16 @@ public class BattleScreen extends ScreenAdapter {
         Table tray = new Table(skin);
         tray.setBackground(skin.getDrawable("panel"));
         tray.pad(3f, 12f, 3f, 12f);
-        tray.add(seedBar).left().expandX();
+        if (session.getMode() == GameMode.I_ZOMBIE) {
+            tray.add(buildZombieTray()).left().expandX();
+        } else {
+            tray.add(seedBar).left().expandX();
+        }
         return tray;
+    }
+
+    private boolean showsSeedTray() {
+        return session.getMode() == GameMode.I_ZOMBIE || !session.getSlots().isEmpty();
     }
 
     private Table buildToolBar() {
@@ -363,7 +395,7 @@ public class BattleScreen extends ScreenAdapter {
         packets.clear();
         for (final PlantSlot slot : session.getSlots()) {
             SeedPacket packet = new SeedPacket(skin, art, slot.getType())
-                    .cost(session.effectiveCost(slot.getType()))
+                    .cost(slot.isSingleUse() ? 0 : session.effectiveCost(slot.getType()))
                     .boosted(slot.isBoosted())
                     .onClick(() -> selectTool(Tool.PLANT, slot.getType()));
             packets.add(packet);
@@ -381,6 +413,16 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     private void refreshSeedBar() {
+        if (session.getMode() == GameMode.I_ZOMBIE) {
+            return;
+        }
+        if (seedTrayCell != null) {
+            float wanted = showsSeedTray() ? 123f : 0f;
+            if (seedTrayCell.getMinHeight() != wanted) {
+                seedTrayCell.height(wanted);
+                seedTrayCell.getTable().invalidateHierarchy();
+            }
+        }
         if (!signature().equals(seedSignature)) {
             rebuildSeedBar();
         }
@@ -409,6 +451,21 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     private void useTool(int column, int row) {
+        if (session.getMode() == GameMode.VASEBREAKER && tool == Tool.NONE) {
+            Result broken = controller.handleBreakVase(column, row);
+            if (broken.isSuccessfull() || !hasVases()) {
+                toasts.show(broken);
+                return;
+            }
+        }
+        if (session.getMode() == GameMode.I_ZOMBIE) {
+            placeZombie(column, row);
+            return;
+        }
+        if (session.getMode() == GameMode.BEGHOULED) {
+            swapAt(column, row);
+            return;
+        }
         Result result;
         switch (tool) {
             case PLANT:
@@ -432,6 +489,54 @@ public class BattleScreen extends ScreenAdapter {
             tool = Tool.NONE;
             pending = null;
         }
+    }
+
+    private boolean hasVases() {
+        return !session.getMinigameManager().getVases().isEmpty();
+    }
+
+    private void placeZombie(int column, int row) {
+        if (pendingZombie == null) {
+            toasts.error("Pick a zombie from the tray first.");
+            return;
+        }
+        toasts.show(controller.handlePlaceZombie(pendingZombie.getName(), column, row));
+    }
+
+    private void swapAt(int column, int row) {
+        if (swapColumn < 0) {
+            swapColumn = column;
+            swapRow = row;
+            lawnView().setSelection(column, row);
+            return;
+        }
+        Result result = controller.handleSwap(swapColumn, swapRow, column, row);
+        toasts.show(result);
+        swapColumn = -1;
+        swapRow = -1;
+        lawnView().setSelection(-1, -1);
+    }
+
+    private Table buildZombieTray() {
+        Table tray = new Table();
+        for (final ZombieType type : session.getMinigameManager().getIzombieTypes()) {
+            Table card = new Table(skin);
+            card.setBackground(skin.getDrawable("card"));
+            card.pad(4f);
+            card.add(Ui.iconCell(art.zombie(type), 46f)).row();
+            card.add(Ui.label(skin, type.getName(), "tiny")).width(88f).row();
+            Table price = new Table();
+            price.add(Ui.iconCell(art.ui("image_ui_hud_ingame_sun"), 18f)).padRight(3f);
+            price.add(Ui.label(skin, String.valueOf(type.getWaveCost()), "small"));
+            card.add(price);
+            Ui.hoverLift(card, 1.05f);
+            Ui.onClick(card, () -> {
+                pendingZombie = type;
+                toasts.success(type.getName() + " ready; click a tile right of the line.");
+            });
+            tray.add(card).size(96f, 116f).padRight(5f);
+        }
+        return tray;
     }
 
     private void updateHover() {
@@ -458,6 +563,9 @@ public class BattleScreen extends ScreenAdapter {
 
     private void autoStartWaves() {
         if (session.getWaveManager().isStarted()
+                || session.getMode() == GameMode.VASEBREAKER
+                || session.getMode() == GameMode.I_ZOMBIE
+                || session.getMode() == GameMode.BEGHOULED
                 || session.isSpecial(SpecialLevelType.PLANT_WHAT_YOU_GET)) {
             return;
         }

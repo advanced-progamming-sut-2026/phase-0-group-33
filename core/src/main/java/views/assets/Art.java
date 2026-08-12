@@ -114,6 +114,23 @@ public final class Art {
         return assets.region(GameAssets.UI, name);
     }
 
+    public TextureRegion vase(models.game.Vase.VaseKind kind) {
+        String key = kind == models.game.Vase.VaseKind.PLANT ? "GREEN"
+                : kind == models.game.Vase.VaseKind.GHOUL ? "GARGANTUAR" : "BROWN";
+        return assets.region(GameAssets.VASES,
+                "IMAGE_VASEBREAKER_VASE_" + key + "_VASE_" + key + "_115X150");
+    }
+
+    public TextureRegion brain() {
+        return assets.region(GameAssets.BRAINS,
+                "IMAGE_ZOMBIE_POWER_BRAIN_PROJECTILE_POWER_BRAIN_PROJECTILE_112X82");
+    }
+
+    public TextureRegion lawnBackground() {
+        return assets.region("ATLASES/DELAYLOAD_BACKGROUND_FRONTLAWN_768_00.atlas",
+                "IMAGE_BACKGROUNDS_FRONTLAWN_TEXTURE");
+    }
+
     public TextureRegion pea() {
         return assets.region(GameAssets.PROJECTILES,
                 "IMAGE_EFFECTS_T_PEA_PROJECTILE_T_PEA_PROJECTILE_39X36");
@@ -189,7 +206,8 @@ public final class Art {
                 return assets.region("ATLASES/DELAYLOAD_BACKGROUND_DARK_COMPRESSED_768_00.atlas",
                         "IMAGE_BACKGROUNDS_DARK_TEXTURE");
             default:
-                return menuBackground();
+                TextureRegion lawn = lawnBackground();
+                return lawn == null ? menuBackground() : lawn;
         }
     }
 

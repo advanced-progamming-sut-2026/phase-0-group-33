@@ -131,6 +131,16 @@ public class QuestScreen extends BaseScreen {
         return box;
     }
 
+    private void startMinigame(String name) {
+        Result result = new controllers.menuControllers.TravelLogController(app)
+                .handlePlayMinigame(name, 1);
+        if (!result.isSuccessfull()) {
+            toasts.show(result);
+            return;
+        }
+        router.go(views.ScreenId.BATTLE);
+    }
+
     private Table minigameCard(String line) {
         Table card = new Table(skin);
         card.setBackground(skin.getDrawable("row"));
@@ -147,8 +157,8 @@ public class QuestScreen extends BaseScreen {
         text.add(Ui.label(skin, name, "h2")).left().row();
         text.add(Ui.wrapped(skin, description, "muted")).width(620f).left().padTop(4f);
         card.add(text).growX();
-        card.add(Ui.button(skin, "Play", "small",
-                () -> toasts.error("The battle screen is not part of this build yet.")))
+        final String key = name;
+        card.add(Ui.button(skin, "Play", "small", () -> startMinigame(key)))
                 .width(140f).height(50f).right();
         return card;
     }
