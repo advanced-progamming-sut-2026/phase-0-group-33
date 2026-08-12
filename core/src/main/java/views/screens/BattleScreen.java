@@ -658,6 +658,7 @@ public class BattleScreen extends ScreenAdapter {
             onGameOver();
         }
         if (session != null) {
+            lawnView.setFrozen(paused || session.isOver());
             refreshHud();
             refreshSeedBar();
             updateHover();

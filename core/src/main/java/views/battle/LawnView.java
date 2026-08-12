@@ -34,6 +34,8 @@ public class LawnView extends Actor {
     private int hoverRow = -1;
     private int selectColumn = -1;
     private int selectRow = -1;
+    private float time;
+    private boolean frozen;
 
     public LawnView(GameSession session, Art art, Skin skin) {
         this.session = session;
@@ -52,6 +54,22 @@ public class LawnView extends Actor {
     public void setHover(int column, int row) {
         this.hoverColumn = column;
         this.hoverRow = row;
+    }
+
+    public void setFrozen(boolean frozen) {
+        this.frozen = frozen;
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        if (!frozen) {
+            time += delta;
+        }
+    }
+
+    private float idlePulse(int seed, float speed, float amount) {
+        return 1f + amount * (float) Math.sin(time * speed + seed * 0.7f);
     }
 
     public void setSelection(int column, int row) {
@@ -312,8 +330,10 @@ public class LawnView extends Actor {
             if (plant.getY() != row) {
                 continue;
             }
-            float width = Lawn.CELL_WIDTH * 0.74f;
-            float height = Lawn.CELL_HEIGHT * 0.74f;
+            float breathe = plant.isDisabled() ? 1f
+                    : idlePulse(plant.getX() * 3 + row, 2.4f, 0.05f);
+            float width = Lawn.CELL_WIDTH * 0.74f / breathe;
+            float height = Lawn.CELL_HEIGHT * 0.74f * breathe;
             float x = Lawn.columnCenter(plant.getX()) - width / 2f;
             float y = Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.12f;
             batch.setColor(plantTint(plant));
@@ -383,10 +403,14 @@ public class LawnView extends Actor {
             if ((int) zombie.getPosition().getY() != row) {
                 continue;
             }
-            float width = Lawn.CELL_WIDTH * 0.66f;
-            float height = Lawn.CELL_HEIGHT * 0.86f;
+            boolean still = zombie.getFrozenTicks() > 0;
+            int seed = System.identityHashCode(zombie) & 0xff;
+            float bob = still ? 0f : (float) Math.abs(Math.sin(time * 5.2f + seed)) * 4f;
+            float lean = still ? 1f : idlePulse(seed, 5.2f, 0.04f);
+            float width = Lawn.CELL_WIDTH * 0.66f * lean;
+            float height = Lawn.CELL_HEIGHT * 0.86f / lean;
             float x = Lawn.columnCenter(zombie.getPosition().getX()) - width / 2f;
-            float y = Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.08f;
+            float y = Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.08f + bob;
             batch.setColor(zombieTint(zombie));
             batch.draw(art.zombie(zombie.getType()), x, y, width, height);
             if (zombie.getFrozenTicks() > 0) {
@@ -441,7 +465,7 @@ public class LawnView extends Actor {
             return;
         }
         for (models.game.Sun sun : session.getSunManager().getSuns()) {
-            float size = sunSize(sun);
+            float size = sunSize(sun) * idlePulse(sun.getX() * 5 + sun.getY(), 3.1f, 0.07f);
             float targetY = Lawn.rowCenter(sun.getY()) - size / 2f;
             float y = targetY;
             if (sun.isFalling()) {
