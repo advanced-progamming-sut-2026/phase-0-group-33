@@ -4,10 +4,10 @@ import models.game.GameSession;
 
 public final class Lawn {
 
-    public static final float LEFT = 262f;
-    public static final float BOTTOM = 96f;
-    public static final float CELL_WIDTH = 106f;
-    public static final float CELL_HEIGHT = 100f;
+    public static final float LEFT = 392f;
+    public static final float BOTTOM = 73f;
+    public static final float CELL_WIDTH = 74f;
+    public static final float CELL_HEIGHT = 92.4f;
     public static final float WIDTH = CELL_WIDTH * GameSession.COLS;
     public static final float HEIGHT = CELL_HEIGHT * GameSession.ROWS;
 
