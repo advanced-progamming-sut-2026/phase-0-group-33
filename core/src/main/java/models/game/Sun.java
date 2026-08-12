@@ -24,6 +24,8 @@ public class Sun {
         }
     }
 
+    private static final int FALL_TICKS = 50;
+
     private final SunKind kind;
     private final int x;
     private final int y;
@@ -41,11 +43,15 @@ public class Sun {
     }
 
     public static Sun falling(SunKind kind, int x, int y) {
-        return new Sun(kind, x, y, 50, kind.getValue(), false);
+        return new Sun(kind, x, y, FALL_TICKS, kind.getValue(), false);
     }
 
     public static Sun produced(int x, int y, int value) {
         return new Sun(SunKind.NORMAL, x, y, 0, value, true);
+    }
+
+    public float getFallProgress() {
+        return ticksToLand <= 0 ? 1f : 1f - ticksToLand / (float) FALL_TICKS;
     }
 
     public boolean isFalling() {

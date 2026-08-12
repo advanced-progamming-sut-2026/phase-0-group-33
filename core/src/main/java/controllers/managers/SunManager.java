@@ -115,6 +115,10 @@ public class SunManager {
         return false;
     }
 
+    public List<Sun> getSuns() {
+        return suns;
+    }
+
     public int getSunBalance() {
         return sunBalance;
     }
