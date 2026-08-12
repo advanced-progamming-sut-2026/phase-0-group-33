@@ -28,6 +28,7 @@ import views.Router;
 import views.ScreenId;
 import views.assets.Art;
 import views.battle.Lawn;
+import views.battle.Overlay;
 import views.battle.LawnView;
 import views.ui.BaseScreen;
 import views.ui.SeedPacket;
@@ -55,6 +56,12 @@ public class BattleScreen extends ScreenAdapter {
     private PlantType pending;
     private String seedSignature = "";
     private float waveDelay;
+    private int lastWave;
+    private Overlay overlay;
+    private Label notice;
+    private float noticeTimer;
+    private final String levelChapter;
+    private final int levelNumber;
     private LawnView lawnView;
     private Label sunLabel;
     private Label plantFoodLabel;
@@ -73,6 +80,10 @@ public class BattleScreen extends ScreenAdapter {
         this.toasts = new Toasts(skin, stage);
         this.controller = new GameController(game.getApp());
         this.session = game.getApp().getCurrentGameSession();
+        this.levelChapter = session == null || session.getLevel() == null ? null
+                : session.getLevel().getChapter().getName();
+        this.levelNumber = session == null || session.getLevel() == null ? 1
+                : session.getLevel().getLevelNumber();
     }
 
     protected boolean isPaused() {
@@ -117,10 +128,12 @@ public class BattleScreen extends ScreenAdapter {
         stage.addActor(lawnView);
 
         stage.addActor(buildHud());
+        stage.addActor(buildNotice());
         installLawnInput();
         installInput();
         refreshHud();
         rebuildSeedBar();
+        showObjectives();
     }
 
     protected LawnView createLawnView() {
@@ -142,12 +155,120 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     protected void onEscape() {
-        leave();
+        if (overlay != null) {
+            return;
+        }
+        openPauseMenu();
+    }
+
+    private Table buildNotice() {
+        Table holder = new Table();
+        holder.setFillParent(true);
+        holder.center();
+        holder.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.disabled);
+        notice = new Label("", skin, "title");
+        notice.setColor(views.ui.Palette.BAD);
+        notice.getColor().a = 0f;
+        holder.add(notice);
+        return holder;
+    }
+
+    protected void announce(String text) {
+        notice.setText(text);
+        notice.getColor().a = 1f;
+        noticeTimer = 2.4f;
+    }
+
+    private void fadeNotice(float delta) {
+        if (noticeTimer <= 0f) {
+            return;
+        }
+        noticeTimer -= delta;
+        if (noticeTimer < 0.6f) {
+            notice.getColor().a = Math.max(0f, noticeTimer / 0.6f);
+        }
+    }
+
+    private void showObjectives() {
+        Table content = new Table();
+        for (String line : objectives()) {
+            content.add(Ui.label(skin, line, "h2")).left().padBottom(6f).row();
+        }
+        content.add(Ui.button(skin, "Let's go!", "green", this::closeOverlay))
+                .width(240f).height(56f).padTop(14f);
+        setPaused(true);
+        overlay = Overlay.open(stage, skin, "Level Briefing", content);
+    }
+
+    private java.util.List<String> objectives() {
+        java.util.List<String> lines = new java.util.ArrayList<>();
+        lines.add("Do not let the zombies reach your house.");
+        SpecialLevelType special = session.getLevel() == null ? null
+                : session.getLevel().getSpecialType();
+        if (special == SpecialLevelType.DEAD_LINE) {
+            lines.add("No zombie may cross the red line on the lawn.");
+        } else if (special == SpecialLevelType.SAVE_OUR_SEEDS) {
+            lines.add("Keep the marked Wall-nuts alive.");
+        } else if (special == SpecialLevelType.TIMED_WAR) {
+            lines.add("Destroy 12 zombies before the timer runs out.");
+        } else if (special == SpecialLevelType.LOVE_YOUR_PLANTS) {
+            lines.add("Losing 5 plants loses the level.");
+        } else if (special == SpecialLevelType.NIGHT_OPS) {
+            lines.add("No sun falls at night; grow your own.");
+        } else if (special == SpecialLevelType.CONVEYOR_BELT) {
+            lines.add("Plants arrive on the belt; you cannot choose them.");
+        } else if (special == SpecialLevelType.PLANT_WHAT_YOU_GET) {
+            lines.add("Plant freely, then start the wave yourself.");
+        } else if (special == SpecialLevelType.LOCKED_PLANTS) {
+            lines.add("Some of your plants are locked for this level.");
+        }
+        lines.add("Waves in this level: " + session.getWaveManager().getTotalWaves());
+        return lines;
+    }
+
+    private void closeOverlay() {
+        if (overlay != null) {
+            overlay.close();
+            overlay = null;
+        }
+        setPaused(false);
+    }
+
+    private void openPauseMenu() {
+        setPaused(true);
+        Table content = new Table();
+        content.add(Ui.button(skin, "Resume", "green", this::closeOverlay))
+                .width(300f).height(56f).padBottom(10f).row();
+        content.add(Ui.button(skin, "Restart level", "blue", this::restart))
+                .width(300f).height(56f).padBottom(10f).row();
+        content.add(Ui.button(skin, "Save and quit", "brown", this::leave))
+                .width(300f).height(56f);
+        overlay = Overlay.open(stage, skin, "Paused", content);
+    }
+
+    private void restart() {
+        if (levelChapter == null) {
+            leave();
+            return;
+        }
+        app.setCurrentGameSession(null);
+        Result result = new controllers.menuControllers.MainController(app)
+                .handleEnterChapter(levelChapter, levelNumber);
+        if (!result.isSuccessfull()) {
+            leave();
+            return;
+        }
+        router.go(app.getCurrentGameSession().getPhase() == models.game.GamePhase.BATTLE
+                ? ScreenId.BATTLE : ScreenId.SEED_SELECT);
     }
 
     protected void leave() {
         app.setCurrentGameSession(null);
         router.go(ScreenId.ADVENTURE);
+    }
+
+    private void startWaveManually() {
+        toasts.show(session.startZombieWaves());
     }
 
     private String username() {
@@ -206,6 +327,11 @@ public class BattleScreen extends ScreenAdapter {
         tray.pad(6f, 12f, 6f, 12f);
         tray.add().expandX();
 
+        if (session.isSpecial(SpecialLevelType.PLANT_WHAT_YOU_GET)
+                && !session.getWaveManager().isStarted()) {
+            tray.add(Ui.button(skin, "Start the wave", "green", this::startWaveManually))
+                    .width(200f).height(46f).padRight(8f);
+        }
         tray.add(Ui.button(skin, "Shovel", "small-brown",
                 () -> selectTool(Tool.SHOVEL, null))).width(120f).height(46f).padLeft(8f);
         tray.add(Ui.button(skin, "Plant Food", "small-purple",
@@ -352,6 +478,12 @@ public class BattleScreen extends ScreenAdapter {
 
     protected void onTick() {
         autoStartWaves();
+        int wave = session.getWaveManager().getCurrentWave();
+        if (wave != lastWave) {
+            lastWave = wave;
+            announce(wave >= session.getWaveManager().getTotalWaves()
+                    ? "The final wave is here!" : "A huge wave of zombies is approaching!");
+        }
     }
 
     @Override
@@ -360,10 +492,14 @@ public class BattleScreen extends ScreenAdapter {
         if (session != null && !paused && !session.isOver()) {
             advance(delta);
         }
+        if (session != null && session.isOver() && overlay == null) {
+            onGameOver();
+        }
         if (session != null) {
             refreshHud();
             refreshSeedBar();
             updateHover();
+            fadeNotice(delta);
         }
         stage.act(delta);
         stage.draw();
@@ -389,6 +525,23 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     protected void onGameOver() {
+        if (overlay != null) {
+            return;
+        }
+        boolean won = session.getPhase() == models.game.GamePhase.WON;
+        setPaused(true);
+        controller.handleAdvanceTime(0);
+
+        Table content = new Table();
+        content.add(Ui.label(skin, won ? "The lawn is safe." : "The zombies ate your brains.",
+                "h2")).padBottom(14f).row();
+        if (!won) {
+            content.add(Ui.button(skin, "Try again", "green", this::restart))
+                    .width(300f).height(56f).padBottom(10f).row();
+        }
+        content.add(Ui.button(skin, "Back to the map", "brown", this::leave))
+                .width(300f).height(56f);
+        overlay = Overlay.open(stage, skin, won ? "Victory" : "Defeat", content);
     }
 
     @Override
