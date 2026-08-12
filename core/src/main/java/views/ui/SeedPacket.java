@@ -29,6 +29,7 @@ public final class SeedPacket extends Table {
 
     private float cooldown;
     private boolean affordable = true;
+    private boolean armed;
 
     public SeedPacket(Skin skin, Art art, PlantType type) {
         this.skin = skin;
@@ -79,6 +80,14 @@ public final class SeedPacket extends Table {
     public SeedPacket affordable(boolean value) {
         this.affordable = value;
         portrait.setColor(value ? Color.WHITE : new Color(0.45f, 0.45f, 0.5f, 1f));
+        return this;
+    }
+
+    public SeedPacket armed(boolean value) {
+        if (armed != value) {
+            armed = value;
+            setBackground(skin.getDrawable(value ? "card-done" : "card"));
+        }
         return this;
     }
 
