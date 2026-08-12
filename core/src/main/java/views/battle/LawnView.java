@@ -62,6 +62,7 @@ public class LawnView extends Actor {
             drawGrid(batch);
         }
         drawSpecialMarkers(batch);
+        drawEntities(batch);
         batch.setColor(previous);
     }
 
@@ -162,6 +163,184 @@ public class LawnView extends Actor {
                 paint(batch, PROTECTED, plant.getX(), plant.getY());
             }
         }
+    }
+
+    private void drawEntities(Batch batch) {
+        for (int row = 1; row <= GameSession.ROWS; row++) {
+            drawPlants(batch, row);
+            drawPushed(batch, row);
+            drawZombies(batch, row);
+        }
+        drawSuns(batch);
+    }
+
+    private void drawPlants(Batch batch, int row) {
+        for (models.game.PlacedPlant plant : session.getPlants()) {
+            if (plant.getY() != row) {
+                continue;
+            }
+            float width = Lawn.CELL_WIDTH * 0.74f;
+            float height = Lawn.CELL_HEIGHT * 0.74f;
+            float x = Lawn.columnCenter(plant.getX()) - width / 2f;
+            float y = Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.12f;
+            batch.setColor(plantTint(plant));
+            batch.draw(art.plant(plant.getType()), x, y, width, height);
+            drawPlantOverlays(batch, plant, x, y, width, height);
+            drawHealthBar(batch, plant.getHealth(), plant.getMaxHealth(),
+                    x, y + height + 3f, width);
+        }
+    }
+
+    private Color plantTint(models.game.PlacedPlant plant) {
+        if (plant.isSheep()) {
+            return new Color(0.95f, 0.95f, 1f, 1f);
+        }
+        if (plant.getArmTicks() > 0) {
+            return new Color(0.7f, 0.7f, 0.7f, 0.85f);
+        }
+        return Color.WHITE;
+    }
+
+    private void drawPlantOverlays(Batch batch, models.game.PlacedPlant plant,
+                                   float x, float y, float width, float height) {
+        if (plant.getIceHealth() > 0 || plant.getFreezeLevel() > 0) {
+            float alpha = 0.2f + 0.2f * Math.min(3, Math.max(1, plant.getFreezeLevel()));
+            batch.setColor(0.6f, 0.85f, 1f, plant.getIceHealth() > 0 ? 0.75f : alpha);
+            fill.draw(batch, x, y, width, height);
+        }
+        if (plant.getOctopusHealth() > 0) {
+            batch.setColor(Color.WHITE);
+            TextureRegion octopus = art.zombie(models.entities.zombie.ZombieType.OCTOPUS);
+            if (octopus != null) {
+                batch.draw(octopus, x + width * 0.15f, y + height * 0.3f, width * 0.7f, height * 0.7f);
+            }
+        }
+        if (plant.getPumpkinHealth() > 0) {
+            batch.setColor(1f, 0.65f, 0.2f, 0.45f);
+            fill.draw(batch, x, y, width, height);
+        }
+    }
+
+    private void drawPushed(Batch batch, int row) {
+        for (models.game.PushedObject pushed : session.getPushedObjects()) {
+            if (pushed.getRow() != row || pushed.isDestroyed()) {
+                continue;
+            }
+            batch.setColor(Color.WHITE);
+            float size = Lawn.CELL_WIDTH * 0.6f;
+            TextureRegion region = art.ui("image_ui_generic_leaf_backdrop");
+            if (region != null) {
+                batch.draw(region, Lawn.columnCenter(pushed.getX()) - size / 2f,
+                        Lawn.rowCenter(row) - size / 2f, size, size);
+            }
+        }
+        for (models.game.RollingNut nut : session.getMinigameManager().getNuts()) {
+            if (nut.getRow() != row) {
+                continue;
+            }
+            batch.setColor(Color.WHITE);
+            float size = Lawn.CELL_WIDTH * (nut.isGiant() ? 0.8f : 0.62f);
+            batch.draw(art.plant(nut.getType()), Lawn.columnCenter(nut.getX()) - size / 2f,
+                    Lawn.rowCenter(row) - size / 2f, size, size);
+        }
+    }
+
+    private void drawZombies(Batch batch, int row) {
+        for (models.entities.zombie.Zombie zombie : session.getZombies()) {
+            if ((int) zombie.getPosition().getY() != row) {
+                continue;
+            }
+            float width = Lawn.CELL_WIDTH * 0.66f;
+            float height = Lawn.CELL_HEIGHT * 0.86f;
+            float x = Lawn.columnCenter(zombie.getPosition().getX()) - width / 2f;
+            float y = Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.08f;
+            batch.setColor(zombieTint(zombie));
+            batch.draw(art.zombie(zombie.getType()), x, y, width, height);
+            if (zombie.getFrozenTicks() > 0) {
+                batch.setColor(0.6f, 0.85f, 1f, 0.75f);
+                fill.draw(batch, x, y, width, height);
+            }
+            drawArmor(batch, zombie, x, y, width, height);
+            int max = Math.max(1, zombie.getType().getHitpoints());
+            drawHealthBar(batch, zombie.getHealth(), max, x, y + height + 3f, width);
+        }
+    }
+
+    private Color zombieTint(models.entities.zombie.Zombie zombie) {
+        if (zombie.getBattle().isHypnotized()) {
+            return new Color(0.75f, 0.5f, 1f, 1f);
+        }
+        if (zombie.getFrozenTicks() > 0) {
+            return new Color(0.7f, 0.85f, 1f, 1f);
+        }
+        if (zombie.getChilledTicks() > 0) {
+            return new Color(0.72f, 0.88f, 1f, 1f);
+        }
+        if (zombie.getBattle().getPoisonTicksLeft() > 0) {
+            return new Color(0.75f, 1f, 0.6f, 1f);
+        }
+        if (zombie.isGlowing()) {
+            return new Color(0.7f, 1f, 0.7f, 1f);
+        }
+        if (zombie.getPosition().getX() < 2.5) {
+            return new Color(1f, 0.6f, 0.6f, 1f);
+        }
+        return Color.WHITE;
+    }
+
+    private void drawArmor(Batch batch, models.entities.zombie.Zombie zombie,
+                           float x, float y, float width, float height) {
+        if (zombie.totalArmor() <= 0) {
+            return;
+        }
+        TextureRegion region = art.ui("image_ui_lock_small_gold");
+        if (region == null) {
+            return;
+        }
+        batch.setColor(Color.WHITE);
+        float size = width * 0.4f;
+        batch.draw(region, x + width - size * 0.7f, y + height - size * 0.6f, size, size);
+    }
+
+    private void drawSuns(Batch batch) {
+        TextureRegion region = art.ui("image_ui_hud_ingame_sun");
+        if (region == null) {
+            return;
+        }
+        for (models.game.Sun sun : session.getSunManager().getSuns()) {
+            float size = sunSize(sun);
+            float targetY = Lawn.rowCenter(sun.getY()) - size / 2f;
+            float y = targetY;
+            if (sun.isFalling()) {
+                float startY = Lawn.BOTTOM + Lawn.HEIGHT + 60f;
+                y = startY + (targetY - startY) * sun.getFallProgress();
+            }
+            batch.setColor(sunColor(sun));
+            batch.draw(region, Lawn.columnCenter(sun.getX()) - size / 2f, y, size, size);
+        }
+    }
+
+    private float sunSize(models.game.Sun sun) {
+        return sun.getKind() == models.game.Sun.SunKind.SPECIAL
+                ? Lawn.CELL_WIDTH * 0.58f : Lawn.CELL_WIDTH * 0.42f;
+    }
+
+    private Color sunColor(models.game.Sun sun) {
+        if (sun.getKind() == models.game.Sun.SunKind.RADIOACTIVE) {
+            return new Color(0.82f, 0.45f, 1f, 1f);
+        }
+        return Color.WHITE;
+    }
+
+    private void drawHealthBar(Batch batch, int health, int max, float x, float y, float width) {
+        float fraction = Math.max(0f, Math.min(1f, health / (float) max));
+        if (fraction >= 1f) {
+            return;
+        }
+        batch.setColor(0f, 0f, 0f, 0.55f);
+        fill.draw(batch, x, y, width, 6f);
+        batch.setColor(fraction > 0.5f ? Color.LIME : fraction > 0.25f ? Color.ORANGE : Color.RED);
+        fill.draw(batch, x, y, width * fraction, 6f);
     }
 
     protected void paint(Batch batch, Color color, double column, int row) {
