@@ -7,6 +7,18 @@ import models.entities.zombie.ZombieType;
 
 public final class Art {
 
+    private static final String[] DARK_GRAVES = {
+        "IMAGE_GRAVESTONES_DARK_NOOP_DARK_NOOP_132X160",
+        "IMAGE_GRAVESTONES_DARK_NOOP_DARK_NOOP_132X156",
+        "IMAGE_GRAVESTONES_DARK_NOOP_DARK_NOOP_93X89",
+    };
+
+    private static final String[] EGYPT_GRAVES = {
+        "IMAGE_GRAVESTONES_EGYPT_HIEROGLYPH_EGYPT_HIEROGLYPH_118X148",
+        "IMAGE_GRAVESTONES_EGYPT_HIEROGLYPH_EGYPT_HIEROGLYPH_113X145",
+        "IMAGE_GRAVESTONES_EGYPT_HIEROGLYPH_EGYPT_HIEROGLYPH_110X145",
+    };
+
     private static final String PLANT_PREFIX = "IMAGE_UI_PACKETS_";
     private static final String ZOMBIE_PREFIX = "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_";
     private static final String FALLBACK_ZOMBIE = "TUTORIAL";
@@ -96,6 +108,23 @@ public final class Art {
     public TextureRegion ui(String name) {
         TextureRegion region = assets.region(GameAssets.UI, name);
         return region == null ? assets.region(GameAssets.UI, "white-pixel") : region;
+    }
+
+    public TextureRegion uiOptional(String name) {
+        return assets.region(GameAssets.UI, name);
+    }
+
+    public TextureRegion mower() {
+        return assets.region(GameAssets.MOWERS, "IMAGE_MOWERS_MOWER_BEACH_MOWER_BEACH_166X175");
+    }
+
+    public TextureRegion grave(String chapterName, float healthFraction) {
+        boolean egypt = chapterName != null
+                && chapterName.replaceAll("[^A-Za-z]", "").equalsIgnoreCase("egypt");
+        String[] stages = egypt ? EGYPT_GRAVES : DARK_GRAVES;
+        int index = healthFraction > 0.66f ? 0 : healthFraction > 0.33f ? 1 : 2;
+        return assets.region(egypt ? GameAssets.GRAVES_EGYPT : GameAssets.GRAVES_DARK,
+                stages[index]);
     }
 
     public TextureRegion logo() {

@@ -26,6 +26,9 @@ public class LawnView extends Actor {
     protected final Art art;
     protected final Drawable fill;
 
+    private static final int GRAVE_MAX_HEALTH = 700;
+
+    private final String chapterName;
     private boolean showGrid;
     private int hoverColumn = -1;
     private int hoverRow = -1;
@@ -34,6 +37,8 @@ public class LawnView extends Actor {
         this.session = session;
         this.art = art;
         this.fill = skin.getDrawable("white");
+        this.chapterName = session.getLevel() == null ? null
+                : session.getLevel().getChapter().getName();
         setBounds(Lawn.LEFT, Lawn.BOTTOM, Lawn.WIDTH, Lawn.HEIGHT);
         setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.enabled);
     }
@@ -96,12 +101,12 @@ public class LawnView extends Actor {
     }
 
     private void drawTerrainIcon(Batch batch, Tile tile, int column, int row) {
-        String icon = null;
         if (tile.getTerrain() == TerrainType.GRAVE) {
-            icon = tile.getGraveSunContent() > 0 ? "image_ui_hud_ingame_sun"
-                    : tile.isGravePlantFood() ? "image_ui_hud_ingame_plantfood_button"
-                    : "image_ui_generic_tombstone_icon";
-        } else if (tile.getTerrain() == TerrainType.SLIDER_UP) {
+            drawGrave(batch, tile, column, row);
+            return;
+        }
+        String icon = null;
+        if (tile.getTerrain() == TerrainType.SLIDER_UP) {
             icon = "image_ui_almanac_stats_screen_nav_arrow_next";
         } else if (tile.getTerrain() == TerrainType.SLIDER_DOWN) {
             icon = "image_ui_almanac_stats_screen_nav_arrow_previous";
@@ -111,7 +116,7 @@ public class LawnView extends Actor {
         if (icon == null) {
             return;
         }
-        TextureRegion region = art.ui(icon);
+        TextureRegion region = art.uiOptional(icon);
         if (region == null) {
             return;
         }
@@ -121,18 +126,49 @@ public class LawnView extends Actor {
                 Lawn.rowCenter(row) - size / 2f, size, size);
     }
 
-    private void drawMowers(Batch batch) {
-        TextureRegion region = art.ui("image_ui_generic_button_hud_minigames_normal");
+    private void drawGrave(Batch batch, Tile tile, int column, int row) {
+        float fraction = Math.max(0f, Math.min(1f, tile.getGraveHealth() / (float) GRAVE_MAX_HEALTH));
+        TextureRegion region = art.grave(chapterName, fraction);
         if (region == null) {
             return;
         }
         batch.setColor(Color.WHITE);
+        float height = Lawn.CELL_HEIGHT * 0.82f;
+        float width = height * region.getRegionWidth() / region.getRegionHeight();
+        batch.draw(region, Lawn.columnCenter(column) - width / 2f,
+                Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.1f, width, height);
+        drawGraveContent(batch, tile, column, row);
+    }
+
+    private void drawGraveContent(Batch batch, Tile tile, int column, int row) {
+        String icon = tile.getGraveSunContent() > 0 ? "image_ui_hud_ingame_sun"
+                : tile.isGravePlantFood() ? "image_ui_hud_ingame_plantfood_button" : null;
+        if (icon == null) {
+            return;
+        }
+        TextureRegion region = art.uiOptional(icon);
+        if (region == null) {
+            return;
+        }
+        float size = Lawn.CELL_WIDTH * 0.32f;
+        batch.draw(region, Lawn.columnCenter(column) - size / 2f,
+                Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.72f, size, size);
+    }
+
+    private void drawMowers(Batch batch) {
+        TextureRegion region = art.mower();
+        if (region == null) {
+            return;
+        }
+        batch.setColor(Color.WHITE);
+        float height = Lawn.CELL_HEIGHT * 0.72f;
+        float width = height * region.getRegionWidth() / region.getRegionHeight();
         for (int row = 1; row <= GameSession.ROWS; row++) {
             if (!session.hasLawnMower(row)) {
                 continue;
             }
-            float size = Lawn.CELL_HEIGHT * 0.62f;
-            batch.draw(region, Lawn.LEFT - size - 6f, Lawn.rowCenter(row) - size / 2f, size, size);
+            batch.draw(region, Lawn.LEFT - width - 4f,
+                    Lawn.rowBottom(row) + Lawn.CELL_HEIGHT * 0.12f, width, height);
         }
     }
 
@@ -228,7 +264,7 @@ public class LawnView extends Actor {
             }
             batch.setColor(Color.WHITE);
             float size = Lawn.CELL_WIDTH * 0.6f;
-            TextureRegion region = art.ui("image_ui_generic_leaf_backdrop");
+            TextureRegion region = art.uiOptional("image_ui_generic_leaf_backdrop");
             if (region != null) {
                 batch.draw(region, Lawn.columnCenter(pushed.getX()) - size / 2f,
                         Lawn.rowCenter(row) - size / 2f, size, size);
@@ -293,7 +329,7 @@ public class LawnView extends Actor {
         if (zombie.totalArmor() <= 0) {
             return;
         }
-        TextureRegion region = art.ui("image_ui_lock_small_gold");
+        TextureRegion region = art.uiOptional("image_ui_lock_small_gold");
         if (region == null) {
             return;
         }
@@ -303,7 +339,7 @@ public class LawnView extends Actor {
     }
 
     private void drawSuns(Batch batch) {
-        TextureRegion region = art.ui("image_ui_hud_ingame_sun");
+        TextureRegion region = art.uiOptional("image_ui_hud_ingame_sun");
         if (region == null) {
             return;
         }
