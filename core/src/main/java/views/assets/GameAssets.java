@@ -56,6 +56,7 @@ public final class GameAssets implements Disposable {
         generate("h2", FONT_BODY, 25, 2f);
         generate("body", FONT_BODY, 19, 1.6f);
         generate("small", FONT_BODY, 15, 1.4f);
+        generate("tiny", FONT_BODY, 12, 1.2f);
     }
 
     private void generate(String key, String path, int size, float border) {

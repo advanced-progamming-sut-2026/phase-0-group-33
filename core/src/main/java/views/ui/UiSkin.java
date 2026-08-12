@@ -38,6 +38,7 @@ public final class UiSkin {
         skin.add("h2", assets.font("h2"));
         skin.add("body", assets.font("body"));
         skin.add("small", assets.font("small"));
+        skin.add("tiny", assets.font("tiny"));
 
         labels(skin, assets);
         buttons(skin, atlas, assets);
@@ -57,6 +58,7 @@ public final class UiSkin {
         skin.add("gold", new Label.LabelStyle(assets.font("body"), Palette.GOLD));
         skin.add("good", new Label.LabelStyle(assets.font("small"), Palette.GOOD));
         skin.add("bad", new Label.LabelStyle(assets.font("small"), Palette.BAD));
+        skin.add("tiny", new Label.LabelStyle(assets.font("tiny"), Palette.TEXT));
     }
 
     private static void buttons(Skin skin, TextureAtlas atlas, GameAssets assets) {
