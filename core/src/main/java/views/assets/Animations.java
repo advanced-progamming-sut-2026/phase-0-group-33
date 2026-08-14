@@ -135,6 +135,33 @@ public final class Animations implements Disposable {
         return rect;
     }
 
+    public java.util.List<String> partNames(String animation) {
+        java.util.List<String> names = new java.util.ArrayList<>();
+        if (!isAvailable() || !has(animation)) {
+            return names;
+        }
+        try {
+            String path = paths.get(animation);
+            player.loadSync(path);
+            collect(player.getParts(path), names);
+        } catch (RuntimeException e) {
+            return names;
+        }
+        return names;
+    }
+
+    private void collect(PamPlayer.AnimationPart part, java.util.List<String> into) {
+        if (part == null) {
+            return;
+        }
+        if (part.name != null && !part.name.isEmpty()) {
+            into.add(part.name);
+        }
+        for (PamPlayer.AnimationPart child : part.children) {
+            collect(child, into);
+        }
+    }
+
     public void draw(Batch batch, ClipRef clip, float time, float x, float y,
                      float scaleX, float scaleY, boolean loop, Map<String, Boolean> visibility) {
         if (!isAvailable() || clip == null) {

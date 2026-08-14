@@ -8,7 +8,7 @@ public final class AnimationCatalog {
 
     private static final ObjectMap<String, String> PLANTS = new ObjectMap<>();
     private static final ObjectMap<String, String> ZOMBIES = new ObjectMap<>();
-    private static final ObjectMap<String, String> ARMOR = new ObjectMap<>();
+    private static final ObjectMap<String, String[]> ARMOR = new ObjectMap<>();
 
     static {
         PLANTS.put("Twin Sunflower", "SUNFLOWER_TWIN");
@@ -62,10 +62,19 @@ public final class AnimationCatalog {
         ZOMBIES.put("Jalapeno Zombie", "ZOMBIE_TUTORIAL");
         ZOMBIES.put("Squash Zombie", "ZOMBIE_TUTORIAL");
 
-        ARMOR.put("Cone Head", "zombie_cone");
-        ARMOR.put("Bucket Head", "zombie_bucket");
-        ARMOR.put("Brick Head", "zombie_screendoor");
-        ARMOR.put("Newspaper", "zombie_newspaper");
+        ARMOR.put("Cone Head", new String[] {
+            "zombie_armor_cone_norm", "zombie_armor_cone_damage_01", "zombie_armor_cone_damage_02"});
+        ARMOR.put("Bucket Head", new String[] {
+            "zombie_armor_bucket_norm", "zombie_armor_bucket_damage_01",
+            "zombie_armor_bucket_damage_02"});
+        ARMOR.put("Brick Head", new String[] {
+            "zombie_armor_brick_norm", "zombie_armor_brick_damage_01",
+            "zombie_armor_brick_damage_02"});
+        ARMOR.put("Knight", new String[] {
+            "zombie_shoulder_armor_norm", "zombie_shoulder_armor_damage_01",
+            "zombie_shoulder_armor_damage_02"});
+        ARMOR.put("Newspaper", new String[] {
+            "_zombie_newspaper", "_zombie_newspaper_dmg1", "_zombie_newspaper_dmg2"});
     }
 
     private AnimationCatalog() {
@@ -81,7 +90,7 @@ public final class AnimationCatalog {
         return mapped == null ? "ZOMBIE_TUTORIAL" : mapped;
     }
 
-    public static String armorPart(ZombieType type) {
+    public static String[] armorParts(ZombieType type) {
         return ARMOR.get(type.getName());
     }
 

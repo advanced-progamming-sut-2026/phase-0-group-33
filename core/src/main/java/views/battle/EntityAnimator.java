@@ -21,7 +21,7 @@ public final class EntityAnimator {
     private final Animations animations;
     private final ObjectMap<String, ClipRef> refs = new ObjectMap<>();
     private static final float REFERENCE_CELL = 93f;
-    private final ObjectMap<ZombieType, Map<String, Boolean>> armour = new ObjectMap<>();
+    private final ObjectMap<String, Map<String, Boolean>> armour = new ObjectMap<>();
 
     public EntityAnimator(Animations animations) {
         this.animations = animations;
@@ -73,17 +73,21 @@ public final class EntityAnimator {
         return Lawn.cellHeight() * ZOMBIE_LIFT;
     }
 
-    public Map<String, Boolean> armourFor(ZombieType type) {
-        if (armour.containsKey(type)) {
-            return armour.get(type);
+    public Map<String, Boolean> armourFor(ZombieType type, float armourFraction) {
+        String[] stages = AnimationCatalog.armorParts(type);
+        if (stages == null || armourFraction <= 0f) {
+            return null;
         }
-        String part = AnimationCatalog.armorPart(type);
-        Map<String, Boolean> map = null;
-        if (part != null) {
-            map = new HashMap<>();
-            map.put(part, Boolean.TRUE);
+        int stage = armourFraction > 0.66f ? 0 : armourFraction > 0.33f ? 1 : 2;
+        String key = type.name() + stage;
+        if (armour.containsKey(key)) {
+            return armour.get(key);
         }
-        armour.put(type, map);
+        Map<String, Boolean> map = new HashMap<>();
+        for (int i = 0; i < stages.length; i++) {
+            map.put(stages[i], i == stage);
+        }
+        armour.put(key, map);
         return map;
     }
 

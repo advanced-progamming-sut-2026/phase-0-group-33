@@ -555,8 +555,17 @@ public class LawnView extends Actor {
         }
         float clock = zombie.getFrozenTicks() > 0 ? seed * 0.11f : time + seed * 0.11f;
         animator.draw(batch, clip, clock, centerX, feet + animator.zombieLift(),
-                animator.zombieScale(), true, animator.armourFor(zombie.getType()));
+                animator.zombieScale(), true,
+                animator.armourFor(zombie.getType(), armourFraction(zombie)));
         return true;
+    }
+
+    private float armourFraction(models.entities.zombie.Zombie zombie) {
+        int max = zombie.getType().getArmorType().getArmorHitpoints();
+        if (max <= 0) {
+            return 0f;
+        }
+        return Math.max(0f, Math.min(1f, zombie.totalArmor() / (float) max));
     }
 
     private boolean isEating(models.entities.zombie.Zombie zombie) {
