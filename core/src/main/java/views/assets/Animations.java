@@ -101,7 +101,9 @@ public final class Animations implements Disposable {
         }
         ClipRef ref = null;
         try {
-            ref = player.getClip(paths.get(animation), clip);
+            String path = paths.get(animation);
+            player.loadSync(path);
+            ref = player.getClip(path, clip);
         } catch (RuntimeException e) {
             ref = null;
         }
