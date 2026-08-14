@@ -32,6 +32,8 @@ public class LawnView extends Actor {
     private static final int GRAVE_MAX_HEALTH = 700;
     private static final String PLANT_FOOD_GLOW = "PLANTFOOD_FX";
     private static final float HURT_FLASH = 0.14f;
+    private static final float IMP_FLIGHT = 0.85f;
+    private static final float IMP_ARC = 1.9f;
     private static final String ICE_PLANT = "FROSTBITE_ICE_BLOCK_PLANT";
     private static final String ICE_ZOMBIE = "FROSTBITE_ICE_BLOCK_ZOMBIE";
     private static final String BOOM = "CHERRYBOMB_EXPLOSION_TOP";
@@ -65,6 +67,8 @@ public class LawnView extends Actor {
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, int[]> plantSpots =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private boolean shakePending;
+    private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, float[]> flights =
+            new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.Array<Corpse> corpses = new com.badlogic.gdx.utils.Array<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, float[]> seen =
             new com.badlogic.gdx.utils.ObjectMap<>();
@@ -293,13 +297,53 @@ public class LawnView extends Actor {
                 }
             }
         }
+        for (com.badlogic.gdx.utils.ObjectMap.Entry<models.entities.zombie.Zombie, float[]> entry
+                : current.entries()) {
+            if (!seen.containsKey(entry.key)) {
+                noteArrival(entry.key);
+            }
+        }
         seen.clear();
         seen.putAll(current);
+        for (models.entities.zombie.Zombie zombie : zombieFlightKeys()) {
+            float[] flight = flights.get(zombie);
+            if (!session.getZombies().contains(zombie) || time >= flight[2]) {
+                flights.remove(zombie);
+            }
+        }
         for (int i = corpses.size - 1; i >= 0; i--) {
             if (time >= corpses.get(i).end) {
                 corpses.removeIndex(i);
             }
         }
+    }
+
+    private void noteArrival(models.entities.zombie.Zombie zombie) {
+        if (zombie.getType() != models.entities.zombie.ZombieType.IMP) {
+            return;
+        }
+        models.entities.zombie.Zombie thrower = null;
+        for (models.entities.zombie.Zombie other : session.getZombies()) {
+            if (other.getType() == models.entities.zombie.ZombieType.GARGANTUAR
+                    && (int) other.getPosition().getY() == (int) zombie.getPosition().getY()) {
+                thrower = other;
+                break;
+            }
+        }
+        if (thrower == null) {
+            return;
+        }
+        flights.put(zombie, new float[] {
+            (float) thrower.getPosition().getX(), time, time + IMP_FLIGHT});
+    }
+
+    private com.badlogic.gdx.utils.Array<models.entities.zombie.Zombie> zombieFlightKeys() {
+        com.badlogic.gdx.utils.Array<models.entities.zombie.Zombie> keys =
+                new com.badlogic.gdx.utils.Array<>();
+        for (models.entities.zombie.Zombie zombie : flights.keys()) {
+            keys.add(zombie);
+        }
+        return keys;
     }
 
     private void trackFiring() {
@@ -719,8 +763,16 @@ public class LawnView extends Actor {
                 continue;
             }
             int seed = System.identityHashCode(zombie) & 0xff;
-            float centerX = Lawn.columnCenter(zombie.getPosition().getX());
-            float feet = Lawn.rowBottom(row) + Lawn.cellHeight() * 0.12f;
+            float[] flight = flights.get(zombie);
+            float column = (float) zombie.getPosition().getX();
+            float arc = 0f;
+            if (flight != null) {
+                float progress = Math.min(1f, (time - flight[1]) / IMP_FLIGHT);
+                column = flight[0] + (column - flight[0]) * progress;
+                arc = IMP_ARC * 4f * progress * (1f - progress) * Lawn.cellHeight();
+            }
+            float centerX = Lawn.columnCenter(column);
+            float feet = Lawn.rowBottom(row) + Lawn.cellHeight() * 0.12f + arc;
             float width = Lawn.cellWidth() * 0.7f;
             float height = Lawn.cellHeight() * 0.92f;
             batch.setColor(zombieTint(zombie));
@@ -946,6 +998,8 @@ public class LawnView extends Actor {
         if (busy != null && time < busy) {
             clip = animator.zombieClip(zombie.getType(),
                     views.assets.AnimationCatalog.abilityClip(zombie.getType()), "walk", "idle");
+        } else if (flights.containsKey(zombie)) {
+            clip = animator.zombieClip(zombie.getType(), "fly", "walk", "idle");
         } else if (eating) {
             String bite = views.assets.AnimationCatalog.biteClip(zombie.getType());
             clip = bite != null && animator.hasZombieClip(zombie.getType(), bite)
