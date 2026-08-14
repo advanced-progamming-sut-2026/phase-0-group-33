@@ -3,6 +3,7 @@ package views;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import models.App;
+import views.assets.Animations;
 import views.assets.Art;
 import views.assets.GameAssets;
 import views.ui.UiSkin;
@@ -12,6 +13,7 @@ public class PvzGame extends Game {
     private App app;
     private GameAssets assets;
     private Art art;
+    private Animations animations;
     private Skin skin;
     private Router router;
 
@@ -25,6 +27,10 @@ public class PvzGame extends Game {
 
     public Art getArt() {
         return art;
+    }
+
+    public Animations getAnimations() {
+        return animations;
     }
 
     public Skin getSkin() {
@@ -43,6 +49,7 @@ public class PvzGame extends Game {
         assets = new GameAssets();
         assets.loadFonts();
         art = new Art(assets);
+        animations = new Animations();
         skin = UiSkin.build(assets);
         router = new Router(this);
 
@@ -56,6 +63,9 @@ public class PvzGame extends Game {
         }
         if (skin != null) {
             skin.dispose();
+        }
+        if (animations != null) {
+            animations.dispose();
         }
         if (assets != null) {
             assets.dispose();
