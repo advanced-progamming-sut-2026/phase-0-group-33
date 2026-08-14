@@ -29,6 +29,7 @@ import views.PvzGame;
 import views.Router;
 import views.ScreenId;
 import views.assets.Art;
+import views.battle.CursorOverlay;
 import views.battle.Lawn;
 import views.battle.Overlay;
 import views.battle.LawnView;
@@ -69,6 +70,7 @@ public class BattleScreen extends ScreenAdapter {
     private final int levelNumber;
     private com.badlogic.gdx.scenes.scene2d.ui.Cell<Table> seedTrayCell;
     private com.badlogic.gdx.scenes.scene2d.ui.Cell<Table> objectiveCell;
+    private CursorOverlay cursor;
     private LawnView lawnView;
     private Label sunLabel;
     private Label plantFoodLabel;
@@ -141,6 +143,8 @@ public class BattleScreen extends ScreenAdapter {
         stage.addActor(lawnView);
 
         stage.addActor(buildHud());
+        cursor = new CursorOverlay(stage, art, lawnView.animator());
+        stage.addActor(cursor);
         stage.addActor(buildNotice());
         installLawnInput();
         installInput();
@@ -604,12 +608,34 @@ public class BattleScreen extends ScreenAdapter {
         int row = Lawn.rowAt(point.y);
         if (column < 1 || row < 1) {
             lawnView.clearHover();
+            updateCursor();
             return;
         }
         lawnView.setHover(tool == Tool.NONE ? -1 : column, tool == Tool.NONE ? -1 : row);
         lawnView.setGhost(tool == Tool.PLANT ? pending : null);
         lawnView.setHoverValid(tool != Tool.PLANT || canPlantAt(column, row));
+        updateCursor();
         collectSunUnder(column, row);
+    }
+
+    private void updateCursor() {
+        if (cursor == null) {
+            return;
+        }
+        switch (tool) {
+            case PLANT:
+                cursor.carryPlant(pending);
+                break;
+            case SHOVEL:
+                cursor.carryIcon("image_ui_hud_ingame_shovel_icon");
+                break;
+            case FOOD:
+                cursor.carryIcon("image_ui_hud_ingame_plantfood_button");
+                break;
+            default:
+                cursor.carryNothing();
+                break;
+        }
     }
 
     private boolean canPlantAt(int column, int row) {

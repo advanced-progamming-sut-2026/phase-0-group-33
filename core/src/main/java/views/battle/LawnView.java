@@ -31,6 +31,7 @@ public class LawnView extends Actor {
 
     private static final int GRAVE_MAX_HEALTH = 700;
     private static final String PLANT_FOOD_GLOW = "PLANTFOOD_FX";
+    private static final float HURT_FLASH = 0.14f;
 
     private final String chapterName;
     private boolean showGrid;
@@ -52,6 +53,10 @@ public class LawnView extends Actor {
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, Float> ability =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Boolean> lastSunPending =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<Object, int[]> lastHealth =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<Object, Float> hurtUntil =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.Array<Corpse> corpses = new com.badlogic.gdx.utils.Array<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, float[]> seen =
@@ -85,6 +90,10 @@ public class LawnView extends Actor {
         setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.enabled);
     }
 
+    public EntityAnimator animator() {
+        return animator;
+    }
+
     public void setShowGrid(boolean showGrid) {
         this.showGrid = showGrid;
     }
@@ -115,7 +124,53 @@ public class LawnView extends Actor {
         time += delta;
         trackFiring();
         trackAbilities();
+        trackDamage();
         trackDeaths();
+    }
+
+    private void trackDamage() {
+        for (models.game.PlacedPlant plant : session.getPlants()) {
+            noteHealth(plant, plant.getHealth() + plant.getPumpkinHealth() + plant.getIceHealth());
+        }
+        for (models.entities.zombie.Zombie zombie : session.getZombies()) {
+            noteHealth(zombie, zombie.getHealth() + zombie.totalArmor());
+        }
+        for (int row = 1; row <= GameSession.ROWS; row++) {
+            for (int column = 1; column <= GameSession.COLS; column++) {
+                Tile tile = session.getGrid().getTile(column - 1, row - 1);
+                if (tile != null && tile.getTerrain() == TerrainType.GRAVE) {
+                    noteHealth(tile, tile.getGraveHealth());
+                }
+            }
+        }
+    }
+
+    private void noteHealth(Object key, int health) {
+        int[] previous = lastHealth.get(key);
+        if (previous == null) {
+            lastHealth.put(key, new int[] {health});
+            return;
+        }
+        if (health < previous[0]) {
+            hurtUntil.put(key, time + HURT_FLASH);
+        }
+        previous[0] = health;
+    }
+
+    private boolean isHurt(Object key) {
+        Float until = hurtUntil.get(key);
+        return until != null && time < until;
+    }
+
+    private void flash(Batch batch, Runnable draw) {
+        int srcFunc = batch.getBlendSrcFunc();
+        int dstFunc = batch.getBlendDstFunc();
+        batch.setBlendFunction(com.badlogic.gdx.graphics.GL20.GL_SRC_ALPHA,
+                com.badlogic.gdx.graphics.GL20.GL_ONE);
+        batch.setColor(0.55f, 0.55f, 0.55f, 1f);
+        draw.run();
+        batch.setBlendFunction(srcFunc, dstFunc);
+        batch.setColor(Color.WHITE);
     }
 
     private void trackAbilities() {
@@ -304,8 +359,15 @@ public class LawnView extends Actor {
         batch.setColor(Color.WHITE);
         float height = Lawn.cellHeight() * 0.82f;
         float width = height * region.getRegionWidth() / region.getRegionHeight();
-        batch.draw(region, Lawn.columnCenter(column) - width / 2f,
-                Lawn.rowBottom(row) + Lawn.cellHeight() * 0.1f, width, height);
+        float gx = Lawn.columnCenter(column) - width / 2f;
+        float gy = Lawn.rowBottom(row) + Lawn.cellHeight() * 0.1f;
+        batch.draw(region, gx, gy, width, height);
+        if (isHurt(tile)) {
+            final TextureRegion flashRegion = region;
+            final float fw = width;
+            final float fh = height;
+            flash(batch, () -> batch.draw(flashRegion, gx, gy, fw, fh));
+        }
         drawGraveContent(batch, tile, column, row);
     }
 
@@ -513,9 +575,15 @@ public class LawnView extends Actor {
             float width = Lawn.cellWidth() * 0.78f;
             float height = Lawn.cellHeight() * 0.8f;
             batch.setColor(plantTint(plant));
+            final models.game.PlacedPlant target = plant;
+            final float px = centerX;
+            final float py = feet;
             if (!drawPlantAnimation(batch, plant, centerX, feet)) {
                 batch.draw(art.plant(plant.getType()), centerX - width / 2f,
                         Lawn.rowBottom(row) + Lawn.cellHeight() * 0.1f, width, height);
+            }
+            if (isHurt(target)) {
+                flash(batch, () -> drawPlantAnimation(batch, target, px, py));
             }
             drawPlantOverlays(batch, plant, centerX - width / 2f,
                     Lawn.rowBottom(row) + Lawn.cellHeight() * 0.1f, width, height);
@@ -589,11 +657,18 @@ public class LawnView extends Actor {
             float width = Lawn.cellWidth() * 0.7f;
             float height = Lawn.cellHeight() * 0.92f;
             batch.setColor(zombieTint(zombie));
+            final models.entities.zombie.Zombie target = zombie;
+            final int zseed = seed;
+            final float zx = centerX;
+            final float zy = feet;
             if (!drawZombieAnimation(batch, zombie, seed, centerX, feet)) {
                 batch.draw(art.zombie(zombie.getType()), centerX - width / 2f,
                         Lawn.rowBottom(row) + Lawn.cellHeight() * 0.06f, width, height);
                 drawArmor(batch, zombie, centerX - width / 2f,
                         Lawn.rowBottom(row) + Lawn.cellHeight() * 0.06f, width, height);
+            }
+            if (isHurt(target)) {
+                flash(batch, () -> drawZombieAnimation(batch, target, zseed, zx, zy));
             }
             int max = Math.max(1, zombie.getType().getHitpoints());
             drawHealthBar(batch, zombie.getHealth(), max, centerX - width / 2f,
