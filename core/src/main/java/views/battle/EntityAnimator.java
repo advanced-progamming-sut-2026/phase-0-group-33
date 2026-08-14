@@ -81,6 +81,24 @@ public final class EntityAnimator {
         return animations.clipDuration(AnimationCatalog.plant(type), clip);
     }
 
+    public ClipRef namedClip(String animation, String... preferred) {
+        return lookup(animation, preferred);
+    }
+
+    public float fitScale(String animation, String clip, float target) {
+        com.badlogic.gdx.math.Rectangle bounds = animations.bounds(animation, clip);
+        return bounds == null || bounds.height <= 0f ? 0f : target / bounds.height;
+    }
+
+    public float centreOffset(String animation, String clip, float scale) {
+        com.badlogic.gdx.math.Rectangle bounds = animations.bounds(animation, clip);
+        return bounds == null ? 0f : -(bounds.y + bounds.height / 2f) * scale;
+    }
+
+    public String clipName(String animation, String... preferred) {
+        return animations.firstClip(animation, preferred);
+    }
+
     public Map<String, Boolean> armourFor(ZombieType type, float armourFraction) {
         String[] stages = AnimationCatalog.armorParts(type);
         if (stages == null || armourFraction <= 0f) {

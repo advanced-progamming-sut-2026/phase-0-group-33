@@ -232,11 +232,14 @@ public class LawnView extends Actor {
     }
 
     private void drawMowers(Batch batch) {
+        batch.setColor(Color.WHITE);
+        if (drawAnimatedMowers(batch)) {
+            return;
+        }
         TextureRegion region = art.mower();
         if (region == null) {
             return;
         }
-        batch.setColor(Color.WHITE);
         float height = Lawn.cellHeight() * 0.72f;
         float width = height * region.getRegionWidth() / region.getRegionHeight();
         for (int row = 1; row <= GameSession.ROWS; row++) {
@@ -246,6 +249,28 @@ public class LawnView extends Actor {
             batch.draw(region, Lawn.left() - width - 4f,
                     Lawn.rowBottom(row) + Lawn.cellHeight() * 0.12f, width, height);
         }
+    }
+
+    private boolean drawAnimatedMowers(Batch batch) {
+        if (!animator.isReady()) {
+            return false;
+        }
+        String animation = views.assets.AnimationCatalog.mower(chapterName);
+        String clipName = animator.clipName(animation, "idle");
+        ClipRef clip = clipName == null ? null : animator.namedClip(animation, clipName);
+        if (clip == null) {
+            return false;
+        }
+        float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 0.7f);
+        float lift = animator.centreOffset(animation, clipName, scale);
+        for (int row = 1; row <= GameSession.ROWS; row++) {
+            if (!session.hasLawnMower(row)) {
+                continue;
+            }
+            animator.draw(batch, clip, time + row * 0.21f, Lawn.left() - Lawn.cellWidth() * 0.45f,
+                    Lawn.rowBottom(row) + Lawn.cellHeight() * 0.46f + lift, scale, true, null);
+        }
+        return true;
     }
 
     private void drawHover(Batch batch) {
@@ -519,20 +544,27 @@ public class LawnView extends Actor {
     }
 
     private void drawSuns(Batch batch) {
+        String animation = views.assets.AnimationCatalog.sun();
+        String clipName = animator.isReady() ? animator.clipName(animation, "animation", "idle") : null;
+        ClipRef clip = clipName == null ? null : animator.namedClip(animation, clipName);
         TextureRegion region = art.uiOptional("image_ui_hud_ingame_sun");
-        if (region == null) {
-            return;
-        }
         for (models.game.Sun sun : session.getSunManager().getSuns()) {
-            float size = sunSize(sun) * idlePulse(sun.getX() * 5 + sun.getY(), 3.1f, 0.07f);
-            float targetY = Lawn.rowCenter(sun.getY()) - size / 2f;
+            float size = sunSize(sun);
+            float targetY = Lawn.rowCenter(sun.getY());
             float y = targetY;
             if (sun.isFalling()) {
                 float startY = Lawn.bottom() + Lawn.height() + 60f;
                 y = startY + (targetY - startY) * sun.getFallProgress();
             }
+            float x = Lawn.columnCenter(sun.getX());
             batch.setColor(sunColor(sun));
-            batch.draw(region, Lawn.columnCenter(sun.getX()) - size / 2f, y, size, size);
+            if (clip != null) {
+                float scale = animator.fitScale(animation, clipName, size);
+                float lift = animator.centreOffset(animation, clipName, scale);
+                animator.draw(batch, clip, time + sun.getX() * 0.31f, x, y + lift, scale, true, null);
+            } else if (region != null) {
+                batch.draw(region, x - size / 2f, y - size / 2f, size, size);
+            }
         }
     }
 

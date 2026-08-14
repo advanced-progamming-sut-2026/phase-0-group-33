@@ -90,6 +90,27 @@ public final class AnimationCatalog {
         return mapped == null ? "ZOMBIE_TUTORIAL" : mapped;
     }
 
+    public static String sun() {
+        return "SUN";
+    }
+
+    public static String mower(String chapterName) {
+        String normalized = chapterName == null ? ""
+                : chapterName.replaceAll("[^A-Za-z]", "").toLowerCase();
+        switch (normalized) {
+            case "egypt":
+                return "MOWER_EGYPT";
+            case "frostbite":
+                return "MOWER_ICEAGE";
+            case "waveybeach":
+                return "MOWER_BEACH";
+            case "darkages":
+                return "MOWER_DARK";
+            default:
+                return "MOWER_TUTORIAL";
+        }
+    }
+
     public static String[] armorParts(ZombieType type) {
         return ARMOR.get(type.getName());
     }
