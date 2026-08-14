@@ -29,6 +29,7 @@ import views.PvzGame;
 import views.Router;
 import views.ScreenId;
 import views.assets.Art;
+import views.battle.ConveyorBar;
 import views.battle.CursorOverlay;
 import views.battle.Dialogue;
 import views.battle.Lawn;
@@ -428,14 +429,24 @@ public class BattleScreen extends ScreenAdapter {
         tray.pad(3f, 12f, 3f, 12f);
         if (session.getMode() == GameMode.I_ZOMBIE) {
             tray.add(buildZombieTray()).left().expandX();
+        } else if (usesConveyor()) {
+            ConveyorBar belt = new ConveyorBar(session, art, lawnView.animator(),
+                    type -> selectTool(Tool.PLANT, type));
+            tray.add(belt).growX().height(112f);
         } else {
             tray.add(seedBar).left().expandX();
         }
         return tray;
     }
 
+    private boolean usesConveyor() {
+        return session.isSpecial(SpecialLevelType.CONVEYOR_BELT)
+                || session.getMode() == GameMode.WALLNUT_BOWLING;
+    }
+
     private boolean showsSeedTray() {
-        return session.getMode() == GameMode.I_ZOMBIE || !session.getSlots().isEmpty();
+        return session.getMode() == GameMode.I_ZOMBIE || usesConveyor()
+                || !session.getSlots().isEmpty();
     }
 
     private Table buildToolBar() {
@@ -498,7 +509,7 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     private void refreshSeedBar() {
-        if (session.getMode() == GameMode.I_ZOMBIE) {
+        if (session.getMode() == GameMode.I_ZOMBIE || usesConveyor()) {
             return;
         }
         if (seedTrayCell != null) {

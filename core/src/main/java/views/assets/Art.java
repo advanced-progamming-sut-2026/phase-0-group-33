@@ -131,6 +131,14 @@ public final class Art {
                 "IMAGE_BACKGROUNDS_FRONTLAWN_TEXTURE");
     }
 
+    public TextureRegion conveyorBelt() {
+        return assets.region(GameAssets.ALWAYS_LOADED, "IMAGE_UI_CONVEYOR_CONVEYOR_BELT");
+    }
+
+    public TextureRegion conveyorTop() {
+        return assets.region(GameAssets.ALWAYS_LOADED, "IMAGE_UI_CONVEYOR_CONVEYOR_TOP");
+    }
+
     public TextureRegion pea() {
         return assets.region(GameAssets.PROJECTILES,
                 "IMAGE_EFFECTS_T_PEA_PROJECTILE_T_PEA_PROJECTILE_39X36");
