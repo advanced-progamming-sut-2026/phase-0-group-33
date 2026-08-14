@@ -112,19 +112,26 @@ public final class Animations implements Disposable {
     }
 
     public Rectangle bounds(String animation) {
+        return bounds(animation, null);
+    }
+
+    public Rectangle bounds(String animation, String clip) {
         if (!isAvailable() || !has(animation)) {
             return null;
         }
-        if (boundsCache.containsKey(animation)) {
-            return boundsCache.get(animation);
+        String key = animation + '#' + clip;
+        if (boundsCache.containsKey(key)) {
+            return boundsCache.get(key);
         }
         Rectangle rect = null;
         try {
-            rect = player.bounds(paths.get(animation));
+            String path = paths.get(animation);
+            player.loadSync(path);
+            rect = clip == null ? player.bounds(path) : player.bounds(path, clip);
         } catch (RuntimeException e) {
             rect = null;
         }
-        boundsCache.put(animation, rect);
+        boundsCache.put(key, rect);
         return rect;
     }
 

@@ -150,7 +150,7 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     protected LawnView createLawnView() {
-        return new LawnView(session, art, skin);
+        return new LawnView(session, art, skin, game.getAnimations());
     }
 
     private void installInput() {
@@ -688,6 +688,7 @@ public class BattleScreen extends ScreenAdapter {
         if (session != null && session.isOver() && overlay == null) {
             onGameOver();
         }
+        game.getAnimations().update();
         if (session != null) {
             lawnView.setFrozen(paused || session.isOver());
             refreshHud();

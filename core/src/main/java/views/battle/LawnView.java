@@ -9,7 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import models.game.GameSession;
 import models.map.TerrainType;
 import models.map.Tile;
+import views.assets.Animations;
 import views.assets.Art;
+import pvz.libpvz.pam.ClipRef;
 
 public class LawnView extends Actor {
 
@@ -22,7 +24,6 @@ public class LawnView extends Actor {
     private static final Color DANGER = new Color(1f, 0.2f, 0.2f, 0.75f);
     private static final Color PROTECTED = new Color(0.4f, 1f, 0.5f, 0.3f);
     private static final Color INVALID = new Color(1f, 0.35f, 0.3f, 0.32f);
-    private static final Color SHADOW = new Color(0f, 0f, 0f, 0.26f);
 
     protected final GameSession session;
     protected final Art art;
@@ -40,10 +41,12 @@ public class LawnView extends Actor {
     private boolean frozen;
     private boolean hoverValid = true;
     private models.entities.plant.PlantType ghost;
+    private final EntityAnimator animator;
 
-    public LawnView(GameSession session, Art art, Skin skin) {
+    public LawnView(GameSession session, Art art, Skin skin, Animations animations) {
         this.session = session;
         this.art = art;
+        this.animator = new EntityAnimator(animations);
         this.fill = skin.getDrawable("white");
         this.chapterName = session.getLevel() == null ? null
                 : session.getLevel().getChapter().getName();
@@ -350,18 +353,19 @@ public class LawnView extends Actor {
             if (plant.getY() != row) {
                 continue;
             }
-            float breathe = plant.isDisabled() ? 1f
-                    : idlePulse(plant.getX() * 3 + row, 2.4f, 0.05f);
-            float width = Lawn.cellWidth() * 0.78f / breathe;
-            float height = Lawn.cellHeight() * 0.8f * breathe;
-            float x = Lawn.columnCenter(plant.getX()) - width / 2f;
-            float y = Lawn.rowBottom(row) + Lawn.cellHeight() * 0.1f;
-            drawShadow(batch, Lawn.columnCenter(plant.getX()), Lawn.rowBottom(row), width * 0.66f);
+            float centerX = Lawn.columnCenter(plant.getX());
+            float feet = Lawn.rowBottom(row) + Lawn.cellHeight() * 0.16f;
+            float width = Lawn.cellWidth() * 0.78f;
+            float height = Lawn.cellHeight() * 0.8f;
             batch.setColor(plantTint(plant));
-            batch.draw(art.plant(plant.getType()), x, y, width, height);
-            drawPlantOverlays(batch, plant, x, y, width, height);
+            if (!drawPlantAnimation(batch, plant, centerX, feet)) {
+                batch.draw(art.plant(plant.getType()), centerX - width / 2f,
+                        Lawn.rowBottom(row) + Lawn.cellHeight() * 0.1f, width, height);
+            }
+            drawPlantOverlays(batch, plant, centerX - width / 2f,
+                    Lawn.rowBottom(row) + Lawn.cellHeight() * 0.1f, width, height);
             drawHealthBar(batch, plant.getHealth(), plant.getMaxHealth(),
-                    x, y + height + 3f, width);
+                    centerX - width / 2f, Lawn.rowBottom(row) + Lawn.cellHeight() * 0.94f, width);
         }
     }
 
@@ -424,25 +428,21 @@ public class LawnView extends Actor {
             if ((int) zombie.getPosition().getY() != row) {
                 continue;
             }
-            boolean still = zombie.getFrozenTicks() > 0;
             int seed = System.identityHashCode(zombie) & 0xff;
-            float bob = still ? 0f : (float) Math.abs(Math.sin(time * 5.2f + seed)) * 4f;
-            float lean = still ? 1f : idlePulse(seed, 5.2f, 0.04f);
-            float width = Lawn.cellWidth() * 0.7f * lean;
-            float height = Lawn.cellHeight() * 0.92f / lean;
-            float x = Lawn.columnCenter(zombie.getPosition().getX()) - width / 2f;
-            float y = Lawn.rowBottom(row) + Lawn.cellHeight() * 0.06f + bob;
-            drawShadow(batch, Lawn.columnCenter(zombie.getPosition().getX()),
-                    Lawn.rowBottom(row), width * 0.6f);
+            float centerX = Lawn.columnCenter(zombie.getPosition().getX());
+            float feet = Lawn.rowBottom(row) + Lawn.cellHeight() * 0.12f;
+            float width = Lawn.cellWidth() * 0.7f;
+            float height = Lawn.cellHeight() * 0.92f;
             batch.setColor(zombieTint(zombie));
-            batch.draw(art.zombie(zombie.getType()), x, y, width, height);
-            if (zombie.getFrozenTicks() > 0) {
-                batch.setColor(0.6f, 0.85f, 1f, 0.75f);
-                fill.draw(batch, x, y, width, height);
+            if (!drawZombieAnimation(batch, zombie, seed, centerX, feet)) {
+                batch.draw(art.zombie(zombie.getType()), centerX - width / 2f,
+                        Lawn.rowBottom(row) + Lawn.cellHeight() * 0.06f, width, height);
+                drawArmor(batch, zombie, centerX - width / 2f,
+                        Lawn.rowBottom(row) + Lawn.cellHeight() * 0.06f, width, height);
             }
-            drawArmor(batch, zombie, x, y, width, height);
             int max = Math.max(1, zombie.getType().getHitpoints());
-            drawHealthBar(batch, zombie.getHealth(), max, x, y + height + 3f, width);
+            drawHealthBar(batch, zombie.getHealth(), max, centerX - width / 2f,
+                    Lawn.rowBottom(row) + Lawn.cellHeight() * 1.02f, width);
         }
     }
 
@@ -512,16 +512,58 @@ public class LawnView extends Actor {
         return Color.WHITE;
     }
 
-    private void drawShadow(Batch batch, float centerX, float rowBottom, float radius) {
-        TextureRegion blob = art.uiOptional("image_ui_generic_shadow");
-        batch.setColor(SHADOW);
-        if (blob == null) {
-            fill.draw(batch, centerX - radius / 2f,
-                    rowBottom + Lawn.cellHeight() * 0.09f, radius, radius * 0.22f);
-            return;
+    private boolean drawPlantAnimation(Batch batch, models.game.PlacedPlant plant,
+                                       float centerX, float feet) {
+        if (!animator.isReady()) {
+            return false;
         }
-        batch.draw(blob, centerX - radius / 2f, rowBottom + Lawn.cellHeight() * 0.06f,
-                radius, radius * 0.34f);
+        ClipRef clip = animator.plantClip(plant.getType(), plantClipNames(plant));
+        if (clip == null) {
+            return false;
+        }
+        float phase = plant.getX() * 0.37f + plant.getY() * 0.19f;
+        animator.draw(batch, clip, time + phase, centerX, feet + animator.plantLift(),
+                animator.plantScale(), true, null);
+        return true;
+    }
+
+    private String[] plantClipNames(models.game.PlacedPlant plant) {
+        float fraction = plant.getHealth() / (float) Math.max(1, plant.getMaxHealth());
+        if (fraction <= 0.34f) {
+            return new String[] {"damage3", "damage2", "damage", "idle3", "idle2", "idle"};
+        }
+        if (fraction <= 0.67f) {
+            return new String[] {"damage2", "damage", "idle2", "idle"};
+        }
+        if (plant.getArmTicks() > 0) {
+            return new String[] {"plant_idle", "idle2", "idle"};
+        }
+        return new String[] {"idle"};
+    }
+
+    private boolean drawZombieAnimation(Batch batch, models.entities.zombie.Zombie zombie,
+                                        int seed, float centerX, float feet) {
+        if (!animator.isReady()) {
+            return false;
+        }
+        boolean eating = isEating(zombie);
+        ClipRef clip = eating
+                ? animator.zombieClip(zombie.getType(), "eat", "attack", "walk", "idle")
+                : animator.zombieClip(zombie.getType(), "walk", "walk1", "idle");
+        if (clip == null) {
+            return false;
+        }
+        float clock = zombie.getFrozenTicks() > 0 ? seed * 0.11f : time + seed * 0.11f;
+        animator.draw(batch, clip, clock, centerX, feet + animator.zombieLift(),
+                animator.zombieScale(), true, animator.armourFor(zombie.getType()));
+        return true;
+    }
+
+    private boolean isEating(models.entities.zombie.Zombie zombie) {
+        int column = (int) Math.round(zombie.getPosition().getX());
+        models.game.PlacedPlant blocking = session.plantAt(column, (int) zombie.getPosition().getY());
+        return blocking != null && zombie.getPosition().getX() - column <= 0.4
+                && zombie.getPosition().getX() - column >= 0;
     }
 
     private void drawHealthBar(Batch batch, int health, int max, float x, float y, float width) {
