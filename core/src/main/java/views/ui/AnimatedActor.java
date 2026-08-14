@@ -26,21 +26,36 @@ public final class AnimatedActor extends Actor {
     }
 
     public static AnimatedActor plant(Animations animations, PlantType type, float box) {
-        return build(animations, AnimationCatalog.plant(type), box, "idle", "idle2");
+        return build(animations, AnimationCatalog.plant(type), box, false, "idle", "idle2");
     }
 
     public static AnimatedActor zombie(Animations animations, ZombieType type, float box) {
-        return build(animations, AnimationCatalog.zombie(type), box, "idle", "walk");
+        return build(animations, AnimationCatalog.zombie(type), box, false, "idle", "walk");
+    }
+
+    public static AnimatedActor named(Animations animations, String animation, float box,
+                                      String... preferred) {
+        return build(animations, animation, box, false, preferred);
+    }
+
+    public static AnimatedActor whole(Animations animations, String animation, float box,
+                                      String... preferred) {
+        return build(animations, animation, box, true, preferred);
     }
 
     private static AnimatedActor build(Animations animations, String animation, float box,
                                        String... preferred) {
+        return build(animations, animation, box, false, preferred);
+    }
+
+    private static AnimatedActor build(Animations animations, String animation, float box,
+                                       boolean wholeAnimation, String... preferred) {
         if (animations == null || !animations.isAvailable()) {
             return null;
         }
         String clipName = animations.firstClip(animation, preferred);
         ClipRef ref = animations.clip(animation, clipName);
-        Rectangle bounds = animations.bounds(animation, clipName);
+        Rectangle bounds = animations.bounds(animation, wholeAnimation ? null : clipName);
         if (ref == null || bounds == null || bounds.height <= 0f || bounds.width <= 0f) {
             return null;
         }

@@ -30,6 +30,7 @@ import views.Router;
 import views.ScreenId;
 import views.assets.Art;
 import views.battle.CursorOverlay;
+import views.battle.Dialogue;
 import views.battle.Lawn;
 import views.battle.Overlay;
 import views.battle.LawnView;
@@ -63,6 +64,10 @@ public class BattleScreen extends ScreenAdapter {
     private String seedSignature = "";
     private float waveDelay;
     private int lastWave;
+    private int lastPlantFood = -1;
+    private int lastCoins = -1;
+    private int lastGems = -1;
+    private int lastPots = -1;
     private Overlay overlay;
     private Label notice;
     private float noticeTimer;
@@ -150,7 +155,8 @@ public class BattleScreen extends ScreenAdapter {
         installInput();
         refreshHud();
         rebuildSeedBar();
-        showObjectives();
+        setPaused(true);
+        Dialogue.open(stage, skin, game.getAnimations(), openingLines(), this::showObjectives);
     }
 
     protected LawnView createLawnView() {
@@ -215,6 +221,23 @@ public class BattleScreen extends ScreenAdapter {
                 .width(240f).height(56f).padTop(14f);
         setPaused(true);
         overlay = Overlay.open(stage, skin, "Level Briefing", content);
+    }
+
+    private java.util.List<String> openingLines() {
+        java.util.List<String> lines = new java.util.ArrayList<>();
+        if (session.getMode() != GameMode.ADVENTURE) {
+            return lines;
+        }
+        String chapter = levelChapter == null ? "" : levelChapter;
+        if (levelNumber == 1) {
+            lines.add("Welcome to " + chapter + "! I hope you brought your gardening gloves.");
+            lines.add("These zombies are hungry, and your brain is on the menu.");
+            lines.add("Plant well and they will never reach the house. Good luck!");
+        } else if (session.getLevel() != null && session.getLevel().getSpecialType() != null) {
+            lines.add("Careful now, this one plays by its own rules.");
+            lines.add("Read the briefing before you plant a single seed.");
+        }
+        return lines;
     }
 
     private java.util.List<String> objectives() {
@@ -697,12 +720,51 @@ public class BattleScreen extends ScreenAdapter {
 
     protected void onTick() {
         autoStartWaves();
+        trackRewards();
         int wave = session.getWaveManager().getCurrentWave();
         if (wave != lastWave) {
             lastWave = wave;
-            announce(wave >= session.getWaveManager().getTotalWaves()
-                    ? "The final wave is here!" : "A huge wave of zombies is approaching!");
+            announce(waveNotice(wave));
         }
+    }
+
+    private String waveNotice(int wave) {
+        String chapter = levelChapter == null ? ""
+                : levelChapter.replaceAll("[^A-Za-z]", "").toLowerCase();
+        if ("darkages".equals(chapter)) {
+            return "Necromancy! The graves are waking up!";
+        }
+        if ("waveybeach".equals(chapter)) {
+            return "The tide is out; zombies are surfacing!";
+        }
+        return wave >= session.getWaveManager().getTotalWaves()
+                ? "The final wave is here!" : "A huge wave of zombies is approaching!";
+    }
+
+    private void trackRewards() {
+        int food = session.getPlantFoods();
+        if (lastPlantFood >= 0 && food > lastPlantFood) {
+            toasts.success("You picked up plant food.");
+        }
+        lastPlantFood = food;
+        if (app.getCurrentUser() == null) {
+            return;
+        }
+        int coins = app.getCurrentUser().getCoins().getAmount();
+        int gems = app.getCurrentUser().getDiamonds().getAmount();
+        int pots = app.getCurrentUser().getPots().getAmount();
+        if (lastCoins >= 0 && coins > lastCoins) {
+            toasts.success("A zombie dropped " + (coins - lastCoins) + " coins.");
+        }
+        if (lastGems >= 0 && gems > lastGems) {
+            toasts.success("A zombie dropped a diamond.");
+        }
+        if (lastPots >= 0 && pots > lastPots) {
+            toasts.success("A zombie dropped a pot.");
+        }
+        lastCoins = coins;
+        lastGems = gems;
+        lastPots = pots;
     }
 
     @Override
