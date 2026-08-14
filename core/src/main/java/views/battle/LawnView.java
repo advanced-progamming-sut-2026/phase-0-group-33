@@ -32,6 +32,8 @@ public class LawnView extends Actor {
     private static final int GRAVE_MAX_HEALTH = 700;
     private static final String PLANT_FOOD_GLOW = "PLANTFOOD_FX";
     private static final float HURT_FLASH = 0.14f;
+    private static final String ICE_PLANT = "FROSTBITE_ICE_BLOCK_PLANT";
+    private static final String ICE_ZOMBIE = "FROSTBITE_ICE_BLOCK_ZOMBIE";
 
     private final String chapterName;
     private boolean showGrid;
@@ -605,9 +607,12 @@ public class LawnView extends Actor {
     private void drawPlantOverlays(Batch batch, models.game.PlacedPlant plant,
                                    float x, float y, float width, float height) {
         if (plant.getIceHealth() > 0 || plant.getFreezeLevel() > 0) {
-            float alpha = 0.2f + 0.2f * Math.min(3, Math.max(1, plant.getFreezeLevel()));
-            batch.setColor(0.6f, 0.85f, 1f, plant.getIceHealth() > 0 ? 0.75f : alpha);
-            fill.draw(batch, x, y, width, height);
+            if (!drawIceBlock(batch, ICE_PLANT, x + width / 2f, y, plant.getIceHealth() > 0
+                    ? 1f : 0.3f + 0.2f * Math.min(3, plant.getFreezeLevel()))) {
+                float alpha = 0.2f + 0.2f * Math.min(3, Math.max(1, plant.getFreezeLevel()));
+                batch.setColor(0.6f, 0.85f, 1f, plant.getIceHealth() > 0 ? 0.75f : alpha);
+                fill.draw(batch, x, y, width, height);
+            }
         }
         if (plant.getOctopusHealth() > 0) {
             batch.setColor(Color.WHITE);
@@ -669,6 +674,9 @@ public class LawnView extends Actor {
             }
             if (isHurt(target)) {
                 flash(batch, () -> drawZombieAnimation(batch, target, zseed, zx, zy));
+            }
+            if (zombie.getFrozenTicks() > 0 || zombie.getBattle().getIceHealth() > 0) {
+                drawIceBlock(batch, ICE_ZOMBIE, centerX, Lawn.rowBottom(row), 0.9f);
             }
             int max = Math.max(1, zombie.getType().getHitpoints());
             drawHealthBar(batch, zombie.getHealth(), max, centerX - width / 2f,
@@ -888,6 +896,25 @@ public class LawnView extends Actor {
         models.game.PlacedPlant blocking = session.plantAt(column, (int) zombie.getPosition().getY());
         return blocking != null && zombie.getPosition().getX() - column <= 0.4
                 && zombie.getPosition().getX() - column >= 0;
+    }
+
+    private boolean drawIceBlock(Batch batch, String animation, float centreX, float bottom,
+                                 float alpha) {
+        if (!animator.isReady()) {
+            return false;
+        }
+        String clipName = animator.clipName(animation, "freeze_idle", "idle");
+        ClipRef clip = clipName == null ? null : animator.namedClip(animation, clipName);
+        if (clip == null) {
+            return false;
+        }
+        float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 0.95f);
+        float lift = animator.centreOffset(animation, clipName, scale);
+        batch.setColor(1f, 1f, 1f, alpha);
+        animator.draw(batch, clip, time, centreX, bottom + Lawn.cellHeight() * 0.42f + lift,
+                scale, true, null);
+        batch.setColor(Color.WHITE);
+        return true;
     }
 
     private void drawHealthBar(Batch batch, int health, int max, float x, float y, float width) {
