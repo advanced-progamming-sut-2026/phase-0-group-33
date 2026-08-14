@@ -171,7 +171,8 @@ public class CollectionScreen extends BaseScreen {
         int packets = store.getInt("packets." + type.getName(), 0);
 
         Table panel = Ui.panel(skin);
-        panel.add(Ui.iconCell(art.plant(type), 120f)).padBottom(6f).row();
+        panel.add(preview(views.ui.AnimatedActor.plant(game.getAnimations(), type, 140f),
+                art.plant(type), 140f)).padBottom(6f).row();
         panel.add(Ui.label(skin, type.getName(), "h1")).padBottom(4f).row();
         panel.add(Ui.divider(skin, 300f)).padBottom(10f).row();
 
@@ -263,7 +264,8 @@ public class CollectionScreen extends BaseScreen {
     private void showZombieDetail(ZombieType type) {
         detailPane.clear();
         Table panel = Ui.panel(skin);
-        panel.add(Ui.iconCell(art.zombie(type), 130f)).padBottom(6f).row();
+        panel.add(preview(views.ui.AnimatedActor.zombie(game.getAnimations(), type, 150f),
+                art.zombie(type), 150f)).padBottom(6f).row();
         panel.add(Ui.label(skin, type.getName(), "h1")).padBottom(4f).row();
         panel.add(Ui.divider(skin, 300f)).padBottom(10f).row();
         stat(panel, art.ui("image_ui_almanac_zombies_zombietoughness_icon"),
@@ -279,6 +281,18 @@ public class CollectionScreen extends BaseScreen {
                 type.getArmorType().isMetallic() ? "yes" : "no");
         stat(panel, art.statIcon("FAMILY"), "Wave cost", String.valueOf(type.getWaveCost()));
         detailPane.add(panel).growX();
+    }
+
+    private com.badlogic.gdx.scenes.scene2d.Actor preview(views.ui.AnimatedActor animated,
+                                                          com.badlogic.gdx.graphics.g2d.TextureRegion fallback,
+                                                          float box) {
+        if (animated != null) {
+            com.badlogic.gdx.scenes.scene2d.ui.Container<views.ui.AnimatedActor> holder =
+                    new com.badlogic.gdx.scenes.scene2d.ui.Container<>(animated);
+            holder.size(box);
+            return holder;
+        }
+        return Ui.iconCell(fallback, box);
     }
 
     private void stat(Table panel, com.badlogic.gdx.graphics.g2d.TextureRegion icon,

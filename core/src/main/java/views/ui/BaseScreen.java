@@ -157,6 +157,7 @@ public abstract class BaseScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0.04f, 0.07f, 0.05f, 1f);
+        game.getAnimations().update();
         stage.act(delta);
         stage.draw();
     }

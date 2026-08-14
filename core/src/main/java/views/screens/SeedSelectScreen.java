@@ -205,7 +205,15 @@ public class SeedSelectScreen extends BaseScreen {
         PlantSlot slot = session().findSlot(type);
 
         Table panel = Ui.panel(skin);
-        panel.add(Ui.iconCell(art.plant(type), 110f)).padBottom(6f).row();
+        views.ui.AnimatedActor animated = views.ui.AnimatedActor.plant(game.getAnimations(), type, 130f);
+        if (animated == null) {
+            panel.add(Ui.iconCell(art.plant(type), 110f)).padBottom(6f).row();
+        } else {
+            com.badlogic.gdx.scenes.scene2d.ui.Container<views.ui.AnimatedActor> holder =
+                    new com.badlogic.gdx.scenes.scene2d.ui.Container<>(animated);
+            holder.size(130f);
+            panel.add(holder).padBottom(6f).row();
+        }
         panel.add(Ui.label(skin, type.getName(), "h1")).padBottom(4f).row();
         panel.add(Ui.divider(skin, 290f)).padBottom(10f).row();
 

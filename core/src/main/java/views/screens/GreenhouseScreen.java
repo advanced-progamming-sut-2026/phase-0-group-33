@@ -84,8 +84,18 @@ public class GreenhouseScreen extends BaseScreen {
 
     private Table growingPot(Table card, final int x, final int y, String plant) {
         PlantType type = Names.plant(plant);
-        card.add(Ui.iconCell(type == null ? art.ui("image_ui_generic_leaf_backdrop") : art.plant(type), 46f))
-                .padBottom(2f).row();
+        views.ui.AnimatedActor animated = type == null ? null
+                : views.ui.AnimatedActor.plant(game.getAnimations(), type, 54f);
+        if (animated == null) {
+            card.add(Ui.iconCell(type == null
+                    ? art.ui("image_ui_generic_leaf_backdrop") : art.plant(type), 46f))
+                    .padBottom(2f).row();
+        } else {
+            com.badlogic.gdx.scenes.scene2d.ui.Container<views.ui.AnimatedActor> holder =
+                    new com.badlogic.gdx.scenes.scene2d.ui.Container<>(animated);
+            holder.size(54f);
+            card.add(holder).padBottom(2f).row();
+        }
         card.add(Ui.label(skin, plant, "small")).row();
 
         long remaining = controller.potRemainingMillis(x, y);
