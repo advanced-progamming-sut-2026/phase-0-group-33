@@ -84,6 +84,7 @@ public class BattleScreen extends ScreenAdapter {
     private Table objectivePanel;
     private ProgressBar waveBar;
     private float accumulator;
+    private float shake;
     private boolean paused;
 
     public BattleScreen(PvzGame game) {
@@ -779,6 +780,10 @@ public class BattleScreen extends ScreenAdapter {
         game.getAnimations().update();
         if (session != null) {
             lawnView.setFrozen(paused || session.isOver());
+            if (lawnView.consumeShake()) {
+                shake = 0.32f;
+            }
+            applyShake(delta);
             refreshHud();
             refreshSeedBar();
             updateHover();
@@ -786,6 +791,20 @@ public class BattleScreen extends ScreenAdapter {
         }
         stage.act(delta);
         stage.draw();
+    }
+
+    private void applyShake(float delta) {
+        com.badlogic.gdx.graphics.Camera camera = stage.getViewport().getCamera();
+        if (shake <= 0f) {
+            camera.position.set(BaseScreen.WIDTH / 2f, BaseScreen.HEIGHT / 2f, 0f);
+            camera.update();
+            return;
+        }
+        shake = Math.max(0f, shake - delta);
+        float power = shake * 26f;
+        camera.position.set(BaseScreen.WIDTH / 2f + com.badlogic.gdx.math.MathUtils.random(-power, power),
+                BaseScreen.HEIGHT / 2f + com.badlogic.gdx.math.MathUtils.random(-power, power), 0f);
+        camera.update();
     }
 
     private void advance(float delta) {

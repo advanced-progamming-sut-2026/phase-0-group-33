@@ -34,6 +34,7 @@ public class LawnView extends Actor {
     private static final float HURT_FLASH = 0.14f;
     private static final String ICE_PLANT = "FROSTBITE_ICE_BLOCK_PLANT";
     private static final String ICE_ZOMBIE = "FROSTBITE_ICE_BLOCK_ZOMBIE";
+    private static final String BOOM = "CHERRYBOMB_EXPLOSION_TOP";
 
     private final String chapterName;
     private boolean showGrid;
@@ -60,6 +61,10 @@ public class LawnView extends Actor {
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<Object, Float> hurtUntil =
             new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.Array<Corpse> blasts = new com.badlogic.gdx.utils.Array<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, int[]> plantSpots =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+    private boolean shakePending;
     private final com.badlogic.gdx.utils.Array<Corpse> corpses = new com.badlogic.gdx.utils.Array<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, float[]> seen =
             new com.badlogic.gdx.utils.ObjectMap<>();
@@ -70,14 +75,21 @@ public class LawnView extends Actor {
         private final int row;
         private final float start;
         private final float end;
+        private final boolean parts;
 
         private Corpse(models.entities.zombie.ZombieType type, float x, int row,
                        float start, float end) {
+            this(type, x, row, start, end, false);
+        }
+
+        private Corpse(models.entities.zombie.ZombieType type, float x, int row,
+                       float start, float end, boolean parts) {
             this.type = type;
             this.x = x;
             this.row = row;
             this.start = start;
             this.end = end;
+            this.parts = parts;
         }
     }
 
@@ -128,6 +140,48 @@ public class LawnView extends Actor {
         trackAbilities();
         trackDamage();
         trackDeaths();
+        trackBlasts();
+    }
+
+    public boolean consumeShake() {
+        boolean value = shakePending;
+        shakePending = false;
+        return value;
+    }
+
+    private void trackBlasts() {
+        for (models.game.PlacedPlant plant : session.getPlants()) {
+            plantSpots.put(plant, new int[] {plant.getX(), plant.getY()});
+        }
+        com.badlogic.gdx.utils.Array<models.game.PlacedPlant> gone =
+                new com.badlogic.gdx.utils.Array<>();
+        for (models.game.PlacedPlant plant : plantSpots.keys()) {
+            if (!session.getPlants().contains(plant)) {
+                gone.add(plant);
+            }
+        }
+        for (models.game.PlacedPlant plant : gone) {
+            int[] spot = plantSpots.remove(plant);
+            if (!isExplosive(plant)) {
+                continue;
+            }
+            float duration = animator.namedClipDuration(BOOM, "explosion");
+            if (duration <= 0f) {
+                continue;
+            }
+            blasts.add(new Corpse(null, spot[0], spot[1], time, time + duration));
+            shakePending = true;
+        }
+        for (int i = blasts.size - 1; i >= 0; i--) {
+            if (time >= blasts.get(i).end) {
+                blasts.removeIndex(i);
+            }
+        }
+    }
+
+    private boolean isExplosive(models.game.PlacedPlant plant) {
+        return plant.getType().getCategory() == models.entities.plant.PlantCategory.EXPLOSIVE
+                || plant.getType().getTags().contains(models.entities.plant.PlantTag.EXPLOSIVE);
     }
 
     private void trackDamage() {
@@ -231,6 +285,13 @@ public class LawnView extends Actor {
             }
             corpses.add(new Corpse(entry.key.getType(), entry.value[0], (int) entry.value[1],
                     time, time + duration));
+            if (animator.hasZombieClip(entry.key.getType(), "particles")) {
+                float parts = animator.zombieClipDuration(entry.key.getType(), "particles");
+                if (parts > 0f) {
+                    corpses.add(new Corpse(entry.key.getType(), entry.value[0],
+                            (int) entry.value[1], time, time + parts, true));
+                }
+            }
         }
         seen.clear();
         seen.putAll(current);
@@ -516,6 +577,7 @@ public class LawnView extends Actor {
             drawPushed(batch, row);
             drawZombies(batch, row);
             drawCorpses(batch, row);
+            drawBlasts(batch, row);
             drawProjectiles(batch, row);
         }
         drawSuns(batch);
@@ -692,7 +754,7 @@ public class LawnView extends Actor {
             if (corpse.row != row) {
                 continue;
             }
-            ClipRef clip = animator.zombieClip(corpse.type, "die");
+            ClipRef clip = animator.zombieClip(corpse.type, corpse.parts ? "particles" : "die");
             if (clip == null) {
                 continue;
             }
@@ -700,6 +762,25 @@ public class LawnView extends Actor {
             animator.draw(batch, clip, time - corpse.start, Lawn.columnCenter(corpse.x),
                     Lawn.rowBottom(row) + Lawn.cellHeight() * 0.12f + animator.zombieLift(),
                     animator.zombieScale(), false, null);
+        }
+    }
+
+    private void drawBlasts(Batch batch, int row) {
+        if (!animator.isReady()) {
+            return;
+        }
+        ClipRef clip = animator.namedClip(BOOM, "explosion");
+        if (clip == null) {
+            return;
+        }
+        for (Corpse blast : blasts) {
+            if (blast.row != row) {
+                continue;
+            }
+            float scale = animator.fitScale(BOOM, "explosion", Lawn.cellHeight() * 2.4f);
+            batch.setColor(Color.WHITE);
+            animator.draw(batch, clip, time - blast.start, Lawn.columnCenter(blast.x),
+                    Lawn.rowCenter(row), scale, false, null);
         }
     }
 

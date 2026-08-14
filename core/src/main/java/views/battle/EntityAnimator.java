@@ -97,6 +97,10 @@ public final class EntityAnimator {
         return lookup(animation, preferred);
     }
 
+    public float namedClipDuration(String animation, String clip) {
+        return animations.clipDuration(animation, clip);
+    }
+
     public float fitScale(String animation, String clip, float target) {
         com.badlogic.gdx.math.Rectangle bounds = animations.bounds(animation, clip);
         return bounds == null || bounds.height <= 0f ? 0f : target / bounds.height;
