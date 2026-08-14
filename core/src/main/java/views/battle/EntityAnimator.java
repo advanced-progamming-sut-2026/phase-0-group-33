@@ -73,6 +73,14 @@ public final class EntityAnimator {
         return Lawn.cellHeight() * ZOMBIE_LIFT;
     }
 
+    public String zombieClipName(ZombieType type, String... preferred) {
+        return animations.firstClip(AnimationCatalog.zombie(type), preferred);
+    }
+
+    public float zombieClipDuration(ZombieType type, String clip) {
+        return animations.clipDuration(AnimationCatalog.zombie(type), clip);
+    }
+
     public String plantClipName(PlantType type, String... preferred) {
         return animations.firstClip(AnimationCatalog.plant(type), preferred);
     }
