@@ -47,6 +47,12 @@ public class LawnView extends Actor {
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> lastCooldown =
             new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, Integer> lastAbility =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, Float> ability =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Boolean> lastSunPending =
+            new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.Array<Corpse> corpses = new com.badlogic.gdx.utils.Array<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, float[]> seen =
             new com.badlogic.gdx.utils.ObjectMap<>();
@@ -108,7 +114,42 @@ public class LawnView extends Actor {
         }
         time += delta;
         trackFiring();
+        trackAbilities();
         trackDeaths();
+    }
+
+    private void trackAbilities() {
+        for (models.entities.zombie.Zombie zombie : session.getZombies()) {
+            String clip = views.assets.AnimationCatalog.abilityClip(zombie.getType());
+            if (clip == null || !animator.hasZombieClip(zombie.getType(), clip)) {
+                continue;
+            }
+            int cooldown = zombie.getBattle().getAbilityCooldown();
+            Integer previous = lastAbility.get(zombie);
+            lastAbility.put(zombie, cooldown);
+            if (previous != null && cooldown > previous) {
+                float duration = animator.zombieClipDuration(zombie.getType(), clip);
+                if (duration > 0f) {
+                    ability.put(zombie, time + duration);
+                }
+            }
+        }
+        for (models.entities.zombie.Zombie zombie : zombieKeys(lastAbility)) {
+            if (!session.getZombies().contains(zombie)) {
+                lastAbility.remove(zombie);
+                ability.remove(zombie);
+            }
+        }
+    }
+
+    private com.badlogic.gdx.utils.Array<models.entities.zombie.Zombie> zombieKeys(
+            com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, Integer> map) {
+        com.badlogic.gdx.utils.Array<models.entities.zombie.Zombie> keys =
+                new com.badlogic.gdx.utils.Array<>();
+        for (models.entities.zombie.Zombie zombie : map.keys()) {
+            keys.add(zombie);
+        }
+        return keys;
     }
 
     private void trackDeaths() {
@@ -151,6 +192,7 @@ public class LawnView extends Actor {
             if (previous == null || previous != 0 || cooldown <= 0) {
                 continue;
             }
+            trackSunProduction(plant);
             String clip = animator.plantClipName(plant.getType(), "attack", "special");
             if (clip == null || "idle".equals(clip)) {
                 continue;
@@ -170,6 +212,7 @@ public class LawnView extends Actor {
         for (models.game.PlacedPlant plant : stale) {
             lastCooldown.remove(plant);
             firing.remove(plant);
+            lastSunPending.remove(plant);
         }
     }
 
@@ -692,6 +735,21 @@ public class LawnView extends Actor {
                 feet + Lawn.cellHeight() * 0.35f + lift, scale, true, null);
     }
 
+    private void trackSunProduction(models.game.PlacedPlant plant) {
+        Boolean previous = lastSunPending.get(plant);
+        boolean pending = plant.isSunPending();
+        lastSunPending.put(plant, pending);
+        if (previous != null && !previous && pending) {
+            String clip = animator.plantClipName(plant.getType(), "special");
+            if ("special".equals(clip)) {
+                float duration = animator.plantClipDuration(plant.getType(), clip);
+                if (duration > 0f) {
+                    firing.put(plant, time + duration);
+                }
+            }
+        }
+    }
+
     private String[] plantClipNames(models.game.PlacedPlant plant) {
         if (plant.getPlantFoodTicks() > 0) {
             return new String[] {"plantfood", "plantfood_on", "special", "attack", "idle"};
@@ -719,9 +777,19 @@ public class LawnView extends Actor {
             return false;
         }
         boolean eating = isEating(zombie);
-        ClipRef clip = eating
-                ? animator.zombieClip(zombie.getType(), "eat", "attack", "walk", "idle")
-                : animator.zombieClip(zombie.getType(), "walk", "walk1", "idle");
+        Float busy = ability.get(zombie);
+        ClipRef clip;
+        if (busy != null && time < busy) {
+            clip = animator.zombieClip(zombie.getType(),
+                    views.assets.AnimationCatalog.abilityClip(zombie.getType()), "walk", "idle");
+        } else if (eating) {
+            String bite = views.assets.AnimationCatalog.biteClip(zombie.getType());
+            clip = bite != null && animator.hasZombieClip(zombie.getType(), bite)
+                    ? animator.zombieClip(zombie.getType(), bite, "eat", "idle")
+                    : animator.zombieClip(zombie.getType(), "eat", "attack", "walk", "idle");
+        } else {
+            clip = animator.zombieClip(zombie.getType(), "walk", "walk1", "idle");
+        }
         if (clip == null) {
             return false;
         }

@@ -90,6 +90,30 @@ public final class AnimationCatalog {
         return mapped == null ? "ZOMBIE_TUTORIAL" : mapped;
     }
 
+    private static final ObjectMap<String, String> ABILITY = new ObjectMap<>();
+    private static final ObjectMap<String, String> BITE = new ObjectMap<>();
+
+    static {
+        ABILITY.put("Ra", "power");
+        ABILITY.put("Tomb Raiser", "power");
+        ABILITY.put("Hunter", "throw");
+        ABILITY.put("Octopus", "toss");
+        ABILITY.put("Explorer", "power");
+        ABILITY.put("Turquoise", "power");
+
+        BITE.put("Gargantuar", "smash_left");
+        BITE.put("All Star", "kick");
+        BITE.put("Piano", "smash_left");
+    }
+
+    public static String abilityClip(ZombieType type) {
+        return ABILITY.get(type.getName());
+    }
+
+    public static String biteClip(ZombieType type) {
+        return BITE.get(type.getName());
+    }
+
     public static String sun() {
         return "SUN";
     }
