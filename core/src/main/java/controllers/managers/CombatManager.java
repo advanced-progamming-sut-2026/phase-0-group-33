@@ -39,6 +39,7 @@ public class CombatManager {
             if (plant.isDead()) {
                 continue;
             }
+            plant.tickPlantFood();
             if (tickFuse(plant)) {
                 continue;
             }
@@ -642,6 +643,7 @@ public class CombatManager {
     }
 
     public void applyPlantFood(PlacedPlant plant) {
+        plant.triggerPlantFood();
         plantFoodEffects.apply(plant);
     }
 

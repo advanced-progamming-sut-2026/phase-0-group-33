@@ -30,6 +30,7 @@ public class LawnView extends Actor {
     protected final Drawable fill;
 
     private static final int GRAVE_MAX_HEALTH = 700;
+    private static final String PLANT_FOOD_GLOW = "PLANTFOOD_FX";
 
     private final String chapterName;
     private boolean showGrid;
@@ -660,16 +661,41 @@ public class LawnView extends Actor {
             return false;
         }
         Float until = firing.get(plant);
-        boolean attacking = until != null && time < until;
-        float clock = attacking
-                ? time - (until - animator.plantClipDuration(plant.getType(), wanted[0]))
-                : time + plant.getX() * 0.37f + plant.getY() * 0.19f;
+        boolean fed = plant.getPlantFoodTicks() > 0;
+        boolean attacking = fed || (until != null && time < until);
+        float clock;
+        if (fed) {
+            clock = (30 - plant.getPlantFoodTicks()) / 10f;
+        } else if (attacking) {
+            clock = time - (until - animator.plantClipDuration(plant.getType(), wanted[0]));
+        } else {
+            clock = time + plant.getX() * 0.37f + plant.getY() * 0.19f;
+        }
+        if (fed) {
+            drawPlantFoodGlow(batch, centerX, feet);
+        }
         animator.draw(batch, clip, clock, centerX, feet + animator.plantLift(),
                 animator.plantScale(), !attacking, null);
         return true;
     }
 
+    private void drawPlantFoodGlow(Batch batch, float centerX, float feet) {
+        ClipRef glow = animator.namedClip(PLANT_FOOD_GLOW, "plantfood", "plantfood_on");
+        if (glow == null) {
+            return;
+        }
+        String clipName = animator.clipName(PLANT_FOOD_GLOW, "plantfood", "plantfood_on");
+        float scale = animator.fitScale(PLANT_FOOD_GLOW, clipName, Lawn.cellHeight() * 1.5f);
+        float lift = animator.centreOffset(PLANT_FOOD_GLOW, clipName, scale);
+        batch.setColor(Color.WHITE);
+        animator.draw(batch, glow, time, centerX,
+                feet + Lawn.cellHeight() * 0.35f + lift, scale, true, null);
+    }
+
     private String[] plantClipNames(models.game.PlacedPlant plant) {
+        if (plant.getPlantFoodTicks() > 0) {
+            return new String[] {"plantfood", "plantfood_on", "special", "attack", "idle"};
+        }
         Float until = firing.get(plant);
         if (until != null && time < until) {
             return new String[] {"attack", "special", "idle"};

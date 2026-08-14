@@ -21,6 +21,7 @@ public class PlacedPlant {
     private int stackCount = 1;
     private int pumpkinHealth;
     private int armTicks;
+    private int plantFoodTicks;
 
     public PlacedPlant(PlantType type, int x, int y, int maxHealth) {
         this.type = type;
@@ -168,6 +169,20 @@ public class PlacedPlant {
 
     public void setArmTicks(int armTicks) {
         this.armTicks = armTicks;
+    }
+
+    public int getPlantFoodTicks() {
+        return plantFoodTicks;
+    }
+
+    public void triggerPlantFood() {
+        this.plantFoodTicks = 30;
+    }
+
+    public void tickPlantFood() {
+        if (plantFoodTicks > 0) {
+            plantFoodTicks--;
+        }
     }
 
     public boolean isDisabled() {
