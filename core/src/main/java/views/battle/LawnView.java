@@ -172,10 +172,6 @@ public class LawnView extends Actor {
         }
     }
 
-    private float idlePulse(int seed, float speed, float amount) {
-        return 1f + amount * (float) Math.sin(time * speed + seed * 0.7f);
-    }
-
     public void setSelection(int column, int row) {
         this.selectColumn = column;
         this.selectRow = row;
