@@ -42,6 +42,10 @@ public class LawnView extends Actor {
     private boolean hoverValid = true;
     private models.entities.plant.PlantType ghost;
     private final EntityAnimator animator;
+    private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Float> firing =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> lastCooldown =
+            new com.badlogic.gdx.utils.ObjectMap<>();
 
     public LawnView(GameSession session, Art art, Skin skin, Animations animations) {
         this.session = session;
@@ -78,8 +82,40 @@ public class LawnView extends Actor {
     @Override
     public void act(float delta) {
         super.act(delta);
-        if (!frozen) {
-            time += delta;
+        if (frozen) {
+            return;
+        }
+        time += delta;
+        trackFiring();
+    }
+
+    private void trackFiring() {
+        for (models.game.PlacedPlant plant : session.getPlants()) {
+            int cooldown = plant.getActionCooldownTicks();
+            Integer previous = lastCooldown.get(plant);
+            lastCooldown.put(plant, cooldown);
+            if (previous == null || previous != 0 || cooldown <= 0) {
+                continue;
+            }
+            String clip = animator.plantClipName(plant.getType(), "attack", "special");
+            if (clip == null || "idle".equals(clip)) {
+                continue;
+            }
+            float duration = animator.plantClipDuration(plant.getType(), clip);
+            if (duration > 0f) {
+                firing.put(plant, time + duration);
+            }
+        }
+        com.badlogic.gdx.utils.Array<models.game.PlacedPlant> stale =
+                new com.badlogic.gdx.utils.Array<>();
+        for (models.game.PlacedPlant plant : lastCooldown.keys()) {
+            if (!session.getPlants().contains(plant)) {
+                stale.add(plant);
+            }
+        }
+        for (models.game.PlacedPlant plant : stale) {
+            lastCooldown.remove(plant);
+            firing.remove(plant);
         }
     }
 
@@ -517,17 +553,26 @@ public class LawnView extends Actor {
         if (!animator.isReady()) {
             return false;
         }
-        ClipRef clip = animator.plantClip(plant.getType(), plantClipNames(plant));
+        String[] wanted = plantClipNames(plant);
+        ClipRef clip = animator.plantClip(plant.getType(), wanted);
         if (clip == null) {
             return false;
         }
-        float phase = plant.getX() * 0.37f + plant.getY() * 0.19f;
-        animator.draw(batch, clip, time + phase, centerX, feet + animator.plantLift(),
-                animator.plantScale(), true, null);
+        Float until = firing.get(plant);
+        boolean attacking = until != null && time < until;
+        float clock = attacking
+                ? time - (until - animator.plantClipDuration(plant.getType(), wanted[0]))
+                : time + plant.getX() * 0.37f + plant.getY() * 0.19f;
+        animator.draw(batch, clip, clock, centerX, feet + animator.plantLift(),
+                animator.plantScale(), !attacking, null);
         return true;
     }
 
     private String[] plantClipNames(models.game.PlacedPlant plant) {
+        Float until = firing.get(plant);
+        if (until != null && time < until) {
+            return new String[] {"attack", "special", "idle"};
+        }
         float fraction = plant.getHealth() / (float) Math.max(1, plant.getMaxHealth());
         if (fraction <= 0.34f) {
             return new String[] {"damage3", "damage2", "damage", "idle3", "idle2", "idle"};

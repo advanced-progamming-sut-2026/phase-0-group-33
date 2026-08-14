@@ -162,6 +162,19 @@ public final class Animations implements Disposable {
         }
     }
 
+    public float clipDuration(String animation, String clip) {
+        if (!isAvailable() || clip == null || !has(animation)) {
+            return 0f;
+        }
+        try {
+            String path = paths.get(animation);
+            player.loadSync(path);
+            return player.clipDurationSeconds(path, clip);
+        } catch (RuntimeException e) {
+            return 0f;
+        }
+    }
+
     public void draw(Batch batch, ClipRef clip, float time, float x, float y,
                      float scaleX, float scaleY, boolean loop, Map<String, Boolean> visibility) {
         if (!isAvailable() || clip == null) {
