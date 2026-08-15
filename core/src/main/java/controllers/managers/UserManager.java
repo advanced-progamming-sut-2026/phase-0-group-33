@@ -226,6 +226,11 @@ public class UserManager {
             result.setSuccess(false);
             return result;
         }
+        if (newUsername == null) {
+            result.addMessage(Authentication.USERNAME.getErrorMessage());
+            result.setSuccess(false);
+            return result;
+        }
         if (newUsername.equals(currentUser.getUsername())) {
             result.addMessage("New username is the same as the current one.");
             result.setSuccess(false);
@@ -263,6 +268,11 @@ public class UserManager {
             result.setSuccess(false);
             return result;
         }
+        if (newNickname == null) {
+            result.addMessage("Nickname must be 3-30 characters.");
+            result.setSuccess(false);
+            return result;
+        }
         if (newNickname.equals(currentUser.getNickname())) {
             result.addMessage("New nickname is the same as the current one.");
             result.setSuccess(false);
@@ -292,6 +302,11 @@ public class UserManager {
             result.setSuccess(false);
             return result;
         }
+        if (newEmail == null) {
+            result.addMessage(Authentication.EMAIL.getErrorMessage());
+            result.setSuccess(false);
+            return result;
+        }
         if (newEmail.equals(currentUser.getEmail())) {
             result.addMessage("New email is the same.");
             result.setSuccess(false);
@@ -318,6 +333,11 @@ public class UserManager {
         Result result = new Result();
         if (currentUser == null) {
             result.addMessage("Not logged in.");
+            result.setSuccess(false);
+            return result;
+        }
+        if (oldPassword == null || newPassword == null) {
+            result.addMessage(Authentication.PASSWORD.getErrorMessage());
             result.setSuccess(false);
             return result;
         }
