@@ -22,6 +22,7 @@ public class ZombieBehaviorManager {
     private final GameSession session;
     private final CombatManager combatManager;
     private final ChapterEnvironment environment;
+    private static final double UMBRELLA_RANGE = 1.0;
     private static final double WIZARD_RANGE = 3.0;
     private static final double PIANO_RANGE = 3.0;
 
@@ -563,8 +564,7 @@ public class ZombieBehaviorManager {
         if (zombie.getType() == ZombieType.IMP_DRAGON && source.getTags().contains(PlantTag.FIRE)) {
             return false;
         }
-        if (zombie.getType() == ZombieType.UMBRELLA
-                && source.getCategory() == PlantCategory.LOBBER) {
+        if (source.getCategory() == PlantCategory.LOBBER && shelteredByUmbrella(zombie)) {
             return false;
         }
         if (zombie.getType() == ZombieType.SNORKEL && isUnderwater(zombie)
@@ -608,9 +608,26 @@ public class ZombieBehaviorManager {
                     victim.setIceHealth(600);
                 }
             }
-            victim.setHealth(victim.getHealth() - Math.max(0, source.getDamage()));
-            if (victim.isDead()) {
+            int damage = combatManager.plantDamage(source);
+            if (!combatManager.damagePlant(victim, damage) && victim.isDead()) {
                 session.removePlant(victim, true);
+            }
+        }
+        return false;
+    }
+
+    private boolean shelteredByUmbrella(Zombie zombie) {
+        if (zombie.getType() == ZombieType.UMBRELLA) {
+            return true;
+        }
+        for (Zombie other : session.getZombies()) {
+            if (other.getType() != ZombieType.UMBRELLA) {
+                continue;
+            }
+            if (Math.abs(other.getPosition().getY() - zombie.getPosition().getY()) <= 1
+                    && Math.abs(other.getPosition().getX() - zombie.getPosition().getX())
+                            <= UMBRELLA_RANGE) {
+                return true;
             }
         }
         return false;
