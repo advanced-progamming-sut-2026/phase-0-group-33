@@ -92,7 +92,8 @@ public class PlantActionManager {
         for (Zombie zombie : session.getZombies()) {
             double distance = Math.abs(zombie.getPosition().getX() - magnetShroom.getX())
                     + Math.abs(zombie.getPosition().getY() - magnetShroom.getY());
-            if (distance <= 4 && distance < best && zombie.totalArmor() > 0) {
+            if (distance <= 4 && distance < best && zombie.totalArmor() > 0
+                    && zombie.getType().getArmorType().isMetallic()) {
                 best = distance;
                 target = zombie;
             }
