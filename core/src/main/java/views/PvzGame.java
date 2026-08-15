@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import models.App;
 import views.assets.Animations;
+import views.assets.Audio;
 import views.assets.Art;
 import views.assets.GameAssets;
 import views.ui.UiSkin;
@@ -14,6 +15,7 @@ public class PvzGame extends Game {
     private GameAssets assets;
     private Art art;
     private Animations animations;
+    private Audio audio;
     private Skin skin;
     private Router router;
 
@@ -33,6 +35,10 @@ public class PvzGame extends Game {
         return animations;
     }
 
+    public Audio getAudio() {
+        return audio;
+    }
+
     public Skin getSkin() {
         return skin;
     }
@@ -50,6 +56,8 @@ public class PvzGame extends Game {
         assets.loadFonts();
         art = new Art(assets);
         animations = new Animations();
+        audio = new Audio();
+        audio.setUser(app.getCurrentUser() == null ? null : app.getCurrentUser().getUsername());
         skin = UiSkin.build(assets);
         router = new Router(this);
 
@@ -66,6 +74,9 @@ public class PvzGame extends Game {
         }
         if (animations != null) {
             animations.dispose();
+        }
+        if (audio != null) {
+            audio.dispose();
         }
         if (assets != null) {
             assets.dispose();

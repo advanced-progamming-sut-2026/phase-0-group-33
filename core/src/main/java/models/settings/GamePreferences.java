@@ -10,6 +10,8 @@ public final class GamePreferences {
     private static final String KEY_SPEED = "pref.gameSpeed";
     private static final String KEY_GRID = "pref.showGrid";
     private static final String KEY_DEBUG = "pref.debugMode";
+    private static final String KEY_MUSIC = "pref.musicVolume";
+    private static final String KEY_SFX = "pref.sfxVolume";
 
     private GamePreferences() {
     }
@@ -37,6 +39,30 @@ public final class GamePreferences {
         UserDataStore store = store(username);
         store.setInt(KEY_GRID, visible ? 1 : 0);
         store.save();
+    }
+
+    public static int getMusicVolume(String username) {
+        return clampVolume(store(username).getInt(KEY_MUSIC, 70));
+    }
+
+    public static void setMusicVolume(String username, int volume) {
+        UserDataStore store = store(username);
+        store.setInt(KEY_MUSIC, clampVolume(volume));
+        store.save();
+    }
+
+    public static int getSfxVolume(String username) {
+        return clampVolume(store(username).getInt(KEY_SFX, 80));
+    }
+
+    public static void setSfxVolume(String username, int volume) {
+        UserDataStore store = store(username);
+        store.setInt(KEY_SFX, clampVolume(volume));
+        store.save();
+    }
+
+    private static int clampVolume(int volume) {
+        return Math.max(0, Math.min(100, volume));
     }
 
     public static boolean isDebugMode(String username) {

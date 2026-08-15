@@ -35,6 +35,7 @@ public class SettingsScreen extends BaseScreen {
         panel.pad(28f);
         addDifficulty(panel);
         addGameSpeed(panel, username);
+        addVolume(panel, username);
         addToggles(panel, username);
         body.add(panel).width(940f).top();
     }
@@ -70,6 +71,39 @@ public class SettingsScreen extends BaseScreen {
         speedBox.add(speed).width(260f).padRight(14f);
         speedBox.add(speedValue);
         settingRow(panel, "Game speed", "How fast the battle advances (1 to 3).", speedBox, 320f);
+    }
+
+    private void addVolume(Table panel, final String username) {
+        panel.add(volumeRow(username, "Music", GamePreferences.getMusicVolume(username), true))
+                .colspan(2).left().padBottom(4f).row();
+        panel.add(volumeRow(username, "Sound effects", GamePreferences.getSfxVolume(username), false))
+                .colspan(2).left().padBottom(22f).row();
+    }
+
+    private Table volumeRow(final String username, String title, int value, final boolean music) {
+        final Label readout = Ui.label(skin, value + "%", "gold");
+        final Slider slider = new Slider(0f, 100f, 5f, false, skin);
+        slider.setValue(value);
+        slider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                int level = (int) slider.getValue();
+                readout.setText(level + "%");
+                if (music) {
+                    GamePreferences.setMusicVolume(username, level);
+                } else {
+                    GamePreferences.setSfxVolume(username, level);
+                }
+                if (game.getAudio() != null) {
+                    game.getAudio().applyVolume();
+                }
+            }
+        });
+        Table row = new Table();
+        row.add(Ui.label(skin, title, "h2")).left().width(230f);
+        row.add(slider).width(300f).padRight(14f);
+        row.add(readout).width(70f).left();
+        return row;
     }
 
     private void addToggles(Table panel, final String username) {

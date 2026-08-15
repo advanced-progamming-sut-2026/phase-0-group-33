@@ -130,6 +130,10 @@ public class BattleScreen extends ScreenAdapter {
             return;
         }
 
+        if (game.getAudio() != null) {
+            game.getAudio().playMusic(battleTrack());
+        }
+
         com.badlogic.gdx.graphics.g2d.TextureRegion backgroundRegion =
                 art.chapterBackground(chapterName());
         Lawn.configure(backgroundRegion);
@@ -585,6 +589,7 @@ public class BattleScreen extends ScreenAdapter {
 
     private void useTool(int column, int row) {
         if (tool == Tool.NONE && controller.handleCollectPlantFood(column, row).isSuccessfull()) {
+            sfx(views.assets.Audio.GULP);
             return;
         }
         if (session.getMode() == GameMode.VASEBREAKER && tool == Tool.NONE) {
@@ -621,6 +626,10 @@ public class BattleScreen extends ScreenAdapter {
                 break;
         }
         toasts.show(result);
+        if (result.isSuccessfull()) {
+            sfx(tool == Tool.PLANT ? views.assets.Audio.PLANT
+                    : tool == Tool.NONE ? views.assets.Audio.SUN : views.assets.Audio.CLICK);
+        }
         if (result.isSuccessfull() && tool != Tool.PLANT) {
             tool = Tool.NONE;
             pending = null;
@@ -827,6 +836,20 @@ public class BattleScreen extends ScreenAdapter {
 
     private int lastScore = -1;
 
+    private String battleTrack() {
+        if (session.isBossLevel()) {
+            return views.assets.Audio.BOSS;
+        }
+        return session.getMode() == GameMode.ADVENTURE
+                ? views.assets.Audio.BATTLE : views.assets.Audio.MINIGAME;
+    }
+
+    private void sfx(String name) {
+        if (game.getAudio() != null) {
+            game.getAudio().play(name);
+        }
+    }
+
     private void trackRewards() {
         trackScore();
         int food = session.getPlantFoods();
@@ -868,6 +891,7 @@ public class BattleScreen extends ScreenAdapter {
             lawnView.setFrozen(paused || session.isOver());
             if (lawnView.consumeShake()) {
                 shake = 0.32f;
+                sfx(views.assets.Audio.EXPLODE);
             }
             applyShake(delta);
             refreshHud();
@@ -917,6 +941,7 @@ public class BattleScreen extends ScreenAdapter {
             return;
         }
         boolean won = session.getPhase() == models.game.GamePhase.WON;
+        sfx(won ? views.assets.Audio.WIN : views.assets.Audio.LOSE);
         setPaused(true);
         controller.handleAdvanceTime(0);
 

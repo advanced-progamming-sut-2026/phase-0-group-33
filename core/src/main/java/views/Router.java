@@ -27,6 +27,12 @@ public final class Router {
 
     public void go(ScreenId id) {
         Screen previous = game.getScreen();
+        if (game.getAudio() != null) {
+            game.getAudio().setUser(game.getApp().getCurrentUser() == null ? null
+                    : game.getApp().getCurrentUser().getUsername());
+            game.getAudio().playMusic(id == ScreenId.BATTLE
+                    ? views.assets.Audio.BATTLE : views.assets.Audio.MENU);
+        }
         game.setScreen(create(id));
         if (previous != null) {
             previous.dispose();
