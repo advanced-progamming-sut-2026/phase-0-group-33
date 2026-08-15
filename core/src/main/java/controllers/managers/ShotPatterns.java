@@ -161,7 +161,7 @@ public class ShotPatterns {
     private Zombie lastZombieInRowBefore(int row, double x) {
         Zombie last = null;
         for (Zombie zombie : session.getZombies()) {
-            if ((int) zombie.getPosition().getY() == row && zombie.getPosition().getX() < x
+            if (zombie.occupiesRow(row) && zombie.getPosition().getX() < x
                     && (last == null || zombie.getPosition().getX() > last.getPosition().getX())) {
                 last = zombie;
             }

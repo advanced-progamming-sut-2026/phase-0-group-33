@@ -16,6 +16,7 @@ public class Tile {
     private boolean gravePlantFood;
     private boolean necromancy;
     private boolean lowTide;
+    private int fireTicks;
 
     public Tile(Point position, TerrainType terrain, boolean hasLawnMower) {
         this.position = position;
@@ -24,6 +25,27 @@ public class Tile {
         this.hasLawnMower = hasLawnMower;
         if (terrain == TerrainType.GRAVE) {
             this.graveHealth = 700;
+        }
+    }
+
+    public int getFireTicks() {
+        return fireTicks;
+    }
+
+    public void ignite(int ticks) {
+        this.fireTicks = ticks;
+        if (terrain == TerrainType.NORMAL) {
+            this.terrain = TerrainType.FIRE;
+        }
+    }
+
+    public void tickFire() {
+        if (fireTicks <= 0) {
+            return;
+        }
+        fireTicks--;
+        if (fireTicks == 0 && terrain == TerrainType.FIRE) {
+            terrain = TerrainType.NORMAL;
         }
     }
 

@@ -8,5 +8,6 @@ public enum TerrainType {
     LILYPAD,
     FROZEN,
     SLIDER_UP,
-    SLIDER_DOWN
+    SLIDER_DOWN,
+    FIRE
 }

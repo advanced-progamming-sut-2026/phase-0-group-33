@@ -44,6 +44,10 @@ public class Zombie {
         return new LinkedHashMap<>();
     }
 
+    public boolean occupiesRow(int row) {
+        return (int) position.getY() == row;
+    }
+
     public boolean isDead() {
         return getHealth() <= 0;
     }

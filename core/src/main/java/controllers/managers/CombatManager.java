@@ -511,7 +511,7 @@ public class CombatManager {
             session.useLawnMower(row);
             List<String> names = new ArrayList<>();
             for (Zombie inRow : new ArrayList<>(session.getZombies())) {
-                if ((int) inRow.getPosition().getY() == row) {
+                if (inRow.occupiesRow(row)) {
                     names.add(inRow.getType().getName());
                     session.getZombies().remove(inRow);
                     session.countKill(inRow);
@@ -650,7 +650,7 @@ public class CombatManager {
     Zombie firstZombieInRowAfter(int row, double x) {
         Zombie first = null;
         for (Zombie zombie : session.getZombies()) {
-            if ((int) zombie.getPosition().getY() == row && zombie.getPosition().getX() >= x
+            if (zombie.occupiesRow(row) && zombie.getPosition().getX() >= x
                     && (first == null || zombie.getPosition().getX() < first.getPosition().getX())) {
                 first = zombie;
             }
@@ -661,7 +661,7 @@ public class CombatManager {
     List<Zombie> zombiesInRowAfter(int row, double x) {
         List<Zombie> result = new ArrayList<>();
         for (Zombie zombie : session.getZombies()) {
-            if ((int) zombie.getPosition().getY() == row && zombie.getPosition().getX() >= x) {
+            if (zombie.occupiesRow(row) && zombie.getPosition().getX() >= x) {
                 result.add(zombie);
             }
         }
