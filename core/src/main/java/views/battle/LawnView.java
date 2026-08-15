@@ -872,7 +872,7 @@ public class LawnView extends Actor {
                 batch.draw(octopus, x + width * 0.15f, y + height * 0.3f, width * 0.7f, height * 0.7f);
             }
         }
-        if (plant.getPumpkinHealth() > 0) {
+        if (plant.getPumpkinHealth() > 0 && !drawPumpkin(batch, plant)) {
             batch.setColor(1f, 0.65f, 0.2f, 0.45f);
             fill.draw(batch, x, y, width, height);
         }
@@ -1112,6 +1112,9 @@ public class LawnView extends Actor {
     }
 
     private String[] plantClipNames(models.game.PlacedPlant plant) {
+        if (plant.getType().getName().toLowerCase().contains("mint")) {
+            return new String[] {"loop", "idle"};
+        }
         if (plant.getPlantFoodTicks() > 0) {
             return new String[] {"plantfood", "plantfood_on", "special", "attack", "idle"};
         }
@@ -1194,6 +1197,26 @@ public class LawnView extends Actor {
         animator.draw(batch, clip, time, centreX, bottom + Lawn.cellHeight() * 0.42f + lift,
                 scale, true, null);
         batch.setColor(Color.WHITE);
+        return true;
+    }
+
+    private boolean drawPumpkin(Batch batch, models.game.PlacedPlant plant) {
+        if (!animator.isReady()) {
+            return false;
+        }
+        int max = models.entities.plant.PlantType.PUMPKIN.getBaseHp();
+        float fraction = Math.max(0f, Math.min(1f, plant.getPumpkinHealth() / (float) max));
+        String clipName = fraction > 0.66f ? "idle" : fraction > 0.33f ? "idle2" : "idle3";
+        ClipRef clip = animator.plantClip(models.entities.plant.PlantType.PUMPKIN,
+                clipName, "idle");
+        if (clip == null) {
+            return false;
+        }
+        batch.setColor(Color.WHITE);
+        animator.draw(batch, clip, time + plant.getX() * 0.21f,
+                Lawn.columnCenter(plant.getX()),
+                Lawn.rowBottom(plant.getY()) + Lawn.cellHeight() * 0.16f + animator.plantLift(),
+                animator.plantScale(), true, null);
         return true;
     }
 
