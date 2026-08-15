@@ -610,11 +610,18 @@ public class ZombieBehaviorManager {
         return false;
     }
 
-    private boolean isUnderwater(Zombie zombie) {
+    public boolean isUnderwater(Zombie zombie) {
         Tile tile = session.getGrid().getTile(
                 (int) Math.round(zombie.getPosition().getX()) - 1,
                 (int) zombie.getPosition().getY() - 1);
-        return tile != null && tile.getTerrain() == TerrainType.WATER;
+        return tile != null && tile.getTerrain() == TerrainType.WATER && !tile.isLowTide();
+    }
+
+    public boolean isSubmerged(Zombie zombie) {
+        if (zombie.getType() != ZombieType.SNORKEL && zombie.getType() != ZombieType.FAST_SWIMMER) {
+            return false;
+        }
+        return isUnderwater(zombie) && !isEatingPlant(zombie);
     }
 
     private boolean isEatingPlant(Zombie zombie) {
