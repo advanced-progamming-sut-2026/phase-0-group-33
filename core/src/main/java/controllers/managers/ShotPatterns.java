@@ -129,7 +129,8 @@ public class ShotPatterns {
     private void hypnotizeShot() {
         List<Zombie> candidates = new ArrayList<>();
         for (Zombie zombie : session.getZombies()) {
-            if (!zombie.getBattle().isHypnotized() && !zombie.getBattle().isSunProducer()) {
+            if (!zombie.getBattle().isHypnotized() && !zombie.getBattle().isSunProducer()
+                    && !(zombie instanceof models.entities.zombie.Zomboss)) {
                 candidates.add(zombie);
             }
         }

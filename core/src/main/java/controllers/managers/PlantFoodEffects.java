@@ -170,7 +170,8 @@ public class PlantFoodEffects {
             if (done >= count) {
                 return;
             }
-            if (!zombie.getBattle().isHypnotized() && !zombie.getBattle().isSunProducer()) {
+            if (!zombie.getBattle().isHypnotized() && !zombie.getBattle().isSunProducer()
+                    && !(zombie instanceof models.entities.zombie.Zomboss)) {
                 zombie.getBattle().setHypnotized(true);
                 System.out.printf("The %s is hypnotized and fights for you now!%n",
                         zombie.getType().getName());
