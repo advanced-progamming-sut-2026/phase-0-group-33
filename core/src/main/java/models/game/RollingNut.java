@@ -2,8 +2,12 @@ package models.game;
 
 import models.entities.plant.PlantType;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class RollingNut {
     private final PlantType type;
+    private final Set<Object> struck = new HashSet<>();
     private double x;
     private int row;
 
@@ -31,6 +35,10 @@ public class RollingNut {
 
     public void setRow(int row) {
         this.row = row;
+    }
+
+    public boolean recordHit(Object zombie) {
+        return struck.add(zombie);
     }
 
     public boolean isGiant() {

@@ -235,7 +235,7 @@ public class MinigameManager {
                 continue;
             }
             Zombie hit = firstZombieNear(nut);
-            if (hit == null) {
+            if (hit == null || !nut.recordHit(hit)) {
                 continue;
             }
             if (nut.isExplosive()) {
@@ -268,6 +268,7 @@ public class MinigameManager {
         }
         nuts.remove(nut);
         nutDirections.remove(nut);
+        nutSteps.remove(nut);
         System.out.printf("The explosive nut blew up in lane %d!%n", nut.getRow());
     }
 
