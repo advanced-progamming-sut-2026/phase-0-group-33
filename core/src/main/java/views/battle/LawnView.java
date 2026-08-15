@@ -1233,25 +1233,10 @@ public class LawnView extends Actor {
         if (clip == null) {
             return false;
         }
-        float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 2.6f);
-        float lift = animator.centreOffset(animation, clipName, scale);
-        animator.draw(batch, clip, time, centerX,
-                feet + Lawn.cellHeight() * 0.5f + lift, scale, true, null);
-        drawBossPortrait(batch, boss, centerX, feet);
+        float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 2.25f);
+        float anchor = animator.bottomOffset(animation, clipName, scale);
+        animator.draw(batch, clip, time, centerX, feet - anchor, scale, true, null);
         return true;
-    }
-
-    private void drawBossPortrait(Batch batch, models.entities.zombie.Zomboss boss,
-                                  float centerX, float feet) {
-        TextureRegion region = art.zombie(boss.getType());
-        if (region == null) {
-            return;
-        }
-        float height = Lawn.cellHeight() * 1.9f;
-        float width = height * region.getRegionWidth() / region.getRegionHeight();
-        batch.setColor(1f, 1f, 1f, boss.isStunned() ? 0.6f : 1f);
-        batch.draw(region, centerX - width / 2f, feet, width, height);
-        batch.setColor(Color.WHITE);
     }
 
     private boolean isEating(models.entities.zombie.Zombie zombie) {
