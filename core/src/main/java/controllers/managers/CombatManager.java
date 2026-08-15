@@ -480,24 +480,8 @@ public class CombatManager {
         } else {
             double dps = zombie.getType().getEatDps() * session.getDamageFactor();
             int bite = (int) Math.ceil(dps / GameSession.TICKS_PER_SECOND);
-            if (plant.getIceHealth() > 0) {
-                plant.setIceHealth(Math.max(0, plant.getIceHealth() - bite));
-                if (plant.getIceHealth() == 0) {
-                    plant.setFreezeLevel(0);
-                    System.out.printf("The %s chewed through the ice around %s at (%d, %d).%n",
-                            zombie.getType().getName(), plant.getType().getName(),
-                            plant.getX(), plant.getY());
-                }
+            if (damagePlant(plant, bite)) {
                 return;
-            }
-            if (plant.getOctopusHealth() > 0) {
-                plant.setOctopusHealth(Math.max(0, plant.getOctopusHealth() - bite));
-                return;
-            }
-            if (plant.getPumpkinHealth() > 0) {
-                plant.setPumpkinHealth(Math.max(0, plant.getPumpkinHealth() - bite));
-            } else {
-                plant.setHealth(plant.getHealth() - bite);
             }
             if (plant.getType() == PlantType.ENDURIAN) {
                 damageZombie(zombie, plant.getType().getDamage() / GameSession.TICKS_PER_SECOND + 1);
@@ -588,6 +572,28 @@ public class CombatManager {
             System.out.printf("The Sweet Potato pulled the %s into lane %d!%n",
                     zombie.getType().getName(), potato.getY());
         }
+    }
+
+    public boolean damagePlant(PlacedPlant plant, int damage) {
+        if (plant.getIceHealth() > 0) {
+            plant.setIceHealth(Math.max(0, plant.getIceHealth() - damage));
+            if (plant.getIceHealth() == 0) {
+                plant.setFreezeLevel(0);
+                System.out.printf("The ice around %s at (%d, %d) broke apart.%n",
+                        plant.getType().getName(), plant.getX(), plant.getY());
+            }
+            return true;
+        }
+        if (plant.getOctopusHealth() > 0) {
+            plant.setOctopusHealth(Math.max(0, plant.getOctopusHealth() - damage));
+            return true;
+        }
+        if (plant.getPumpkinHealth() > 0) {
+            plant.setPumpkinHealth(Math.max(0, plant.getPumpkinHealth() - damage));
+            return true;
+        }
+        plant.setHealth(plant.getHealth() - damage);
+        return false;
     }
 
     public void onPlantEaten(PlacedPlant plant) {

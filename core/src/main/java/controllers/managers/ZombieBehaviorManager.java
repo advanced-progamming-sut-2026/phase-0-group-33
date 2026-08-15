@@ -427,9 +427,8 @@ public class ZombieBehaviorManager {
         int col = (int) Math.round(zombie.getPosition().getX());
         PlacedPlant blocking = session.plantAt(col, (int) zombie.getPosition().getY());
         if (blocking != null) {
-            blocking.setHealth(blocking.getHealth()
-                    - zombie.getType().getEatDps() / GameSession.TICKS_PER_SECOND - 1);
-            if (blocking.isDead()) {
+            int bite = zombie.getType().getEatDps() / GameSession.TICKS_PER_SECOND + 1;
+            if (!combatManager.damagePlant(blocking, bite) && blocking.isDead()) {
                 session.removePlant(blocking, true);
             }
             return true;
@@ -499,8 +498,7 @@ public class ZombieBehaviorManager {
         if (target == null) {
             return;
         }
-        target.setHealth(target.getHealth() - 20);
-        if (target.isDead()) {
+        if (!combatManager.damagePlant(target, 20) && target.isDead()) {
             session.removePlant(target, true);
         }
     }
