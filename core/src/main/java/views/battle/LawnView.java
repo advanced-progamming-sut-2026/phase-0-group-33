@@ -31,11 +31,13 @@ public class LawnView extends Actor {
 
     private static final int GRAVE_MAX_HEALTH = 700;
     private static final String PLANT_FOOD_GLOW = "PLANTFOOD_FX";
+    private static final String ICE_PLANT = "FROSTBITE_ICE_BLOCK_PLANT";
+    private static final String ICE_ZOMBIE = "FROSTBITE_ICE_BLOCK_ZOMBIE";
+    private static final String TIDE_LINE = "WATER_TIDE_LINE";
+    private static final String WATER_TILE = "WATER_SQUARE";
     private static final float HURT_FLASH = 0.14f;
     private static final float IMP_FLIGHT = 0.85f;
     private static final float IMP_ARC = 1.9f;
-    private static final String ICE_PLANT = "FROSTBITE_ICE_BLOCK_PLANT";
-    private static final String ICE_ZOMBIE = "FROSTBITE_ICE_BLOCK_ZOMBIE";
     private static final String BOOM = "CHERRYBOMB_EXPLOSION_TOP";
 
     private final String chapterName;
@@ -397,9 +399,61 @@ public class LawnView extends Actor {
         if (showGrid) {
             drawGrid(batch);
         }
+        drawTideLine(batch);
         drawSpecialMarkers(batch);
         drawEntities(batch);
         batch.setColor(previous);
+    }
+
+    private void paintNothing() {
+        return;
+    }
+
+    private boolean drawWaterTile(Batch batch, int column, int row) {
+        if (!animator.isReady()) {
+            return false;
+        }
+        ClipRef clip = animator.namedClip(WATER_TILE, "idle", "animation");
+        if (clip == null) {
+            return false;
+        }
+        String clipName = animator.clipName(WATER_TILE, "idle", "animation");
+        float scale = animator.fitScale(WATER_TILE, clipName, Lawn.cellHeight());
+        float lift = animator.centreOffset(WATER_TILE, clipName, scale);
+        batch.setColor(1f, 1f, 1f, 0.85f);
+        animator.draw(batch, clip, time + column * 0.13f, Lawn.columnCenter(column),
+                Lawn.rowCenter(row) + lift, scale, true, null);
+        batch.setColor(Color.WHITE);
+        return true;
+    }
+
+    private void drawTideLine(Batch batch) {
+        if (!animator.isReady() || session.getLevel() == null) {
+            return;
+        }
+        int firstWater = -1;
+        for (int column = 1; column <= GameSession.COLS && firstWater < 0; column++) {
+            for (int row = 1; row <= GameSession.ROWS; row++) {
+                Tile tile = session.getGrid().getTile(column - 1, row - 1);
+                if (tile != null && tile.getTerrain() == TerrainType.WATER) {
+                    firstWater = column;
+                    break;
+                }
+            }
+        }
+        if (firstWater < 1) {
+            return;
+        }
+        ClipRef clip = animator.namedClip(TIDE_LINE, "idle");
+        if (clip == null) {
+            return;
+        }
+        String clipName = animator.clipName(TIDE_LINE, "idle");
+        float scale = animator.fitScale(TIDE_LINE, clipName, Lawn.height());
+        float lift = animator.centreOffset(TIDE_LINE, clipName, scale);
+        batch.setColor(Color.WHITE);
+        animator.draw(batch, clip, time, Lawn.columnLeft(firstWater),
+                Lawn.bottom() + Lawn.height() / 2f + lift, scale, true, null);
     }
 
     private void drawTerrain(Batch batch) {
@@ -409,9 +463,16 @@ public class LawnView extends Actor {
                 if (tile == null) {
                     continue;
                 }
-                Color tint = terrainTint(tile);
-                if (tint != null) {
-                    paint(batch, tint, column, row);
+                if (tile.getTerrain() == TerrainType.WATER && !tile.isLowTide()
+                        && drawWaterTile(batch, column, row)) {
+                    paintNothing();
+                } else {
+                    Color tint = terrainTint(tile);
+                    if (tint != null) {
+                        paint(batch, tint, column, row);
+                    } else if (tile.getTerrain() == TerrainType.WATER) {
+                        paint(batch, WATER, column, row);
+                    }
                 }
                 if (tile.isNecromancy()) {
                     paint(batch, NECROMANCY, column, row);
@@ -423,7 +484,7 @@ public class LawnView extends Actor {
 
     private Color terrainTint(Tile tile) {
         if (tile.getTerrain() == TerrainType.WATER) {
-            return tile.isLowTide() ? LOW_TIDE : WATER;
+            return tile.isLowTide() ? LOW_TIDE : null;
         }
         if (tile.getTerrain() == TerrainType.SLIDER_UP || tile.getTerrain() == TerrainType.SLIDER_DOWN) {
             return SLIDER;
