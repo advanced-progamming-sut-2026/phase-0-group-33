@@ -75,7 +75,26 @@ public class GameController extends BaseController {
     }
 
     public Result handleStartGame() {
-        return session() == null ? noSession() : session().startGame();
+        if (session() == null) {
+            return noSession();
+        }
+        Result result = session().startGame();
+        if (result.isSuccessfull()) {
+            consumeStoredPlantFood();
+        }
+        return result;
+    }
+
+    private void consumeStoredPlantFood() {
+        if (app.getCurrentUser() == null) {
+            return;
+        }
+        utils.UserDataStore store =
+                utils.UserDataStore.forUser(app.getCurrentUser().getUsername());
+        if (store.getInt("plantFoods", 0) > 0) {
+            store.setInt("plantFoods", 0);
+            store.save();
+        }
     }
 
     public Result handleStartZombieWaves() {

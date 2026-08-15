@@ -71,8 +71,6 @@ public class MainController extends BaseController {
 
         List<String> unlockedPlants = unlockedPlants(store);
         int plantFoods = store.getInt("plantFoods", 0);
-        store.setInt("plantFoods", 0);
-        store.save();
 
         app.setCurrentGameSession(new GameSession(
                 GameSetup.adventure(user, level, unlockedPlants, plantFoods,
