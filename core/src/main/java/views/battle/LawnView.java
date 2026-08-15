@@ -38,6 +38,9 @@ public class LawnView extends Actor {
     private static final float HURT_FLASH = 0.14f;
     private static final float IMP_FLIGHT = 0.85f;
     private static final float IMP_ARC = 1.9f;
+    private static final String SANDSTORM = "SANDSTORM_TOP";
+    private static final String SNOWSTORM = "SNOWSTORM_TOP";
+    private static final float STORM_LIFE = 1.4f;
     private static final String BOOM = "CHERRYBOMB_EXPLOSION_TOP";
 
     private final String chapterName;
@@ -69,6 +72,9 @@ public class LawnView extends Actor {
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, int[]> plantSpots =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private boolean shakePending;
+    private final com.badlogic.gdx.utils.Array<float[]> storms = new com.badlogic.gdx.utils.Array<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> lastFreeze =
+            new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, float[]> flights =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.Array<Corpse> corpses = new com.badlogic.gdx.utils.Array<>();
@@ -147,6 +153,78 @@ public class LawnView extends Actor {
         trackDamage();
         trackDeaths();
         trackBlasts();
+        trackStorms();
+    }
+
+    private void trackStorms() {
+        for (com.badlogic.gdx.utils.ObjectMap.Entry<models.entities.zombie.Zombie, float[]> entry
+                : seen.entries()) {
+            models.entities.zombie.Zombie zombie = entry.key;
+            if (!session.getZombies().contains(zombie)) {
+                continue;
+            }
+            float previousX = entry.value[0];
+            float nowX = (float) zombie.getPosition().getX();
+            if (previousX - nowX > 0.9f) {
+                storms.add(new float[] {nowX, (int) zombie.getPosition().getY(), time, 0f});
+            }
+        }
+        for (models.game.PlacedPlant plant : session.getPlants()) {
+            Integer previous = lastFreeze.get(plant);
+            int level = plant.getFreezeLevel();
+            lastFreeze.put(plant, level);
+            if (previous != null && level > previous) {
+                storms.add(new float[] {0f, plant.getY(), time, 1f});
+            }
+        }
+        com.badlogic.gdx.utils.Array<models.game.PlacedPlant> gone =
+                new com.badlogic.gdx.utils.Array<>();
+        for (models.game.PlacedPlant plant : lastFreeze.keys()) {
+            if (!session.getPlants().contains(plant)) {
+                gone.add(plant);
+            }
+        }
+        for (models.game.PlacedPlant plant : gone) {
+            lastFreeze.remove(plant);
+        }
+        for (int i = storms.size - 1; i >= 0; i--) {
+            if (time - storms.get(i)[2] >= STORM_LIFE) {
+                storms.removeIndex(i);
+            }
+        }
+    }
+
+    private void drawStorms(Batch batch) {
+        if (!animator.isReady()) {
+            return;
+        }
+        for (float[] storm : storms) {
+            boolean wind = storm[3] > 0.5f;
+            String animation = wind ? SNOWSTORM : SANDSTORM;
+            String clipName = animator.clipName(animation, "animation", "idle");
+            ClipRef clip = clipName == null ? null : animator.namedClip(animation, clipName);
+            if (clip == null) {
+                continue;
+            }
+            int row = (int) storm[1];
+            float age = time - storm[2];
+            float fade = Math.min(0.7f, 1.6f * (1f - age / STORM_LIFE));
+            batch.setColor(1f, 1f, 1f, Math.max(0f, fade));
+            if (wind) {
+                float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 1.4f);
+                float lift = animator.centreOffset(animation, clipName, scale);
+                for (int column = 2; column <= GameSession.COLS; column += 3) {
+                    animator.draw(batch, clip, age + column * 0.09f, Lawn.columnCenter(column),
+                            Lawn.rowCenter(row) + lift, scale, true, null);
+                }
+            } else {
+                float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 1.6f);
+                float lift = animator.centreOffset(animation, clipName, scale);
+                animator.draw(batch, clip, age, Lawn.columnCenter(storm[0]),
+                        Lawn.rowCenter(row) + lift, scale, true, null);
+            }
+            batch.setColor(Color.WHITE);
+        }
     }
 
     public boolean consumeShake() {
@@ -402,6 +480,7 @@ public class LawnView extends Actor {
         drawTideLine(batch);
         drawSpecialMarkers(batch);
         drawEntities(batch);
+        drawStorms(batch);
         batch.setColor(previous);
     }
 
