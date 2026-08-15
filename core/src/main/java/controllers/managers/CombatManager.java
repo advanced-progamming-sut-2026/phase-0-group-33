@@ -369,11 +369,9 @@ public class CombatManager {
             }
         }
         for (PlacedPlant plant : new ArrayList<>(session.getPlants())) {
-            if (Math.abs(plant.getX() - x) <= 1 && Math.abs(plant.getY() - y) <= 1) {
-                plant.setHealth(plant.getHealth() - 80);
-                if (plant.isDead()) {
-                    session.removePlant(plant, true);
-                }
+            if (Math.abs(plant.getX() - x) <= 1 && Math.abs(plant.getY() - y) <= 1
+                    && !damagePlant(plant, 80) && plant.isDead()) {
+                session.removePlant(plant, true);
             }
         }
     }
