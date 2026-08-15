@@ -74,6 +74,8 @@ public class BattleScreen extends ScreenAdapter {
     private float noticeTimer;
     private final String levelChapter;
     private final int levelNumber;
+    private final GameMode replayMode;
+    private final int replayTier;
     private com.badlogic.gdx.scenes.scene2d.ui.Cell<Table> seedTrayCell;
     private com.badlogic.gdx.scenes.scene2d.ui.Cell<Table> objectiveCell;
     private CursorOverlay cursor;
@@ -100,6 +102,8 @@ public class BattleScreen extends ScreenAdapter {
         this.session = game.getApp().getCurrentGameSession();
         this.levelChapter = session == null || session.getLevel() == null ? null
                 : session.getLevel().getChapter().getName();
+        this.replayMode = session == null ? null : session.getMode();
+        this.replayTier = session == null ? 1 : Math.max(1, session.getDifficultyTier());
         this.levelNumber = session == null || session.getLevel() == null ? 1
                 : session.getLevel().getLevelNumber();
     }
@@ -316,7 +320,7 @@ public class BattleScreen extends ScreenAdapter {
 
     private void restart() {
         if (levelChapter == null) {
-            leave();
+            restartMinigame();
             return;
         }
         app.setCurrentGameSession(null);
@@ -328,6 +332,44 @@ public class BattleScreen extends ScreenAdapter {
         }
         router.go(app.getCurrentGameSession().getPhase() == models.game.GamePhase.BATTLE
                 ? ScreenId.BATTLE : ScreenId.SEED_SELECT);
+    }
+
+    private void restartMinigame() {
+        String name = minigameKey();
+        if (name == null) {
+            leave();
+            return;
+        }
+        app.setCurrentGameSession(null);
+        Result result = new controllers.menuControllers.TravelLogController(app)
+                .handlePlayMinigame(name, replayTier);
+        if (!result.isSuccessfull() || app.getCurrentGameSession() == null) {
+            leave();
+            return;
+        }
+        router.go(ScreenId.BATTLE);
+    }
+
+    private String minigameKey() {
+        if (replayMode == null) {
+            return null;
+        }
+        switch (replayMode) {
+            case VASEBREAKER:
+                return "vasebreaker";
+            case WALLNUT_BOWLING:
+                return "wallnut-bowling";
+            case I_ZOMBIE:
+                return "i-zombie";
+            case BEGHOULED:
+                return "beghouled";
+            case ZOMBOTANY:
+                return "zombotany";
+            case SCORING:
+                return "scoring";
+            default:
+                return null;
+        }
     }
 
     protected void leave() {

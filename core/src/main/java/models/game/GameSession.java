@@ -464,6 +464,10 @@ public class GameSession {
         return setup.getLevel() instanceof models.progress.level.BossLevel;
     }
 
+    public int getDifficultyTier() {
+        return setup.getDifficultyTier();
+    }
+
     public ScoreTracker getScoreTracker() {
         return scoreTracker;
     }
