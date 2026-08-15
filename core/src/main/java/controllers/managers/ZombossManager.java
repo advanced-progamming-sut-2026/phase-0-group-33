@@ -127,6 +127,7 @@ public class ZombossManager {
     }
 
     private void fireballs() {
+        boss.startMove(Zomboss.Move.BOMB);
         int count = 2 + session.getRandom().nextInt(2);
         for (int i = 0; i < count; i++) {
             int column = 1 + session.getRandom().nextInt(GameSession.COLS);
@@ -144,6 +145,7 @@ public class ZombossManager {
     }
 
     private void burnRows() {
+        boss.startMove(Zomboss.Move.BURN);
         int top = (int) boss.getPosition().getY();
         for (int row = top; row <= Math.min(GameSession.ROWS, top + 1); row++) {
             for (int column = 1; column <= GameSession.COLS; column++) {
@@ -158,6 +160,7 @@ public class ZombossManager {
     }
 
     private void missile() {
+        boss.startMove(Zomboss.Move.MISSILE);
         int column = 1 + session.getRandom().nextInt(GameSession.COLS);
         int row = 1 + session.getRandom().nextInt(GameSession.ROWS);
         destroyPlantAt(column, row);
@@ -176,6 +179,7 @@ public class ZombossManager {
     }
 
     private void chargeForward() {
+        boss.startMove(Zomboss.Move.CHARGE);
         int top = (int) boss.getPosition().getY();
         for (int row = top; row <= Math.min(GameSession.ROWS, top + 1); row++) {
             for (int column = 1; column <= GameSession.COLS; column++) {
@@ -186,6 +190,7 @@ public class ZombossManager {
     }
 
     private void iceMissile() {
+        boss.startMove(Zomboss.Move.SLINGSHOT);
         int column = 1 + session.getRandom().nextInt(GameSession.COLS);
         int row = 1 + session.getRandom().nextInt(GameSession.ROWS);
         destroyPlantAt(column, row);
@@ -193,6 +198,7 @@ public class ZombossManager {
     }
 
     private void icyWind() {
+        boss.startMove(Zomboss.Move.WIND);
         for (int i = 0; i < 2; i++) {
             int row = 1 + session.getRandom().nextInt(GameSession.ROWS);
             for (PlacedPlant plant : session.getPlants()) {
@@ -209,6 +215,7 @@ public class ZombossManager {
     }
 
     private void freezeColumn() {
+        boss.startMove(Zomboss.Move.GLACIER);
         int column = 3 + session.getRandom().nextInt(GameSession.COLS - 3);
         for (int row = 1; row <= GameSession.ROWS; row++) {
             Zombie frozen = session.spawnZombie(ZombieType.TROGLOBITE, column, row, currentWave());
@@ -218,6 +225,7 @@ public class ZombossManager {
     }
 
     private void babySharks() {
+        boss.startMove(Zomboss.Move.SPAWN_SHARK);
         int count = 1 + session.getRandom().nextInt(2);
         for (int i = 0; i < count; i++) {
             PlacedPlant target = plantOnWater();
@@ -241,6 +249,7 @@ public class ZombossManager {
     }
 
     private void turbine() {
+        boss.startMove(Zomboss.Move.TURBINE);
         int top = (int) boss.getPosition().getY();
         for (int row = top; row <= Math.min(GameSession.ROWS, top + 1); row++) {
             for (PlacedPlant plant : new ArrayList<>(session.getPlants())) {
@@ -265,6 +274,7 @@ public class ZombossManager {
             return;
         }
         int count = 1 + session.getRandom().nextInt(3);
+        boss.startMove(Zomboss.Move.SUMMON);
         for (int i = 0; i < count; i++) {
             ZombieType type = SUMMONS.get(session.getRandom().nextInt(SUMMONS.size()));
             int row = 1 + session.getRandom().nextInt(GameSession.ROWS);
@@ -281,7 +291,7 @@ public class ZombossManager {
             return;
         }
         int row = 1 + session.getRandom().nextInt(GameSession.ROWS - 1);
-        boss.getPosition().setY(row);
+        boss.moveToRow(row);
         System.out.printf("The %s moved to rows %d and %d.%n",
                 boss.getKind().getTitle(), row, row + 1);
     }

@@ -511,6 +511,9 @@ public class CombatManager {
             session.useLawnMower(row);
             List<String> names = new ArrayList<>();
             for (Zombie inRow : new ArrayList<>(session.getZombies())) {
+                if (inRow instanceof models.entities.zombie.Zomboss) {
+                    continue;
+                }
                 if (inRow.occupiesRow(row)) {
                     names.add(inRow.getType().getName());
                     session.getZombies().remove(inRow);

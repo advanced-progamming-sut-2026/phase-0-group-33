@@ -127,6 +127,75 @@ public final class AnimationCatalog {
         }
     }
 
+    public static String[] zombossClips(models.entities.zombie.Zomboss.BossKind kind,
+                                        models.entities.zombie.Zomboss.Move move,
+                                        boolean stunned) {
+        if (stunned) {
+            return new String[] {"stun_loop", "stun", "vulnerable_loop", "vulnerable", "idle"};
+        }
+        switch (kind) {
+            case DRAGON:
+                return dragonClips(move);
+            case ROBOT:
+                return robotClips(move);
+            case MAMMOTH:
+                return mammothClips(move);
+            default:
+                return sharkClips(move);
+        }
+    }
+
+    private static String[] dragonClips(models.entities.zombie.Zomboss.Move move) {
+        switch (move) {
+            case BOMB:
+                return new String[] {"fire_bomb_loop", "fire_bomb", "idle"};
+            case BURN:
+                return new String[] {"fire_attack_idle", "fire_attack", "idle"};
+            case SUMMON:
+                return new String[] {"summoning", "idle"};
+            default:
+                return new String[] {"idle"};
+        }
+    }
+
+    private static String[] robotClips(models.entities.zombie.Zomboss.Move move) {
+        switch (move) {
+            case MISSILE:
+                return new String[] {"rocket_launch", "missile_start", "idle"};
+            case CHARGE:
+                return new String[] {"walk_forward", "stomp", "idle"};
+            case SUMMON:
+                return new String[] {"zombie_portal_loop", "zombie_portal_start", "idle"};
+            default:
+                return new String[] {"idle"};
+        }
+    }
+
+    private static String[] mammothClips(models.entities.zombie.Zomboss.Move move) {
+        switch (move) {
+            case SLINGSHOT:
+                return new String[] {"slingshot", "idle"};
+            case WIND:
+                return new String[] {"wind_2", "wind_1", "idle"};
+            case GLACIER:
+                return new String[] {"glacier_column_3", "glacier_column_1", "idle"};
+            default:
+                return new String[] {"idle"};
+        }
+    }
+
+    private static String[] sharkClips(models.entities.zombie.Zomboss.Move move) {
+        switch (move) {
+            case TURBINE:
+                return new String[] {"suction_loop", "suction_on", "idle"};
+            case SPAWN_SHARK:
+            case SUMMON:
+                return new String[] {"spawn", "emerge", "idle"};
+            default:
+                return new String[] {"idle"};
+        }
+    }
+
     public static String fireTile() {
         return "FIRETILE";
     }

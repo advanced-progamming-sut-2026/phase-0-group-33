@@ -27,8 +27,14 @@ public class Zomboss extends Zombie {
         }
     }
 
+    public enum Move {
+        IDLE, BOMB, BURN, MISSILE, CHARGE, SLINGSHOT, WIND, GLACIER,
+        SPAWN_SHARK, TURBINE, SUMMON
+    }
+
     public static final int SEGMENTS = 3;
     private static final int STUN_TICKS = 60;
+    private static final int MOVE_TICKS = 18;
 
     private final BossKind kind;
     private final int segmentHealth;
@@ -36,12 +42,16 @@ public class Zomboss extends Zombie {
     private int segmentsCleared;
     private int stunTicks;
     private int abilityTicks;
+    private Move move = Move.IDLE;
+    private int moveTicks;
+    private int previousRow;
 
     public Zomboss(BossKind kind, int row, double healthFactor) {
         super(ZombieType.GARGANTUAR, new Position(8, row),
                 (int) Math.round(kind.getHitpoints() * healthFactor), 0);
         this.kind = kind;
         this.segmentHealth = Math.max(1, getHealth() / SEGMENTS);
+        this.previousRow = row;
     }
 
     public BossKind getKind() {
@@ -82,12 +92,33 @@ public class Zomboss extends Zombie {
         this.abilityTicks = abilityTicks;
     }
 
+    public Move getMove() {
+        return moveTicks > 0 ? move : Move.IDLE;
+    }
+
+    public void startMove(Move move) {
+        this.move = move;
+        this.moveTicks = MOVE_TICKS;
+    }
+
+    public int getPreviousRow() {
+        return previousRow;
+    }
+
+    public void moveToRow(int row) {
+        this.previousRow = (int) getPosition().getY();
+        getPosition().setY(row);
+    }
+
     public void tickTimers() {
         if (stunTicks > 0) {
             stunTicks--;
         }
         if (abilityTicks > 0) {
             abilityTicks--;
+        }
+        if (moveTicks > 0) {
+            moveTicks--;
         }
     }
 

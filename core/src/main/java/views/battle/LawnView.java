@@ -53,6 +53,7 @@ public class LawnView extends Actor {
     private static final float POP_TIME = 0.42f;
     private static final String ARMOUR_BREAK = "ARMOR_BREAK_EFFECT";
     private static final float SLIDE_TIME = 0.22f;
+    private static final float BOSS_SLIDE = 0.45f;
 
     private final String chapterName;
     private boolean showGrid;
@@ -103,6 +104,11 @@ public class LawnView extends Actor {
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, float[]> slides =
             new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<String, Float> bossMoveStart =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+    private float bossLane = -1f;
+    private float bossFrom = -1f;
+    private float bossAt = -1f;
 
     private static final class Fx {
         private final String animation;
@@ -204,6 +210,7 @@ public class LawnView extends Actor {
         trackBirths();
         trackShots();
         trackArmour();
+        trackBoss();
         for (int i = effects.size - 1; i >= 0; i--) {
             if (time >= effects.get(i).end) {
                 effects.removeIndex(i);
@@ -274,6 +281,24 @@ public class LawnView extends Actor {
         float progress = age / POP_TIME;
         return 1f + 0.26f * (1f - progress)
                 * (float) Math.sin(progress * Math.PI * 3f);
+    }
+
+    private void trackBoss() {
+        models.entities.zombie.Zomboss boss = session.getZombossManager().getBoss();
+        if (boss == null) {
+            bossLane = -1f;
+            return;
+        }
+        float lane = (float) boss.getPosition().getY();
+        if (bossLane < 0f) {
+            bossLane = lane;
+            return;
+        }
+        if (lane != bossLane) {
+            bossFrom = bossLane;
+            bossAt = time;
+            bossLane = lane;
+        }
     }
 
     private void trackArmour() {
@@ -1480,14 +1505,29 @@ public class LawnView extends Actor {
                                 float centerX, float feet) {
         String animation = views.assets.AnimationCatalog.zomboss(boss.getKind());
         String clipName = animator.clipName(animation,
-                boss.isStunned() ? "vulnerable" : "idle", "idle");
+                views.assets.AnimationCatalog.zombossClips(
+                        boss.getKind(), boss.getMove(), boss.isStunned()));
         ClipRef clip = clipName == null ? null : animator.namedClip(animation, clipName);
         if (clip == null) {
             return false;
         }
+        Float started = bossMoveStart.get(clipName);
+        if (started == null) {
+            bossMoveStart.clear();
+            bossMoveStart.put(clipName, time);
+            started = time;
+        }
         float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 2.25f);
         float anchor = animator.bottomOffset(animation, clipName, scale);
-        animator.draw(batch, clip, time, centerX, feet - anchor, scale, true, null);
+        float shift = 0f;
+        if (bossFrom >= 0f && time - bossAt < BOSS_SLIDE) {
+            float progress = (time - bossAt) / BOSS_SLIDE;
+            float eased = progress * progress * (3f - 2f * progress);
+            shift = (Lawn.rowBottom(bossFrom) - Lawn.rowBottom(boss.getPosition().getY()))
+                    * (1f - eased);
+        }
+        animator.draw(batch, clip, time - started, centerX, feet - anchor + shift,
+                scale, true, null);
         return true;
     }
 
