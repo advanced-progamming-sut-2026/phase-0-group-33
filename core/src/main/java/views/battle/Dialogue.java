@@ -68,8 +68,8 @@ public final class Dialogue extends Table {
     private void next() {
         index++;
         if (index >= lines.size()) {
-            addAction(Actions.sequence(Actions.fadeOut(0.2f), Actions.removeActor(),
-                    Actions.run(onFinished)));
+            addAction(Actions.sequence(Actions.fadeOut(0.2f), Actions.run(onFinished),
+                    Actions.removeActor()));
             return;
         }
         text.setText(lines.get(index));
