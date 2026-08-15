@@ -114,6 +114,23 @@ public final class AnimationCatalog {
         return BITE.get(type.getName());
     }
 
+    public static String zomboss(models.entities.zombie.Zomboss.BossKind kind) {
+        switch (kind) {
+            case DRAGON:
+                return "ZOMBIE_DARK_ZOMBOSS";
+            case MAMMOTH:
+                return "ZOMBIE_ICEAGE_ZOMBOSS";
+            case SHARK:
+                return "ZOMBIE_BEACH_ZOMBOSS";
+            default:
+                return "ZOMBIE_EGYPT_ZOMBOSS";
+        }
+    }
+
+    public static String fireTile() {
+        return "FIRETILE";
+    }
+
     public static String sun() {
         return "SUN";
     }

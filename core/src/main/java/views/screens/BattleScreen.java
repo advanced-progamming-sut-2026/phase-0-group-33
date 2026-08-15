@@ -244,6 +244,12 @@ public class BattleScreen extends ScreenAdapter {
 
     private java.util.List<String> objectives() {
         java.util.List<String> lines = new java.util.ArrayList<>();
+        if (session.isBossLevel()) {
+            lines.add("Zomboss himself is here, and he fills two rows.");
+            lines.add("His health comes in three parts; break one and he reels.");
+            lines.add("Plants arrive on the belt, so use what you are given.");
+            return lines;
+        }
         if (session.getMode() == GameMode.VASEBREAKER) {
             lines.add("Break every vase and survive whatever crawls out.");
             return lines;
@@ -711,6 +717,18 @@ public class BattleScreen extends ScreenAdapter {
         }
     }
 
+    private void refreshBossBar() {
+        models.entities.zombie.Zomboss boss = session.getZombossManager().getBoss();
+        if (boss == null) {
+            return;
+        }
+        waveBar.setValue(boss.healthFraction());
+        int left = models.entities.zombie.Zomboss.SEGMENTS - boss.getSegmentsCleared();
+        waveLabel.setText(boss.isStunned() ? boss.getKind().getTitle() + " is dazed!"
+                : boss.getKind().getTitle() + "  -  " + left + " of "
+                + models.entities.zombie.Zomboss.SEGMENTS + " segments left");
+    }
+
     protected void refreshHud() {
         String status = objectiveStatus();
         objectivePanel.setVisible(status != null);
@@ -726,6 +744,10 @@ public class BattleScreen extends ScreenAdapter {
         plantFoodLabel.setText(String.valueOf(session.getPlantFoods()));
         int wave = session.getWaveManager().getCurrentWave();
         int total = session.getWaveManager().getTotalWaves();
+        if (session.isBossLevel() && session.getZombossManager().hasBoss()) {
+            refreshBossBar();
+            return;
+        }
         waveLabel.setText(wave == 0 ? "The horde is coming" : "Wave " + wave + " of " + total);
         waveBar.setValue(total == 0 ? 0f : Math.min(1f, wave / (float) total));
     }

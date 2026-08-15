@@ -94,6 +94,7 @@ public class GameSession {
         minigameManager.setUpBoard();
         if (minigameManager.startsImmediately()) {
             phase = GamePhase.BATTLE;
+            spawnBossIfNeeded();
         }
     }
 
@@ -171,10 +172,14 @@ public class GameSession {
             placeProtectedSeeds();
         }
         behaviorManager.spawnFrozenZombiesIfFrostbite();
+        spawnBossIfNeeded();
+        return Result.ok("The battle begins! Use 'start zombie waves' to summon the horde.");
+    }
+
+    private void spawnBossIfNeeded() {
         if (isBossLevel()) {
             zombossManager.spawn(((models.progress.level.BossLevel) setup.getLevel()).getBossKind());
         }
-        return Result.ok("The battle begins! Use 'start zombie waves' to summon the horde.");
     }
 
     private void placeProtectedSeeds() {

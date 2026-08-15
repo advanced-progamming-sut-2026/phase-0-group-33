@@ -42,6 +42,7 @@ public class LawnView extends Actor {
     private static final String SNOWSTORM = "SNOWSTORM_TOP";
     private static final float STORM_LIFE = 1.4f;
     private static final float MOWER_RUN = 1.6f;
+    private static final String FIRE_TILE = "FIRETILE";
     private static final String BOOM = "CHERRYBOMB_EXPLOSION_TOP";
 
     private final String chapterName;
@@ -595,6 +596,9 @@ public class LawnView extends Actor {
             icon = "image_ui_almanac_stats_screen_nav_arrow_next";
         } else if (tile.getTerrain() == TerrainType.SLIDER_DOWN) {
             icon = "image_ui_almanac_stats_screen_nav_arrow_previous";
+        } else if (tile.getTerrain() == TerrainType.FIRE) {
+            drawFireTile(batch, column, row);
+            return;
         } else if (tile.isHasLilyPad()) {
             icon = "image_ui_generic_leaf_backdrop";
         }
@@ -609,6 +613,24 @@ public class LawnView extends Actor {
         float size = Lawn.cellWidth() * 0.6f;
         batch.draw(region, Lawn.columnCenter(column) - size / 2f,
                 Lawn.rowCenter(row) - size / 2f, size, size);
+    }
+
+    private void drawFireTile(Batch batch, int column, int row) {
+        if (!animator.isReady()) {
+            paint(batch, DANGER, column, row);
+            return;
+        }
+        String clipName = animator.clipName(FIRE_TILE, "firetile_up", "idle");
+        ClipRef clip = clipName == null ? null : animator.namedClip(FIRE_TILE, clipName);
+        if (clip == null) {
+            paint(batch, DANGER, column, row);
+            return;
+        }
+        float scale = animator.fitScale(FIRE_TILE, clipName, Lawn.cellHeight());
+        float lift = animator.centreOffset(FIRE_TILE, clipName, scale);
+        batch.setColor(Color.WHITE);
+        animator.draw(batch, clip, time + column * 0.17f, Lawn.columnCenter(column),
+                Lawn.rowCenter(row) + lift, scale, true, null);
     }
 
     private void drawGrave(Batch batch, Tile tile, int column, int row) {
@@ -1165,6 +1187,9 @@ public class LawnView extends Actor {
         if (!animator.isReady()) {
             return false;
         }
+        if (zombie instanceof models.entities.zombie.Zomboss) {
+            return drawZomboss(batch, (models.entities.zombie.Zomboss) zombie, centerX, feet);
+        }
         boolean eating = isEating(zombie);
         Float busy = ability.get(zombie);
         ClipRef clip;
@@ -1197,6 +1222,36 @@ public class LawnView extends Actor {
             return 0f;
         }
         return Math.max(0f, Math.min(1f, zombie.totalArmor() / (float) max));
+    }
+
+    private boolean drawZomboss(Batch batch, models.entities.zombie.Zomboss boss,
+                                float centerX, float feet) {
+        String animation = views.assets.AnimationCatalog.zomboss(boss.getKind());
+        String clipName = animator.clipName(animation,
+                boss.isStunned() ? "vulnerable" : "idle", "idle");
+        ClipRef clip = clipName == null ? null : animator.namedClip(animation, clipName);
+        if (clip == null) {
+            return false;
+        }
+        float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 2.6f);
+        float lift = animator.centreOffset(animation, clipName, scale);
+        animator.draw(batch, clip, time, centerX,
+                feet + Lawn.cellHeight() * 0.5f + lift, scale, true, null);
+        drawBossPortrait(batch, boss, centerX, feet);
+        return true;
+    }
+
+    private void drawBossPortrait(Batch batch, models.entities.zombie.Zomboss boss,
+                                  float centerX, float feet) {
+        TextureRegion region = art.zombie(boss.getType());
+        if (region == null) {
+            return;
+        }
+        float height = Lawn.cellHeight() * 1.9f;
+        float width = height * region.getRegionWidth() / region.getRegionHeight();
+        batch.setColor(1f, 1f, 1f, boss.isStunned() ? 0.6f : 1f);
+        batch.draw(region, centerX - width / 2f, feet, width, height);
+        batch.setColor(Color.WHITE);
     }
 
     private boolean isEating(models.entities.zombie.Zombie zombie) {
