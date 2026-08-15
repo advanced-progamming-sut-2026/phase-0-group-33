@@ -265,7 +265,8 @@ public class CombatManager {
             if (target != null) {
                 System.out.printf("A bouncing grape hit the %s in lane %d.%n",
                         target.getType().getName(), row);
-                damageZombie(target, plantDamage(PlantType.GRAPESHOT) / 2, PlantType.GRAPESHOT);
+                hitZombie(target, PlantType.GRAPESHOT,
+                        plantDamage(PlantType.GRAPESHOT) / 2);
             }
         }
     }
@@ -446,7 +447,8 @@ public class CombatManager {
                 * session.getHealthFactor());
         if (zombie.getHealth() <= scaledMax / 2) {
             impThrown.add(zombie);
-            session.spawnZombie(ZombieType.IMP, 3, (int) zombie.getPosition().getY(),
+            double landing = Math.max(1, zombie.getPosition().getX() - 3);
+            session.spawnZombie(ZombieType.IMP, landing, (int) zombie.getPosition().getY(),
                     zombie.getSpawnWave());
         }
     }
@@ -478,6 +480,20 @@ public class CombatManager {
         } else {
             double dps = zombie.getType().getEatDps() * session.getDamageFactor();
             int bite = (int) Math.ceil(dps / GameSession.TICKS_PER_SECOND);
+            if (plant.getIceHealth() > 0) {
+                plant.setIceHealth(Math.max(0, plant.getIceHealth() - bite));
+                if (plant.getIceHealth() == 0) {
+                    plant.setFreezeLevel(0);
+                    System.out.printf("The %s chewed through the ice around %s at (%d, %d).%n",
+                            zombie.getType().getName(), plant.getType().getName(),
+                            plant.getX(), plant.getY());
+                }
+                return;
+            }
+            if (plant.getOctopusHealth() > 0) {
+                plant.setOctopusHealth(Math.max(0, plant.getOctopusHealth() - bite));
+                return;
+            }
             if (plant.getPumpkinHealth() > 0) {
                 plant.setPumpkinHealth(Math.max(0, plant.getPumpkinHealth() - bite));
             } else {
@@ -580,7 +596,7 @@ public class CombatManager {
         } else if (plant.getType() == PlantType.HYPNO_SHROOM) {
             hypnotizeEater(plant);
         } else if (plant.getType().getTags().contains(PlantTag.EXPLOSIVE)) {
-            damageArea(plant.getX(), plant.getY(), 1, PlantType.EXPLODE_O_NUT);
+            damageArea(plant.getX(), plant.getY(), 1, plant.getType());
             System.out.printf("%s exploded as it died!%n", plant.getType().getName());
         }
     }
