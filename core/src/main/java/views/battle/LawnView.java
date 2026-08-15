@@ -41,6 +41,7 @@ public class LawnView extends Actor {
     private static final String SANDSTORM = "SANDSTORM_TOP";
     private static final String SNOWSTORM = "SNOWSTORM_TOP";
     private static final float STORM_LIFE = 1.4f;
+    private static final float MOWER_RUN = 1.6f;
     private static final String BOOM = "CHERRYBOMB_EXPLOSION_TOP";
 
     private final String chapterName;
@@ -72,6 +73,8 @@ public class LawnView extends Actor {
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, int[]> plantSpots =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private boolean shakePending;
+    private final boolean[] mowerSeen = new boolean[GameSession.ROWS + 1];
+    private final float[] mowerRun = new float[GameSession.ROWS + 1];
     private final com.badlogic.gdx.utils.Array<float[]> storms = new com.badlogic.gdx.utils.Array<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> lastFreeze =
             new com.badlogic.gdx.utils.ObjectMap<>();
@@ -154,6 +157,17 @@ public class LawnView extends Actor {
         trackDeaths();
         trackBlasts();
         trackStorms();
+        trackMowers();
+    }
+
+    private void trackMowers() {
+        for (int row = 1; row <= GameSession.ROWS; row++) {
+            boolean present = session.hasLawnMower(row);
+            if (mowerSeen[row] && !present) {
+                mowerRun[row] = time;
+            }
+            mowerSeen[row] = present;
+        }
     }
 
     private void trackStorms() {
@@ -670,11 +684,22 @@ public class LawnView extends Actor {
         }
         float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 0.7f);
         float lift = animator.centreOffset(animation, clipName, scale);
+        ClipRef running = animator.namedClip(animation, "attack", "idle");
         for (int row = 1; row <= GameSession.ROWS; row++) {
-            if (!session.hasLawnMower(row)) {
+            if (session.hasLawnMower(row)) {
+                animator.draw(batch, clip, time + row * 0.21f,
+                        Lawn.left() - Lawn.cellWidth() * 0.45f,
+                        Lawn.rowBottom(row) + Lawn.cellHeight() * 0.46f + lift, scale, true, null);
                 continue;
             }
-            animator.draw(batch, clip, time + row * 0.21f, Lawn.left() - Lawn.cellWidth() * 0.45f,
+            float age = time - mowerRun[row];
+            if (mowerRun[row] <= 0f || age > MOWER_RUN) {
+                continue;
+            }
+            float progress = age / MOWER_RUN;
+            float x = Lawn.left() - Lawn.cellWidth() * 0.45f
+                    + progress * (Lawn.width() + Lawn.cellWidth());
+            animator.draw(batch, running == null ? clip : running, age, x,
                     Lawn.rowBottom(row) + Lawn.cellHeight() * 0.46f + lift, scale, true, null);
         }
         return true;
