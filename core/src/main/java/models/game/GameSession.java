@@ -6,6 +6,7 @@ import controllers.managers.MinigameManager;
 import controllers.managers.PlantActionManager;
 import controllers.managers.PlantingManager;
 import controllers.managers.ProjectileManager;
+import controllers.managers.ZombossManager;
 import controllers.managers.SunManager;
 import controllers.managers.WaveManager;
 import controllers.managers.ZombieBehaviorManager;
@@ -50,6 +51,7 @@ public class GameSession {
     private final BattleCommands battleCommands;
     private final MinigameManager minigameManager;
     private final ProjectileManager projectileManager;
+    private final ZombossManager zombossManager;
     private final ScoreTracker scoreTracker = new ScoreTracker();
     private final QuestStats questStats = new QuestStats();
     private GamePhase phase = GamePhase.PREPARATION;
@@ -76,6 +78,7 @@ public class GameSession {
         this.battleCommands = new BattleCommands(this);
         this.minigameManager = new MinigameManager(this, setup.getDifficultyTier());
         this.projectileManager = new ProjectileManager(this, combatManager);
+        this.zombossManager = new ZombossManager(this, combatManager);
         BoardBuilder.build(grid, setup.getLevel() == null ? null : setup.getLevel().getChapter(), random);
         initModeState();
     }
@@ -168,6 +171,9 @@ public class GameSession {
             placeProtectedSeeds();
         }
         behaviorManager.spawnFrozenZombiesIfFrostbite();
+        if (isBossLevel()) {
+            zombossManager.spawn(((models.progress.level.BossLevel) setup.getLevel()).getBossKind());
+        }
         return Result.ok("The battle begins! Use 'start zombie waves' to summon the horde.");
     }
 
@@ -442,6 +448,14 @@ public class GameSession {
 
     public ProjectileManager getProjectileManager() {
         return projectileManager;
+    }
+
+    public ZombossManager getZombossManager() {
+        return zombossManager;
+    }
+
+    public boolean isBossLevel() {
+        return setup.getLevel() instanceof models.progress.level.BossLevel;
     }
 
     public ScoreTracker getScoreTracker() {

@@ -48,6 +48,7 @@ public class BattleCommands {
         }
         session.getCombatManager().plantsAct();
         session.getProjectileManager().tick();
+        session.getZombossManager().tick();
         session.getCombatManager().zombiesAct();
         session.getBehaviorManager().tickEnvironment();
         session.getPlantActionManager().tick();
@@ -80,6 +81,13 @@ public class BattleCommands {
 
     private void checkVictory() {
         if (session.isOver() || !usesWaves() || session.isSpecial(SpecialLevelType.TIMED_WAR)) {
+            return;
+        }
+        if (session.isBossLevel()) {
+            if (session.getZombossManager().hasBoss()
+                    && !session.getZombies().contains(session.getZombossManager().getBoss())) {
+                session.winGame();
+            }
             return;
         }
         if (session.getWaveManager().allWavesCleared()) {
