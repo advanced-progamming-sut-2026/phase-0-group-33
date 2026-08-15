@@ -56,6 +56,11 @@ public class LawnView extends Actor {
     private static final float BOSS_SLIDE = 0.45f;
     private static final float RECOVER_TIME = 0.55f;
     private static final int CHARGE_TICKS = 6;
+    private static final String RIPPLE = "WATER_ZOMBIE_RIPPLE";
+    private static final String RIPPLE_BIG = "WATER_GARGANTUAR_RIPPLE";
+    private static final String RIPPLE_SMALL = "WATER_IMP_RIPPLE";
+    private static final String SPLASH = "WATER_SPLASH";
+    private static final float SURFACE_TIME = 0.55f;
 
     private final String chapterName;
     private boolean showGrid;
@@ -107,6 +112,10 @@ public class LawnView extends Actor {
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, float[]> slides =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<String, Float> bossMoveStart =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, Boolean> diving =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, Float> surfaced =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private float bossLane = -1f;
     private float bossFrom = -1f;
@@ -209,6 +218,7 @@ public class LawnView extends Actor {
         trackDeaths();
         trackStorms();
         trackMowers();
+        trackDiving();
         trackBirths();
         trackShots();
         trackArmour();
@@ -231,6 +241,65 @@ public class LawnView extends Actor {
         }
         effects.add(new Fx(animation, clip, x, row, time,
                 time + Math.min(duration, life), height, lift));
+    }
+
+    private void trackDiving() {
+        for (models.entities.zombie.Zombie zombie : session.getZombies()) {
+            boolean under = session.getBehaviorManager().isSubmerged(zombie);
+            Boolean previous = diving.get(zombie);
+            diving.put(zombie, under);
+            if (previous == null || previous == under) {
+                continue;
+            }
+            surfaced.put(zombie, time);
+            addFx(SPLASH, "water_splash_01", (float) zombie.getPosition().getX(),
+                    (int) zombie.getPosition().getY(), 1.1f, 0.1f, SURFACE_TIME);
+        }
+        com.badlogic.gdx.utils.Array<models.entities.zombie.Zombie> stale =
+                new com.badlogic.gdx.utils.Array<>();
+        for (models.entities.zombie.Zombie zombie : diving.keys()) {
+            if (!session.getZombies().contains(zombie)) {
+                stale.add(zombie);
+            }
+        }
+        for (models.entities.zombie.Zombie zombie : stale) {
+            diving.remove(zombie);
+            surfaced.remove(zombie);
+        }
+    }
+
+    private boolean isDiving(models.entities.zombie.Zombie zombie) {
+        Boolean under = diving.get(zombie);
+        if (under == null || !under) {
+            return false;
+        }
+        Float changed = surfaced.get(zombie);
+        return changed == null || time - changed >= SURFACE_TIME * 0.5f;
+    }
+
+    private boolean drawRipple(Batch batch, models.entities.zombie.Zombie zombie,
+                               float centerX, float row) {
+        if (!animator.isReady()) {
+            return false;
+        }
+        String animation = zombie.getType() == models.entities.zombie.ZombieType.GARGANTUAR
+                ? RIPPLE_BIG
+                : zombie.getType() == models.entities.zombie.ZombieType.IMP
+                        ? RIPPLE_SMALL : RIPPLE;
+        Float changed = surfaced.get(zombie);
+        boolean leaving = changed != null && time - changed < SURFACE_TIME;
+        String clipName = animator.clipName(animation,
+                leaving ? "ripple_exit" : "ripple", "ripple");
+        ClipRef clip = clipName == null ? null : animator.namedClip(animation, clipName);
+        if (clip == null) {
+            return false;
+        }
+        float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 0.85f);
+        float lift = animator.centreOffset(animation, clipName, scale);
+        batch.setColor(Color.WHITE);
+        animator.draw(batch, clip, leaving ? time - changed : time, centerX,
+                Lawn.rowBottom((int) row) + Lawn.cellHeight() * 0.4f + lift, scale, true, null);
+        return true;
     }
 
     private void trackBirths() {
@@ -1255,6 +1324,9 @@ public class LawnView extends Actor {
             final int zseed = seed;
             final float zx = centerX;
             final float zy = feet;
+            if (isDiving(zombie) && drawRipple(batch, zombie, centerX, row)) {
+                continue;
+            }
             if (!drawZombieAnimation(batch, zombie, seed, centerX, feet)) {
                 batch.draw(art.zombie(zombie.getType()), centerX - width / 2f,
                         Lawn.rowBottom(row) + Lawn.cellHeight() * 0.06f, width, height);
