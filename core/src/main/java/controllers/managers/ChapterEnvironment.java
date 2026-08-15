@@ -65,7 +65,8 @@ public class ChapterEnvironment {
 
     private void applySliders() {
         for (Zombie zombie : session.getZombies()) {
-            if (zombie.getType() == ZombieType.DODO) {
+            if (zombie.getType() == ZombieType.DODO
+                    || zombie instanceof models.entities.zombie.Zomboss) {
                 continue;
             }
             int col = (int) Math.round(zombie.getPosition().getX());
@@ -104,6 +105,9 @@ public class ChapterEnvironment {
         Chapter chapter = chapter();
         if (chapter instanceof Egypt && waveNumber == session.getWaveManager().getTotalWaves()) {
             for (Zombie zombie : session.getZombies()) {
+                if (zombie instanceof models.entities.zombie.Zomboss) {
+                    continue;
+                }
                 if (zombie.getSpawnWave() == waveNumber && session.getRandom().nextInt(100) < 40) {
                     int jump = 1 + session.getRandom().nextInt(4);
                     zombie.getPosition().setX(Math.max(2, zombie.getPosition().getX() - jump));
