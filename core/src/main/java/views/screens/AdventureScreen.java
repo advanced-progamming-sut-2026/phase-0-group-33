@@ -62,7 +62,7 @@ public class AdventureScreen extends BaseScreen {
             final String name = CHAPTERS[i];
             Chapter chapter = Chapter.getByName(name);
             int total = chapter.getLevels().size();
-            int done = Math.max(0, progress(name) - 1);
+            int done = Math.max(0, Math.min(total, progress(name) - 1));
             boolean locked = isLocked(i);
             boolean active = name.equals(selectedChapter);
 

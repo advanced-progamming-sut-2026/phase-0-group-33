@@ -40,7 +40,8 @@ public class ProfileController extends BaseController {
         UserDataStore store = UserDataStore.forUser(user.getUsername());
         int levelsDone = 0;
         for (String chapter : new String[] { "Egypt", "Frost Bite", "Wavey Beach", "Dark Ages" }) {
-            levelsDone += store.getInt("progress." + chapter, 1) - 1;
+            int total = models.progress.chapter.Chapter.getByName(chapter).getLevels().size();
+            levelsDone += Math.min(total, store.getInt("progress." + chapter, 1) - 1);
         }
         result.setSuccess(true);
         result.setData(user);

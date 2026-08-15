@@ -71,7 +71,9 @@ public class LeaderboardController extends BaseController {
         String best = "-";
         int bestLevel = 0;
         for (String chapter : CHAPTERS) {
-            int completed = store.getInt("progress." + chapter, 1) - 1;
+            int completed = Math.min(
+                    models.progress.chapter.Chapter.getByName(chapter).getLevels().size(),
+                    store.getInt("progress." + chapter, 1) - 1);
             if (completed > bestLevel) {
                 bestLevel = completed;
                 best = chapter + " L" + completed;
@@ -83,7 +85,9 @@ public class LeaderboardController extends BaseController {
     private int completedLevels(UserDataStore store) {
         int total = 0;
         for (String chapter : CHAPTERS) {
-            total += store.getInt("progress." + chapter, 1) - 1;
+            total += Math.min(
+                    models.progress.chapter.Chapter.getByName(chapter).getLevels().size(),
+                    store.getInt("progress." + chapter, 1) - 1);
         }
         return total;
     }

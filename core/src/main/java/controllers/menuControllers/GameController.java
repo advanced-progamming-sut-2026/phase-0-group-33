@@ -268,25 +268,35 @@ public class GameController extends BaseController {
     }
 
     private void recordSeenZombies(GameSession session, UserDataStore store) {
-        String seen = store.get("zombies", "");
+        String stored = store.get("zombies", "");
+        java.util.List<String> seen = new java.util.ArrayList<>();
+        if (!stored.isEmpty()) {
+            seen.addAll(java.util.Arrays.asList(stored.split(",")));
+        }
         for (ZombieType type : session.getEncounteredZombies()) {
             if (!seen.contains(type.getName())) {
                 NewsStore.add(app.getCurrentUser().getUsername(),
                         "New zombie encountered: " + type.getName());
-                seen = seen.isEmpty() ? type.getName() : seen + "," + type.getName();
+                seen.add(type.getName());
             }
         }
-        store.set("zombies", seen);
+        store.set("zombies", String.join(",", seen));
     }
 
     private void recordVictory(GameSession session, UserDataStore store) {
         Chapter chapter = session.getLevel().getChapter();
         int levelNumber = session.getLevel().getLevelNumber();
         String progressKey = "progress." + chapter.getName();
-        if (store.getInt(progressKey, 1) == levelNumber && levelNumber < chapter.getLevels().size()) {
+        if (store.getInt(progressKey, 1) == levelNumber) {
             store.setInt(progressKey, levelNumber + 1);
-            NewsStore.add(app.getCurrentUser().getUsername(),
-                    "New level unlocked: " + chapter.getName() + " level " + (levelNumber + 1));
+            if (levelNumber < chapter.getLevels().size()) {
+                NewsStore.add(app.getCurrentUser().getUsername(),
+                        "New level unlocked: " + chapter.getName()
+                                + " level " + (levelNumber + 1));
+            } else {
+                NewsStore.add(app.getCurrentUser().getUsername(),
+                        "Chapter cleared: " + chapter.getName());
+            }
         }
         store.addInt("completed." + chapter.getName(), 1);
         int reward = 100 + 50 * levelNumber;
