@@ -27,6 +27,8 @@ public final class GameAssets implements Disposable {
     public static final String MOWERS = "ATLASES/BEACHMOWERGROUP_768_00.atlas";
     public static final String GRAVES_DARK = "ATLASES/TOMBSTONE_DARK_BASE_768_00.atlas";
     public static final String GRAVES_EGYPT = "ATLASES/EGYPT_GRAVESTONE_768_00.atlas";
+    public static final String GRAVES_SUN = "ATLASES/TOMBSTONE_DARK_SUN_768_00.atlas";
+    public static final String GRAVES_FOOD = "ATLASES/TOMBSTONE_DARK_PLANTFOOD_768_00.atlas";
 
     private static final String FONT_BODY = "skin/AVENIRNEXTLTPRO-DEMICN.TTF";
     private static final String FONT_DISPLAY = "skin/HOUSE OF TERROR.TTF";

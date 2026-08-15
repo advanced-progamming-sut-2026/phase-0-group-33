@@ -599,7 +599,12 @@ public class LawnView extends Actor {
 
     private void drawGrave(Batch batch, Tile tile, int column, int row) {
         float fraction = Math.max(0f, Math.min(1f, tile.getGraveHealth() / (float) GRAVE_MAX_HEALTH));
-        TextureRegion region = art.grave(chapterName, fraction);
+        TextureRegion region = tile.getGraveSunContent() > 0 ? art.graveWithSun(fraction)
+                : tile.isGravePlantFood() ? art.graveWithFood(fraction)
+                : art.grave(chapterName, fraction);
+        if (region == null) {
+            region = art.grave(chapterName, fraction);
+        }
         if (region == null) {
             return;
         }

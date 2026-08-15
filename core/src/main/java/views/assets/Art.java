@@ -19,6 +19,18 @@ public final class Art {
         "IMAGE_GRAVESTONES_EGYPT_HIEROGLYPH_EGYPT_HIEROGLYPH_110X145",
     };
 
+    private static final String[] SUN_GRAVES = {
+        "IMAGE_GRAVESTONES_DARK_SUN_DARK_SUN_132X160",
+        "IMAGE_GRAVESTONES_DARK_SUN_DARK_SUN_132X157",
+        "IMAGE_GRAVESTONES_DARK_SUN_DARK_SUN_132X160_2",
+    };
+
+    private static final String[] FOOD_GRAVES = {
+        "IMAGE_GRAVESTONES_DARK_PLANTFOOD_DARK_PLANTFOOD_132X160",
+        "IMAGE_GRAVESTONES_DARK_PLANTFOOD_DARK_PLANTFOOD_132X157",
+        "IMAGE_GRAVESTONES_DARK_PLANTFOOD_DARK_PLANTFOOD_132X160_2",
+    };
+
     private static final String PLANT_PREFIX = "IMAGE_UI_PACKETS_";
     private static final String ZOMBIE_PREFIX = "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_";
     private static final String FALLBACK_ZOMBIE = "TUTORIAL";
@@ -155,6 +167,18 @@ public final class Art {
         int index = healthFraction > 0.66f ? 0 : healthFraction > 0.33f ? 1 : 2;
         return assets.region(egypt ? GameAssets.GRAVES_EGYPT : GameAssets.GRAVES_DARK,
                 stages[index]);
+    }
+
+    public TextureRegion graveWithSun(float healthFraction) {
+        return assets.region(GameAssets.GRAVES_SUN, SUN_GRAVES[stageOf(healthFraction)]);
+    }
+
+    public TextureRegion graveWithFood(float healthFraction) {
+        return assets.region(GameAssets.GRAVES_FOOD, FOOD_GRAVES[stageOf(healthFraction)]);
+    }
+
+    private static int stageOf(float healthFraction) {
+        return healthFraction > 0.66f ? 0 : healthFraction > 0.33f ? 1 : 2;
     }
 
     public TextureRegion logo() {
