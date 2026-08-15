@@ -617,6 +617,14 @@ public class MinigameManager {
                 + " into " + target.getName() + ".");
     }
 
+    public int upgradeCostOf(PlantType source) {
+        return upgradeCost(source);
+    }
+
+    public PlantType upgradeTargetOf(PlantType source) {
+        return upgradeTarget(source);
+    }
+
     private PlantType upgradeTarget(PlantType source) {
         if (source == null) {
             return null;

@@ -52,6 +52,7 @@ public class LawnView extends Actor {
     private static final float ASH_LIFE = 1.3f;
     private static final float POP_TIME = 0.42f;
     private static final String ARMOUR_BREAK = "ARMOR_BREAK_EFFECT";
+    private static final float SLIDE_TIME = 0.22f;
 
     private final String chapterName;
     private boolean showGrid;
@@ -99,6 +100,8 @@ public class LawnView extends Actor {
     private final com.badlogic.gdx.utils.ObjectMap<models.game.Projectile, float[]> shots =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, Integer> lastArmour =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, float[]> slides =
             new com.badlogic.gdx.utils.ObjectMap<>();
 
     private static final class Fx {
@@ -455,6 +458,10 @@ public class LawnView extends Actor {
 
     private void trackBlasts() {
         for (models.game.PlacedPlant plant : session.getPlants()) {
+            int[] spot = plantSpots.get(plant);
+            if (spot != null && (spot[0] != plant.getX() || spot[1] != plant.getY())) {
+                slides.put(plant, new float[] {spot[0], spot[1], time});
+            }
             plantSpots.put(plant, new int[] {plant.getX(), plant.getY()});
         }
         com.badlogic.gdx.utils.Array<models.game.PlacedPlant> gone =
@@ -1102,8 +1109,21 @@ public class LawnView extends Actor {
             if (plant.getY() != row) {
                 continue;
             }
-            float centerX = Lawn.columnCenter(plant.getX());
-            float feet = Lawn.rowBottom(row) + Lawn.cellHeight() * 0.16f;
+            float column = plant.getX();
+            float lane = row;
+            float[] slide = slides.get(plant);
+            if (slide != null) {
+                float progress = (time - slide[2]) / SLIDE_TIME;
+                if (progress >= 1f) {
+                    slides.remove(plant);
+                } else {
+                    float eased = progress * progress * (3f - 2f * progress);
+                    column = slide[0] + (column - slide[0]) * eased;
+                    lane = slide[1] + (lane - slide[1]) * eased;
+                }
+            }
+            float centerX = Lawn.columnCenter(column);
+            float feet = Lawn.rowBottom(lane) + Lawn.cellHeight() * 0.16f;
             float width = Lawn.cellWidth() * 0.78f;
             float height = Lawn.cellHeight() * 0.8f;
             batch.setColor(plantTint(plant));
@@ -1112,15 +1132,15 @@ public class LawnView extends Actor {
             final float py = feet;
             if (!drawPlantAnimation(batch, plant, centerX, feet)) {
                 batch.draw(art.plant(plant.getType()), centerX - width / 2f,
-                        Lawn.rowBottom(row) + Lawn.cellHeight() * 0.1f, width, height);
+                        Lawn.rowBottom(lane) + Lawn.cellHeight() * 0.1f, width, height);
             }
             if (isHurt(target)) {
                 flash(batch, () -> drawPlantAnimation(batch, target, px, py));
             }
             drawPlantOverlays(batch, plant, centerX - width / 2f,
-                    Lawn.rowBottom(row) + Lawn.cellHeight() * 0.1f, width, height);
+                    Lawn.rowBottom(lane) + Lawn.cellHeight() * 0.1f, width, height);
             drawHealthBar(batch, plant.getHealth(), plant.getMaxHealth(),
-                    centerX - width / 2f, Lawn.rowBottom(row) + Lawn.cellHeight() * 0.94f, width);
+                    centerX - width / 2f, Lawn.rowBottom(lane) + Lawn.cellHeight() * 0.94f, width);
         }
     }
 

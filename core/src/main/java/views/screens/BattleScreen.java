@@ -466,6 +466,10 @@ public class BattleScreen extends ScreenAdapter {
             tray.add(Ui.button(skin, "Start the wave", "green", this::startWaveManually))
                     .width(200f).height(46f).padRight(8f);
         }
+        if (session.getMode() == GameMode.BEGHOULED) {
+            tray.add(Ui.button(skin, "Upgrade", "small-purple", this::openUpgradePicker))
+                    .width(150f).height(46f).padLeft(8f);
+        }
         tray.add(Ui.button(skin, "Shovel", "small-brown",
                 () -> selectTool(Tool.SHOVEL, null))).width(120f).height(46f).padLeft(8f);
         tray.add(Ui.button(skin, "Plant Food", "small-purple",
@@ -480,6 +484,24 @@ public class BattleScreen extends ScreenAdapter {
             })).width(104f).height(46f).padLeft(8f);
         }
         return tray;
+    }
+
+    private void openUpgradePicker() {
+        setPaused(true);
+        Table content = new Table();
+        for (final PlantType type : UPGRADEABLE) {
+            content.add(new SeedPacket(skin, art, type)
+                    .cost(session.getMinigameManager().upgradeCostOf(type))
+                    .onClick(() -> {
+                        toasts.show(controller.handleBeghouledUpgrade(type.getName()));
+                        closeOverlay();
+                    }))
+                    .size(SeedPacket.PACKET_WIDTH, SeedPacket.PACKET_HEIGHT).pad(5f);
+        }
+        content.row();
+        content.add(Ui.button(skin, "Cancel", "brown", this::closeOverlay))
+                .colspan(UPGRADEABLE.length).width(220f).height(48f).padTop(12f);
+        overlay = Overlay.open(stage, skin, "Upgrade every plant of one kind", content);
     }
 
     private void selectTool(Tool next, PlantType type) {
@@ -539,6 +561,10 @@ public class BattleScreen extends ScreenAdapter {
                     .armed(tool == Tool.PLANT && pending == slot.getType());
         }
     }
+
+    private static final PlantType[] UPGRADEABLE = {
+        PlantType.PEASHOOTER, PlantType.REPEATER, PlantType.WALL_NUT,
+        PlantType.PUFF_SHROOM, PlantType.CABBAGE_PULT, PlantType.MELON_PULT};
 
     private void installLawnInput() {
         lawnView.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ClickListener() {

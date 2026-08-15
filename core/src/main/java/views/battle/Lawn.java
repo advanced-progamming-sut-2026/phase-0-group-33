@@ -73,8 +73,8 @@ public final class Lawn {
         return columnLeft(column) + cellWidth / 2f;
     }
 
-    public static float rowBottom(int row) {
-        return bottom + (GameSession.ROWS - row) * cellHeight;
+    public static float rowBottom(double row) {
+        return bottom + (float) (GameSession.ROWS - row) * cellHeight;
     }
 
     public static float rowCenter(int row) {
