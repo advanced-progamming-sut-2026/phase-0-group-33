@@ -100,6 +100,15 @@ public class GameController extends BaseController {
         return result;
     }
 
+    public Result handleCollectPlantFood(int x, int y) {
+        if (session() == null) {
+            return noSession();
+        }
+        return session().collectPlantFoodAt(x, y)
+                ? Result.ok("You picked up plant food.")
+                : Result.fail("There is no plant food to pick up there.");
+    }
+
     public Result handleShowSunAmount() {
         return session() == null ? noSession()
                 : Result.ok("Sun: " + session().getSunManager().getSunBalance());

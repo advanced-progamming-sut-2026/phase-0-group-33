@@ -615,9 +615,9 @@ public class CombatManager {
 
     private void handleDrops(Zombie zombie) {
         if (zombie.isGlowing() && session.getPlantFoods() < 3) {
-            session.setPlantFoods(session.getPlantFoods() + 1);
-            System.out.printf("The glowing zombie dropeed a plant food; you have %d plant foods now.%n",
-                    session.getPlantFoods());
+            session.dropPlantFood((int) Math.round(zombie.getPosition().getX()),
+                    (int) zombie.getPosition().getY());
+            System.out.println("The glowing zombie dropped a plant food; pick it up!");
         }
         if (session.getRandom().nextInt(100) < 10) {
             dropTreasure();

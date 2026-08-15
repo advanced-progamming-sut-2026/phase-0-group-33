@@ -57,6 +57,7 @@ public class GameSession {
     private GamePhase phase = GamePhase.PREPARATION;
     private int tickCount;
     private int plantFoods;
+    private final java.util.List<PlantFoodDrop> plantFoodDrops = new java.util.ArrayList<>();
     private boolean cooldownsDisabled;
     private int plantsLost;
     private int zombiesKilled;
@@ -489,6 +490,34 @@ public class GameSession {
 
     public void setPlantFoods(int plantFoods) {
         this.plantFoods = Math.min(3, plantFoods);
+    }
+
+    public java.util.List<PlantFoodDrop> getPlantFoodDrops() {
+        return plantFoodDrops;
+    }
+
+    public void dropPlantFood(int x, int y) {
+        plantFoodDrops.add(new PlantFoodDrop(
+                Math.max(1, Math.min(COLS, x)), Math.max(1, Math.min(ROWS, y))));
+    }
+
+    public boolean collectPlantFoodAt(int x, int y) {
+        for (PlantFoodDrop drop : plantFoodDrops) {
+            if (drop.getX() == x && drop.getY() == y && !drop.isFalling()) {
+                plantFoodDrops.remove(drop);
+                setPlantFoods(plantFoods + 1);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void tickPlantFoodDrops() {
+        for (int i = plantFoodDrops.size() - 1; i >= 0; i--) {
+            if (plantFoodDrops.get(i).tick()) {
+                plantFoodDrops.remove(i);
+            }
+        }
     }
 
     public boolean isCooldownsDisabled() {

@@ -43,6 +43,7 @@ public class BattleCommands {
             slot.tick();
         }
         session.getSunManager().tick();
+        session.tickPlantFoodDrops();
         if (usesWaves()) {
             session.getWaveManager().tick();
         }

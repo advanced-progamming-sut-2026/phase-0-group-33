@@ -554,6 +554,9 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     private void useTool(int column, int row) {
+        if (tool == Tool.NONE && controller.handleCollectPlantFood(column, row).isSuccessfull()) {
+            return;
+        }
         if (session.getMode() == GameMode.VASEBREAKER && tool == Tool.NONE) {
             Result broken = controller.handleBreakVase(column, row);
             if (broken.isSuccessfull() || !hasVases()) {
