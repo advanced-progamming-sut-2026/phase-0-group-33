@@ -220,7 +220,7 @@ public class CombatManager {
             return;
         }
         for (Zombie zombie : session.getZombies()) {
-            if ((int) zombie.getPosition().getY() == plant.getY()
+            if (zombie.occupiesRow(plant.getY())
                     && Math.abs(zombie.getPosition().getX() - plant.getX()) <= 0.5) {
                 explode(plant);
                 return;
@@ -236,7 +236,7 @@ public class CombatManager {
             }
         } else if (type == PlantType.ICEBERG_LETTUCE) {
             for (Zombie zombie : new ArrayList<>(session.getZombies())) {
-                if ((int) zombie.getPosition().getY() == plant.getY()
+                if (zombie.occupiesRow(plant.getY())
                         && Math.abs(zombie.getPosition().getX() - plant.getX()) <= 0.5) {
                     zombie.setFrozenTicks(5 * GameSession.TICKS_PER_SECOND);
                     System.out.printf("The Iceberg Lettuce froze the %s solid!%n",
@@ -628,6 +628,9 @@ public class CombatManager {
 
     private void hypnotizeEater(PlacedPlant shroom) {
         for (Zombie zombie : session.getZombies()) {
+            if (zombie instanceof models.entities.zombie.Zomboss) {
+                continue;
+            }
             if ((int) zombie.getPosition().getY() == shroom.getY()
                     && Math.abs(zombie.getPosition().getX() - shroom.getX()) <= 1) {
                 zombie.getBattle().setHypnotized(true);

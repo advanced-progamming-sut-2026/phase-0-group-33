@@ -117,7 +117,7 @@ public class ProjectileManager {
         Zombie closest = null;
         double best = HIT_RANGE;
         for (Zombie zombie : session.getZombies()) {
-            if ((int) zombie.getPosition().getY() != row) {
+            if (!zombie.occupiesRow(row)) {
                 continue;
             }
             double distance = Math.abs(zombie.getPosition().getX() - x);

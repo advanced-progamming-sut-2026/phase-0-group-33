@@ -45,7 +45,7 @@ public class Zombie {
     }
 
     public boolean occupiesRow(int row) {
-        return (int) position.getY() == row;
+        return (int) getPosition().getY() == row;
     }
 
     public boolean isDead() {
