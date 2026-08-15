@@ -44,6 +44,13 @@ public class LawnView extends Actor {
     private static final float MOWER_RUN = 1.6f;
     private static final String FIRE_TILE = "FIRETILE";
     private static final String BOOM = "CHERRYBOMB_EXPLOSION_TOP";
+    private static final String POOF = "PLANT_POOF";
+    private static final String DIRT = "DIRT_SPAWN_GRASS";
+    private static final String ASH = "ZOMBIE_BIGHEAD_ASH";
+    private static final String ASH_GARGANTUAR = "ZOMBIE_BIGHEAD_GARGANTUAR_ASH";
+    private static final String ASH_IMP = "ZOMBIE_BIGHEAD_IMP_ASH";
+    private static final float ASH_LIFE = 1.3f;
+    private static final float POP_TIME = 0.42f;
 
     private final String chapterName;
     private boolean showGrid;
@@ -74,6 +81,7 @@ public class LawnView extends Actor {
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, int[]> plantSpots =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private boolean shakePending;
+    private boolean seeded;
     private final boolean[] mowerSeen = new boolean[GameSession.ROWS + 1];
     private final float[] mowerRun = new float[GameSession.ROWS + 1];
     private final com.badlogic.gdx.utils.Array<float[]> storms = new com.badlogic.gdx.utils.Array<>();
@@ -84,6 +92,34 @@ public class LawnView extends Actor {
     private final com.badlogic.gdx.utils.Array<Corpse> corpses = new com.badlogic.gdx.utils.Array<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, float[]> seen =
             new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.Array<Fx> effects = new com.badlogic.gdx.utils.Array<>();
+    private final com.badlogic.gdx.utils.ObjectMap<Object, Float> births =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.game.Projectile, float[]> shots =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+
+    private static final class Fx {
+        private final String animation;
+        private final String clip;
+        private final float x;
+        private final int row;
+        private final float start;
+        private final float end;
+        private final float height;
+        private final float lift;
+
+        private Fx(String animation, String clip, float x, int row,
+                   float start, float end, float height, float lift) {
+            this.animation = animation;
+            this.clip = clip;
+            this.x = x;
+            this.row = row;
+            this.start = start;
+            this.end = end;
+            this.height = height;
+            this.lift = lift;
+        }
+    }
 
     private static final class Corpse {
         private final models.entities.zombie.ZombieType type;
@@ -155,10 +191,158 @@ public class LawnView extends Actor {
         trackFiring();
         trackAbilities();
         trackDamage();
-        trackDeaths();
         trackBlasts();
+        trackDeaths();
         trackStorms();
         trackMowers();
+        trackBirths();
+        trackShots();
+        for (int i = effects.size - 1; i >= 0; i--) {
+            if (time >= effects.get(i).end) {
+                effects.removeIndex(i);
+            }
+        }
+    }
+
+    private void addFx(String animation, String clip, float x, int row,
+                       float height, float lift, float life) {
+        if (!animator.isReady() || animator.namedClip(animation, clip) == null) {
+            return;
+        }
+        float duration = animator.namedClipDuration(animation, clip);
+        if (duration <= 0f) {
+            return;
+        }
+        effects.add(new Fx(animation, clip, x, row, time,
+                time + Math.min(duration, life), height, lift));
+    }
+
+    private void trackBirths() {
+        boolean settled = seeded;
+        for (models.game.PlacedPlant plant : session.getPlants()) {
+            if (births.containsKey(plant)) {
+                continue;
+            }
+            births.put(plant, time);
+            if (settled) {
+                addFx(POOF, "animation", plant.getX(), plant.getY(), 1.15f, 0.3f, 1f);
+            }
+        }
+        boolean planted = session.getMode() == models.game.GameMode.I_ZOMBIE
+                || session.getMode() == models.game.GameMode.VASEBREAKER;
+        for (models.entities.zombie.Zombie zombie : session.getZombies()) {
+            if (births.containsKey(zombie)) {
+                continue;
+            }
+            births.put(zombie, time);
+            if (settled && planted) {
+                addFx(DIRT, "tomb_dirt_anim", (float) zombie.getPosition().getX(),
+                        (int) zombie.getPosition().getY(), 1f, 0.1f, 1f);
+            }
+        }
+        com.badlogic.gdx.utils.Array<Object> stale = new com.badlogic.gdx.utils.Array<>();
+        for (Object key : births.keys()) {
+            boolean alive = key instanceof models.game.PlacedPlant
+                    ? session.getPlants().contains(key)
+                    : session.getZombies().contains(key);
+            if (!alive) {
+                stale.add(key);
+            }
+        }
+        for (Object key : stale) {
+            births.remove(key);
+        }
+        seeded = true;
+    }
+
+    private float popScale(Object key) {
+        Float born = births.get(key);
+        if (born == null) {
+            return 1f;
+        }
+        float age = time - born;
+        if (age < 0f || age >= POP_TIME) {
+            return 1f;
+        }
+        float progress = age / POP_TIME;
+        return 1f + 0.26f * (1f - progress)
+                * (float) Math.sin(progress * Math.PI * 3f);
+    }
+
+    private void trackShots() {
+        com.badlogic.gdx.utils.Array<models.game.Projectile> gone =
+                new com.badlogic.gdx.utils.Array<>();
+        for (models.game.Projectile shot : shots.keys()) {
+            if (!session.getProjectileManager().getProjectiles().contains(shot)) {
+                gone.add(shot);
+            }
+        }
+        for (models.game.Projectile shot : gone) {
+            float[] last = shots.remove(shot);
+            if (last[0] >= GameSession.COLS + 0.4f) {
+                continue;
+            }
+            addFx(splatFor(shot.getSource()), "animation", last[0], (int) last[1],
+                    0.9f, 0.42f, 0.9f);
+        }
+        for (models.game.Projectile shot : session.getProjectileManager().getProjectiles()) {
+            shots.put(shot, new float[] {(float) shot.getX(), shot.getRow()});
+        }
+    }
+
+    private String splatFor(models.entities.plant.PlantType source) {
+        java.util.Set<models.entities.plant.PlantTag> tags = source.getTags();
+        if (tags.contains(models.entities.plant.PlantTag.ICE)) {
+            return "ZOMBIE_HUNTER_SNOWBALL_SPLAT";
+        }
+        if (tags.contains(models.entities.plant.PlantTag.FIRE)) {
+            return "SPLAT_FIRE_PEA_BLUE";
+        }
+        if (tags.contains(models.entities.plant.PlantTag.AOE)) {
+            return "SPLAT_CABBAGEPULT";
+        }
+        return "SPLAT_GIANTPEA";
+    }
+
+    private String ashFor(models.entities.zombie.ZombieType type) {
+        if (type == models.entities.zombie.ZombieType.GARGANTUAR) {
+            return ASH_GARGANTUAR;
+        }
+        if (type == models.entities.zombie.ZombieType.IMP
+                || type == models.entities.zombie.ZombieType.IMP_DRAGON) {
+            return ASH_IMP;
+        }
+        return ASH;
+    }
+
+    private boolean blastNear(float x, int row) {
+        for (Corpse blast : blasts) {
+            if (Math.abs(blast.x - x) <= 1.6f && Math.abs(blast.row - row) <= 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void drawEffects(Batch batch, int row) {
+        if (!animator.isReady()) {
+            return;
+        }
+        for (Fx fx : effects) {
+            if (fx.row != row) {
+                continue;
+            }
+            ClipRef clip = animator.namedClip(fx.animation, fx.clip);
+            if (clip == null) {
+                continue;
+            }
+            float scale = animator.fitScale(fx.animation, fx.clip,
+                    Lawn.cellHeight() * fx.height);
+            float lift = animator.centreOffset(fx.animation, fx.clip, scale);
+            batch.setColor(Color.WHITE);
+            animator.draw(batch, clip, time - fx.start, Lawn.columnCenter(fx.x),
+                    Lawn.rowBottom(row) + Lawn.cellHeight() * fx.lift + lift, scale, false, null);
+        }
     }
 
     private void trackMowers() {
@@ -382,6 +566,11 @@ public class LawnView extends Actor {
             if (duration <= 0f) {
                 continue;
             }
+            if (blastNear(entry.value[0], (int) entry.value[1])) {
+                addFx(ashFor(entry.key.getType()), "animation", entry.value[0],
+                        (int) entry.value[1], 1.1f, 0.2f, ASH_LIFE);
+                continue;
+            }
             corpses.add(new Corpse(entry.key.getType(), entry.value[0], (int) entry.value[1],
                     time, time + duration));
             if (animator.hasZombieClip(entry.key.getType(), "particles")) {
@@ -499,10 +688,6 @@ public class LawnView extends Actor {
         batch.setColor(previous);
     }
 
-    private void paintNothing() {
-        return;
-    }
-
     private boolean drawWaterTile(Batch batch, int column, int row) {
         if (!animator.isReady()) {
             return false;
@@ -557,10 +742,8 @@ public class LawnView extends Actor {
                 if (tile == null) {
                     continue;
                 }
-                if (tile.getTerrain() == TerrainType.WATER && !tile.isLowTide()
-                        && drawWaterTile(batch, column, row)) {
-                    paintNothing();
-                } else {
+                if (tile.getTerrain() != TerrainType.WATER || tile.isLowTide()
+                        || !drawWaterTile(batch, column, row)) {
                     Color tint = terrainTint(tile);
                     if (tint != null) {
                         paint(batch, tint, column, row);
@@ -815,6 +998,7 @@ public class LawnView extends Actor {
             drawCorpses(batch, row);
             drawBlasts(batch, row);
             drawProjectiles(batch, row);
+            drawEffects(batch, row);
         }
         drawSuns(batch);
     }
@@ -1126,7 +1310,7 @@ public class LawnView extends Actor {
             drawPlantFoodGlow(batch, centerX, feet);
         }
         animator.draw(batch, clip, clock, centerX, feet + animator.plantLift(),
-                animator.plantScale(), !attacking, null);
+                animator.plantScale() * popScale(plant), !attacking, null);
         return true;
     }
 
@@ -1211,7 +1395,7 @@ public class LawnView extends Actor {
         }
         float clock = zombie.getFrozenTicks() > 0 ? seed * 0.11f : time + seed * 0.11f;
         animator.draw(batch, clip, clock, centerX, feet + animator.zombieLift(),
-                animator.zombieScale(), true,
+                animator.zombieScale() * popScale(zombie), true,
                 animator.armourFor(zombie.getType(), armourFraction(zombie)));
         return true;
     }
