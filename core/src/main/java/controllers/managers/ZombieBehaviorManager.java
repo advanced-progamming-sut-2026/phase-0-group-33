@@ -22,6 +22,9 @@ public class ZombieBehaviorManager {
     private final GameSession session;
     private final CombatManager combatManager;
     private final ChapterEnvironment environment;
+    private static final double WIZARD_RANGE = 3.0;
+    private static final double PIANO_RANGE = 3.0;
+
     private final Set<Zombie> pushersWithObject = new HashSet<>();
 
     public ZombieBehaviorManager(GameSession session, CombatManager combatManager) {
@@ -325,15 +328,15 @@ public class ZombieBehaviorManager {
         if (!cooldownReady(zombie, 80)) {
             return;
         }
-        for (PlacedPlant plant : session.getPlants()) {
-            if (!plant.isSheep()) {
-                plant.setSheep(true);
-                zombie.getBattle().getSheepPlants().add(plant);
-                System.out.printf("The Wizard turned %s at (%d, %d) into a sheep!%n",
-                        plant.getType().getName(), plant.getX(), plant.getY());
-                return;
-            }
+        PlacedPlant target = nearestPlantInRow(zombie);
+        if (target == null || target.isSheep()
+                || zombie.getPosition().getX() - target.getX() > WIZARD_RANGE) {
+            return;
         }
+        target.setSheep(true);
+        zombie.getBattle().getSheepPlants().add(target);
+        System.out.printf("The Wizard turned %s at (%d, %d) into a sheep!%n",
+                target.getType().getName(), target.getX(), target.getY());
     }
 
     private boolean allStarCharge(Zombie zombie) {
@@ -446,7 +449,12 @@ public class ZombieBehaviorManager {
             return;
         }
         for (Zombie other : session.getZombies()) {
-            if (other == zombie || other.getBattle().isSunProducer()) {
+            if (other == zombie || other.getBattle().isSunProducer()
+                    || other instanceof models.entities.zombie.Zomboss) {
+                continue;
+            }
+            if (Math.abs(other.getPosition().getX() - zombie.getPosition().getX())
+                    > PIANO_RANGE) {
                 continue;
             }
             int row = (int) other.getPosition().getY();
@@ -548,7 +556,7 @@ public class ZombieBehaviorManager {
     public boolean beforeHit(Zombie zombie, PlantType source) {
         if (zombie.getBattle().getIceHealth() > 0) {
             int melt = source.getTags().contains(PlantTag.FIRE) ? 600
-                    : Math.max(20, source.getDamage());
+                    : Math.max(20, combatManager.plantDamage(source));
             zombie.getBattle().setIceHealth(Math.max(0, zombie.getBattle().getIceHealth() - melt));
             return false;
         }
