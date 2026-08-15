@@ -168,15 +168,16 @@ public class PlantingManager {
                 && type == PlantType.HOT_POTATO && !hasFrozenPlant(tile)) {
             return Result.fail("Hot Potato can only be used on frozen tiles or frozen plants.");
         }
-        if (terrain == TerrainType.WATER && type != PlantType.LILY_PAD
+        boolean deepWater = terrain == TerrainType.WATER && !tile.isLowTide();
+        if (deepWater && type != PlantType.LILY_PAD
                 && !type.getTags().contains(PlantTag.WATER) && !tile.isHasLilyPad()) {
             return Result.fail("Place a Lily Pad on the water first.");
         }
-        if (terrain != TerrainType.WATER && type == PlantType.LILY_PAD) {
-            return Result.fail("Lily Pads can only be placed on water.");
+        if (!deepWater && type == PlantType.LILY_PAD) {
+            return Result.fail("Lily Pads can only be placed on open water.");
         }
-        if (terrain != TerrainType.WATER && type == PlantType.TANGLE_KELP) {
-            return Result.fail("Tangle Kelp can only be planted in water.");
+        if (!deepWater && type == PlantType.TANGLE_KELP) {
+            return Result.fail("Tangle Kelp can only be planted in open water.");
         }
         return null;
     }
