@@ -157,7 +157,7 @@ public class PlantFoodEffects {
             Tile tile = session.getGrid().getTile(
                     (int) Math.round(zombie.getPosition().getX()) - 1,
                     (int) zombie.getPosition().getY() - 1);
-            if (tile != null && tile.getTerrain() == TerrainType.WATER) {
+            if (tile != null && tile.getTerrain() == TerrainType.WATER && !tile.isLowTide()) {
                 combat.damageZombie(zombie, CombatManager.INSTANT_KILL_DAMAGE, plant.getType());
                 drowned++;
             }

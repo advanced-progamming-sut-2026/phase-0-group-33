@@ -219,7 +219,7 @@ public class CombatManager {
         if (!plant.getType().getTags().contains(PlantTag.TRAP)) {
             return;
         }
-        for (Zombie zombie : session.getZombies()) {
+        for (Zombie zombie : new ArrayList<>(session.getZombies())) {
             if (zombie.occupiesRow(plant.getY())
                     && Math.abs(zombie.getPosition().getX() - plant.getX()) <= 0.5) {
                 explode(plant);
