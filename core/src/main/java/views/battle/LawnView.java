@@ -1258,12 +1258,41 @@ public class LawnView extends Actor {
             if (isHurt(target)) {
                 flash(batch, () -> drawZombieAnimation(batch, target, zseed, zx, zy));
             }
+            drawZombotanyHead(batch, zombie, centerX, feet);
             if (zombie.getFrozenTicks() > 0 || zombie.getBattle().getIceHealth() > 0) {
                 drawIceBlock(batch, ICE_ZOMBIE, centerX, Lawn.rowBottom(row), 0.9f);
             }
             int max = Math.max(1, zombie.getType().getHitpoints());
             drawHealthBar(batch, zombie.getHealth(), max, centerX - width / 2f,
                     Lawn.rowBottom(row) + Lawn.cellHeight() * 1.02f, width);
+        }
+    }
+
+    private void drawZombotanyHead(Batch batch, models.entities.zombie.Zombie zombie,
+                                   float centerX, float feet) {
+        models.entities.plant.PlantType head =
+                views.assets.AnimationCatalog.zombotanyHead(zombie.getType());
+        if (head == null) {
+            return;
+        }
+        batch.setColor(Color.WHITE);
+        float size = Lawn.cellHeight() * 0.52f;
+        float x = centerX - size * 0.28f;
+        float y = feet + Lawn.cellHeight() * 0.5f;
+        if (animator.isReady()) {
+            ClipRef clip = animator.plantClip(head, "idle");
+            if (clip != null) {
+                float scale = animator.fitScale(
+                        views.assets.AnimationCatalog.plant(head),
+                        animator.plantClipName(head, "idle"), size);
+                animator.draw(batch, clip, time + (float) zombie.getPosition().getX() * 0.3f,
+                        x + size / 2f, y, scale, true, null);
+                return;
+            }
+        }
+        TextureRegion region = art.plant(head);
+        if (region != null) {
+            batch.draw(region, x, y, size, size);
         }
     }
 

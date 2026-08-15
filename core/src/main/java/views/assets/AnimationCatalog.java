@@ -90,6 +90,8 @@ public final class AnimationCatalog {
         return mapped == null ? "ZOMBIE_TUTORIAL" : mapped;
     }
 
+    private static final ObjectMap<String, models.entities.plant.PlantType> ZOMBOTANY =
+            new ObjectMap<>();
     private static final ObjectMap<String, String> ABILITY = new ObjectMap<>();
     private static final ObjectMap<String, String> BITE = new ObjectMap<>();
 
@@ -100,10 +102,20 @@ public final class AnimationCatalog {
         ABILITY.put("Octopus", "toss");
         ABILITY.put("Explorer", "power");
         ABILITY.put("Turquoise", "power");
+        ABILITY.put("Fisherman", "cast");
+
+        ZOMBOTANY.put("Peashooter Zombie", models.entities.plant.PlantType.PEASHOOTER);
+        ZOMBOTANY.put("Wall-nut Zombie", models.entities.plant.PlantType.WALL_NUT);
+        ZOMBOTANY.put("Jalapeno Zombie", models.entities.plant.PlantType.JALAPENO);
+        ZOMBOTANY.put("Squash Zombie", models.entities.plant.PlantType.SQUASH);
 
         BITE.put("Gargantuar", "smash_left");
         BITE.put("All Star", "kick");
         BITE.put("Piano", "smash_left");
+    }
+
+    public static models.entities.plant.PlantType zombotanyHead(ZombieType type) {
+        return ZOMBOTANY.get(type.getName());
     }
 
     public static String abilityClip(ZombieType type) {

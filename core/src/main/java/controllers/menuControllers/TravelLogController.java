@@ -163,6 +163,7 @@ public class TravelLogController extends BaseController {
                 "- I Zombie | command the zombies and eat all the brains",
                 "- Beghouled | match 3 plants, upgrade, survive the endless horde",
                 "- Zombotany | zombies with plant powers",
+                "- Scoring Game | chase the highest score you can",
                 "Each minigame has 3 stages; start one with:",
                 "play minigame -n <name> -d <1|2|3>");
     }
@@ -171,7 +172,8 @@ public class TravelLogController extends BaseController {
         GameMode mode = resolveMinigame(name);
         if (mode == null) {
             return Result.fail("No minigame with this name. "
-                    + "Options: vasebreaker, wallnut-bowling, i-zombie, beghouled, zombotany");
+                    + "Options: vasebreaker, wallnut-bowling, i-zombie, beghouled, "
+                    + "zombotany, scoring-game");
         }
         User user = app.getCurrentUser();
         UserDataStore store = UserDataStore.forUser(user.getUsername());
@@ -197,6 +199,9 @@ public class TravelLogController extends BaseController {
                 return GameMode.BEGHOULED;
             case "zombotany":
                 return GameMode.ZOMBOTANY;
+            case "scoringgame":
+            case "scoring":
+                return GameMode.SCORING;
             default:
                 return null;
         }

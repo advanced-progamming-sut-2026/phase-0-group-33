@@ -403,6 +403,10 @@ public class BattleScreen extends ScreenAdapter {
             }
             return "Brains left: " + brains;
         }
+        if (session.getMode() == GameMode.SCORING) {
+            return "Score: " + session.getScoreTracker().getScore()
+                    + "    Zombies down: " + session.getZombiesKilled();
+        }
         if (session.getMode() == GameMode.BEGHOULED) {
             return "Combos: " + session.getMinigameManager().getCombosMade()
                     + " / " + session.getMinigameManager().getCombosNeeded();
@@ -791,6 +795,23 @@ public class BattleScreen extends ScreenAdapter {
         }
     }
 
+    private void trackScore() {
+        if (session.getMode() != GameMode.SCORING) {
+            return;
+        }
+        int score = session.getScoreTracker().getScore();
+        if (lastScore < 0) {
+            lastScore = score;
+            return;
+        }
+        if (score / 500 > lastScore / 500) {
+            toasts.success("Score " + (score / 500) * 500 + " reached!");
+        } else if (score > lastScore) {
+            toasts.show(models.Result.ok("+" + (score - lastScore) + " points"));
+        }
+        lastScore = score;
+    }
+
     private String waveNotice(int wave) {
         String chapter = levelChapter == null ? ""
                 : levelChapter.replaceAll("[^A-Za-z]", "").toLowerCase();
@@ -804,7 +825,10 @@ public class BattleScreen extends ScreenAdapter {
                 ? "The final wave is here!" : "A huge wave of zombies is approaching!";
     }
 
+    private int lastScore = -1;
+
     private void trackRewards() {
+        trackScore();
         int food = session.getPlantFoods();
         if (lastPlantFood >= 0 && food > lastPlantFood) {
             toasts.success("You picked up plant food.");
