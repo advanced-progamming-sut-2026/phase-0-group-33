@@ -61,7 +61,7 @@ public class UserManager {
             result.setSuccess(false);
             return result;
         }
-        if (!password.equals(passwordConfirm)) {
+        if (password == null || !password.equals(passwordConfirm)) {
             result.addMessage("Passwords do not match.");
             result.setSuccess(false);
             return result;
@@ -71,7 +71,7 @@ public class UserManager {
             result.setSuccess(false);
             return result;
         }
-        if (nickname.length() < 3 || nickname.length() > 30) {
+        if (nickname == null || nickname.length() < 3 || nickname.length() > 30) {
             result.addMessage("Nickname must be between 3 and 30 characters.");
             result.setSuccess(false);
             return result;

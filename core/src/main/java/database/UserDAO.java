@@ -14,6 +14,13 @@ import java.util.Map;
 public class UserDAO {
     private static final String USERS_DIR = "users";
 
+    private static final java.util.regex.Pattern SAFE_NAME =
+            java.util.regex.Pattern.compile("[A-Za-z0-9-]{1,64}");
+
+    private static boolean isSafeName(String username) {
+        return username != null && SAFE_NAME.matcher(username).matches();
+    }
+
     private static String fileFor(String username) {
         return USERS_DIR + "/" + username + ".properties";
     }
@@ -26,6 +33,9 @@ public class UserDAO {
     }
 
     private boolean writeUser(User user) {
+        if (!isSafeName(user.getUsername())) {
+            return false;
+        }
         Map<String, String> values = new LinkedHashMap<>();
         values.put("username", user.getUsername());
         values.put("passwordHash", user.getPasswordHash());
@@ -48,7 +58,7 @@ public class UserDAO {
     }
 
     public User findByUsername(String username) {
-        if (username == null || !FileStore.exists(fileFor(username))) {
+        if (!isSafeName(username) || !FileStore.exists(fileFor(username))) {
             return null;
         }
         Map<String, String> values = new LinkedHashMap<>();
@@ -155,7 +165,7 @@ public class UserDAO {
     }
 
     public boolean existsByUsername(String username) {
-        return FileStore.exists(fileFor(username));
+        return isSafeName(username) && FileStore.exists(fileFor(username));
     }
 
     public SecurityQuestion getSecurityQuestion(String username) {

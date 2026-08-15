@@ -16,6 +16,6 @@ public enum LoginCommands {
     }
 
     public boolean matches(String input) {
-        return pattern.matcher(input).matches();
+        return input != null && pattern.matcher(input).matches();
     }
 }

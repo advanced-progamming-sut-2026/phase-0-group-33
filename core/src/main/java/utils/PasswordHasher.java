@@ -6,9 +6,10 @@ import java.security.NoSuchAlgorithmException;
 
 public class PasswordHasher {
     public static String hash(String password) {
+        String source = password == null ? "" : password;
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+            byte[] hash = digest.digest(source.getBytes(StandardCharsets.UTF_8));
             StringBuilder hexString = new StringBuilder();
             for (byte b : hash) {
                 String hex = Integer.toHexString(0xff & b);
@@ -19,11 +20,5 @@ public class PasswordHasher {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("SHA-256 algorithm not available", e);
         }
-    }
-
-    public static void main(String[] args) {
-        String password = "password";
-        String hash = PasswordHasher.hash(password);
-        System.out.println(hash);
     }
 }

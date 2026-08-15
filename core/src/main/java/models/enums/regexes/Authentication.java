@@ -23,6 +23,9 @@ public enum Authentication {
     }
 
     public boolean matches(String input) {
+        if (input == null) {
+            return false;
+        }
         if (this == EMAIL) {
             return pattern.matcher(input).matches() && localPartEndsWithAlphanumeric(input);
         }

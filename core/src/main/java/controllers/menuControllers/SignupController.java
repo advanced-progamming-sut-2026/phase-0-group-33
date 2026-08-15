@@ -40,7 +40,7 @@ public class SignupController extends BaseController {
             result.setSuccess(false);
             result.addMessage("There is no question with the given ID");
             return result;
-        } else if (!answer.equals(confirmation)) {
+        } else if (answer == null || !answer.equals(confirmation)) {
             result.setSuccess(false);
             result.addMessage("Answers do not match");
             return result;
