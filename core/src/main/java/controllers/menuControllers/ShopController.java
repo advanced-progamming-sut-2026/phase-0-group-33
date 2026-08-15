@@ -21,6 +21,7 @@ public class ShopController extends BaseController {
     private static final int EXCHANGE_DIAMONDS = 5;
     private static final int EXCHANGE_COINS = 500;
     private static final int DAILY_PRICE = 1600;
+    private static final int MAX_BUY_COUNT = 99;
 
     public ShopController(App app) {
         super(app);
@@ -62,6 +63,9 @@ public class ShopController extends BaseController {
     public Result handleShopBuy(String itemId, int count, String plantType) {
         if (count < 1) {
             return Result.fail("Count must be at least 1.");
+        }
+        if (count > MAX_BUY_COUNT) {
+            return Result.fail("You can buy at most " + MAX_BUY_COUNT + " of an item at a time.");
         }
         switch (itemId) {
             case "1":

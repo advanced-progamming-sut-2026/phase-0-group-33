@@ -423,7 +423,7 @@ public class UserManager {
             return result;
         }
         int current = currentUser.getCoins().getAmount();
-        if (current < amount) {
+        if (amount < 0 || current < amount) {
             result.addMessage("Not enough coins. You have " + current + ".");
             result.setSuccess(false);
             return result;
@@ -444,7 +444,7 @@ public class UserManager {
             return result;
         }
         int current = currentUser.getDiamonds().getAmount();
-        if (current < amount) {
+        if (amount < 0 || current < amount) {
             result.addMessage("Not enough diamonds. You have " + current + ".");
             result.setSuccess(false);
             return result;
