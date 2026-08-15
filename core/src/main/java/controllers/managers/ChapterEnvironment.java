@@ -152,7 +152,8 @@ public class ChapterEnvironment {
         System.out.printf("The tide shifted; the last %d columns are underwater.%n", water);
         for (PlacedPlant plant : new ArrayList<>(session.getPlants())) {
             Tile tile = session.getGrid().getTile(plant.getX() - 1, plant.getY() - 1);
-            if (tile.getTerrain() == TerrainType.WATER && !tile.isHasLilyPad()
+            if (tile.getTerrain() == TerrainType.WATER && !tile.isLowTide()
+                    && !tile.isHasLilyPad()
                     && !plant.getType().getTags().contains(PlantTag.WATER)) {
                 System.out.printf("%s at (%d, %d) was swept away by the tide!%n",
                         plant.getType().getName(), plant.getX(), plant.getY());

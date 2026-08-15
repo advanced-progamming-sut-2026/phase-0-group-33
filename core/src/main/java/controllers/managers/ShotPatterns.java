@@ -115,6 +115,9 @@ public class ShotPatterns {
             return;
         }
         if (session.getRandom().nextInt(100) < 25) {
+            if (!session.getBehaviorManager().beforeHit(target, plant.getType())) {
+                return;
+            }
             target.setFrozenTicks(3 * GameSession.TICKS_PER_SECOND);
             combat.damageZombie(target, combat.plantDamage(plant.getType()) * 2, plant.getType());
             System.out.printf("Butter pinned the %s in place!%n", target.getType().getName());

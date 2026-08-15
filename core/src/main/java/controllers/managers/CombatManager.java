@@ -207,7 +207,7 @@ public class CombatManager {
     private void meleeHit(PlacedPlant plant) {
         for (Zombie zombie : zombiesInRowAfter(plant.getY(), plant.getX() - 0.5)) {
             if (zombie.getPosition().getX() <= plant.getX() + 1.5) {
-                damageZombie(zombie, plantDamage(plant), plant.getType());
+                hitZombie(zombie, plant);
                 if (!plant.getType().getTags().contains(PlantTag.AOE)) {
                     return;
                 }
@@ -231,9 +231,8 @@ public class CombatManager {
     public void explode(PlacedPlant plant) {
         PlantType type = plant.getType();
         if (type == PlantType.JALAPENO) {
-            for (Zombie zombie : zombiesInRowAfter(plant.getY(), 0)) {
-                zombie.setChilledTicks(0);
-                damageZombie(zombie, plantDamage(type));
+            for (Zombie zombie : new ArrayList<>(zombiesInRowAfter(plant.getY(), 0))) {
+                hitZombie(zombie, type);
             }
         } else if (type == PlantType.ICEBERG_LETTUCE) {
             for (Zombie zombie : new ArrayList<>(session.getZombies())) {
@@ -281,6 +280,14 @@ public class CombatManager {
     }
 
     public void hitZombie(Zombie zombie, PlantType source) {
+        hitZombie(zombie, source, plantDamage(source));
+    }
+
+    public void hitZombie(Zombie zombie, PlacedPlant plant) {
+        hitZombie(zombie, plant.getType(), plantDamage(plant));
+    }
+
+    private void hitZombie(Zombie zombie, PlantType source, int damage) {
         if (!session.getBehaviorManager().beforeHit(zombie, source)) {
             return;
         }
@@ -292,7 +299,7 @@ public class CombatManager {
         }
         if (source.getTags().contains(PlantTag.POISON)) {
             zombie.getBattle().setPoisonTicksLeft(POISON_TICKS);
-            zombie.damageHealthDirectly(plantDamage(source));
+            zombie.damageHealthDirectly(damage);
             if (zombie.isDead() && session.getZombies().remove(zombie)) {
                 announceDeath(zombie);
                 session.countKill(zombie);
@@ -302,7 +309,7 @@ public class CombatManager {
             }
             return;
         }
-        damageZombie(zombie, plantDamage(source), source);
+        damageZombie(zombie, damage, source);
     }
 
     private void randomLightning(PlacedPlant plant) {
