@@ -610,30 +610,8 @@ public class LawnView extends Actor {
         }
         for (com.badlogic.gdx.utils.ObjectMap.Entry<models.entities.zombie.Zombie, float[]> entry
                 : seen.entries()) {
-            if (current.containsKey(entry.key)) {
-                continue;
-            }
-            String clip = animator.zombieClipName(entry.key.getType(), "die");
-            if (clip == null || !"die".equals(clip)) {
-                continue;
-            }
-            float duration = animator.zombieClipDuration(entry.key.getType(), clip);
-            if (duration <= 0f) {
-                continue;
-            }
-            if (blastNear(entry.value[0], (int) entry.value[1])) {
-                addFx(ashFor(entry.key.getType()), "animation", entry.value[0],
-                        (int) entry.value[1], 1.1f, 0.2f, ASH_LIFE);
-                continue;
-            }
-            corpses.add(new Corpse(entry.key.getType(), entry.value[0], (int) entry.value[1],
-                    time, time + duration));
-            if (animator.hasZombieClip(entry.key.getType(), "particles")) {
-                float parts = animator.zombieClipDuration(entry.key.getType(), "particles");
-                if (parts > 0f) {
-                    corpses.add(new Corpse(entry.key.getType(), entry.value[0],
-                            (int) entry.value[1], time, time + parts, true));
-                }
+            if (!current.containsKey(entry.key)) {
+                noteDeath(entry.key, entry.value[0], (int) entry.value[1]);
             }
         }
         for (com.badlogic.gdx.utils.ObjectMap.Entry<models.entities.zombie.Zombie, float[]> entry
@@ -644,6 +622,32 @@ public class LawnView extends Actor {
         }
         seen.clear();
         seen.putAll(current);
+        expireCorpses();
+    }
+
+    private void noteDeath(models.entities.zombie.Zombie zombie, float x, int row) {
+        String clip = animator.zombieClipName(zombie.getType(), "die");
+        if (clip == null || !"die".equals(clip)) {
+            return;
+        }
+        float duration = animator.zombieClipDuration(zombie.getType(), clip);
+        if (duration <= 0f) {
+            return;
+        }
+        if (blastNear(x, row)) {
+            addFx(ashFor(zombie.getType()), "animation", x, row, 1.1f, 0.2f, ASH_LIFE);
+            return;
+        }
+        corpses.add(new Corpse(zombie.getType(), x, row, time, time + duration));
+        if (animator.hasZombieClip(zombie.getType(), "particles")) {
+            float parts = animator.zombieClipDuration(zombie.getType(), "particles");
+            if (parts > 0f) {
+                corpses.add(new Corpse(zombie.getType(), x, row, time, time + parts, true));
+            }
+        }
+    }
+
+    private void expireCorpses() {
         for (models.entities.zombie.Zombie zombie : zombieFlightKeys()) {
             float[] flight = flights.get(zombie);
             if (!session.getZombies().contains(zombie) || time >= flight[2]) {

@@ -44,11 +44,6 @@ public final class AnimatedActor extends Actor {
     }
 
     private static AnimatedActor build(Animations animations, String animation, float box,
-                                       String... preferred) {
-        return build(animations, animation, box, false, preferred);
-    }
-
-    private static AnimatedActor build(Animations animations, String animation, float box,
                                        boolean wholeAnimation, String... preferred) {
         if (animations == null || !animations.isAvailable()) {
             return null;

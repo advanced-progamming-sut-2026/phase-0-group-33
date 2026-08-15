@@ -99,7 +99,7 @@ public final class Animations implements Disposable {
         if (clipCache.containsKey(key)) {
             return clipCache.get(key);
         }
-        ClipRef ref = null;
+        ClipRef ref;
         try {
             String path = paths.get(animation);
             player.loadSync(path);
@@ -123,7 +123,7 @@ public final class Animations implements Disposable {
         if (boundsCache.containsKey(key)) {
             return boundsCache.get(key);
         }
-        Rectangle rect = null;
+        Rectangle rect;
         try {
             String path = paths.get(animation);
             player.loadSync(path);

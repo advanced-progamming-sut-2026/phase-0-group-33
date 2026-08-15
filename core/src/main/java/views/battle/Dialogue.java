@@ -15,7 +15,6 @@ public final class Dialogue extends Table {
 
     private static final String SPEAKER = "CRAZYDAVE";
 
-    private final Skin skin;
     private final List<String> lines;
     private final Runnable onFinished;
     private final com.badlogic.gdx.scenes.scene2d.ui.Label text;
@@ -24,7 +23,6 @@ public final class Dialogue extends Table {
 
     private Dialogue(Skin skin, Animations animations, List<String> lines, Runnable onFinished) {
         super(skin);
-        this.skin = skin;
         this.lines = lines;
         this.onFinished = onFinished;
 
