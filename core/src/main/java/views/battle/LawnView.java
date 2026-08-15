@@ -54,6 +54,8 @@ public class LawnView extends Actor {
     private static final String ARMOUR_BREAK = "ARMOR_BREAK_EFFECT";
     private static final float SLIDE_TIME = 0.22f;
     private static final float BOSS_SLIDE = 0.45f;
+    private static final float RECOVER_TIME = 0.55f;
+    private static final int CHARGE_TICKS = 6;
 
     private final String chapterName;
     private boolean showGrid;
@@ -1474,6 +1476,15 @@ public class LawnView extends Actor {
         Float until = firing.get(plant);
         if (until != null && time < until) {
             return new String[] {"attack", "special", "idle"};
+        }
+        if (until != null && time < until + RECOVER_TIME) {
+            return new String[] {
+                "recovery", "reload", "bite_end", "attack_end", "recover", "idle"};
+        }
+        if (plant.getActionCooldownTicks() > 0
+                && plant.getActionCooldownTicks() <= CHARGE_TICKS) {
+            return new String[] {
+                "charge", "busy", "attack_start", "special_idle", "attack_emerge", "idle"};
         }
         float fraction = plant.getHealth() / (float) Math.max(1, plant.getMaxHealth());
         if (fraction <= 0.34f) {
