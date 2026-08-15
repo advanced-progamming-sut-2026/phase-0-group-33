@@ -148,6 +148,7 @@ public class ChapterEnvironment {
                 }
             }
         }
+        models.game.BoardBuilder.markLowTide(session.getGrid(), session.getRandom(), 3);
         System.out.printf("The tide shifted; the last %d columns are underwater.%n", water);
         for (PlacedPlant plant : new ArrayList<>(session.getPlants())) {
             Tile tile = session.getGrid().getTile(plant.getX() - 1, plant.getY() - 1);

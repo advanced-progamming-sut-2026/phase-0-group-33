@@ -9,6 +9,9 @@ import models.progress.chapter.FrostBite;
 import models.progress.chapter.WaveyBeach;
 
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public final class BoardBuilder {
@@ -37,7 +40,7 @@ public final class BoardBuilder {
             markSpecialTiles(grid, random, 4, true);
         }
         if (chapter instanceof WaveyBeach) {
-            markSpecialTiles(grid, random, 3, false);
+            markLowTide(grid, random, 3);
         }
     }
 
@@ -48,9 +51,27 @@ public final class BoardBuilder {
             Tile tile = grid.getTile(col - 1, row - 1);
             if (necromancy) {
                 tile.setNecromancy(true);
-            } else {
-                tile.setLowTide(true);
             }
+        }
+    }
+
+    public static void markLowTide(Grid grid, Random random, int count) {
+        List<Tile> sea = new ArrayList<>();
+        for (int row = 1; row <= GameSession.ROWS; row++) {
+            for (int col = 1; col <= GameSession.COLS; col++) {
+                Tile tile = grid.getTile(col - 1, row - 1);
+                if (tile == null) {
+                    continue;
+                }
+                tile.setLowTide(false);
+                if (tile.getTerrain() == TerrainType.WATER) {
+                    sea.add(tile);
+                }
+            }
+        }
+        Collections.shuffle(sea, random);
+        for (int i = 0; i < Math.min(count, sea.size()); i++) {
+            sea.get(i).setLowTide(true);
         }
     }
 
