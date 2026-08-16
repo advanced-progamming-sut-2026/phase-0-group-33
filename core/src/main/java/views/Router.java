@@ -27,6 +27,10 @@ public final class Router {
 
     public void go(ScreenId id) {
         Screen previous = game.getScreen();
+        if (game.getApp().getCurrentUser() != null) {
+            views.ui.Display.setFullscreen(models.settings.GamePreferences.isFullscreen(
+                    game.getApp().getCurrentUser().getUsername()));
+        }
         if (game.getAudio() != null) {
             game.getAudio().setUser(game.getApp().getCurrentUser() == null ? null
                     : game.getApp().getCurrentUser().getUsername());

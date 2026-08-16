@@ -105,6 +105,9 @@ public abstract class BaseScreen extends ScreenAdapter {
         InputMultiplexer multiplexer = new InputMultiplexer(stage, new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
+                if (Display.handleKey(keycode)) {
+                    return true;
+                }
                 if (keycode == Input.Keys.ESCAPE) {
                     goBack();
                     return true;

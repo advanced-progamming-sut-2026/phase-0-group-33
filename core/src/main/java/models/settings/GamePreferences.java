@@ -12,6 +12,7 @@ public final class GamePreferences {
     private static final String KEY_DEBUG = "pref.debugMode";
     private static final String KEY_MUSIC = "pref.musicVolume";
     private static final String KEY_SFX = "pref.sfxVolume";
+    private static final String KEY_FULLSCREEN = "pref.fullscreen";
 
     private GamePreferences() {
     }
@@ -58,6 +59,16 @@ public final class GamePreferences {
     public static void setSfxVolume(String username, int volume) {
         UserDataStore store = store(username);
         store.setInt(KEY_SFX, clampVolume(volume));
+        store.save();
+    }
+
+    public static boolean isFullscreen(String username) {
+        return store(username).getInt(KEY_FULLSCREEN, 0) == 1;
+    }
+
+    public static void setFullscreen(String username, boolean fullscreen) {
+        UserDataStore store = store(username);
+        store.setInt(KEY_FULLSCREEN, fullscreen ? 1 : 0);
         store.save();
     }
 

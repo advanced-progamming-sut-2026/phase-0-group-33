@@ -14,6 +14,7 @@ public final class Lwjgl3Launcher {
         config.setTitle("Plants vs. Zombies - Group 33");
         config.setWindowedMode(1280, 720);
         config.setWindowSizeLimits(960, 540, -1, -1);
+        config.setResizable(true);
         config.useVsync(true);
         config.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
         new Lwjgl3Application(new PvzGame(), config);

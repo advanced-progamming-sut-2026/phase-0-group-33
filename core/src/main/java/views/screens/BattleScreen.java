@@ -177,6 +177,9 @@ public class BattleScreen extends ScreenAdapter {
         InputMultiplexer multiplexer = new InputMultiplexer(stage, new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
+                if (views.ui.Display.handleKey(keycode)) {
+                    return true;
+                }
                 if (keycode == Input.Keys.ESCAPE) {
                     onEscape();
                     return true;

@@ -117,6 +117,18 @@ public class SettingsScreen extends BaseScreen {
         });
         settingRow(panel, "Lawn grid", "Shows the tile boundaries during a battle.", grid, 420f);
 
+        final CheckBox fullscreen = new CheckBox("  Play in fullscreen", skin);
+        fullscreen.setChecked(views.ui.Display.isFullscreen());
+        fullscreen.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                views.ui.Display.setFullscreen(fullscreen.isChecked());
+                GamePreferences.setFullscreen(username, fullscreen.isChecked());
+            }
+        });
+        settingRow(panel, "Fullscreen",
+                "Fills the whole screen. F11 or Alt+Enter toggles it any time.", fullscreen, 420f);
+
         final CheckBox debug = new CheckBox("  Enable debug mode", skin);
         debug.setChecked(GamePreferences.isDebugMode(username));
         debug.addListener(new ChangeListener() {
