@@ -22,6 +22,7 @@ public final class AnimationCatalog {
         PLANTS.put("Goo Peashooter", "GOOPEASHOOTER");
         PLANTS.put("Primal Sunflower", "PRIMAL_SUNFLOWER");
         PLANTS.put("Primal Potato Mine", "PRIMAL_POTATOMINE");
+        PLANTS.put("Cat-tail", "HOMINGTHISTLE");
 
         ZOMBIES.put("Normal", "ZOMBIE_TUTORIAL");
         ZOMBIES.put("Cone Head", "ZOMBIE_TUTORIAL");
