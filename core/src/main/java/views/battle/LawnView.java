@@ -1283,6 +1283,9 @@ public class LawnView extends Actor {
                 continue;
             }
             batch.setColor(Color.WHITE);
+            if (drawPushedArt(batch, pushed, row)) {
+                continue;
+            }
             float size = Lawn.cellWidth() * 0.6f;
             TextureRegion region = art.uiOptional("image_ui_generic_leaf_backdrop");
             if (region != null) {
@@ -1344,6 +1347,24 @@ public class LawnView extends Actor {
             drawHealthBar(batch, zombie.getHealth(), max, centerX - width / 2f,
                     Lawn.rowBottom(row) + Lawn.cellHeight() * 1.02f, width);
         }
+    }
+
+    private boolean drawPushedArt(Batch batch, models.game.PushedObject pushed, int row) {
+        if (!animator.isReady()) {
+            return false;
+        }
+        String animation = views.assets.AnimationCatalog.pushed(pushed.getKind());
+        String clipName = animator.clipName(animation,
+                views.assets.AnimationCatalog.pushedClip(pushed.getKind()), "idle");
+        ClipRef clip = clipName == null ? null : animator.namedClip(animation, clipName);
+        if (clip == null) {
+            return false;
+        }
+        float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 0.95f);
+        float anchor = animator.bottomOffset(animation, clipName, scale);
+        animator.draw(batch, clip, time, Lawn.columnCenter(pushed.getX()),
+                Lawn.rowBottom(row) + Lawn.cellHeight() * 0.1f - anchor, scale, true, null);
+        return true;
     }
 
     private void drawZombotanyHead(Batch batch, models.entities.zombie.Zombie zombie,
@@ -1596,6 +1617,8 @@ public class LawnView extends Actor {
             clip = bite != null && animator.hasZombieClip(zombie.getType(), bite)
                     ? animator.zombieClip(zombie.getType(), bite, "eat", "idle")
                     : animator.zombieClip(zombie.getType(), "eat", "attack", "walk", "idle");
+        } else if (isPushing(zombie)) {
+            clip = animator.zombieClip(zombie.getType(), "push", "walk", "idle");
         } else {
             clip = animator.zombieClip(zombie.getType(), "walk", "walk1", "idle");
         }
@@ -1607,6 +1630,22 @@ public class LawnView extends Actor {
                 animator.zombieScale() * popScale(zombie), true,
                 animator.armourFor(zombie.getType(), armourFraction(zombie)));
         return true;
+    }
+
+    private boolean isPushing(models.entities.zombie.Zombie zombie) {
+        models.entities.zombie.ZombieType type = zombie.getType();
+        if (type != models.entities.zombie.ZombieType.TROGLOBITE
+                && type != models.entities.zombie.ZombieType.ARCAD
+                && type != models.entities.zombie.ZombieType.BARREL_ROLLER) {
+            return false;
+        }
+        for (models.game.PushedObject pushed : session.getPushedObjects()) {
+            if (pushed.getRow() == (int) zombie.getPosition().getY() && !pushed.isDestroyed()
+                    && Math.abs(pushed.getX() - zombie.getPosition().getX()) <= 1.5) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private float armourFraction(models.entities.zombie.Zombie zombie) {

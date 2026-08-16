@@ -209,6 +209,28 @@ public final class AnimationCatalog {
         }
     }
 
+    public static String pushed(models.game.PushedObject.Kind kind) {
+        switch (kind) {
+            case BARREL:
+                return "ZOMBIE_PIRATE_BARREL_PUSHER_BARREL";
+            case ARCADE_MACHINE:
+                return "80S_ARCADE_CABINET";
+            default:
+                return "ZOMBOSS_GLACIER_BLOCK";
+        }
+    }
+
+    public static String pushedClip(models.game.PushedObject.Kind kind) {
+        switch (kind) {
+            case BARREL:
+                return "roll";
+            case ARCADE_MACHINE:
+                return "idle";
+            default:
+                return "idle";
+        }
+    }
+
     public static String fireTile() {
         return "FIRETILE";
     }
