@@ -1,8 +1,57 @@
-# group-33 — Plants vs. Zombies 2 (Phase 1)
+<div align="center">
 
-## Welcome To Our Hell🔥
+# 🌻 Plants vs. Zombies 2 — Group 33
 
-### Team Members
+**A full remake of PopCap's lawn defence, built from scratch in Java with libGDX.**
+
+Four chapters · 69 plants · 38 zombies · 4 Zomboss fights · 6 minigames · every frame driven by the game's original PAM animations.
+
+[![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
+[![libGDX](https://img.shields.io/badge/libGDX-1.13.1-E74C3C?style=flat-square)](https://libgdx.com/)
+[![Gradle](https://img.shields.io/badge/Gradle-multi--module-02303A?style=flat-square&logo=gradle&logoColor=white)](https://gradle.org/)
+[![Checkstyle](https://img.shields.io/badge/Checkstyle-0_errors-2ECC71?style=flat-square)](config/checkstyle/checkstyle.xml)
+[![PMD](https://img.shields.io/badge/PMD-clean-2ECC71?style=flat-square)](config/pmd/ruleset.xml)
+
+*Advanced Programming — Sharif University of Technology*
+
+</div>
+
+---
+
+<div align="center">
+<img src="docs/screenshots/04-battle.jpg" width="85%" alt="A battle in Ancient Egypt: sunflowers, peashooters and a wall-nut hold the line against coneheads, Ra and an Explorer.">
+</div>
+
+---
+
+## Table of Contents
+
+**Part I — The Game**
+[Screenshots](#screenshots) ·
+[Quick Start](#quick-start) ·
+[Controls](#controls) ·
+[What's In It](#whats-in-it) ·
+[The Adventure](#the-adventure) ·
+[Boss Fights](#boss-fights) ·
+[Minigames](#minigames) ·
+[Between Battles](#between-battles)
+
+**Part II — The Code**
+[Architecture](#architecture) ·
+[The Graphics Pipeline](#the-graphics-pipeline) ·
+[Build & Code Quality](#build--code-quality) ·
+[How We Verified It](#how-we-verified-it) ·
+[Data & Persistence](#data--persistence)
+
+**Part III — Reference**
+[The Parked CLI](#the-parked-command-line-build-legacy-cli) ·
+[Command Reference](#general-menu-rules) ·
+[Design Decisions](#design-decisions-left-to-us) ·
+[Cheats](#cheat-commands)
+
+---
+
+## Team
 
 | Full Name | Student ID |
 |-----------|------------|
@@ -12,99 +61,317 @@
 
 ---
 
-## Table of Contents
+# Part I — The Game
 
-- [Project Layout](#project-layout)
-- [How to Run](#how-to-run)
-- [Build & Code Quality](#build--code-quality-gradle)
-- [The Parked Command-Line Build](#the-parked-command-line-build-legacy-cli)
-- [General Menu Rules](#general-menu-rules)
-- [Command Reference by Menu](#command-reference-by-menu)
-  - [Signup Menu](#signup-menu)
-  - [Login Menu](#login-menu)
-  - [Main Menu](#main-menu)
-  - [Settings Menu](#settings-menu)
-  - [News Menu](#news-menu)
-  - [Profile Menu](#profile-menu)
-  - [Game Menu — Plant Selection](#game-menu--plant-selection-preparation-phase)
-  - [Game Menu — In Battle](#game-menu--in-battle)
-  - [Collection Menu](#collection-menu)
-  - [Greenhouse Menu](#greenhouse-menu)
-  - [Shop Menu](#shop-menu)
-  - [Travel Log Menu](#travel-log-menu)
-  - [Leaderboard Menu](#leaderboard-menu)
-- [**Reading the Map** (symbol guide)](#reading-the-map)
-- [Design Decisions Left to Us](#design-decisions-left-to-us)
-  - [Levels & Chapters](#levels--chapters)
-  - [Special Levels](#special-levels)
-  - [Quests](#quests)
-  - [Scoring Game (Miopoints)](#scoring-game-miopoints)
-  - [Minigames](#minigames)
-  - [Plant Upgrades](#plant-upgrades)
-  - [Difficulty](#difficulty)
-  - [Economy Numbers](#economy-numbers)
-- [Cheat Commands](#cheat-commands)
+## Screenshots
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshots/01-main-menu.jpg" alt="Main menu"><br><sub><b>Main menu</b> — every screen shares one animated backdrop, a gold-trimmed panel skin and a persistent currency bar.</sub></td>
+<td width="50%"><img src="docs/screenshots/02-adventure.jpg" alt="Adventure map"><br><sub><b>Adventure map</b> — four chapters, progress bars, per-level cards that name the special rule waiting inside.</sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/screenshots/03-almanac.jpg" alt="Almanac"><br><sub><b>Almanac</b> — all 69 plants and 38 zombies with live animated portraits, stats, family filters and a seen/unseen gate.</sub></td>
+<td width="50%"><img src="docs/screenshots/05-boss.jpg" alt="Dragon Zomboss"><br><sub><b>Dragon Zomboss</b> — a two-lane boss with a segmented health bar, its own move set and burning tiles.</sub></td>
+</tr>
+</table>
 
 ---
 
-## Project Layout
+## Quick Start
 
-The project is a **libGDX** Gradle build. Requires JDK 21.
-
-```
-core/       game logic + the graphical view layer  (models, controllers, utils, database, views)
-lwjgl3/     desktop launcher (LWJGL3 backend)
-assets/     textures, atlases, sounds, skins — runtime working directory
-config/     Checkstyle + PMD rulesets
-legacy-cli/ the command-line build, parked — see below
-```
-
-`core` holds every rule of the game and knows nothing about the launcher, so the
-same logic can later be driven by another backend.
-
-## How to Run
+You need **JDK 21**. Nothing else — Gradle fetches the rest.
 
 ```bash
 ./gradlew :lwjgl3:run          # Linux / macOS
 gradlew.bat :lwjgl3:run        # Windows
 ```
 
-**IntelliJ:** open the project as a **Gradle** project (point it at `build.gradle`
-in the repo root), then run `Lwjgl3Launcher`.
+**First run:** create an account on the sign-up screen, pick a security question, log in.
+In a hurry? The main menu has an **Unlock everything** button that opens all chapters,
+levels and plants at max level, and tops up your wallet.
 
-To build a distributable fat jar:
+**Packaging a jar:**
 
 ```bash
-gradlew.bat :lwjgl3:jar        # -> lwjgl3/build/libs/group-33-1.0.jar
+./gradlew :lwjgl3:jar          # -> lwjgl3/build/libs/group-33-1.0.jar
 ```
 
-All persistent data (accounts, progress, greenhouse, news, quests) is written to a
-`data/` folder next to the working directory. Gradle runs the game with `assets/`
-as its working directory, so during development saves land in `assets/data/`
-(git-ignored); a packaged jar writes `data/` next to itself.
+**In IntelliJ:** open the repo root as a **Gradle** project, then run `Lwjgl3Launcher`.
 
 ---
 
-## Build & Code Quality (Gradle)
+## Controls
+
+Everything is mouse-driven; the keyboard is for shortcuts.
+
+| Input | Does |
+|-------|------|
+| **Left click** a seed packet | Pick that plant up — the cursor becomes the plant and the lawn highlights legal tiles |
+| **Left click** a lawn tile | Plant it (green tint = legal, red = blocked, occupied or unaffordable) |
+| **Left click** a falling sun | Collect it |
+| **Left click** a glowing plant | Pick up the plant food it dropped |
+| **Shovel** button, then a plant | Dig it up |
+| **Plant Food** button, then a plant | Supercharge it — every plant has its own plant-food effect |
+| **Esc** | Pause menu in battle · back one screen in the menus |
+| **F11** or **Alt + Enter** | Toggle fullscreen, from anywhere |
+
+Fullscreen is also a checkbox in **Settings**, and it is remembered per account — the
+game comes back up the way you left it. The viewport letterboxes cleanly at any aspect
+ratio, ultrawide included.
+
+---
+
+## What's In It
+
+<table>
+<tr>
+<td align="center"><b>69</b><br><sub>plants</sub></td>
+<td align="center"><b>38</b><br><sub>zombies</sub></td>
+<td align="center"><b>4</b><br><sub>chapters</sub></td>
+<td align="center"><b>16</b><br><sub>levels</sub></td>
+<td align="center"><b>8</b><br><sub>special level types</sub></td>
+<td align="center"><b>6</b><br><sub>minigames</sub></td>
+<td align="center"><b>4</b><br><sub>Zomboss fights</sub></td>
+<td align="center"><b>14</b><br><sub>screens</sub></td>
+</tr>
+</table>
+
+Every plant does something distinct — not just "shoots faster". Shooters lead their
+targets with real projectiles, lobbers arc over wall-nuts and graves, melee plants have
+reach, traps arm on a timer, and instant plants detonate the moment they touch the lawn.
+Torchwood ignites peas that pass through it. Magnet-shroom strips metal armour and
+ignores traffic cones. Umbrella zombies shelter everyone beside them from lobbed shots.
+Snorkel zombies dive and surface as a ripple on the water.
+
+---
+
+## The Adventure
+
+Four chapters, four levels each, unlocked in order. Every chapter changes the rules of
+the lawn, not just the wallpaper.
+
+| Chapter | L1 | L2 | L3 | L4 | The lawn itself |
+|---------|----|----|----|----|-----------------|
+| 🏜️ **Egypt** | Ordinary | Conveyor Belt | Locked Plants | 🤖 **Robot Zomboss** | Gravestones block straight shots; a sandstorm hurls zombies forward on the last wave |
+| ❄️ **Frost Bite** | Ordinary | Save Our Seeds | Timed War | 🦣 **Mammoth Zomboss** | Icy winds freeze plants in stages; slider tiles shove zombies between lanes; zombies arrive frozen in ice |
+| 🏖️ **Wavey Beach** | Ordinary | Dead Line | Love Your Plants | 🦈 **Shark Zomboss** | The tide advances and retreats every wave, drowning land plants and exposing low-tide shallows that zombies climb out of |
+| 🌑 **Dark Ages** | Ordinary | Night Ops | Plant What You Get | 🐉 **Dragon Zomboss** | No sky sun; graves rise every wave and necromancy raises the dead out of them |
+
+All eight special level types from the course document are implemented and each appears
+at least once: **Conveyor Belt**, **Locked Plants**, **Save Our Seeds**, **Timed War**,
+**Night Ops**, **Dead Line**, **Love Your Plants**, **Plant What You Get**.
+See [Design Decisions](#special-levels) for the exact rule we gave each one.
+
+---
+
+## Boss Fights
+
+Each chapter ends with a **Zomboss** — a two-lane monster with a segmented health bar,
+its own animation set, and a move list drawn from the document.
+
+| Boss | Moves |
+|------|-------|
+| 🐉 **Dragon** | Fireballs that scorch a tile for 4s and leave a Dragon Imp · sets both its rows ablaze · summons |
+| 🤖 **Robot** | Rocket strike that throws up two graves · charges forward and flattens its rows · summons through a portal |
+| 🦣 **Mammoth** | Ice missile · icy wind down two rows · freezes a whole column solid. Never moves, never summons |
+| 🦈 **Shark** | Spits baby sharks that swallow water plants · turbine that inhales everything in front of it |
+
+Clear a health segment and the boss reels back, stunned and vulnerable. It slides
+smoothly between lane pairs, plays a different clip for every move, and — unlike every
+other zombie — it cannot be mown down by a lawnmower or hypnotised off the board.
+
+---
+
+## Minigames
+
+Reachable from **Quests & Minigames**, each with three difficulty tiers.
+
+| Minigame | The twist |
+|----------|-----------|
+| 🏺 **Vasebreaker** | Break vases blind — some hide zombies, some hide seed packets that fade if you dawdle |
+| 🎳 **Wall-nut Bowling** | Bowl nuts from behind the red line; they ricochet diagonally off each zombie they flatten |
+| 🧟 **I, Zombie** | You play the horde — buy zombies with sun and eat five brains through a pre-built garden |
+| 💎 **Beghouled** | Match three plants to clear them, bank combos, buy upgrades, and survive the trickle of zombies |
+| 🌱 **Zombotany** | Zombies wearing plant heads: peashooter zombies snipe your defences, jalapeño zombies torch a lane |
+| 🏆 **Scoring Game** | An endless run scored on five patterns — multi-kills, speed kills, mass kills, streaks and untouched mowers |
+
+---
+
+## Between Battles
+
+| Screen | What it's for |
+|--------|---------------|
+| **Almanac** | Every plant and zombie, animated, with full stats. Zombies stay silhouetted until you meet them |
+| **Greenhouse** | Twelve pots on real timers. Marigolds pay coins; other plants bank a free plant-food boost for your next level |
+| **Shop** | Pots, plant food, seed bundles, currency exchange, and a date-seeded daily offer at 20% off |
+| **Travel Log** | 20 quests across critical / high / daily pages, with live progress bars and real payouts |
+| **Leaderboard** | Sortable by miopoint score, minigames won, quests done or levels cleared |
+| **Profile** | Rename, re-email, change password, and see your run totals |
+| **Settings** | Difficulty, game speed, music and SFX volume, lawn grid overlay, fullscreen, debug mode |
+| **News** | Everything the game wants to tell you: new zombies met, levels unlocked, chapters cleared |
+
+---
+
+# Part II — The Code
+
+## Architecture
+
+A Gradle multi-module build. `core` holds every rule and every pixel; `lwjgl3` is a
+thirty-line launcher. The logic layer knows nothing about libGDX-the-backend, so the
+same rules already drive two different front-ends — the graphical game and the parked CLI.
+
+```
+group-33/
+├── core/                       everything: rules + rendering
+│   └── src/main/java/
+│       ├── models/             the game's nouns — no behaviour that needs a controller
+│       │   ├── entities/       PlantType (69) · ZombieType (38) · armour decorators
+│       │   ├── game/           GameSession · PlacedPlant · Projectile · Sun · ScoreTracker
+│       │   ├── map/            Grid · Tile · TerrainType
+│       │   ├── progress/       Chapter → Level → SpecialLevel / BossLevel
+│       │   ├── quest/ shop/ user/ settings/
+│       │   └── enums/regexes/  every command pattern, one enum per menu
+│       ├── controllers/
+│       │   ├── managers/       the tick loop: Combat · ZombieBehavior · Planting ·
+│       │   │                   Wave · Sun · Projectile · Minigame · Zomboss ·
+│       │   │                   ChapterEnvironment · PlantFoodEffects · ShotPatterns
+│       │   └── menuControllers/ one controller per screen
+│       ├── views/
+│       │   ├── screens/        14 scene2d screens
+│       │   ├── battle/         LawnView · EntityAnimator · Lawn · ConveyorBar · Dialogue
+│       │   ├── assets/         Art · Animations · AnimationCatalog · Audio
+│       │   └── ui/             skin, reusable widgets, Display (fullscreen)
+│       ├── database/           flat-file DAOs
+│       └── utils/              FileStore · UserDataStore · SessionStore · PasswordHasher
+├── lwjgl3/                     desktop launcher (LWJGL3 backend)
+├── assets/                     3 030 tracked files — atlases, PAM animations, skin, data
+├── tools/build_atlases.py      turns the game's RESOURCES.json into libGDX atlases
+├── config/                     Checkstyle + PMD rulesets
+├── docs/screenshots/           the images in this README
+└── legacy-cli/                 the phase-1 CLI, parked but intact
+```
+
+**The tick loop.** The model runs on a fixed clock: `GameSession.TICKS_PER_SECOND = 10`.
+`BattleScreen` accumulates real frame time, converts it into whole ticks (scaled by the
+player's game-speed setting, capped per frame so a stutter can't fast-forward the game),
+and calls `session.advanceTime(1)` for each one. The renderer interpolates between ticks,
+so the game logic stays deterministic and testable while the picture stays smooth.
+
+**Why the view never guesses.** `LawnView` watches the model rather than being told what
+to draw. It diffs health to flash damage, diffs cooldowns to trigger attack clips, diffs
+positions to spawn storms, diffs the plant list to puff a cloud of dirt where something
+was just planted, and diffs the zombie list to lay down a corpse — or a pile of ash, if a
+blast went off nearby. No controller ever calls a view method.
+
+---
+
+## The Graphics Pipeline
+
+There are no sprite sheets in this project. Everything is rendered from the original
+game's own vector animation format.
+
+```
+ assets/RESOURCES.json  ──►  tools/build_atlases.py  ──►  780 libGDX .atlas descriptors
+                                                            (42 246 regions)
+ assets/IMAGES/**.PAM   ──►  libPVZ (PamPlayer)      ──►  1 458 skeletal animations
+                                                            resolved by clip name
+```
+
+1. **Atlases.** The asset dump ships one giant `RESOURCES.json` plus packed PNGs.
+   `tools/build_atlases.py` reads that manifest and emits a libGDX `.atlas` next to every
+   page, so `TextureAtlas` can find any of the 42 246 regions by name.
+
+2. **Animations.** `.PAM` is PopCap's skeletal format. We render it with
+   [libPVZ](https://github.com/pizpizi/libPVZ), wrapped in `views/assets/Animations` —
+   which indexes `animations.json`, caches clip handles and bounds, and degrades to a
+   still texture rather than crashing if anything is missing.
+
+3. **Naming.** `AnimationCatalog` is the single map from a game concept to an animation
+   and a clip: every plant, every zombie, boss move sets, armour part names for the three
+   damage stages, mower per chapter, and the effect library (poof, ash, ripple, splat,
+   splash, sandstorm, fire tile…).
+
+4. **Placement.** `EntityAnimator` converts clip bounds into lawn coordinates — one unit
+   scale for plants and one for zombies so relative sizes stay honest, plus helpers to
+   anchor a sprite by its centre or by its feet. That last one matters: the Dragon
+   Zomboss extends 506 units *above* its origin, so anchoring it by the centre buried it
+   behind the seed tray.
+
+**Lawn geometry is derived, never hard-coded.** `Lawn.configure()` takes the chapter
+background, works out how `Scaling.fill` will letterbox it, and computes the grid from
+fractions of the image. One set of numbers aligns plants to the painted tiles in all four
+chapters, at any window size.
+
+---
+
+## Build & Code Quality
 
 | Task | What it does |
 |------|--------------|
-| `gradlew build` | Compiles every module. |
-| `gradlew :lwjgl3:run` | Compiles and starts the game. |
-| `gradlew lint` | Runs **Checkstyle + PMD** on `core` together. |
-| `gradlew :core:checkstyleMain` | Naming, line length (≤120), method length (≤50), unused imports. |
-| `gradlew :core:pmdMain` | Unused locals/fields/methods/parameters, `NcssCount` (method ≤50, class ≤500). |
+| `./gradlew build` | Compiles every module |
+| `./gradlew :lwjgl3:run` | Compiles and starts the game |
+| `./gradlew lint` | Runs **Checkstyle + PMD** over `core` |
+| `./gradlew :lwjgl3:jar` | Fat jar into `lwjgl3/build/libs/` |
 
-The linters run against `core` only — `lwjgl3` is launcher boilerplate. The rules in
-`config/checkstyle/checkstyle.xml` and `config/pmd/ruleset.xml` mirror exactly the
-Checkstyle/PMD rules listed in the course document. Reports are written to
+The rulesets in `config/` mirror exactly the Checkstyle and PMD rules named in the course
+document: naming conventions, line length ≤ 120, method length ≤ 50, unused imports,
+unused locals / fields / methods / parameters, and NCSS counts.
+
+**Current state: Checkstyle reports 0 violations.** PMD reports 2, both the same
+`NcssCount` note about `LawnView` and `BattleScreen` being large classes — they are the
+renderer and the battle HUD, and we judged splitting working, verified rendering code
+purely to satisfy a size metric to be the worse trade. Reports land in
 `core/build/reports/{checkstyle,pmd}/main.html`.
+
+The linters run on `core` only; `lwjgl3` is launcher boilerplate.
 
 ---
 
+## How We Verified It
+
+Reading code finds the bugs you thought to look for. We wrote throwaway harnesses to
+find the rest, ran them against the real game, then deleted them.
+
+| Harness | What it drove | Result |
+|---------|---------------|--------|
+| **Art audit** | Every one of the 69 plants, 38 zombies and 33 effect animations: does the animation exist, does the clip resolve, are the bounds valid, do the `attack` / `eat` / `die` / ability clips exist, are all three armour damage-stage parts present in the PAM? | Found the one plant with no animation at all |
+| **Plant audit** | Planted all 69 plants into a live session and ran 30 seconds: sun producers must produce, attackers must draw blood, walls must survive, mints must release and vanish, Ice-shroom must freeze, Magnet-shroom must strip metal | 0 failures |
+| **Zombie audit** | All 38 zombies walking and eating, plus **25 signature abilities** asserted individually — Ra stealing sun, tomb raising, torch burning, hunter freezing, octopus wrapping, wizard sheeping, fisherman hooking, gargantuar imp-throwing, king knighting, turquoise lasering, prospector dynamite, pianist shuffling, newspaper and pharaoh raging, diver submerging, dodo hopping | 0 failures |
+| **Model fuzzer** | 160 randomised games across all chapters, levels and minigames — random planting, digging, feeding, sun collecting, vase breaking, swapping, zombie spawning — asserting ~21 000 invariants: no negative sun, no plant off the lawn, no two plants on a tile, no NaN positions, no zombie in a lane that doesn't exist, no runaway spawn counts | 0 violations |
+| **Menu fuzzer** | Shop, greenhouse, profile, leaderboard, travel log, registration and login hammered with `-5`, `0`, `MAX_VALUE`, `null`, empty strings, NUL bytes, SQL-looking strings and non-Latin text | Found an integer-overflow exploit and six crashes |
+| **Screen regression** | All 14 menus plus 16 full battles (10 adventure levels, 6 minigames) launched, played and screenshotted | 0 exceptions |
+
+The fuzzers earned their keep: the shop's price arithmetic overflowed on a large enough
+purchase count, which made the "can you afford it?" check pass on a negative number and
+*minted currency*; and an unvalidated username went straight into a file path.
+
+---
+
+## Data & Persistence
+
+Plain UTF-8 text files, no database engine, human-readable and easy to inspect during
+marking. Everything lives in a `data/` folder beside the working directory — during
+development that is `assets/data/` (git-ignored); a packaged jar writes next to itself.
+
+```
+data/
+├── users/<username>.properties   account, wallet, difficulty, security question
+├── user_<username>.properties    per-user progress: chapters, plant levels, packets,
+│                                 greenhouse pots, quest state, preferences
+└── news_<username>.txt           the news feed
+```
+
+Usernames are validated before they ever touch a path, so nothing outside `data/` is
+reachable. Passwords are stored as SHA-256 hashes, never plaintext.
+
+---
+
+# Part III — Reference
+
 ## The Parked Command-Line Build (`legacy-cli/`)
 
-The phase-0 CLI is **not deleted** — it is moved out of the compiled source set so it
+The phase-1 CLI is **not deleted** — it is moved out of the compiled source set so it
 does not interfere with the graphical build:
 
 | Parked path | What it is |
@@ -116,11 +383,10 @@ does not interfere with the graphical build:
 | `legacy-cli/run_game.py` | the no-build-tool launcher script |
 | `legacy-cli/AP.iml` | the old IntelliJ module descriptor |
 
-`GameBoardPrinter` stayed in `core` (`core/src/main/java/views/`) — it is a pure
-text formatter with no input handling, and is still useful for debugging.
+`GameBoardPrinter` stayed in `core` (`core/src/main/java/views/`) — it is a pure text
+formatter with no input handling, and is still useful for debugging.
 
-**To bring the CLI back**, move the sources into `core`'s source set and restore the
-one call that was removed from `App.run()`:
+**To bring the CLI back**, move the sources into `core`'s source set:
 
 ```bash
 git mv legacy-cli/src/views/menus core/src/main/java/views/menus
@@ -136,9 +402,12 @@ Then add an `application` block to `core/build.gradle` with `mainClass = 'Main'`
 
 ## General Menu Rules
 
-> The command reference below documents the **parked CLI** build. It is kept as the
-> specification of the game's rules and flows — the graphical screens implement the
-> same behaviour, so this stays the reference for what each action must do.
+> **What this section is.** Everything from here to the end documents the command
+> language of the parked CLI. We keep it because it is the most precise written
+> specification of the game's rules that we have: every graphical screen implements the
+> same behaviour, so if you want to know exactly what an action does — what it validates,
+> what it costs, what it prints — this is the reference. The `data/` files it describes
+> are the same ones the graphical game reads and writes.
 
 These commands work in **every** menu:
 
@@ -484,7 +753,7 @@ The doc explicitly leaves many details to the team. This section documents **our
 
 ### Levels & Chapters
 
-The adventure has **4 chapters**, each with **4 levels** in a fixed order: an ordinary level, two special levels, then a boss level (**boss levels are Phase 2**, so they are placeholders here). Chapters unlock in order — you must finish a chapter to open the next one (or use the [`unlock-chapters` cheat](#cheat-commands)).
+The adventure has **4 chapters**, each with **4 levels** in a fixed order: an ordinary level, two special levels, then a boss level. Chapters unlock in order — you must finish a chapter to open the next one (or use the [`unlock-chapters` cheat](#cheat-commands)).
 
 Enter a chapter at its furthest-unlocked level:
 
@@ -502,10 +771,10 @@ menu enter chapter -c <chaptername> -l <level>
 
 | Chapter | L1 | L2 | L3 | L4 | Extra zombies |
 |---------|----|----|----|----|---------------|
-| **Egypt** | Ordinary | Conveyor Belt | Locked Plants | Boss *(P2)* | Ra, Explorer, Tomb Raiser, Pharaoh, Camel |
-| **Frost Bite** | Ordinary | Save Our Seeds | Timed War | Boss *(P2)* | Dodo, Hunter, Troglobite, Weasel Hoarder |
-| **Wavey Beach** | Ordinary | Dead Line | Love Your Plants | Boss *(P2)* | Fisherman, Octopus, Snorkel, Surfer, Fast Swimmer |
-| **Dark Ages** | Ordinary | Night Ops | Plant What You Get | Boss *(P2)* | Juggler, Wizard, King, Imp Dragon |
+| **Egypt** | Ordinary | Conveyor Belt | Locked Plants | Robot Zomboss | Ra, Explorer, Tomb Raiser, Pharaoh, Camel |
+| **Frost Bite** | Ordinary | Save Our Seeds | Timed War | Mammoth Zomboss | Dodo, Hunter, Troglobite, Weasel Hoarder |
+| **Wavey Beach** | Ordinary | Dead Line | Love Your Plants | Shark Zomboss | Fisherman, Octopus, Snorkel, Surfer, Fast Swimmer |
+| **Dark Ages** | Ordinary | Night Ops | Plant What You Get | Dragon Zomboss | Juggler, Wizard, King, Imp Dragon |
 
 Chapter names accept any spacing/casing: `Egypt`, `Frost Bite`/`frostbite`, `Wavey Beach`/`waveybeach`, `Dark Ages`/`darkages`.
 
