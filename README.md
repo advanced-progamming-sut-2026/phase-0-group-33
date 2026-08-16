@@ -218,7 +218,7 @@ Reachable from **Quests & Minigames**, each with three difficulty tiers.
 ## Architecture
 
 A Gradle multi-module build. `core` holds every rule and every pixel; `lwjgl3` is a
-thirty-line launcher. The logic layer knows nothing about libGDX-the-backend, so the
+twenty-two-line launcher. The logic layer knows nothing about libGDX-the-backend, so the
 same rules already drive two different front-ends — the graphical game and the parked CLI.
 
 ```
@@ -255,8 +255,9 @@ group-33/
 **The tick loop.** The model runs on a fixed clock: `GameSession.TICKS_PER_SECOND = 10`.
 `BattleScreen` accumulates real frame time, converts it into whole ticks (scaled by the
 player's game-speed setting, capped per frame so a stutter can't fast-forward the game),
-and calls `session.advanceTime(1)` for each one. The renderer interpolates between ticks,
-so the game logic stays deterministic and testable while the picture stays smooth.
+and calls `session.advanceTime(1)` for each one. Animation clocks, on the other hand, run
+on raw frame time — so the simulation stays deterministic and reproducible while the
+picture stays smooth at any frame rate.
 
 **Why the view never guesses.** `LawnView` watches the model rather than being told what
 to draw. It diffs health to flash damage, diffs cooldowns to trigger attack clips, diffs
