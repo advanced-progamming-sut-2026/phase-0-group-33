@@ -93,6 +93,7 @@ public final class AnimationCatalog {
 
     private static final ObjectMap<String, models.entities.plant.PlantType> ZOMBOTANY =
             new ObjectMap<>();
+    private static final ObjectMap<String, String> RIDE = new ObjectMap<>();
     private static final ObjectMap<String, String> ABILITY = new ObjectMap<>();
     private static final ObjectMap<String, String> BITE = new ObjectMap<>();
 
@@ -104,6 +105,9 @@ public final class AnimationCatalog {
         ABILITY.put("Explorer", "power");
         ABILITY.put("Turquoise", "power");
         ABILITY.put("Fisherman", "cast");
+
+        RIDE.put("Surfer", "walk_board");
+        RIDE.put("Piano", "idle");
 
         ZOMBOTANY.put("Peashooter Zombie", models.entities.plant.PlantType.PEASHOOTER);
         ZOMBOTANY.put("Wall-nut Zombie", models.entities.plant.PlantType.WALL_NUT);
@@ -117,6 +121,10 @@ public final class AnimationCatalog {
 
     public static models.entities.plant.PlantType zombotanyHead(ZombieType type) {
         return ZOMBOTANY.get(type.getName());
+    }
+
+    public static String rideClip(ZombieType type) {
+        return RIDE.get(type.getName());
     }
 
     public static String abilityClip(ZombieType type) {
@@ -207,6 +215,14 @@ public final class AnimationCatalog {
             default:
                 return new String[] {"idle"};
         }
+    }
+
+    public static String mount(ZombieType type) {
+        return type == ZombieType.PIANO ? "PIANO" : null;
+    }
+
+    public static String[] mountClips(ZombieType type) {
+        return new String[] {"idle", "play"};
     }
 
     public static String pushed(models.game.PushedObject.Kind kind) {

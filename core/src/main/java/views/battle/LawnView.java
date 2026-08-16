@@ -1617,6 +1617,12 @@ public class LawnView extends Actor {
             clip = bite != null && animator.hasZombieClip(zombie.getType(), bite)
                     ? animator.zombieClip(zombie.getType(), bite, "eat", "idle")
                     : animator.zombieClip(zombie.getType(), "eat", "attack", "walk", "idle");
+        } else if (views.assets.AnimationCatalog.rideClip(zombie.getType()) != null
+                && animator.hasZombieClip(zombie.getType(),
+                        views.assets.AnimationCatalog.rideClip(zombie.getType()))) {
+            drawMount(batch, zombie, centerX, feet);
+            clip = animator.zombieClip(zombie.getType(),
+                    views.assets.AnimationCatalog.rideClip(zombie.getType()), "walk", "idle");
         } else if (isPushing(zombie)) {
             clip = animator.zombieClip(zombie.getType(), "push", "walk", "idle");
         } else {
@@ -1630,6 +1636,31 @@ public class LawnView extends Actor {
                 animator.zombieScale() * popScale(zombie), true,
                 animator.armourFor(zombie.getType(), armourFraction(zombie)));
         return true;
+    }
+
+    private void drawMount(Batch batch, models.entities.zombie.Zombie zombie,
+                           float centerX, float feet) {
+        String animation = views.assets.AnimationCatalog.mount(zombie.getType());
+        if (animation == null) {
+            return;
+        }
+        String clipName = animator.clipName(animation,
+                views.assets.AnimationCatalog.mountClips(zombie.getType()));
+        ClipRef clip = clipName == null ? null : animator.namedClip(animation, clipName);
+        if (clip == null) {
+            return;
+        }
+        float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 0.95f);
+        if (scale <= 0f) {
+            return;
+        }
+        float anchor = animator.bottomOffset(animation, clipName, scale);
+        Color previous = batch.getColor().cpy();
+        batch.setColor(Color.WHITE);
+        animator.draw(batch, clip, time, centerX,
+                Lawn.rowBottom((int) zombie.getPosition().getY())
+                        + Lawn.cellHeight() * 0.12f - anchor, scale, true, null);
+        batch.setColor(previous);
     }
 
     private boolean isPushing(models.entities.zombie.Zombie zombie) {

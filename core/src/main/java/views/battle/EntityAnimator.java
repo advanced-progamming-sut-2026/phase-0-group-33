@@ -106,6 +106,11 @@ public final class EntityAnimator {
         return bounds == null || bounds.height <= 0f ? 0f : target / bounds.height;
     }
 
+    public float fitWidth(String animation, String clip, float target) {
+        com.badlogic.gdx.math.Rectangle bounds = animations.bounds(animation, clip);
+        return bounds == null || bounds.width <= 0f ? 0f : target / bounds.width;
+    }
+
     public float bottomOffset(String animation, String clip, float scale) {
         com.badlogic.gdx.math.Rectangle bounds = animations.bounds(animation, clip);
         return bounds == null ? 0f : -(bounds.y + bounds.height) * scale;
