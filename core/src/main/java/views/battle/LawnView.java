@@ -1620,7 +1620,7 @@ public class LawnView extends Actor {
         } else if (views.assets.AnimationCatalog.rideClip(zombie.getType()) != null
                 && animator.hasZombieClip(zombie.getType(),
                         views.assets.AnimationCatalog.rideClip(zombie.getType()))) {
-            drawMount(batch, zombie, centerX, feet);
+            drawMount(batch, zombie, centerX);
             clip = animator.zombieClip(zombie.getType(),
                     views.assets.AnimationCatalog.rideClip(zombie.getType()), "walk", "idle");
         } else if (isPushing(zombie)) {
@@ -1638,8 +1638,7 @@ public class LawnView extends Actor {
         return true;
     }
 
-    private void drawMount(Batch batch, models.entities.zombie.Zombie zombie,
-                           float centerX, float feet) {
+    private void drawMount(Batch batch, models.entities.zombie.Zombie zombie, float centerX) {
         String animation = views.assets.AnimationCatalog.mount(zombie.getType());
         if (animation == null) {
             return;
