@@ -354,6 +354,8 @@ purchase count, which made the "can you afford it?" check pass on a negative num
 Plain UTF-8 text files, no database engine, human-readable and easy to inspect during
 marking. Everything lives in a `data/` folder beside the working directory — during
 development that is `assets/data/` (git-ignored); a packaged jar writes next to itself.
+The read-only seed data the game ships with (`plants.csv`, `zombies.xlsx`) lives in
+`core/src/main/java/database/csv/`.
 
 ```
 data/
