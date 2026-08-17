@@ -41,7 +41,8 @@ public class LawnView extends Actor {
     private static final String SANDSTORM = "SANDSTORM_TOP";
     private static final String SNOWSTORM = "SNOWSTORM_TOP";
     private static final float STORM_LIFE = 1.4f;
-    private static final float MOWER_RUN = 1.6f;
+    private static final float MOWER_RUN = 2.2f;
+    private static final float MOWER_START = 0.35f;
     private static final String FIRE_TILE = "FIRETILE";
     private static final String BOOM = "CHERRYBOMB_EXPLOSION_TOP";
     private static final String POOF = "PLANT_POOF";
@@ -469,7 +470,8 @@ public class LawnView extends Actor {
         for (int row = 1; row <= GameSession.ROWS; row++) {
             boolean present = session.hasLawnMower(row);
             if (mowerSeen[row] && !present) {
-                mowerRun[row] = time;
+                mowerRun[row] = Math.max(time, 0.0001f);
+                shakePending = true;
             }
             mowerSeen[row] = present;
         }
@@ -812,6 +814,7 @@ public class LawnView extends Actor {
         drawTideLine(batch);
         drawSpecialMarkers(batch);
         drawEntities(batch);
+        drawDrivingMowers(batch);
         drawStorms(batch);
         batch.setColor(previous);
     }
@@ -1017,25 +1020,52 @@ public class LawnView extends Actor {
         }
         float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 0.7f);
         float lift = animator.centreOffset(animation, clipName, scale);
-        ClipRef running = animator.namedClip(animation, "attack", "idle");
         for (int row = 1; row <= GameSession.ROWS; row++) {
-            if (session.hasLawnMower(row)) {
-                animator.draw(batch, clip, time + row * 0.21f,
-                        Lawn.left() - Lawn.cellWidth() * 0.45f,
-                        Lawn.rowBottom(row) + Lawn.cellHeight() * 0.46f + lift, scale, true, null);
+            if (!session.hasLawnMower(row)) {
                 continue;
             }
-            float age = time - mowerRun[row];
-            if (mowerRun[row] <= 0f || age > MOWER_RUN) {
-                continue;
-            }
-            float progress = age / MOWER_RUN;
-            float x = Lawn.left() - Lawn.cellWidth() * 0.45f
-                    + progress * (Lawn.width() + Lawn.cellWidth());
-            animator.draw(batch, running == null ? clip : running, age, x,
+            animator.draw(batch, clip, time + row * 0.21f,
+                    Lawn.left() - Lawn.cellWidth() * 0.45f,
                     Lawn.rowBottom(row) + Lawn.cellHeight() * 0.46f + lift, scale, true, null);
         }
         return true;
+    }
+
+    private void drawDrivingMowers(Batch batch) {
+        if (!animator.isReady()) {
+            return;
+        }
+        String animation = views.assets.AnimationCatalog.mower(chapterName);
+        String idleName = animator.clipName(animation, "idle");
+        if (idleName == null) {
+            return;
+        }
+        float scale = animator.fitScale(animation, idleName, Lawn.cellHeight() * 0.7f);
+        float lift = animator.centreOffset(animation, idleName, scale);
+        float parked = Lawn.left() - Lawn.cellWidth() * 0.45f;
+        for (int row = 1; row <= GameSession.ROWS; row++) {
+            if (session.hasLawnMower(row) || mowerRun[row] <= 0f) {
+                continue;
+            }
+            float age = time - mowerRun[row];
+            if (age < 0f || age > MOWER_START + MOWER_RUN) {
+                continue;
+            }
+            String wanted = age < MOWER_START ? "transition" : "attack";
+            String clipName = animator.clipName(animation, wanted, "attack", "idle");
+            ClipRef clip = clipName == null ? null : animator.namedClip(animation, clipName);
+            if (clip == null) {
+                continue;
+            }
+            float x = parked;
+            if (age >= MOWER_START) {
+                float progress = (age - MOWER_START) / MOWER_RUN;
+                x = parked + progress * (Lawn.width() + Lawn.cellWidth() * 1.4f);
+            }
+            batch.setColor(Color.WHITE);
+            animator.draw(batch, clip, age < MOWER_START ? age : age - MOWER_START, x,
+                    Lawn.rowBottom(row) + Lawn.cellHeight() * 0.46f + lift, scale, true, null);
+        }
     }
 
     private void drawHover(Batch batch) {
