@@ -606,13 +606,22 @@ public class MinigameManager {
         if (source == null || target == null) {
             return Result.fail("No upgrade exists for this plant.");
         }
+        List<PlacedPlant> targets = new ArrayList<>();
+        for (PlacedPlant plant : session.getPlants()) {
+            if (plant.getType() == source) {
+                targets.add(plant);
+            }
+        }
+        if (targets.isEmpty()) {
+            return Result.fail("There is no " + source.getName() + " on the board to upgrade.");
+        }
         int cost = upgradeCost(source);
         if (!session.getSunManager().spendSun(cost)) {
             return Result.fail("This upgrade costs " + cost + " sun and you have "
                     + session.getSunManager().getSunBalance() + ".");
         }
         int upgraded = 0;
-        for (PlacedPlant plant : new ArrayList<>(session.getPlants())) {
+        for (PlacedPlant plant : targets) {
             if (plant.getType() == source) {
                 int x = plant.getX();
                 int y = plant.getY();
