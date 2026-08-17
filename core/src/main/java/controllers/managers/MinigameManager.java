@@ -26,6 +26,7 @@ public class MinigameManager {
     private static final int BELT_INTERVAL_TICKS = 12 * GameSession.TICKS_PER_SECOND;
     private static final int PACKET_LIFETIME_TICKS = 30 * GameSession.TICKS_PER_SECOND;
     private static final int LANE_STEP_TICKS = 3;
+    private static final double NUT_SPEED = 0.18;
     private static final List<PlantType> BOWLING_NUTS = List.of(
             PlantType.WALL_NUT, PlantType.EXPLODE_O_NUT, PlantType.TALL_NUT);
     private static final List<PlantType> BEGHOULED_TYPES = List.of(
@@ -226,7 +227,7 @@ public class MinigameManager {
 
     private void moveNuts() {
         for (RollingNut nut : new ArrayList<>(nuts)) {
-            nut.setX(nut.getX() + 0.3);
+            nut.setX(nut.getX() + NUT_SPEED);
             driftNut(nut);
             if (nut.getX() > GameSession.COLS + 0.5) {
                 nuts.remove(nut);
@@ -277,10 +278,16 @@ public class MinigameManager {
         if (direction == 0) {
             direction = session.getRandom().nextBoolean() ? 1 : -1;
         } else {
-            direction = 0;
+            direction = -direction;
+        }
+        int next = nut.getRow() + direction;
+        if (next < 1 || next > GameSession.ROWS) {
+            direction = -direction;
         }
         nutDirections.put(nut, direction);
-        nutSteps.put(nut, 0);
+        nutSteps.put(nut, LANE_STEP_TICKS);
+        System.out.printf("The nut ricocheted towards lane %d.%n",
+                Math.max(1, Math.min(GameSession.ROWS, nut.getRow() + direction)));
     }
 
     private void driftNut(RollingNut nut) {
