@@ -84,8 +84,7 @@ public class CombatManager {
         boolean acted;
         switch (type.getCategory()) {
             case SUN_PRODUCER:
-                produceSun(plant);
-                acted = true;
+                acted = produceSun(plant);
                 break;
             case SHOOTER:
                 acted = shoot(plant, false);
@@ -114,15 +113,16 @@ public class CombatManager {
         }
     }
 
-    private void produceSun(PlacedPlant plant) {
+    private boolean produceSun(PlacedPlant plant) {
         if (plant.isSunPending()) {
-            return;
+            return false;
         }
         int value = productionValue(plant);
         session.getSunManager().addProducedSun(plant.getX(), plant.getY(), value);
         plant.setSunPending(true);
         System.out.printf("plant %s produced a sun at (%d, %d)%n",
                 plant.getType().getName(), plant.getX(), plant.getY());
+        return true;
     }
 
     private int productionValue(PlacedPlant plant) {
