@@ -81,24 +81,26 @@ public class CombatManager {
             plant.setActionCooldownTicks((int) Math.round(interval * GameSession.TICKS_PER_SECOND));
             return;
         }
+        boolean acted;
         switch (type.getCategory()) {
             case SUN_PRODUCER:
                 produceSun(plant);
+                acted = true;
                 break;
             case SHOOTER:
-                shoot(plant, false);
+                acted = shoot(plant, false);
                 break;
             case STRIKE_THROUGH:
-                strikeThrough(plant);
+                acted = strikeThrough(plant);
                 break;
             case LOBBER:
-                lob(plant);
+                acted = lob(plant);
                 break;
             case HOMING:
-                homingShot(plant);
+                acted = homingShot(plant);
                 break;
             case MELEE:
-                meleeHit(plant);
+                acted = meleeHit(plant);
                 break;
             case EXPLOSIVE:
                 trapCheck(plant);
@@ -106,7 +108,10 @@ public class CombatManager {
             default:
                 return;
         }
-        plant.setActionCooldownTicks((int) Math.round(interval * GameSession.TICKS_PER_SECOND));
+        if (acted) {
+            plant.setActionCooldownTicks(
+                    (int) Math.round(interval * GameSession.TICKS_PER_SECOND));
+        }
     }
 
     private void produceSun(PlacedPlant plant) {
@@ -134,10 +139,10 @@ public class CombatManager {
         }
     }
 
-    void shoot(PlacedPlant plant, boolean pierceGraves) {
+    boolean shoot(PlacedPlant plant, boolean pierceGraves) {
         Zombie target = firstZombieInRowAfter(plant.getY(), plant.getX());
         if (target == null) {
-            return;
+            return false;
         }
         if (!pierceGraves) {
             Tile grave = graveBetween(plant.getY(), plant.getX(), target.getPosition().getX());
@@ -146,25 +151,26 @@ public class CombatManager {
                 if (grave.getTerrain() != TerrainType.GRAVE) {
                     grantGraveContent(grave);
                 }
-                return;
+                return true;
             }
             models.game.PushedObject pushed = pushedObjectBetween(
                     plant.getY(), plant.getX(), target.getPosition().getX());
             if (pushed != null) {
                 pushed.damage(plantDamage(plant.getType()));
-                return;
+                return true;
             }
             PlacedPlant blocked = disabledPlantBetween(
                     plant.getY(), plant.getX(), target.getPosition().getX());
             if (blocked != null) {
                 damageDisablingLayer(blocked, plant.getType());
-                return;
+                return true;
             }
         }
         int shots = plant.getType() == PlantType.PEA_POD ? plant.getStackCount() : 1;
         for (int i = 0; i < shots; i++) {
             session.getProjectileManager().launchStraight(plant, plant.getY(), 1);
         }
+        return true;
     }
 
     void launchToward(PlacedPlant plant, int row, int direction) {
@@ -172,22 +178,26 @@ public class CombatManager {
     }
 
 
-    private void strikeThrough(PlacedPlant plant) {
+    private boolean strikeThrough(PlacedPlant plant) {
+        if (firstZombieInRowAfter(plant.getY(), plant.getX()) == null) {
+            return false;
+        }
         session.getProjectileManager().launchPiercing(plant);
+        return true;
     }
 
-    private void lob(PlacedPlant plant) {
+    private boolean lob(PlacedPlant plant) {
         Zombie target = firstZombieInRowAfter(plant.getY(), plant.getX());
         if (target == null) {
-            return;
+            return false;
         }
         session.getProjectileManager().launchLob(plant, target.getPosition().getX());
+        return true;
     }
 
-    private void homingShot(PlacedPlant plant) {
+    private boolean homingShot(PlacedPlant plant) {
         if (plant.getType() == PlantType.ELECTRIC_BLUEBERRY) {
-            randomLightning(plant);
-            return;
+            return randomLightning(plant);
         }
         Zombie target = null;
         double best = Double.MAX_VALUE;
@@ -199,22 +209,27 @@ public class CombatManager {
                 target = zombie;
             }
         }
-        if (target != null) {
-            int row = (int) target.getPosition().getY();
-            int direction = target.getPosition().getX() >= plant.getX() ? 1 : -1;
-            session.getProjectileManager().launchStraight(plant, row, direction);
+        if (target == null) {
+            return false;
         }
+        int row = (int) target.getPosition().getY();
+        int direction = target.getPosition().getX() >= plant.getX() ? 1 : -1;
+        session.getProjectileManager().launchStraight(plant, row, direction);
+        return true;
     }
 
-    private void meleeHit(PlacedPlant plant) {
+    private boolean meleeHit(PlacedPlant plant) {
+        boolean hit = false;
         for (Zombie zombie : zombiesInRowAfter(plant.getY(), plant.getX() - 0.5)) {
             if (zombie.getPosition().getX() <= plant.getX() + 1.5) {
                 hitZombie(zombie, plant);
+                hit = true;
                 if (!plant.getType().getTags().contains(PlantTag.AOE)) {
-                    return;
+                    return true;
                 }
             }
         }
+        return hit;
     }
 
     private void trapCheck(PlacedPlant plant) {
@@ -315,15 +330,16 @@ public class CombatManager {
         damageZombie(zombie, damage, source);
     }
 
-    private void randomLightning(PlacedPlant plant) {
+    private boolean randomLightning(PlacedPlant plant) {
         List<Zombie> candidates = new ArrayList<>(session.getZombies());
         if (candidates.isEmpty()) {
-            return;
+            return false;
         }
         Zombie target = candidates.get(session.getRandom().nextInt(candidates.size()));
         System.out.printf("Electric Blueberry struck the %s with lightning!%n",
                 target.getType().getName());
         damageZombie(target, INSTANT_KILL_DAMAGE, plant.getType());
+        return true;
     }
 
     private void tickPoison(Zombie zombie) {
