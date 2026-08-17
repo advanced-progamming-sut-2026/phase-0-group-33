@@ -103,6 +103,8 @@ public class LawnView extends Actor {
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, Float> hopping =
             new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, Float> breaking =
+            new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.Array<Corpse> corpses = new com.badlogic.gdx.utils.Array<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, float[]> seen =
             new com.badlogic.gdx.utils.ObjectMap<>();
@@ -222,6 +224,7 @@ public class LawnView extends Actor {
         trackDeaths();
         trackStorms();
         trackMowers();
+        expireBreakClips();
         trackDiving();
         trackBirths();
         trackShots();
@@ -245,6 +248,29 @@ public class LawnView extends Actor {
         }
         effects.add(new Fx(animation, clip, x, row, time,
                 time + Math.min(duration, life), height, lift));
+    }
+
+    private void noteBreakClip(models.entities.zombie.Zombie zombie) {
+        String clip = views.assets.AnimationCatalog.breakClip(zombie.getType());
+        if (clip == null || !animator.hasZombieClip(zombie.getType(), clip)) {
+            return;
+        }
+        float duration = animator.zombieClipDuration(zombie.getType(), clip);
+        breaking.put(zombie, time + (duration > 0f ? duration : 0.6f));
+    }
+
+    private void expireBreakClips() {
+        com.badlogic.gdx.utils.Array<models.entities.zombie.Zombie> settled =
+                new com.badlogic.gdx.utils.Array<>();
+        for (com.badlogic.gdx.utils.ObjectMap.Entry<models.entities.zombie.Zombie, Float> entry
+                : breaking.entries()) {
+            if (time >= entry.value || !session.getZombies().contains(entry.key)) {
+                settled.add(entry.key);
+            }
+        }
+        for (models.entities.zombie.Zombie zombie : settled) {
+            breaking.remove(zombie);
+        }
     }
 
     private void trackDiving() {
@@ -384,6 +410,7 @@ public class LawnView extends Actor {
             if (previous != null && previous > 0 && armour <= 0) {
                 addFx(ARMOUR_BREAK, "animation", (float) zombie.getPosition().getX(),
                         (int) zombie.getPosition().getY(), 1.2f, 0.7f, 1.25f);
+                noteBreakClip(zombie);
             }
         }
         for (models.entities.zombie.Zombie zombie : zombieKeys(lastArmour)) {
@@ -1688,11 +1715,21 @@ public class LawnView extends Actor {
         String[] stated = views.assets.AnimationCatalog.stateClips(zombie.getType(),
                 eating, zombie.totalArmor() > 0, zombie.getBattle().isCharging(),
                 zombie.getBattle().isSpinning(), hopping.containsKey(zombie));
-        if (busy != null && time < busy) {
+        Float shattering = breaking.get(zombie);
+        if (shattering != null && time < shattering) {
+            clip = animator.zombieClip(zombie.getType(),
+                    views.assets.AnimationCatalog.breakClip(zombie.getType()), "walk", "idle");
+        } else if (busy != null && time < busy) {
             clip = animator.zombieClip(zombie.getType(),
                     views.assets.AnimationCatalog.abilityClip(zombie.getType()), "walk", "idle");
         } else if (flights.containsKey(zombie)) {
-            clip = animator.zombieClip(zombie.getType(), "fly", "walk", "idle");
+            float[] flight = flights.get(zombie);
+            boolean landing = time > flight[2] - 0.25f;
+            clip = landing
+                    ? animator.zombieClip(zombie.getType(),
+                            views.assets.AnimationCatalog.landClip(zombie.getType()),
+                            "fly", "walk", "idle")
+                    : animator.zombieClip(zombie.getType(), "fly", "walk", "idle");
         } else if (eating && stated != null) {
             clip = animator.zombieClip(zombie.getType(), stated);
         } else if (eating) {

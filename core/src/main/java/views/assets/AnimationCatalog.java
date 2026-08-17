@@ -123,6 +123,33 @@ public final class AnimationCatalog {
         return ZOMBOTANY.get(type.getName());
     }
 
+    public static String breakClip(ZombieType type) {
+        switch (type) {
+            case NEWSPAPER:
+                return "newspaper_defeat";
+            case PHARAOH:
+                return "break_power";
+            case JUGGLER:
+                return "spinup";
+            case ALLSTAR:
+                return "tackle";
+            default:
+                return null;
+        }
+    }
+
+    public static String landClip(ZombieType type) {
+        switch (type) {
+            case IMP:
+            case IMP_DRAGON:
+                return "land";
+            case PROSPECTOR:
+                return "land";
+            default:
+                return null;
+        }
+    }
+
     public static String[] stateClips(ZombieType type, boolean eating, boolean armoured,
                                       boolean charging, boolean spinning, boolean hopping) {
         String action = eating ? "eat" : "walk";
