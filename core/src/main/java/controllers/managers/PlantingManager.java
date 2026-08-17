@@ -148,6 +148,11 @@ public class PlantingManager {
         return true;
     }
 
+    public boolean canStandOn(PlantType type, int x, int y) {
+        Tile tile = session.getGrid().getTile(x - 1, y - 1);
+        return tile != null && checkTerrain(type, tile) == null;
+    }
+
     private Result checkTerrain(PlantType type, Tile tile) {
         TerrainType terrain = tile.getTerrain();
         if (terrain == TerrainType.GRAVE && type != PlantType.GRAVE_BUSTER) {

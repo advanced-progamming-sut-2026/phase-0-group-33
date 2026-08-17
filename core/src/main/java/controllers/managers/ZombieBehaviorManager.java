@@ -299,8 +299,11 @@ public class ZombieBehaviorManager {
             session.removePlant(target, true);
             return;
         }
-        if (session.plantAt(target.getX() + 1, target.getY()) == null) {
-            target.setX(target.getX() + 1);
+        int landing = target.getX() + 1;
+        if (session.plantAt(landing, target.getY()) == null
+                && session.getPlantingManager().canStandOn(
+                        target.getType(), landing, target.getY())) {
+            target.setX(landing);
             System.out.printf("The Fisherman hooked %s one tile forward to (%d, %d).%n",
                     target.getType().getName(), target.getX(), target.getY());
         }
