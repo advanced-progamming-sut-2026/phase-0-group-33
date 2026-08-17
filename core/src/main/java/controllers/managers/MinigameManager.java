@@ -24,6 +24,7 @@ import java.util.Set;
 
 public class MinigameManager {
     private static final int BELT_INTERVAL_TICKS = 12 * GameSession.TICKS_PER_SECOND;
+    private static final int BOSS_BELT_INTERVAL_TICKS = 4 * GameSession.TICKS_PER_SECOND;
     private static final int PACKET_LIFETIME_TICKS = 30 * GameSession.TICKS_PER_SECOND;
     private static final int LANE_STEP_TICKS = 3;
     private static final double NUT_SPEED = 0.18;
@@ -179,7 +180,8 @@ public class MinigameManager {
             return;
         }
         beltTicks++;
-        if (beltTicks >= BELT_INTERVAL_TICKS && session.getSlots().size() < 8) {
+        int interval = session.isBossLevel() ? BOSS_BELT_INTERVAL_TICKS : BELT_INTERVAL_TICKS;
+        if (beltTicks >= interval && session.getSlots().size() < 8) {
             beltTicks = 0;
             addBeltSlot(session.getMode() == GameMode.WALLNUT_BOWLING
                     ? randomNutType() : randomUnlockedPlant());

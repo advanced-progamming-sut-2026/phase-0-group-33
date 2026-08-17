@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ZombossManager {
 
-    private static final int ABILITY_INTERVAL = 45;
+    private static final int ABILITY_INTERVAL = 130;
     private static final int FIRE_TICKS = 4 * GameSession.TICKS_PER_SECOND;
     private static final int SUMMON_CHANCE = 45;
     private static final int MOVE_CHANCE = 30;
