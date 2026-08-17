@@ -123,6 +123,23 @@ public final class AnimationCatalog {
         return ZOMBOTANY.get(type.getName());
     }
 
+    private static final ObjectMap<String, String[]> ATTACK_VARIANTS = new ObjectMap<>();
+
+    static {
+        ATTACK_VARIANTS.put("Bonk Choy",
+                new String[] {"attack", "attack2", "attack3", "attack4", "attack5"});
+        ATTACK_VARIANTS.put("Wasabi Whip",
+                new String[] {"attack", "attack2", "attack3", "attack4", "attack5"});
+        ATTACK_VARIANTS.put("Split Pea", new String[] {"attack", "attack2", "attack3"});
+        ATTACK_VARIANTS.put("Kernel-pult", new String[] {"attack", "attack2"});
+        ATTACK_VARIANTS.put("Grapeshot", new String[] {"attack", "attack_t2", "attack_t3"});
+        ATTACK_VARIANTS.put("Bowling Bulb", new String[] {"attack", "special2", "special3"});
+    }
+
+    public static String[] attackVariants(models.entities.plant.PlantType type) {
+        return ATTACK_VARIANTS.get(type.getName());
+    }
+
     public static String breakClip(ZombieType type) {
         switch (type) {
             case NEWSPAPER:

@@ -77,6 +77,8 @@ public class LawnView extends Actor {
     private final EntityAnimator animator;
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Float> firing =
             new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> attacks =
+            new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> lastCooldown =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, Integer> lastAbility =
@@ -821,6 +823,8 @@ public class LawnView extends Actor {
             float duration = animator.plantClipDuration(plant.getType(), clip);
             if (duration > 0f) {
                 firing.put(plant, time + duration);
+                Integer seen = attacks.get(plant);
+                attacks.put(plant, seen == null ? 1 : seen + 1);
             }
         }
         com.badlogic.gdx.utils.Array<models.game.PlacedPlant> stale =
@@ -833,6 +837,7 @@ public class LawnView extends Actor {
         for (models.game.PlacedPlant plant : stale) {
             lastCooldown.remove(plant);
             firing.remove(plant);
+            attacks.remove(plant);
             lastSunPending.remove(plant);
         }
     }
@@ -1672,11 +1677,24 @@ public class LawnView extends Actor {
         if (plant.getType().getName().toLowerCase().contains("mint")) {
             return new String[] {"loop", "idle"};
         }
+        int stage = growthStage(plant);
         if (plant.getPlantFoodTicks() > 0) {
+            if (stage > 0) {
+                return new String[] {"plantfood_stage" + stage, "plantfood", "plantfood_on",
+                    "special", "attack", "idle"};
+            }
             return new String[] {"plantfood", "plantfood_on", "special", "attack", "idle"};
         }
         Float until = firing.get(plant);
         if (until != null && time < until) {
+            if (stage > 0) {
+                return new String[] {"attack_stage" + stage, "special_stage" + stage,
+                    "attack", "special", "idle_stage" + stage, "idle"};
+            }
+            String variant = attackVariant(plant);
+            if (variant != null) {
+                return new String[] {variant, "attack", "special", "idle"};
+            }
             return new String[] {"attack", "special", "idle"};
         }
         if (until != null && time < until + RECOVER_TIME) {
@@ -1696,9 +1714,41 @@ public class LawnView extends Actor {
             return new String[] {"damage2", "damage", "idle2", "idle"};
         }
         if (plant.getArmTicks() > 0) {
-            return new String[] {"plant_idle", "idle2", "idle"};
+            return new String[] {"plant_idle", "plant", "idle2", "idle"};
+        }
+        if (stage > 0) {
+            return new String[] {"idle_stage" + stage, "idle_stage" + stage + "_",
+                "idle" + stage, "idle"};
         }
         return new String[] {"idle"};
+    }
+
+    private int growthStage(models.game.PlacedPlant plant) {
+        models.entities.plant.PlantType type = plant.getType();
+        if (type.getTags().contains(models.entities.plant.PlantTag.WRAMP_UP)) {
+            return Math.max(1, Math.min(3, plant.getGrowthStage()));
+        }
+        if (type.getTags().contains(models.entities.plant.PlantTag.STACK)
+                && type != models.entities.plant.PlantType.PUMPKIN
+                && type != models.entities.plant.PlantType.LILY_PAD) {
+            return Math.max(1, Math.min(5, plant.getStackCount()));
+        }
+        return 0;
+    }
+
+    private String attackVariant(models.game.PlacedPlant plant) {
+        String[] variants = views.assets.AnimationCatalog.attackVariants(plant.getType());
+        if (variants == null || variants.length == 0) {
+            return null;
+        }
+        int index = Math.abs(System.identityHashCode(plant) / 7 + attackCycle(plant))
+                % variants.length;
+        return variants[index];
+    }
+
+    private int attackCycle(models.game.PlacedPlant plant) {
+        Integer count = attacks.get(plant);
+        return count == null ? 0 : count;
     }
 
     private boolean drawZombieAnimation(Batch batch, models.entities.zombie.Zombie zombie,
