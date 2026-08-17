@@ -85,7 +85,7 @@ public class ShotPatterns {
     }
 
     private void diagonalShot(PlacedPlant plant) {
-        for (int row : new int[] { plant.getY() - 1, plant.getY() + 1 }) {
+        for (int row : new int[] { plant.getY() - 1, plant.getY(), plant.getY() + 1 }) {
             if (row < 1 || row > GameSession.ROWS) {
                 continue;
             }
