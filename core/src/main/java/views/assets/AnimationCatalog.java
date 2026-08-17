@@ -134,6 +134,11 @@ public final class AnimationCatalog {
         ATTACK_VARIANTS.put("Kernel-pult", new String[] {"attack", "attack2"});
         ATTACK_VARIANTS.put("Grapeshot", new String[] {"attack", "attack_t2", "attack_t3"});
         ATTACK_VARIANTS.put("Bowling Bulb", new String[] {"attack", "special2", "special3"});
+        ATTACK_VARIANTS.put("Chomper", new String[] {"bite", "attack"});
+        ATTACK_VARIANTS.put("Magnet-shroom", new String[] {"catch", "busy"});
+        ATTACK_VARIANTS.put("Tangle Kelp", new String[] {"attack_submerge", "attack"});
+        ATTACK_VARIANTS.put("Pea Pod", new String[] {"attack", "attack 2", "attack 3"});
+        ATTACK_VARIANTS.put("Cactus", new String[] {"attack", "attack_stretch"});
     }
 
     public static String[] attackVariants(models.entities.plant.PlantType type) {

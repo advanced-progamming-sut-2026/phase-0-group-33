@@ -816,7 +816,8 @@ public class LawnView extends Actor {
                 continue;
             }
             trackSunProduction(plant);
-            String clip = animator.plantClipName(plant.getType(), "attack", "special");
+            String clip = animator.plantClipName(plant.getType(),
+                    firstAttackClip(plant.getType()));
             if (clip == null || "idle".equals(clip)) {
                 continue;
             }
@@ -1744,6 +1745,18 @@ public class LawnView extends Actor {
         int index = Math.abs(System.identityHashCode(plant) / 7 + attackCycle(plant))
                 % variants.length;
         return variants[index];
+    }
+
+    private String[] firstAttackClip(models.entities.plant.PlantType type) {
+        String[] variants = views.assets.AnimationCatalog.attackVariants(type);
+        if (variants == null) {
+            return new String[] {"attack", "special"};
+        }
+        String[] wanted = new String[variants.length + 2];
+        System.arraycopy(variants, 0, wanted, 0, variants.length);
+        wanted[variants.length] = "attack";
+        wanted[variants.length + 1] = "special";
+        return wanted;
     }
 
     private int attackCycle(models.game.PlacedPlant plant) {
