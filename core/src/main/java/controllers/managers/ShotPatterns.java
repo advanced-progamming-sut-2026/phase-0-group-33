@@ -70,13 +70,11 @@ public class ShotPatterns {
     }
 
     private void starShot(PlacedPlant plant) {
-        Zombie forward = combat.firstZombieInRowAfter(plant.getY(), plant.getX());
-        if (forward != null) {
-            combat.hitZombie(forward, plant.getType());
+        if (combat.firstZombieInRowAfter(plant.getY(), plant.getX()) != null) {
+            combat.launchToward(plant, plant.getY(), 1);
         }
-        Zombie backward = lastZombieInRowBefore(plant.getY(), plant.getX());
-        if (backward != null) {
-            combat.hitZombie(backward, plant.getType());
+        if (lastZombieInRowBefore(plant.getY(), plant.getX()) != null) {
+            combat.launchToward(plant, plant.getY(), -1);
         }
         for (Zombie zombie : new ArrayList<>(session.getZombies())) {
             if (Math.abs(zombie.getPosition().getX() - plant.getX()) <= 0.5
@@ -91,13 +89,11 @@ public class ShotPatterns {
             if (row < 1 || row > GameSession.ROWS) {
                 continue;
             }
-            Zombie ahead = combat.firstZombieInRowAfter(row, plant.getX());
-            if (ahead != null) {
-                combat.hitZombie(ahead, plant.getType());
+            if (combat.firstZombieInRowAfter(row, plant.getX()) != null) {
+                combat.launchToward(plant, row, 1);
             }
-            Zombie behind = lastZombieInRowBefore(row, plant.getX());
-            if (behind != null) {
-                combat.hitZombie(behind, plant.getType());
+            if (lastZombieInRowBefore(row, plant.getX()) != null) {
+                combat.launchToward(plant, row, -1);
             }
         }
     }
@@ -145,17 +141,17 @@ public class ShotPatterns {
 
     private void bouncingBulb(PlacedPlant plant) {
         int row = plant.getY();
-        double from = plant.getX();
         int step = session.getRandom().nextBoolean() ? 1 : -1;
         for (int bounce = 0; bounce < 3; bounce++) {
             if (row < 1 || row > GameSession.ROWS) {
                 step = -step;
                 row += 2 * step;
             }
-            Zombie target = combat.firstZombieInRowAfter(row, from);
-            if (target != null) {
-                combat.hitZombie(target, plant.getType());
-                from = target.getPosition().getX();
+            if (row < 1 || row > GameSession.ROWS) {
+                return;
+            }
+            combat.launchToward(plant, row, 1);
+            if (bounce > 0) {
                 System.out.printf("The bulb bounced into lane %d.%n", row);
             }
             row += step;

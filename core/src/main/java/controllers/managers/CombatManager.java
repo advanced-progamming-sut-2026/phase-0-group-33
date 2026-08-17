@@ -200,7 +200,9 @@ public class CombatManager {
             }
         }
         if (target != null) {
-            hitZombie(target, plant.getType());
+            int row = (int) target.getPosition().getY();
+            int direction = target.getPosition().getX() >= plant.getX() ? 1 : -1;
+            session.getProjectileManager().launchStraight(plant, row, direction);
         }
     }
 
