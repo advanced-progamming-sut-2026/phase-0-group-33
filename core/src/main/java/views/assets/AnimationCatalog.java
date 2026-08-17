@@ -123,6 +123,51 @@ public final class AnimationCatalog {
         return ZOMBOTANY.get(type.getName());
     }
 
+    public static String[] stateClips(ZombieType type, boolean eating, boolean armoured,
+                                      boolean charging, boolean spinning, boolean hopping) {
+        String action = eating ? "eat" : "walk";
+        switch (type) {
+            case NEWSPAPER:
+                return armoured
+                        ? new String[] {action + "_newspaper", action, "idle"}
+                        : new String[] {action, "idle"};
+            case PHARAOH:
+                return armoured
+                        ? new String[] {action, "idle"}
+                        : new String[] {action + "_norm", action, "idle"};
+            case WEASEL_HOARDER:
+                return armoured || !eating
+                        ? new String[] {"tree_" + action, action, "idle"}
+                        : new String[] {"tree_eat", "eat", "idle"};
+            case BARREL_ROLLER:
+                return new String[] {action + "2", action, "idle"};
+            case ALLSTAR:
+                return charging
+                        ? new String[] {"run", "walk", "idle"}
+                        : new String[] {action, "idle"};
+            case SURFER:
+                return charging
+                        ? new String[] {"surf_idle", "walk_board", "walk", "idle"}
+                        : new String[] {action, "idle"};
+            case JUGGLER:
+                return spinning
+                        ? new String[] {"spin_walk", "spin", action, "idle"}
+                        : new String[] {action, "idle"};
+            case DODO:
+                return hopping
+                        ? new String[] {"fly_loop", "fly_start", action, "idle"}
+                        : new String[] {action, "idle"};
+            case WEASEL:
+                return eating
+                        ? new String[] {"eat_loop", "eat_start", "eat", "idle"}
+                        : new String[] {action, "idle"};
+            case OCTOPUS:
+                return new String[] {action, "idle"};
+            default:
+                return null;
+        }
+    }
+
     public static String rideClip(ZombieType type) {
         return RIDE.get(type.getName());
     }

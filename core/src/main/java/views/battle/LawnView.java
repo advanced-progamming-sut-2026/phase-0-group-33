@@ -41,6 +41,7 @@ public class LawnView extends Actor {
     private static final String SANDSTORM = "SANDSTORM_TOP";
     private static final String SNOWSTORM = "SNOWSTORM_TOP";
     private static final float STORM_LIFE = 1.4f;
+    private static final float DODO_HOP = 0.55f;
     private static final float MOWER_RUN = 2.2f;
     private static final float MOWER_START = 0.35f;
     private static final String FIRE_TILE = "FIRETILE";
@@ -99,6 +100,8 @@ public class LawnView extends Actor {
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> lastFreeze =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, float[]> flights =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, Float> hopping =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.Array<Corpse> corpses = new com.badlogic.gdx.utils.Array<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, float[]> seen =
@@ -487,7 +490,11 @@ public class LawnView extends Actor {
             float previousX = entry.value[0];
             float nowX = (float) zombie.getPosition().getX();
             if (previousX - nowX > 0.9f) {
-                storms.add(new float[] {nowX, (int) zombie.getPosition().getY(), time, 0f});
+                if (zombie.getType() == models.entities.zombie.ZombieType.DODO) {
+                    hopping.put(zombie, time + DODO_HOP);
+                } else {
+                    storms.add(new float[] {nowX, (int) zombie.getPosition().getY(), time, 0f});
+                }
             }
         }
         for (models.game.PlacedPlant plant : session.getPlants()) {
@@ -512,6 +519,17 @@ public class LawnView extends Actor {
             if (time - storms.get(i)[2] >= STORM_LIFE) {
                 storms.removeIndex(i);
             }
+        }
+        com.badlogic.gdx.utils.Array<models.entities.zombie.Zombie> landed =
+                new com.badlogic.gdx.utils.Array<>();
+        for (com.badlogic.gdx.utils.ObjectMap.Entry<models.entities.zombie.Zombie, Float> hop
+                : hopping.entries()) {
+            if (time >= hop.value || !session.getZombies().contains(hop.key)) {
+                landed.add(hop.key);
+            }
+        }
+        for (models.entities.zombie.Zombie zombie : landed) {
+            hopping.remove(zombie);
         }
     }
 
@@ -1667,11 +1685,16 @@ public class LawnView extends Actor {
         boolean eating = isEating(zombie);
         Float busy = ability.get(zombie);
         ClipRef clip;
+        String[] stated = views.assets.AnimationCatalog.stateClips(zombie.getType(),
+                eating, zombie.totalArmor() > 0, zombie.getBattle().isCharging(),
+                zombie.getBattle().isSpinning(), hopping.containsKey(zombie));
         if (busy != null && time < busy) {
             clip = animator.zombieClip(zombie.getType(),
                     views.assets.AnimationCatalog.abilityClip(zombie.getType()), "walk", "idle");
         } else if (flights.containsKey(zombie)) {
             clip = animator.zombieClip(zombie.getType(), "fly", "walk", "idle");
+        } else if (eating && stated != null) {
+            clip = animator.zombieClip(zombie.getType(), stated);
         } else if (eating) {
             String bite = views.assets.AnimationCatalog.biteClip(zombie.getType());
             clip = bite != null && animator.hasZombieClip(zombie.getType(), bite)
@@ -1686,7 +1709,12 @@ public class LawnView extends Actor {
         } else if (isPushing(zombie)) {
             clip = animator.zombieClip(zombie.getType(), "push", "walk", "idle");
         } else {
-            clip = animator.zombieClip(zombie.getType(), "walk", "walk1", "idle");
+            String[] wanted = views.assets.AnimationCatalog.stateClips(zombie.getType(),
+                    eating, zombie.totalArmor() > 0, zombie.getBattle().isCharging(),
+                    zombie.getBattle().isSpinning(), hopping.containsKey(zombie));
+            clip = wanted == null
+                    ? animator.zombieClip(zombie.getType(), "walk", "walk1", "idle")
+                    : animator.zombieClip(zombie.getType(), wanted);
         }
         if (clip == null) {
             return false;
