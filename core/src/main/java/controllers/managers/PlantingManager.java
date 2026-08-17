@@ -96,7 +96,6 @@ public class PlantingManager {
         consume(slot, cost);
         session.getQuestStats().onPlanted(type, x, y);
         if (slot.isBoosted()) {
-            slot.setBoosted(false);
             session.getCombatManager().applyPlantFood(plant);
         } else if (consumeStoredBoost(type)) {
             System.out.println("A stored greenhouse boost activated for " + type.getName() + "!");
