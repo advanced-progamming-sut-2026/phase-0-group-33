@@ -65,25 +65,24 @@ public class SunManager {
     }
 
     public Sun collectAt(int x, int y) {
-        Sun landedMatch = null;
+        Sun match = null;
         for (Sun sun : suns) {
             if (sun.getX() != x || sun.getY() != y) {
                 continue;
             }
-            if (sun.isFalling()) {
-                if (sun.getKind() == Sun.SunKind.RADIOACTIVE) {
-                    suns.remove(sun);
-                    return sun;
-                }
-            } else if (landedMatch == null) {
-                landedMatch = sun;
+            if (sun.isFalling() && sun.getKind() == Sun.SunKind.RADIOACTIVE) {
+                suns.remove(sun);
+                return sun;
+            }
+            if (match == null || (match.isFalling() && !sun.isFalling())) {
+                match = sun;
             }
         }
-        if (landedMatch != null) {
-            suns.remove(landedMatch);
-            sunBalance += landedMatch.getValue();
+        if (match != null) {
+            suns.remove(match);
+            sunBalance += match.getValue();
         }
-        return landedMatch;
+        return match;
     }
 
     public void clearProducedAt(int x, int y) {

@@ -623,6 +623,9 @@ public class BattleScreen extends ScreenAdapter {
         lawnView.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ClickListener() {
             @Override
             public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
+                if (tool == Tool.NONE && catchSun(Lawn.left() + x, Lawn.bottom() + y)) {
+                    return;
+                }
                 int column = Lawn.columnAt(Lawn.left() + x);
                 int row = Lawn.rowAt(Lawn.bottom() + y);
                 if (column >= 1 && row >= 1) {
@@ -630,6 +633,20 @@ public class BattleScreen extends ScreenAdapter {
                 }
             }
         });
+    }
+
+    private boolean catchSun(float stageX, float stageY) {
+        models.game.Sun sun = lawnView.sunAt(stageX, stageY);
+        if (sun == null) {
+            return false;
+        }
+        Result result = session.collectSun(sun.getX(), sun.getY());
+        if (!result.isSuccessfull()) {
+            return false;
+        }
+        toasts.show(result);
+        sfx(views.assets.Audio.SUN);
+        return true;
     }
 
     private void useTool(int column, int row) {

@@ -1469,6 +1469,36 @@ public class LawnView extends Actor {
         batch.draw(region, x + width - size * 0.7f, y + height - size * 0.6f, size, size);
     }
 
+    public models.game.Sun sunAt(float stageX, float stageY) {
+        models.game.Sun best = null;
+        float bestDistance = Float.MAX_VALUE;
+        for (models.game.Sun sun : session.getSunManager().getSuns()) {
+            float size = sunSize(sun);
+            float x = Lawn.columnCenter(sun.getX());
+            float y = sunDrawY(sun);
+            float dx = Math.abs(stageX - x);
+            float dy = Math.abs(stageY - y);
+            if (dx > size * 0.6f || dy > size * 0.6f) {
+                continue;
+            }
+            float distance = dx + dy;
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                best = sun;
+            }
+        }
+        return best;
+    }
+
+    private float sunDrawY(models.game.Sun sun) {
+        float targetY = Lawn.rowCenter(sun.getY());
+        if (!sun.isFalling()) {
+            return targetY;
+        }
+        float startY = Lawn.bottom() + Lawn.height() + 60f;
+        return startY + (targetY - startY) * sun.getFallProgress();
+    }
+
     private void drawSuns(Batch batch) {
         String animation = views.assets.AnimationCatalog.sun();
         String clipName = animator.isReady() ? animator.clipName(animation, "animation", "idle") : null;
@@ -1476,12 +1506,7 @@ public class LawnView extends Actor {
         TextureRegion region = art.uiOptional("image_ui_hud_ingame_sun");
         for (models.game.Sun sun : session.getSunManager().getSuns()) {
             float size = sunSize(sun);
-            float targetY = Lawn.rowCenter(sun.getY());
-            float y = targetY;
-            if (sun.isFalling()) {
-                float startY = Lawn.bottom() + Lawn.height() + 60f;
-                y = startY + (targetY - startY) * sun.getFallProgress();
-            }
+            float y = sunDrawY(sun);
             float x = Lawn.columnCenter(sun.getX());
             batch.setColor(sunColor(sun));
             if (clip != null) {

@@ -121,7 +121,7 @@ public class BattleCommands {
         if (sun == null) {
             return Result.fail("There is no sun to collect at (" + x + ", " + y + ").");
         }
-        if (sun.isFalling()) {
+        if (sun.isFalling() && sun.getKind() == Sun.SunKind.RADIOACTIVE) {
             session.getCombatManager().applyRadioactiveExplosion(x, y);
             return Result.ok("The radioactive sun exploded mid-air at (" + x + ", " + y + ")!");
         }
