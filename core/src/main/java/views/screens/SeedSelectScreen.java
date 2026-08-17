@@ -155,16 +155,25 @@ public class SeedSelectScreen extends BaseScreen {
                 continue;
             }
             boolean selected = session().findSlot(type) != null;
+            final boolean locked = session().getSelection().isLockedForLevel(type);
             PlantCard card = new PlantCard(skin, art, type)
                     .level(store.getInt("level." + type.getName(), 1))
                     .cost(session().effectiveCost(type))
-                    .selected(selected)
-                    .boosted(selected && session().findSlot(type).isBoosted());
-            if (selected) {
+                    .selected(selected && !locked)
+                    .boosted(selected && session().findSlot(type).isBoosted())
+                    .locked(locked);
+            if (locked) {
+                card.note("locked in this level", Palette.BAD);
+            } else if (selected) {
                 card.note("in your line-up", Palette.GOOD);
             }
             card.onClick(() -> {
                 focused = type;
+                if (locked) {
+                    toasts.error(type.getName() + " is locked in this level.");
+                    showDetail(type);
+                    return;
+                }
                 toggle(type);
             });
             Ui.hoverLift(card, 1.05f);

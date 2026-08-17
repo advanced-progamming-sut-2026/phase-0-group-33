@@ -64,6 +64,10 @@ public class PlantSelection {
         return Result.ok(type.getName() + " added to your selection.");
     }
 
+    public boolean isLockedForLevel(PlantType type) {
+        return isLockedInThisLevel(type);
+    }
+
     private boolean isLockedInThisLevel(PlantType type) {
         if (specialType == SpecialLevelType.PLANT_WHAT_YOU_GET
                 && type.getCategory() == PlantCategory.SUN_PRODUCER) {
