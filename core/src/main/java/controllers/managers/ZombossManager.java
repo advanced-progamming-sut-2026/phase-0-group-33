@@ -26,6 +26,7 @@ public class ZombossManager {
     private final CombatManager combat;
 
     private Zomboss boss;
+    private boolean defeated;
 
     public ZombossManager(GameSession session, CombatManager combat) {
         this.session = session;
@@ -40,11 +41,16 @@ public class ZombossManager {
         return boss != null;
     }
 
+    public boolean isDefeated() {
+        return defeated;
+    }
+
     public void spawn(Zomboss.BossKind kind) {
         if (boss != null) {
             return;
         }
         int row = 2;
+        defeated = false;
         boss = new Zomboss(kind, row, session.getHealthFactor());
         boss.setAbilityTicks(ABILITY_INTERVAL);
         session.getZombies().add(boss);
@@ -57,7 +63,9 @@ public class ZombossManager {
             return;
         }
         if (!session.getZombies().contains(boss)) {
+            defeated = true;
             boss = null;
+            System.out.println("The Zomboss has been defeated!");
             return;
         }
         tickFires();

@@ -85,8 +85,11 @@ public class BattleCommands {
             return;
         }
         if (session.isBossLevel()) {
-            if (session.getZombossManager().hasBoss()
-                    && !session.getZombies().contains(session.getZombossManager().getBoss())) {
+            boolean gone = session.getZombossManager().isDefeated()
+                    || (session.getZombossManager().hasBoss()
+                        && !session.getZombies().contains(
+                            session.getZombossManager().getBoss()));
+            if (gone) {
                 session.winGame();
             }
             return;
