@@ -12,4 +12,12 @@ public abstract class BaseController implements AppController {
     public App getApp() {
         return app;
     }
+
+    protected boolean loggedOut() {
+        return app.getCurrentUser() == null;
+    }
+
+    protected models.Result notLoggedIn() {
+        return models.Result.fail("You must be logged in to do that.");
+    }
 }

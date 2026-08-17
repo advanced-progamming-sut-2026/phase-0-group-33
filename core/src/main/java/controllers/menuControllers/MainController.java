@@ -34,6 +34,9 @@ public class MainController extends BaseController {
     }
 
     public Result handleEnterChapter(String chapterName, int requestedLevel) {
+        if (loggedOut()) {
+            return notLoggedIn();
+        }
         Chapter chapter = Chapter.getByName(chapterName);
         if (chapter == null) {
             return Result.fail("No chapter with the given name.");

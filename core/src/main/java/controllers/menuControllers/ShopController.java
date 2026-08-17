@@ -61,6 +61,9 @@ public class ShopController extends BaseController {
     }
 
     public Result handleShopBuy(String itemId, int count, String plantType) {
+        if (loggedOut()) {
+            return notLoggedIn();
+        }
         if (count < 1) {
             return Result.fail("Count must be at least 1.");
         }

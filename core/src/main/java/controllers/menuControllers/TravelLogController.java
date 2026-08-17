@@ -23,6 +23,9 @@ public class TravelLogController extends BaseController {
     }
 
     public Result handleShowPage(String pageName) {
+        if (loggedOut()) {
+            return notLoggedIn();
+        }
         if (pageName.equalsIgnoreCase("minigame") || pageName.equalsIgnoreCase("minigames")) {
             return minigamePage();
         }
@@ -169,6 +172,9 @@ public class TravelLogController extends BaseController {
     }
 
     public Result handlePlayMinigame(String name, int difficulty) {
+        if (loggedOut()) {
+            return notLoggedIn();
+        }
         GameMode mode = resolveMinigame(name);
         if (mode == null) {
             return Result.fail("No minigame with this name. "

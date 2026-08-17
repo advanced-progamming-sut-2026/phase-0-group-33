@@ -95,6 +95,9 @@ public class GreenhouseController extends BaseController {
     }
 
     public Result handlePlantPot(int x, int y) {
+        if (loggedOut()) {
+            return notLoggedIn();
+        }
         if (x < 1 || x > COLS || y < 1 || y > ROWS) {
             return Result.fail("Pot coordinates must be x in 1.." + COLS + " and y in 1.." + ROWS + ".");
         }
@@ -118,6 +121,9 @@ public class GreenhouseController extends BaseController {
     }
 
     public Result handleCollect(int x, int y) {
+        if (loggedOut()) {
+            return notLoggedIn();
+        }
         UserDataStore store = store();
         String plant = store.get(potKey(x, y) + ".plant", null);
         if (plant == null) {
@@ -144,6 +150,9 @@ public class GreenhouseController extends BaseController {
     }
 
     public Result handleGrow(int x, int y) {
+        if (loggedOut()) {
+            return notLoggedIn();
+        }
         UserDataStore store = store();
         String plant = store.get(potKey(x, y) + ".plant", null);
         if (plant == null) {
