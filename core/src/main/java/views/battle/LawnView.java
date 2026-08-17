@@ -815,6 +815,7 @@ public class LawnView extends Actor {
         drawSpecialMarkers(batch);
         drawEntities(batch);
         drawDrivingMowers(batch);
+        drawGhost(batch);
         drawStorms(batch);
         batch.setColor(previous);
     }
@@ -1076,7 +1077,10 @@ public class LawnView extends Actor {
             return;
         }
         paint(batch, hoverValid ? HOVER : INVALID, hoverColumn, hoverRow);
-        if (ghost == null) {
+    }
+
+    private void drawGhost(Batch batch) {
+        if (ghost == null || hoverColumn < 1 || hoverRow < 1) {
             return;
         }
         float width = Lawn.cellWidth() * 0.78f;
@@ -1084,6 +1088,7 @@ public class LawnView extends Actor {
         batch.setColor(1f, 1f, 1f, hoverValid ? 0.62f : 0.3f);
         batch.draw(art.plant(ghost), Lawn.columnCenter(hoverColumn) - width / 2f,
                 Lawn.rowBottom(hoverRow) + Lawn.cellHeight() * 0.1f, width, height);
+        batch.setColor(Color.WHITE);
     }
 
     private void drawGrid(Batch batch) {
