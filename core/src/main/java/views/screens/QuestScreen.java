@@ -65,9 +65,10 @@ public class QuestScreen extends BaseScreen {
         List<String> lines = result.getMessages();
         for (int i = 1; i < lines.size(); i++) {
             String line = lines.get(i);
-            if (line.startsWith("- ")) {
-                line = line.substring(2);
+            if (!line.startsWith("- ")) {
+                continue;
             }
+            line = line.substring(2);
             Table card = "minigame".equals(page) ? minigameCard(line) : questCard(line);
             Ui.appear(card, i);
             content.add(card).growX().padBottom(8f).row();
@@ -134,11 +135,12 @@ public class QuestScreen extends BaseScreen {
     private void startMinigame(String name) {
         Result result = new controllers.menuControllers.TravelLogController(app)
                 .handlePlayMinigame(name, 1);
-        if (!result.isSuccessfull()) {
+        if (!result.isSuccessfull() || app.getCurrentGameSession() == null) {
             toasts.show(result);
             return;
         }
-        router.go(views.ScreenId.BATTLE);
+        router.go(app.getCurrentGameSession().getPhase() == models.game.GamePhase.BATTLE
+                ? views.ScreenId.BATTLE : views.ScreenId.SEED_SELECT);
     }
 
     private Table minigameCard(String line) {
