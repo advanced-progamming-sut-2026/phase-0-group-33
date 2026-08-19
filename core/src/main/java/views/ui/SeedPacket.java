@@ -16,8 +16,8 @@ import views.assets.Art;
 
 public final class SeedPacket extends Table {
 
-    public static final float PACKET_WIDTH = 96f;
-    public static final float PACKET_HEIGHT = 116f;
+    public static final float PACKET_WIDTH = 88f;
+    public static final float PACKET_HEIGHT = 98f;
 
     private static final Color DIM = new Color(0f, 0f, 0f, 0.6f);
 
@@ -42,7 +42,7 @@ public final class SeedPacket extends Table {
         portrait = new Image(new TextureRegionDrawable(art.plant(type)));
         portrait.setScaling(Scaling.fit);
         Container<Image> cell = new Container<>(portrait);
-        cell.size(PACKET_WIDTH - 22f, 56f);
+        cell.size(PACKET_WIDTH - 22f, 46f);
 
         Label name = new Label(type.getName(), skin, "tiny");
         name.setAlignment(Align.center);

@@ -47,10 +47,21 @@ public final class ConveyorBar extends Actor {
     }
 
     private void pick(float localX) {
-        int index = (int) (localX / SLOT_WIDTH);
-        java.util.List<PlantSlot> slots = session.getSlots();
-        if (index >= 0 && index < slots.size()) {
-            onPick.accept(slots.get(index).getType());
+        PlantSlot best = null;
+        float bestDistance = SLOT_WIDTH;
+        for (PlantSlot slot : session.getSlots()) {
+            Float x = positions.get(slot);
+            if (x == null) {
+                continue;
+            }
+            float distance = Math.abs(localX - (x + SLOT_WIDTH / 2f));
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                best = slot;
+            }
+        }
+        if (best != null) {
+            onPick.accept(best.getType());
         }
     }
 
@@ -65,7 +76,8 @@ public final class ConveyorBar extends Actor {
             float target = i * SLOT_WIDTH;
             Float current = positions.get(slot);
             if (current == null) {
-                current = getWidth();
+                current = Math.max(target, getWidth());
+                positions.put(slot, current);
             }
             float step = SLIDE_SPEED * delta;
             current = current > target ? Math.max(target, current - step)

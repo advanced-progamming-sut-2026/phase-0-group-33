@@ -420,10 +420,10 @@ public class BattleScreen extends ScreenAdapter {
         bar.add().expandX();
         bar.add(Ui.button(skin, "Menu", "small-brown", this::onEscape)).width(120f).height(46f);
 
-        root.add(bar).growX().height(58f).row();
+        root.add(bar).growX().height(44f).row();
         objectiveCell = root.add(buildObjectivePanel()).left().padLeft(14f);
         root.row();
-        seedTrayCell = root.add(buildSeedTray()).growX().height(showsSeedTray() ? 123f : 0f);
+        seedTrayCell = root.add(buildSeedTray()).growX().height(showsSeedTray() ? 104f : 0f);
         root.row();
         root.add().expand().row();
         root.add(buildToolBar()).growX().height(66f);
@@ -485,7 +485,7 @@ public class BattleScreen extends ScreenAdapter {
     private Table buildSeedTray() {
         Table tray = new Table(skin);
         tray.setBackground(skin.getDrawable("panel"));
-        tray.pad(3f, 12f, 3f, 12f);
+        tray.pad(1f, 12f, 1f, 12f);
         if (session.getMode() == GameMode.I_ZOMBIE) {
             tray.add(buildZombieTray()).left().expandX();
         } else if (usesConveyor()) {
@@ -692,9 +692,12 @@ public class BattleScreen extends ScreenAdapter {
             sfx(tool == Tool.PLANT ? views.assets.Audio.PLANT
                     : tool == Tool.NONE ? views.assets.Audio.SUN : views.assets.Audio.CLICK);
         }
-        if (result.isSuccessfull() && tool != Tool.PLANT) {
+        if (result.isSuccessfull()) {
             tool = Tool.NONE;
             pending = null;
+            lawnView.setGhost(null);
+            lawnView.clearHover();
+            updateCursor();
         }
     }
 
