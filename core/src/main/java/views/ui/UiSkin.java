@@ -109,8 +109,10 @@ public final class UiSkin {
         CheckBox.CheckBoxStyle checkBox = new CheckBox.CheckBoxStyle();
         checkBox.font = assets.font("body");
         checkBox.fontColor = Palette.TEXT;
-        checkBox.checkboxOff = sized(atlas, "image_ui_almanac_checkbox_disabled", 34f);
-        checkBox.checkboxOn = sized(atlas, "image_ui_almanac_checkbox_enabled", 34f);
+        checkBox.checkboxOff = sized(atlas, "image_ui_mainmenu_checkbox_disabled", 34f);
+        checkBox.checkboxOn = sized(atlas,
+                "image_ui_generic_check_mark_anim_check_mark_anim_102x102", 34f);
+        checkBox.checkedFontColor = Palette.GOLD;
         skin.add("default", checkBox);
     }
 

@@ -74,13 +74,13 @@ public class SettingsScreen extends BaseScreen {
     }
 
     private void addVolume(Table panel, final String username) {
-        panel.add(volumeRow(username, "Music", GamePreferences.getMusicVolume(username), true))
-                .colspan(2).left().padBottom(4f).row();
-        panel.add(volumeRow(username, "Sound effects", GamePreferences.getSfxVolume(username), false))
-                .colspan(2).left().padBottom(22f).row();
+        settingRow(panel, "Music", "Volume of the background music.",
+                volumeRow(username, GamePreferences.getMusicVolume(username), true), 320f);
+        settingRow(panel, "Sound effects", "Volume of planting, shooting and explosions.",
+                volumeRow(username, GamePreferences.getSfxVolume(username), false), 320f);
     }
 
-    private Table volumeRow(final String username, String title, int value, final boolean music) {
+    private Table volumeRow(final String username, int value, final boolean music) {
         final Label readout = Ui.label(skin, value + "%", "gold");
         final Slider slider = new Slider(0f, 100f, 5f, false, skin);
         slider.setValue(value);
@@ -100,9 +100,8 @@ public class SettingsScreen extends BaseScreen {
             }
         });
         Table row = new Table();
-        row.add(Ui.label(skin, title, "h2")).left().width(230f);
-        row.add(slider).width(300f).padRight(14f);
-        row.add(readout).width(70f).left();
+        row.add(slider).width(240f).padRight(12f);
+        row.add(readout).width(60f).left();
         return row;
     }
 

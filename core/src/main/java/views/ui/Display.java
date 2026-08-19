@@ -47,11 +47,15 @@ public final class Display {
         return alt && (keycode == Input.Keys.ENTER || keycode == Input.Keys.NUMPAD_ENTER);
     }
 
-    public static boolean handleKey(int keycode) {
+    public static boolean handleKey(int keycode, models.App app) {
         if (!isToggleKey(keycode)) {
             return false;
         }
         toggle();
+        if (app != null && app.getCurrentUser() != null) {
+            models.settings.GamePreferences.setFullscreen(
+                    app.getCurrentUser().getUsername(), isFullscreen());
+        }
         return true;
     }
 }

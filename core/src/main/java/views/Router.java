@@ -20,6 +20,7 @@ import views.screens.SignupScreen;
 public final class Router {
 
     private final PvzGame game;
+    private String displayOwner;
 
     public Router(PvzGame game) {
         this.game = game;
@@ -27,10 +28,7 @@ public final class Router {
 
     public void go(ScreenId id) {
         Screen previous = game.getScreen();
-        if (game.getApp().getCurrentUser() != null) {
-            views.ui.Display.setFullscreen(models.settings.GamePreferences.isFullscreen(
-                    game.getApp().getCurrentUser().getUsername()));
-        }
+        applyDisplayPreferenceOnce();
         if (game.getAudio() != null) {
             game.getAudio().setUser(game.getApp().getCurrentUser() == null ? null
                     : game.getApp().getCurrentUser().getUsername());
@@ -45,6 +43,20 @@ public final class Router {
 
     public void go(Menus menu) {
         go(ScreenId.from(menu));
+    }
+
+    private void applyDisplayPreferenceOnce() {
+        if (game.getApp().getCurrentUser() == null) {
+            displayOwner = null;
+            return;
+        }
+        String user = game.getApp().getCurrentUser().getUsername();
+        if (user.equals(displayOwner)) {
+            return;
+        }
+        displayOwner = user;
+        views.ui.Display.setFullscreen(
+                models.settings.GamePreferences.isFullscreen(user));
     }
 
     public void syncWithApp() {
