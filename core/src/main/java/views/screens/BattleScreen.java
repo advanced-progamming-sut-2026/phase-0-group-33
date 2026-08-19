@@ -38,6 +38,7 @@ import views.battle.LawnView;
 import views.ui.BaseScreen;
 import views.ui.SeedPacket;
 import views.ui.Toasts;
+import views.ui.AnimatedActor;
 import views.ui.Ui;
 
 public class BattleScreen extends ScreenAdapter {
@@ -1012,7 +1013,20 @@ public class BattleScreen extends ScreenAdapter {
 
         Table content = new Table();
         content.add(Ui.label(skin, won ? "The lawn is safe." : "The zombies ate your brains.",
-                "h2")).padBottom(14f).row();
+                "h2")).padBottom(10f).row();
+        if (won && session.getFarewell() != null) {
+            Table quote = new Table();
+            AnimatedActor dave = AnimatedActor.whole(game.getAnimations(), "CRAZYDAVE", 84f,
+                    "anim_mediumtalk", "anim_smalltalk", "anim_idle");
+            if (dave != null) {
+                Table window = new Table();
+                window.setClip(true);
+                window.add(dave).size(84f);
+                quote.add(window).size(84f).padRight(12f);
+            }
+            quote.add(Ui.wrapped(skin, session.getFarewell(), "muted")).width(360f);
+            content.add(quote).padBottom(16f).row();
+        }
         if (!won) {
             content.add(Ui.button(skin, "Try again", "green", this::restart))
                     .width(300f).height(56f).padBottom(10f).row();

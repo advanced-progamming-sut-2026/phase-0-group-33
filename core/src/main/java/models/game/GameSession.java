@@ -62,6 +62,7 @@ public class GameSession {
     private int plantsLost;
     private int zombiesKilled;
     private int timerTicksLeft = -1;
+    private String farewell;
 
     public GameSession(GameSetup setup) {
         this.setup = setup;
@@ -293,11 +294,12 @@ public class GameSession {
         scoreTracker.onGameWon(unusedMowerCount());
         if (getMode() == GameMode.ADVENTURE || getMode() == GameMode.ZOMBOTANY
                 || getMode() == GameMode.SCORING) {
-            System.out.println(
-                    "Dear humanz, zis is not done yet; we will come back to eat your brainz, humanz.");
+            farewell = "Dear humanz, zis is not done yet;"
+                    + " we will come back to eat your brainz, humanz.";
         } else {
-            System.out.println("You won the minigame!");
+            farewell = "You won the minigame!";
         }
+        System.out.println(farewell);
         if (getMode() == GameMode.SCORING) {
             System.out.println("Your miopoint score: " + scoreTracker.getScore());
         }
@@ -533,6 +535,10 @@ public class GameSession {
         for (PlantSlot slot : selection.getSlots()) {
             slot.setCooldownTicks(0);
         }
+    }
+
+    public String getFarewell() {
+        return farewell;
     }
 
     public int getTimerTicksLeft() {
