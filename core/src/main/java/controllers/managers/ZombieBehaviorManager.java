@@ -22,6 +22,7 @@ public class ZombieBehaviorManager {
     private final GameSession session;
     private final CombatManager combatManager;
     private final ChapterEnvironment environment;
+    private static final int THAW_PER_TICK = 3;
     private static final double UMBRELLA_RANGE = 1.0;
     private static final double WIZARD_RANGE = 3.0;
     private static final double PIANO_RANGE = 3.0;
@@ -64,6 +65,12 @@ public class ZombieBehaviorManager {
 
     public boolean handleSpecial(Zombie zombie) {
         if (zombie.getBattle().getIceHealth() > 0) {
+            int left = zombie.getBattle().getIceHealth() - THAW_PER_TICK;
+            zombie.getBattle().setIceHealth(Math.max(0, left));
+            if (left <= 0) {
+                System.out.printf("The ice around the %s melted away.%n",
+                        zombie.getType().getName());
+            }
             return true;
         }
         if (zombie.getBattle().isHypnotized()) {
