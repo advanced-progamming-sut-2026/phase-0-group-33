@@ -105,6 +105,7 @@ public final class AnimationCatalog {
         ABILITY.put("Explorer", "power");
         ABILITY.put("Turquoise", "power");
         ABILITY.put("Fisherman", "cast");
+        ABILITY.put("Wizard", "sheep");
 
         RIDE.put("Surfer", "walk_board");
         RIDE.put("Piano", "idle");
@@ -251,6 +252,41 @@ public final class AnimationCatalog {
 
     public static String abilityClip(ZombieType type) {
         return ABILITY.get(type.getName());
+    }
+
+    public static String[] abilityClips(ZombieType type) {
+        switch (type) {
+            case RA:
+            case TURQUOISE:
+                return new String[] {"power_up", "power", "walk", "idle"};
+            case WIZARD:
+                return new String[] {"sheep", "walk", "idle"};
+            case FISHERMAN:
+                return new String[] {"cast", "cast_loop", "reel", "idle"};
+            case OCTOPUS:
+                return new String[] {"toss", "idle4", "idle5", "walk", "idle"};
+            default:
+                String single = ABILITY.get(type.getName());
+                return single == null ? null : new String[] {single, "walk", "idle"};
+        }
+    }
+
+    public static String[] biteClips(ZombieType type, boolean alternate) {
+        switch (type) {
+            case GARGANTUAR:
+                return alternate
+                        ? new String[] {"smash_right", "smash_left", "eat", "idle"}
+                        : new String[] {"smash_left", "smash_right", "eat", "idle"};
+            case PIANO:
+                return alternate
+                        ? new String[] {"smash_right", "smash_left", "eat", "idle"}
+                        : new String[] {"smash_left", "eat", "idle"};
+            case ALLSTAR:
+                return new String[] {"kick", "tackle", "eat", "idle"};
+            default:
+                String single = BITE.get(type.getName());
+                return single == null ? null : new String[] {single, "eat", "idle"};
+        }
     }
 
     public static String biteClip(ZombieType type) {

@@ -1835,8 +1835,10 @@ public class LawnView extends Actor {
         }
         Float busy = ability.get(zombie);
         if (busy != null && time < busy) {
-            return animator.zombieClip(type,
-                    views.assets.AnimationCatalog.abilityClip(type), "walk", "idle");
+            String[] wanted = views.assets.AnimationCatalog.abilityClips(type);
+            return wanted == null
+                    ? animator.zombieClip(type, "walk", "idle")
+                    : animator.zombieClip(type, wanted);
         }
         if (flights.containsKey(zombie)) {
             float[] flight = flights.get(zombie);
@@ -1849,10 +1851,11 @@ public class LawnView extends Actor {
             return animator.zombieClip(type, stated);
         }
         if (eating) {
-            String bite = views.assets.AnimationCatalog.biteClip(type);
-            return bite != null && animator.hasZombieClip(type, bite)
-                    ? animator.zombieClip(type, bite, "eat", "idle")
-                    : animator.zombieClip(type, "eat", "attack", "walk", "idle");
+            String[] bites = views.assets.AnimationCatalog.biteClips(type,
+                    (System.identityHashCode(zombie) & 1) == 0);
+            return bites == null
+                    ? animator.zombieClip(type, "eat", "attack", "walk", "idle")
+                    : animator.zombieClip(type, bites);
         }
         String ride = views.assets.AnimationCatalog.rideClip(type);
         if (ride != null && animator.hasZombieClip(type, ride)) {
