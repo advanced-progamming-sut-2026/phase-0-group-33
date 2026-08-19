@@ -142,4 +142,9 @@ public final class EntityAnimator {
                      float scale, boolean loop, Map<String, Boolean> visibility) {
         animations.draw(batch, clip, time, x, y, scale, scale, loop, visibility);
     }
+
+    public void drawMirrored(Batch batch, ClipRef clip, float time, float x, float y,
+                             float scale, boolean loop, Map<String, Boolean> visibility) {
+        animations.draw(batch, clip, time, x, y, -scale, scale, loop, visibility);
+    }
 }

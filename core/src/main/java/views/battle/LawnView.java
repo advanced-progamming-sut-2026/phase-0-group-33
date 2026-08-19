@@ -1792,9 +1792,16 @@ public class LawnView extends Actor {
             return false;
         }
         float clock = zombie.getFrozenTicks() > 0 ? seed * 0.11f : time + seed * 0.11f;
-        animator.draw(batch, clip, clock, centerX, feet + animator.zombieLift(),
-                animator.zombieScale() * popScale(zombie), true,
-                animator.armourFor(zombie.getType(), armourFraction(zombie)));
+        float scale = animator.zombieScale() * popScale(zombie);
+        java.util.Map<String, Boolean> armour =
+                animator.armourFor(zombie.getType(), armourFraction(zombie));
+        if (zombie.getBattle().isHypnotized()) {
+            animator.drawMirrored(batch, clip, clock, centerX,
+                    feet + animator.zombieLift(), scale, true, armour);
+        } else {
+            animator.draw(batch, clip, clock, centerX,
+                    feet + animator.zombieLift(), scale, true, armour);
+        }
         return true;
     }
 
