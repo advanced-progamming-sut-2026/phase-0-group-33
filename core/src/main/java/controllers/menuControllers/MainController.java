@@ -89,7 +89,7 @@ public class MainController extends BaseController {
         UserDataStore store = UserDataStore.forUser(app.getCurrentUser().getUsername());
         for (String name : CHAPTER_ORDER) {
             Chapter chapter = Chapter.getByName(name);
-            store.setInt("progress." + name, chapter.getLevels().size());
+            store.setInt("progress." + name, chapter.getLevels().size() + 1);
         }
         store.save();
         return Result.ok("All chapters and levels unlocked. "
