@@ -29,6 +29,6 @@ public class FrostBite extends Chapter {
 
     @Override
     public double getDifficultyFactor() {
-        return 1.2;
+        return 1.15;
     }
 }

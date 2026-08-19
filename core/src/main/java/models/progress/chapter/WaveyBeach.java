@@ -31,7 +31,7 @@ public class WaveyBeach extends Chapter {
 
     @Override
     public double getDifficultyFactor() {
-        return 1.3;
+        return 1.25;
     }
 
     @Override

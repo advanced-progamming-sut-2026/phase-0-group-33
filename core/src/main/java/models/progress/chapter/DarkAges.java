@@ -40,6 +40,6 @@ public class DarkAges extends Chapter {
 
     @Override
     public double getDifficultyFactor() {
-        return 1.5;
+        return 1.4;
     }
 }
