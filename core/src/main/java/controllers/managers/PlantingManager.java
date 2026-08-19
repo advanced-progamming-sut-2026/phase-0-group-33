@@ -237,6 +237,7 @@ public class PlantingManager {
     private Result detonateInstantly(PlantType type, PlantSlot slot, int cost, int x, int y) {
         consume(slot, cost);
         session.getQuestStats().onPlanted(type, x, y);
+        session.recordDetonation(type, x, y);
         if (type == PlantType.ICE_SHROOM) {
             for (Zombie zombie : session.getZombies()) {
                 zombie.setFrozenTicks(5 * GameSession.TICKS_PER_SECOND);

@@ -63,6 +63,8 @@ public class GameSession {
     private int zombiesKilled;
     private int timerTicksLeft = -1;
     private String farewell;
+    private final java.util.List<int[]> detonations = new java.util.ArrayList<>();
+    private final java.util.List<PlantType> detonationTypes = new java.util.ArrayList<>();
 
     public GameSession(GameSetup setup) {
         this.setup = setup;
@@ -535,6 +537,23 @@ public class GameSession {
         for (PlantSlot slot : selection.getSlots()) {
             slot.setCooldownTicks(0);
         }
+    }
+
+    public void recordDetonation(PlantType type, int x, int y) {
+        if (detonations.size() > 32) {
+            return;
+        }
+        detonations.add(new int[] {x, y});
+        detonationTypes.add(type);
+    }
+
+    public java.util.List<int[]> drainDetonations(java.util.List<PlantType> types) {
+        java.util.List<int[]> copy = new java.util.ArrayList<>(detonations);
+        types.clear();
+        types.addAll(detonationTypes);
+        detonations.clear();
+        detonationTypes.clear();
+        return copy;
     }
 
     public String getFarewell() {

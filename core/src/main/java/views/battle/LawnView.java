@@ -46,6 +46,7 @@ public class LawnView extends Actor {
     private static final float MOWER_START = 0.35f;
     private static final String FIRE_TILE = "FIRETILE";
     private static final String BOOM = "CHERRYBOMB_EXPLOSION_TOP";
+    private static final float BLAST_LIFE = 3.5f;
     private static final String POOF = "PLANT_POOF";
     private static final String DIRT = "DIRT_SPAWN_GRASS";
     private static final String ASH = "ZOMBIE_BIGHEAD_ASH";
@@ -620,17 +621,9 @@ public class LawnView extends Actor {
             }
         }
         for (models.game.PlacedPlant plant : gone) {
-            int[] spot = plantSpots.remove(plant);
-            if (!isExplosive(plant)) {
-                continue;
-            }
-            float duration = animator.namedClipDuration(BOOM, "explosion");
-            if (duration <= 0f) {
-                continue;
-            }
-            blasts.add(new Corpse(null, spot[0], spot[1], time, time + duration));
-            shakePending = true;
+            plantSpots.remove(plant);
         }
+        drainDetonations();
         for (int i = blasts.size - 1; i >= 0; i--) {
             if (time >= blasts.get(i).end) {
                 blasts.removeIndex(i);
@@ -638,10 +631,35 @@ public class LawnView extends Actor {
         }
     }
 
-    private boolean isExplosive(models.game.PlacedPlant plant) {
-        return plant.getType().getCategory() == models.entities.plant.PlantCategory.EXPLOSIVE
-                || plant.getType().getTags().contains(models.entities.plant.PlantTag.EXPLOSIVE);
+    private void drainDetonations() {
+        java.util.List<models.entities.plant.PlantType> types = new java.util.ArrayList<>();
+        java.util.List<int[]> spots = session.drainDetonations(types);
+        for (int i = 0; i < spots.size() && i < types.size(); i++) {
+            int[] spot = spots.get(i);
+            float duration = animator.namedClipDuration(BOOM, "explosion");
+            if (duration > 0f) {
+                blasts.add(new Corpse(null, spot[0], spot[1], time, time + duration));
+            }
+            shakePending = true;
+            noteDetonation(types.get(i), spot[0], spot[1]);
+        }
     }
+
+    private void noteDetonation(models.entities.plant.PlantType type, int column, int row) {
+        addFx(views.assets.AnimationCatalog.blastRear(), "explosion", column, row,
+                2.2f, 0.5f, BLAST_LIFE);
+        String[] own = views.assets.AnimationCatalog.detonation(type);
+        if (own != null) {
+            addFx(own[0], own[1], column, row, 1.6f, 0.35f, BLAST_LIFE);
+        }
+        if (type == models.entities.plant.PlantType.JALAPENO) {
+            for (int col = 1; col <= GameSession.COLS; col++) {
+                addFx(views.assets.AnimationCatalog.laneFire(), "idle", col, row,
+                        1.1f, 0.15f, BLAST_LIFE);
+            }
+        }
+    }
+
 
     private void trackDamage() {
         for (models.game.PlacedPlant plant : session.getPlants()) {

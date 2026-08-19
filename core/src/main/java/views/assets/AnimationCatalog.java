@@ -145,6 +145,34 @@ public final class AnimationCatalog {
         return ATTACK_VARIANTS.get(type.getName());
     }
 
+    private static final ObjectMap<String, String[]> DETONATION = new ObjectMap<>();
+
+    static {
+        DETONATION.put("Cherry Bomb", new String[] {"CHERRYBOMB", "attack"});
+        DETONATION.put("Grapeshot", new String[] {"GRAPESHOT", "attack"});
+        DETONATION.put("Jalapeno", new String[] {"JALAPENO", "attack"});
+        DETONATION.put("Doom-shroom", new String[] {"DOOMSHROOM", "stage3_explode"});
+        DETONATION.put("Ice-shroom", new String[] {"ICESHROOM", "attack"});
+        DETONATION.put("Potato Mine", new String[] {"POTATOMINE", "attack"});
+        DETONATION.put("Primal Potato Mine", new String[] {"PRIMAL_POTATOMINE", "attack"});
+        DETONATION.put("Squash", new String[] {"SQUASH", "jump_down_left"});
+        DETONATION.put("Iceberg Lettuce", new String[] {"ICEBURG", "attack"});
+        DETONATION.put("Explode-o-nut", new String[] {"EXPLODEONUT", "plantfood"});
+        DETONATION.put("Tangle Kelp", new String[] {"TANGLEKELP", "attack_submerge"});
+    }
+
+    public static String[] detonation(models.entities.plant.PlantType type) {
+        return DETONATION.get(type.getName());
+    }
+
+    public static String blastRear() {
+        return "CHERRYBOMB_EXPLOSION_REAR";
+    }
+
+    public static String laneFire() {
+        return "JALAPENO_FIRE";
+    }
+
     public static String breakClip(ZombieType type) {
         switch (type) {
             case NEWSPAPER:

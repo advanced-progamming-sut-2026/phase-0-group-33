@@ -225,6 +225,7 @@ public class CombatManager {
 
     public void explode(PlacedPlant plant) {
         PlantType type = plant.getType();
+        session.recordDetonation(type, plant.getX(), plant.getY());
         if (type == PlantType.JALAPENO) {
             for (Zombie zombie : new ArrayList<>(zombiesInRowAfter(plant.getY(), 0))) {
                 hitZombie(zombie, type);
