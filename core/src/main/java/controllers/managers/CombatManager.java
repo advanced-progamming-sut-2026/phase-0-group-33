@@ -144,28 +144,6 @@ public class CombatManager {
         if (target == null) {
             return false;
         }
-        if (!pierceGraves) {
-            Tile grave = graveBetween(plant.getY(), plant.getX(), target.getPosition().getX());
-            if (grave != null) {
-                grave.damageGrave(plantDamage(plant.getType()));
-                if (grave.getTerrain() != TerrainType.GRAVE) {
-                    grantGraveContent(grave);
-                }
-                return true;
-            }
-            models.game.PushedObject pushed = pushedObjectBetween(
-                    plant.getY(), plant.getX(), target.getPosition().getX());
-            if (pushed != null) {
-                pushed.damage(plantDamage(plant.getType()));
-                return true;
-            }
-            PlacedPlant blocked = disabledPlantBetween(
-                    plant.getY(), plant.getX(), target.getPosition().getX());
-            if (blocked != null) {
-                damageDisablingLayer(blocked, plant.getType());
-                return true;
-            }
-        }
         int shots = plant.getType() == PlantType.PEA_POD ? plant.getStackCount() : 1;
         for (int i = 0; i < shots; i++) {
             session.getProjectileManager().launchStraight(plant, plant.getY(), 1);
@@ -717,6 +695,28 @@ public class CombatManager {
             }
         }
         return result;
+    }
+
+    public boolean blockedAt(int row, double x, PlantType source) {
+        Tile grave = graveBetween(row, x - 0.5, x + 0.1);
+        if (grave != null) {
+            grave.damageGrave(plantDamage(source));
+            if (grave.getTerrain() != TerrainType.GRAVE) {
+                grantGraveContent(grave);
+            }
+            return true;
+        }
+        models.game.PushedObject pushed = pushedObjectBetween(row, x - 0.5, x + 0.1);
+        if (pushed != null) {
+            pushed.damage(plantDamage(source));
+            return true;
+        }
+        PlacedPlant blocked = disabledPlantBetween(row, x - 0.5, x + 0.5);
+        if (blocked != null) {
+            damageDisablingLayer(blocked, source);
+            return true;
+        }
+        return false;
     }
 
     private Tile graveBetween(int row, double fromX, double toX) {

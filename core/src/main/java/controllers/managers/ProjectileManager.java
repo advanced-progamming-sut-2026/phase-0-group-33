@@ -80,6 +80,12 @@ public class ProjectileManager {
             projectile.markSpent();
             return;
         }
+        if (projectile.getMotion() == Projectile.Motion.STRAIGHT
+                && combat.blockedAt(projectile.getRow(), projectile.getX(),
+                        projectile.getSource())) {
+            projectile.markSpent();
+            return;
+        }
         Zombie target = zombieNear(projectile.getRow(), projectile.getX());
         if (target == null || !projectile.recordHit(target)) {
             return;
