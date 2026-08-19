@@ -1432,7 +1432,8 @@ public class LawnView extends Actor {
             if (zombie.getFrozenTicks() > 0 || zombie.getBattle().getIceHealth() > 0) {
                 drawIceBlock(batch, ICE_ZOMBIE, centerX, Lawn.rowBottom(row), 0.9f);
             }
-            int max = Math.max(1, zombie.getType().getHitpoints());
+            int max = Math.max(1, (int) Math.round(zombie.getType().getHitpoints()
+                    * session.getHealthFactor()));
             drawHealthBar(batch, zombie.getHealth(), max, centerX - width / 2f,
                     Lawn.rowBottom(row) + Lawn.cellHeight() * 1.02f, width);
         }
