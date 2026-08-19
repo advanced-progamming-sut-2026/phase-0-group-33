@@ -120,6 +120,8 @@ public class LawnView extends Actor {
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<String, Float> bossMoveStart =
             new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<Long, Boolean> graveSeen =
+            new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, Boolean> diving =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, Float> surfaced =
@@ -231,6 +233,7 @@ public class LawnView extends Actor {
         trackShots();
         trackArmour();
         trackBoss();
+        trackGraves();
         for (int i = effects.size - 1; i >= 0; i--) {
             if (time >= effects.get(i).end) {
                 effects.removeIndex(i);
@@ -463,8 +466,22 @@ public class LawnView extends Actor {
             if (last[0] >= GameSession.COLS + 0.4f) {
                 continue;
             }
-            addFx(splatFor(shot.getSource()), "animation", last[0], (int) last[1],
-                    0.9f, 0.42f, 0.9f);
+            if (shot.getSource().getTags().contains(models.entities.plant.PlantTag.PEA)) {
+                for (models.game.PlacedPlant other : session.getPlants()) {
+                    if (other.getType() == models.entities.plant.PlantType.TORCHWOOD
+                            && other.getY() == (int) last[1]
+                            && Math.abs(other.getX() - last[0]) <= 1.2f) {
+                        noteTorchwoodBurn(other.getX(), other.getY());
+                    }
+                }
+            }
+            String[] impact = views.assets.AnimationCatalog.impact(shot.getSource());
+            if (impact != null) {
+                addFx(impact[0], impact[1], last[0], (int) last[1], 0.9f, 0.42f, 1.1f);
+            } else {
+                addFx(splatFor(shot.getSource()), "animation", last[0], (int) last[1],
+                        0.9f, 0.42f, 0.9f);
+            }
         }
         for (models.game.Projectile shot : session.getProjectileManager().getProjectiles()) {
             shots.put(shot, new float[] {(float) shot.getX(), shot.getRow()});
@@ -643,6 +660,30 @@ public class LawnView extends Actor {
         for (int i = blasts.size - 1; i >= 0; i--) {
             if (time >= blasts.get(i).end) {
                 blasts.removeIndex(i);
+            }
+        }
+    }
+
+    private void noteTorchwoodBurn(float column, int row) {
+        addFx(views.assets.AnimationCatalog.torchwoodHit(), "hit_normal",
+                column, row, 1f, 0.45f, 0.8f);
+    }
+
+    private void trackGraves() {
+        for (int row = 1; row <= GameSession.ROWS; row++) {
+            for (int column = 1; column <= GameSession.COLS; column++) {
+                Tile tile = session.getGrid().getTile(column - 1, row - 1);
+                if (tile == null) {
+                    continue;
+                }
+                long key = row * 100L + column;
+                boolean grave = tile.getTerrain() == TerrainType.GRAVE;
+                Boolean before = graveSeen.get(key);
+                graveSeen.put(key, grave);
+                if (before != null && before && !grave) {
+                    addFx(views.assets.AnimationCatalog.graveDirt(), "gravebuster_dirt_anim",
+                            column, row, 1.1f, 0.1f, 1.2f);
+                }
             }
         }
     }

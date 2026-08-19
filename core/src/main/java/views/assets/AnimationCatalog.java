@@ -180,6 +180,45 @@ public final class AnimationCatalog {
         return PROJECTILE.get(type.getName());
     }
 
+    private static final ObjectMap<String, String[]> IMPACT = new ObjectMap<>();
+
+    static {
+        IMPACT.put("Peashooter", new String[] {"T_SPLAT_PEA", "animation"});
+        IMPACT.put("Repeater", new String[] {"T_SPLAT_PEA", "animation"});
+        IMPACT.put("Threepeater", new String[] {"T_SPLAT_PEA", "animation"});
+        IMPACT.put("Split Pea", new String[] {"T_SPLAT_PEA", "animation"});
+        IMPACT.put("Pea Pod", new String[] {"T_SPLAT_PEA", "animation"});
+        IMPACT.put("Mega Gatling Pea", new String[] {"T_SPLAT_PEA", "animation"});
+        IMPACT.put("Snow Pea", new String[] {"T_SPLAT_SNOW_PEA", "animation"});
+        IMPACT.put("Fire Peashooter", new String[] {"T_SPLAT_FIRE_PEA", "animation"});
+        IMPACT.put("Goo Peashooter", new String[] {"GOOPEASHOOTER_PROJECTILES", "hit_t1"});
+        IMPACT.put("Kernel-pult", new String[] {"SPLAT_KERNALPULT_KERNAL", "animation"});
+        IMPACT.put("Cabbage-pult", new String[] {"SPLAT_CABBAGEPULT", "animation"});
+        IMPACT.put("Melon-pult", new String[] {"T_SPLAT_MELONPULT", "animation"});
+        IMPACT.put("Winter Melon", new String[] {"T_SPLAT_WINTERMELON", "animation"});
+        IMPACT.put("Pepper-pult", new String[] {"PEPPERPULT_PROJECTILE_SPLAT", "animation"});
+        IMPACT.put("Cactus", new String[] {"CACTUS_PROJECTILE_HIT", "animation"});
+        IMPACT.put("Citron", new String[] {"CITRON_CITRUS_ORB_HIT", "animation"});
+        IMPACT.put("Rotobaga", new String[] {"ROTORUTABAGA_PROJECTILE_HIT", "animation"});
+        IMPACT.put("Grapeshot", new String[] {"GRAPESHOT_HIT", "animation"});
+        IMPACT.put("Starfruit", new String[] {"T_STARFRUIT_PROJECTILE_HIT", "idle"});
+        IMPACT.put("Puff-shroom", new String[] {"T_PUFFSHROOM_HIT", "animation"});
+        IMPACT.put("Fume-shroom", new String[] {"FUMESHROOM_BUBBLES_HIT", "animation"});
+        IMPACT.put("Sea-shroom", new String[] {"SEASHROOM_PROJECTILE", "animation2"});
+    }
+
+    public static String[] impact(models.entities.plant.PlantType type) {
+        return IMPACT.get(type.getName());
+    }
+
+    public static String torchwoodHit() {
+        return "TORCHWOOD_HIT_EFFECTS";
+    }
+
+    public static String graveDirt() {
+        return "GRAVEBUSTER_DIRT";
+    }
+
     private static final ObjectMap<String, String[]> DETONATION = new ObjectMap<>();
 
     static {
@@ -188,8 +227,9 @@ public final class AnimationCatalog {
         DETONATION.put("Jalapeno", new String[] {"JALAPENO", "attack"});
         DETONATION.put("Doom-shroom", new String[] {"DOOMSHROOM", "stage3_explode"});
         DETONATION.put("Ice-shroom", new String[] {"ICESHROOM", "attack"});
-        DETONATION.put("Potato Mine", new String[] {"POTATOMINE", "attack"});
-        DETONATION.put("Primal Potato Mine", new String[] {"PRIMAL_POTATOMINE", "attack"});
+        DETONATION.put("Potato Mine", new String[] {"POTATOMINE_EXPLOSION", "animation"});
+        DETONATION.put("Primal Potato Mine",
+                new String[] {"PRIMAL_POTATOMINE_EXPLOSION", "animation"});
         DETONATION.put("Squash", new String[] {"SQUASH", "jump_down_left"});
         DETONATION.put("Iceberg Lettuce", new String[] {"ICEBURG", "attack"});
         DETONATION.put("Explode-o-nut", new String[] {"EXPLODEONUT", "plantfood"});
