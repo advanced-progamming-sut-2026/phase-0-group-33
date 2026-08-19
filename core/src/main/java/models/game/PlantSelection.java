@@ -2,7 +2,10 @@ package models.game;
 
 import models.Result;
 import models.entities.plant.PlantCategory;
+import models.entities.plant.PlantTag;
 import models.entities.plant.PlantType;
+import models.progress.chapter.Chapter;
+import models.progress.level.Level;
 import models.progress.level.special.SpecialLevelType;
 
 import java.util.ArrayList;
@@ -14,10 +17,12 @@ public class PlantSelection {
     private final List<PlantSlot> slots = new ArrayList<>();
     private final List<String> unlockedPlantNames;
     private final SpecialLevelType specialType;
+    private final Chapter chapter;
 
-    public PlantSelection(List<String> unlockedPlantNames, SpecialLevelType specialType) {
+    public PlantSelection(List<String> unlockedPlantNames, Level level) {
         this.unlockedPlantNames = unlockedPlantNames;
-        this.specialType = specialType;
+        this.specialType = level == null ? null : level.getSpecialType();
+        this.chapter = level == null ? null : level.getChapter();
     }
 
     public Result listAllPlants() {
@@ -68,7 +73,40 @@ public class PlantSelection {
         return isLockedInThisLevel(type);
     }
 
+    private boolean isUselessHere(PlantType type) {
+        if (chapter == null) {
+            return false;
+        }
+        boolean water = type.getTags().contains(PlantTag.WATER)
+                || type == PlantType.LILY_PAD;
+        if (water && chapter.getWaterColumns() <= 0) {
+            return true;
+        }
+        if (type == PlantType.HOT_POTATO
+                && !(chapter instanceof models.progress.chapter.FrostBite)) {
+            return true;
+        }
+        return type == PlantType.GRAVE_BUSTER && chapter.getGraveCount() <= 0
+                && !(chapter instanceof models.progress.chapter.DarkAges);
+    }
+
+    public String lockReason(PlantType type) {
+        if (isUselessHere(type)) {
+            if (type.getTags().contains(PlantTag.WATER) || type == PlantType.LILY_PAD) {
+                return "there is no water in this chapter";
+            }
+            if (type == PlantType.HOT_POTATO) {
+                return "nothing freezes in this chapter";
+            }
+            return "there are no gravestones in this chapter";
+        }
+        return isLockedInThisLevel(type) ? "this level locks it" : null;
+    }
+
     private boolean isLockedInThisLevel(PlantType type) {
+        if (isUselessHere(type)) {
+            return true;
+        }
         if (specialType == SpecialLevelType.PLANT_WHAT_YOU_GET
                 && type.getCategory() == PlantCategory.SUN_PRODUCER) {
             return true;

@@ -67,7 +67,7 @@ public class GameSession {
         this.setup = setup;
         this.random = setup.getSeed() >= 0 ? new Random(setup.getSeed()) : new Random();
         this.selection = new PlantSelection(new ArrayList<>(setup.getUnlockedPlants()),
-                setup.getLevel() == null ? null : setup.getLevel().getSpecialType());
+                setup.getLevel());
         this.plantFoods = Math.min(3, setup.getPlantFoods());
         this.sunManager = new SunManager(startingSun(), skyEnabled(), difficulty() / 3.0, random);
         this.waveManager = new WaveManager(this, zombiePool(), waveCount(), waveBudget(),

@@ -163,14 +163,17 @@ public class SeedSelectScreen extends BaseScreen {
                     .boosted(selected && session().findSlot(type).isBoosted())
                     .locked(locked);
             if (locked) {
-                card.note("locked in this level", Palette.BAD);
+                String reason = session().getSelection().lockReason(type);
+                card.note(reason == null ? "locked in this level" : reason, Palette.BAD);
             } else if (selected) {
                 card.note("in your line-up", Palette.GOOD);
             }
             card.onClick(() -> {
                 focused = type;
                 if (locked) {
-                    toasts.error(type.getName() + " is locked in this level.");
+                    String reason = session().getSelection().lockReason(type);
+                    toasts.error(type.getName() + " is locked: "
+                            + (reason == null ? "this level locks it" : reason) + ".");
                     showDetail(type);
                     return;
                 }
