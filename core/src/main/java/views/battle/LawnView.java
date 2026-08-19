@@ -961,10 +961,13 @@ public class LawnView extends Actor {
             return;
         }
         String icon = null;
+        float spin = 0f;
         if (tile.getTerrain() == TerrainType.SLIDER_UP) {
             icon = "image_ui_almanac_stats_screen_nav_arrow_next";
+            spin = 90f;
         } else if (tile.getTerrain() == TerrainType.SLIDER_DOWN) {
             icon = "image_ui_almanac_stats_screen_nav_arrow_previous";
+            spin = 90f;
         } else if (tile.getTerrain() == TerrainType.FIRE) {
             drawFireTile(batch, column, row);
             return;
@@ -980,8 +983,13 @@ public class LawnView extends Actor {
         }
         batch.setColor(Color.WHITE);
         float size = Lawn.cellWidth() * 0.6f;
-        batch.draw(region, Lawn.columnCenter(column) - size / 2f,
-                Lawn.rowCenter(row) - size / 2f, size, size);
+        float x = Lawn.columnCenter(column) - size / 2f;
+        float y = Lawn.rowCenter(row) - size / 2f;
+        if (spin == 0f) {
+            batch.draw(region, x, y, size, size);
+            return;
+        }
+        batch.draw(region, x, y, size / 2f, size / 2f, size, size, 1f, 1f, spin);
     }
 
     private void drawFireTile(Batch batch, int column, int row) {
