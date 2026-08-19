@@ -35,6 +35,10 @@ public abstract class Chapter {
         return 0;
     }
 
+    public double getDifficultyFactor() {
+        return 1.0;
+    }
+
     public int getWaterColumns() {
         return 0;
     }

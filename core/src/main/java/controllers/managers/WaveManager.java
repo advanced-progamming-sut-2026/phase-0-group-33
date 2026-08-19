@@ -33,7 +33,7 @@ public class WaveManager {
         double[] budgets = new double[waves];
         budgets[0] = baseBudget;
         for (int i = 1; i < waves; i++) {
-            budgets[i] = budgets[i - 1] * 1.25;
+            budgets[i] = budgets[i - 1] * 1.35;
         }
         if (waves > 1) {
             budgets[waves - 1] = budgets[waves - 2] * 2;

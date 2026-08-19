@@ -31,4 +31,9 @@ public class Egypt extends Chapter {
     public int getGraveCount() {
         return 2;
     }
+
+    @Override
+    public double getDifficultyFactor() {
+        return 1.0;
+    }
 }

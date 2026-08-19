@@ -30,6 +30,11 @@ public class WaveyBeach extends Chapter {
     }
 
     @Override
+    public double getDifficultyFactor() {
+        return 1.3;
+    }
+
+    @Override
     public int getWaterColumns() {
         return 2;
     }

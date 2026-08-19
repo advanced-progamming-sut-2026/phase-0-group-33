@@ -26,4 +26,9 @@ public class FrostBite extends Chapter {
         return withCommons(ZombieType.DODO, ZombieType.HUNTER, ZombieType.TROGLOBITE,
                 ZombieType.WEASEL_HOARDER);
     }
+
+    @Override
+    public double getDifficultyFactor() {
+        return 1.2;
+    }
 }
