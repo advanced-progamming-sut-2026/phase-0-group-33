@@ -222,8 +222,8 @@ public class LawnView extends Actor {
         trackAbilities();
         trackDamage();
         trackBlasts();
-        trackDeaths();
         trackStorms();
+        trackDeaths();
         trackMowers();
         expireBreakClips();
         trackDiving();
