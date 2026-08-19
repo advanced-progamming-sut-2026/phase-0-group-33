@@ -651,23 +651,7 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     private void useTool(int column, int row) {
-        if (tool == Tool.NONE && controller.handleCollectPlantFood(column, row).isSuccessfull()) {
-            sfx(views.assets.Audio.GULP);
-            return;
-        }
-        if (session.getMode() == GameMode.VASEBREAKER && tool == Tool.NONE) {
-            Result broken = controller.handleBreakVase(column, row);
-            if (broken.isSuccessfull() || !hasVases()) {
-                toasts.show(broken);
-                return;
-            }
-        }
-        if (session.getMode() == GameMode.I_ZOMBIE) {
-            placeZombie(column, row);
-            return;
-        }
-        if (session.getMode() == GameMode.BEGHOULED) {
-            swapAt(column, row);
+        if (handleModeClick(column, row)) {
             return;
         }
         Result result;
@@ -692,14 +676,39 @@ public class BattleScreen extends ScreenAdapter {
         if (result.isSuccessfull()) {
             sfx(tool == Tool.PLANT ? views.assets.Audio.PLANT
                     : tool == Tool.NONE ? views.assets.Audio.SUN : views.assets.Audio.CLICK);
+            clearTool();
         }
-        if (result.isSuccessfull()) {
-            tool = Tool.NONE;
-            pending = null;
-            lawnView.setGhost(null);
-            lawnView.clearHover();
-            updateCursor();
+    }
+
+    private boolean handleModeClick(int column, int row) {
+        if (tool == Tool.NONE && controller.handleCollectPlantFood(column, row).isSuccessfull()) {
+            sfx(views.assets.Audio.GULP);
+            return true;
         }
+        if (session.getMode() == GameMode.VASEBREAKER && tool == Tool.NONE) {
+            Result broken = controller.handleBreakVase(column, row);
+            if (broken.isSuccessfull() || !hasVases()) {
+                toasts.show(broken);
+                return true;
+            }
+        }
+        if (session.getMode() == GameMode.I_ZOMBIE) {
+            placeZombie(column, row);
+            return true;
+        }
+        if (session.getMode() == GameMode.BEGHOULED) {
+            swapAt(column, row);
+            return true;
+        }
+        return false;
+    }
+
+    private void clearTool() {
+        tool = Tool.NONE;
+        pending = null;
+        lawnView.setGhost(null);
+        lawnView.clearHover();
+        updateCursor();
     }
 
     private boolean hasVases() {

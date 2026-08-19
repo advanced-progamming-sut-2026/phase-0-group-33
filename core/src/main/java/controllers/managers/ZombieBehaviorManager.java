@@ -65,12 +65,7 @@ public class ZombieBehaviorManager {
 
     public boolean handleSpecial(Zombie zombie) {
         if (zombie.getBattle().getIceHealth() > 0) {
-            int left = zombie.getBattle().getIceHealth() - THAW_PER_TICK;
-            zombie.getBattle().setIceHealth(Math.max(0, left));
-            if (left <= 0) {
-                System.out.printf("The ice around the %s melted away.%n",
-                        zombie.getType().getName());
-            }
+            thaw(zombie);
             return true;
         }
         if (zombie.getBattle().isHypnotized()) {
@@ -114,6 +109,15 @@ public class ZombieBehaviorManager {
                 return false;
             default:
                 return handleSpecialExtra(zombie);
+        }
+    }
+
+    private void thaw(Zombie zombie) {
+        int left = zombie.getBattle().getIceHealth() - THAW_PER_TICK;
+        zombie.getBattle().setIceHealth(Math.max(0, left));
+        if (left <= 0) {
+            System.out.printf("The ice around the %s melted away.%n",
+                    zombie.getType().getName());
         }
     }
 
