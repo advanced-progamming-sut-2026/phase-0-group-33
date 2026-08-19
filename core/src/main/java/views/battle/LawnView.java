@@ -38,8 +38,6 @@ public class LawnView extends Actor {
     private static final float HURT_FLASH = 0.14f;
     private static final float IMP_FLIGHT = 0.85f;
     private static final float IMP_ARC = 1.9f;
-    private static final String SANDSTORM = "SANDSTORM_TOP";
-    private static final String SNOWSTORM = "SNOWSTORM_TOP";
     private static final float STORM_LIFE = 1.4f;
     private static final float DODO_HOP = 0.55f;
     private static final float MOWER_RUN = 2.2f;
@@ -335,6 +333,35 @@ public class LawnView extends Actor {
         return true;
     }
 
+    private void drawStormLayer(Batch batch, String animation, float column, int row,
+                                float age, float height) {
+        String clipName = animator.clipName(animation, "loop", "intro", "animation", "idle");
+        ClipRef clip = clipName == null ? null : animator.namedClip(animation, clipName);
+        if (clip == null) {
+            return;
+        }
+        float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * height);
+        float lift = animator.centreOffset(animation, clipName, scale);
+        animator.draw(batch, clip, age, Lawn.columnCenter(column),
+                Lawn.rowCenter(row) + lift, scale, true, null);
+    }
+
+    private void drawGust(Batch batch, String animation, int row, float age) {
+        String clipName = animator.clipName(animation, "animation", "loop", "idle");
+        ClipRef clip = clipName == null ? null : animator.namedClip(animation, clipName);
+        if (clip == null) {
+            drawStormLayer(batch, views.assets.AnimationCatalog.stormTop(true),
+                    5f, row, age, 1.4f);
+            return;
+        }
+        float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 1.3f);
+        float lift = animator.centreOffset(animation, clipName, scale);
+        for (int column = 2; column <= GameSession.COLS; column += 3) {
+            animator.draw(batch, clip, age + column * 0.09f, Lawn.columnCenter(column),
+                    Lawn.rowCenter(row) + lift, scale, true, null);
+        }
+    }
+
     private void trackBirths() {
         boolean settled = seeded;
         for (models.game.PlacedPlant plant : session.getPlants()) {
@@ -571,29 +598,18 @@ public class LawnView extends Actor {
             return;
         }
         for (float[] storm : storms) {
-            boolean wind = storm[3] > 0.5f;
-            String animation = wind ? SNOWSTORM : SANDSTORM;
-            String clipName = animator.clipName(animation, "animation", "idle");
-            ClipRef clip = clipName == null ? null : animator.namedClip(animation, clipName);
-            if (clip == null) {
-                continue;
-            }
+            boolean icy = storm[3] > 0.5f;
             int row = (int) storm[1];
             float age = time - storm[2];
-            float fade = Math.min(0.7f, 1.6f * (1f - age / STORM_LIFE));
+            float fade = Math.min(0.85f, 1.8f * (1f - age / STORM_LIFE));
             batch.setColor(1f, 1f, 1f, Math.max(0f, fade));
-            if (wind) {
-                float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 1.4f);
-                float lift = animator.centreOffset(animation, clipName, scale);
-                for (int column = 2; column <= GameSession.COLS; column += 3) {
-                    animator.draw(batch, clip, age + column * 0.09f, Lawn.columnCenter(column),
-                            Lawn.rowCenter(row) + lift, scale, true, null);
-                }
+            if (icy) {
+                drawGust(batch, views.assets.AnimationCatalog.chillWind(), row, age);
             } else {
-                float scale = animator.fitScale(animation, clipName, Lawn.cellHeight() * 1.6f);
-                float lift = animator.centreOffset(animation, clipName, scale);
-                animator.draw(batch, clip, age, Lawn.columnCenter(storm[0]),
-                        Lawn.rowCenter(row) + lift, scale, true, null);
+                drawStormLayer(batch, views.assets.AnimationCatalog.stormRear(false),
+                        storm[0], row, age, 1.9f);
+                drawStormLayer(batch, views.assets.AnimationCatalog.stormTop(false),
+                        storm[0], row, age, 1.7f);
             }
             batch.setColor(Color.WHITE);
         }
@@ -1275,20 +1291,48 @@ public class LawnView extends Actor {
 
     private void drawProjectiles(Batch batch, int row) {
         TextureRegion region = art.pea();
-        if (region == null) {
-            return;
-        }
         for (models.game.Projectile shot : session.getProjectileManager().getProjectiles()) {
             if (shot.getRow() != row) {
                 continue;
             }
             float size = Lawn.cellWidth() * projectileScale(shot.getSource());
-            float x = Lawn.columnCenter(shot.getX()) - size / 2f;
+            float centreX = Lawn.columnCenter(shot.getX());
             float y = Lawn.rowBottom(row) + Lawn.cellHeight() * 0.45f
                     + (float) shot.getHeight() * Lawn.cellHeight() * 0.5f;
+            if (drawShotAnimation(batch, shot, centreX, y + size / 2f, size)) {
+                continue;
+            }
+            if (region == null) {
+                continue;
+            }
             batch.setColor(projectileTint(shot.getSource()));
-            batch.draw(region, x, y, size, size);
+            batch.draw(region, centreX - size / 2f, y, size, size);
         }
+        batch.setColor(Color.WHITE);
+    }
+
+    private boolean drawShotAnimation(Batch batch, models.game.Projectile shot,
+                                      float centreX, float centreY, float size) {
+        if (!animator.isReady()) {
+            return false;
+        }
+        String[] art = views.assets.AnimationCatalog.projectile(shot.getSource());
+        if (art == null) {
+            return false;
+        }
+        ClipRef clip = animator.namedClip(art[0], art[1]);
+        if (clip == null) {
+            return false;
+        }
+        float scale = animator.fitScale(art[0], art[1], size * 1.3f);
+        if (scale <= 0f) {
+            return false;
+        }
+        float lift = animator.centreOffset(art[0], art[1], scale);
+        batch.setColor(Color.WHITE);
+        animator.draw(batch, clip, time + (float) shot.getOriginX() * 0.17f, centreX,
+                centreY + lift, scale, true, null);
+        return true;
     }
 
     private float projectileScale(models.entities.plant.PlantType source) {

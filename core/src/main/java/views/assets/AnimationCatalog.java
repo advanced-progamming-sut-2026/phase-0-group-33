@@ -146,6 +146,40 @@ public final class AnimationCatalog {
         return ATTACK_VARIANTS.get(type.getName());
     }
 
+    private static final ObjectMap<String, String[]> PROJECTILE = new ObjectMap<>();
+
+    static {
+        PROJECTILE.put("Peashooter", new String[] {"T_PEA_PROJECTILE", "animation"});
+        PROJECTILE.put("Repeater", new String[] {"T_PEA_PROJECTILE", "animation"});
+        PROJECTILE.put("Threepeater", new String[] {"T_PEA_PROJECTILE", "animation"});
+        PROJECTILE.put("Split Pea", new String[] {"T_PEA_PROJECTILE", "animation"});
+        PROJECTILE.put("Pea Pod", new String[] {"T_PEA_PROJECTILE", "animation"});
+        PROJECTILE.put("Mega Gatling Pea", new String[] {"T_PEA_PROJECTILE", "animation"});
+        PROJECTILE.put("Snow Pea", new String[] {"T_SNOW_PEA", "animation"});
+        PROJECTILE.put("Fire Peashooter", new String[] {"T_FIRE_PEA", "animation"});
+        PROJECTILE.put("Goo Peashooter",
+                new String[] {"GOOPEASHOOTER_PROJECTILES", "projectile_t1"});
+        PROJECTILE.put("Kernel-pult", new String[] {"T_KERNALPULT_PROJECTILE", "animation"});
+        PROJECTILE.put("Cabbage-pult", new String[] {"T_CABBAGEPULT_PROJECTILE", "animation"});
+        PROJECTILE.put("Melon-pult", new String[] {"T_MELON_PROJECTILE", "animation"});
+        PROJECTILE.put("Winter Melon", new String[] {"T_WINTERMELON_PROJECTILE", "animation"});
+        PROJECTILE.put("Pepper-pult", new String[] {"T_PEPPERPULT_PROJECTILE", "animation"});
+        PROJECTILE.put("Cactus", new String[] {"T_CACTUS_PROJECTILE", "idle"});
+        PROJECTILE.put("Citron", new String[] {"T_CITRON_CITRUS_ORB", "Citron_Citrus_Orb"});
+        PROJECTILE.put("Puff-shroom", new String[] {"T_PUFFSHROOM_PROJECTILE", "animation"});
+        PROJECTILE.put("Sea-shroom", new String[] {"SEASHROOM_PROJECTILE", "animation"});
+        PROJECTILE.put("Starfruit", new String[] {"T_STARFRUIT_PROJECTILE", "animation"});
+        PROJECTILE.put("Bowling Bulb", new String[] {"BOWLINGBULB_PROJECTILE1", "animation"});
+        PROJECTILE.put("Rotobaga", new String[] {"T_PEA_PROJECTILE", "animation"});
+        PROJECTILE.put("Cat-tail", new String[] {"T_SPORESHROOM_PROJECTILE", "animation"});
+        PROJECTILE.put("Fume-shroom", new String[] {"T_SPORESHROOM_PROJECTILE", "animation"});
+        PROJECTILE.put("Sun-shroom", new String[] {"T_PUFFSHROOM_PROJECTILE", "animation"});
+    }
+
+    public static String[] projectile(models.entities.plant.PlantType type) {
+        return PROJECTILE.get(type.getName());
+    }
+
     private static final ObjectMap<String, String[]> DETONATION = new ObjectMap<>();
 
     static {
@@ -168,6 +202,18 @@ public final class AnimationCatalog {
 
     public static String blastRear() {
         return "CHERRYBOMB_EXPLOSION_REAR";
+    }
+
+    public static String stormTop(boolean icy) {
+        return icy ? "SNOWSTORM_TOP" : "SANDSTORM_TOP";
+    }
+
+    public static String stormRear(boolean icy) {
+        return icy ? "SNOWSTORM_REAR" : "SANDSTORM_REAR";
+    }
+
+    public static String chillWind() {
+        return "FROSTBITE_CHILL_WIND";
     }
 
     public static String laneFire() {
