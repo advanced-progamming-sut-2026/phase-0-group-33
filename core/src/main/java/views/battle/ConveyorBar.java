@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.ObjectMap;
 import models.entities.plant.PlantType;
 import models.game.GameSession;
@@ -98,6 +100,13 @@ public final class ConveyorBar extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+        Rectangle scissor = new Rectangle();
+        ScissorStack.calculateScissors(getStage().getCamera(), batch.getTransformMatrix(),
+                new Rectangle(getX(), getY(), getWidth(), getHeight()), scissor);
+        batch.flush();
+        if (!ScissorStack.pushScissors(scissor)) {
+            return;
+        }
         drawBelt(batch);
         batch.setColor(Color.WHITE);
         for (PlantSlot slot : session.getSlots()) {
@@ -108,6 +117,8 @@ public final class ConveyorBar extends Actor {
             drawPlant(batch, slot.getType(),
                     getY() + getHeight() - offset - SLOT_WIDTH / 2f);
         }
+        batch.flush();
+        ScissorStack.popScissors();
     }
 
     private void drawBelt(Batch batch) {
@@ -118,18 +129,22 @@ public final class ConveyorBar extends Actor {
         }
         batch.setColor(Color.WHITE);
         float tile = SLOT_WIDTH;
-        float beltWidth = getWidth() * 0.86f;
+        float thickness = getWidth() * 0.82f;
+        float centreX = getX() + getWidth() * 0.5f;
         for (float y = -tile; y < getHeight() + tile; y += tile) {
-            batch.draw(belt, getX(), getY() + y + scroll, beltWidth, tile);
+            float centreY = getY() + y + scroll + tile / 2f;
+            batch.draw(belt, centreX - tile / 2f, centreY - thickness / 2f,
+                    tile / 2f, thickness / 2f, tile, thickness, 1f, 1f, 90f);
             if (side != null) {
-                batch.draw(side, getX() + beltWidth * 0.86f, getY() + y + scroll,
-                        beltWidth * 0.34f, tile);
+                float rail = thickness * 0.34f;
+                batch.draw(side, centreX - tile / 2f + thickness * 0.43f,
+                        centreY - rail / 2f, tile / 2f, rail / 2f, tile, rail, 1f, 1f, 90f);
             }
         }
     }
 
     private void drawPlant(Batch batch, PlantType type, float centreY) {
-        float centreX = getX() + getWidth() * 0.43f;
+        float centreX = getX() + getWidth() * 0.5f;
         float feet = centreY - SLOT_WIDTH * 0.4f;
         ClipRef clip = animator.plantClip(type, "idle");
         if (clip == null) {
@@ -138,7 +153,7 @@ public final class ConveyorBar extends Actor {
             batch.draw(region, centreX - size / 2f, feet, size, size);
             return;
         }
-        float scale = animator.plantScale() * 0.68f;
+        float scale = animator.plantScale() * 0.8f;
         animator.draw(batch, clip, time, centreX, feet + animator.plantLift() * 0.72f,
                 scale, true, null);
     }

@@ -494,7 +494,7 @@ public class BattleScreen extends ScreenAdapter {
             return 108f;
         }
         if (usesConveyor()) {
-            return 104f;
+            return 120f;
         }
         return session.getSlots().size() > COLUMN_SLOTS ? 200f : 106f;
     }
@@ -509,7 +509,7 @@ public class BattleScreen extends ScreenAdapter {
         } else if (usesConveyor()) {
             ConveyorBar belt = new ConveyorBar(session, art, lawnView.animator(),
                     type -> selectTool(Tool.PLANT, type));
-            tray.add(belt).width(90f).height(460f);
+            tray.add(belt).width(106f).height(470f);
         } else {
             tray.add(seedBar).top().expandY();
         }
