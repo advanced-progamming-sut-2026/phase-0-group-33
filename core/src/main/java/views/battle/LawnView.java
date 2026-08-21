@@ -1382,7 +1382,9 @@ public class LawnView extends Actor {
             if (shot.getRow() != row) {
                 continue;
             }
-            float size = Lawn.cellWidth() * projectileScale(shot.getSource());
+            float size = Lawn.cellWidth()
+                    * (shot.getMotion() == models.game.Projectile.Motion.SCATTER
+                            ? 0.5f : projectileScale(shot.getSource()));
             float centreX = Lawn.columnCenter(shot.getX());
             float y = Lawn.rowBottom(shot.getLane()) + Lawn.cellHeight() * 0.45f
                     + (float) shot.getHeight() * Lawn.cellHeight() * 0.5f;
