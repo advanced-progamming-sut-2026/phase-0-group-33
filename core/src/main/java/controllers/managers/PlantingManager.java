@@ -97,9 +97,6 @@ public class PlantingManager {
         session.getQuestStats().onPlanted(type, x, y);
         if (slot.isBoosted()) {
             session.getCombatManager().applyPlantFood(plant);
-        } else if (consumeStoredBoost(type)) {
-            System.out.println("A stored greenhouse boost activated for " + type.getName() + "!");
-            session.getCombatManager().applyPlantFood(plant);
         }
         return Result.ok(type.getName() + " planted at (" + x + ", " + y + ").");
     }
@@ -135,17 +132,6 @@ public class PlantingManager {
             return Result.ok("Gold Bloom burst into 375 sun!");
         }
         return null;
-    }
-
-    private boolean consumeStoredBoost(PlantType type) {
-        utils.UserDataStore store = utils.UserDataStore.forUser(
-                session.getUser().getUsername());
-        if (store.getInt("boost." + type.getName(), 0) <= 0) {
-            return false;
-        }
-        store.setInt("boost." + type.getName(), 0);
-        store.save();
-        return true;
     }
 
     public boolean canStandOn(PlantType type, int x, int y) {

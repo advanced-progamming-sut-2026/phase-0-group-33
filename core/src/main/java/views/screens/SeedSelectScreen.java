@@ -239,17 +239,7 @@ public class SeedSelectScreen extends BaseScreen {
         stat(panel, art.ui("image_ui_almanac_plant_select_pkt"), "Seed packets",
                 String.valueOf(store.getInt("packets." + type.getName(), 0)));
 
-        if (slot == null) {
-            panel.add(Ui.label(skin, "Not in your line-up yet.", "muted")).padTop(6f).row();
-        } else if (slot.isBoosted()) {
-            panel.add(Ui.label(skin, "Boosted for this level.", "good")).padTop(6f).row();
-        } else {
-            panel.add(Ui.button(skin, "Boost (" + BOOST_COST + " gems)", "purple", () -> {
-                toasts.show(controller.handleBoostPlant(type.getName()));
-                topBar().refresh();
-                refresh();
-            })).width(280f).height(52f).padTop(10f).row();
-        }
+        addBoostRow(panel, type, slot);
 
         panel.add(Ui.button(skin, "Upgrade plant", "small", () -> {
             toasts.show(collection.handleUpgradePlant(type.getName()));
@@ -258,6 +248,25 @@ public class SeedSelectScreen extends BaseScreen {
         })).width(280f).height(48f).padTop(8f);
 
         detailPane.add(panel).growX();
+    }
+
+    private void addBoostRow(Table panel, models.entities.plant.PlantType type,
+                             models.game.PlantSlot slot) {
+        if (slot == null) {
+            panel.add(Ui.label(skin, "Not in your line-up yet.", "muted")).padTop(6f).row();
+            return;
+        }
+        if (slot.isBoosted()) {
+            panel.add(Ui.label(skin, session().isGreenhouseBoost(type)
+                    ? "Greenhouse boost ready for this level."
+                    : "Boosted for this level.", "good")).padTop(6f).row();
+            return;
+        }
+        panel.add(Ui.button(skin, "Boost (" + BOOST_COST + " gems)", "purple", () -> {
+            toasts.show(controller.handleBoostPlant(type.getName()));
+            topBar().refresh();
+            refresh();
+        })).width(280f).height(52f).padTop(10f).row();
     }
 
     private void stat(Table panel, TextureRegion icon, String key, String value) {

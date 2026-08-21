@@ -52,17 +52,6 @@ public class GameController extends BaseController {
         if (!validation.isSuccessfull()) {
             return validation;
         }
-        UserDataStore store = UserDataStore.forUser(app.getCurrentUser().getUsername());
-        String boostKey = "boost." + type;
-        if (store.getInt(boostKey, 0) > 0) {
-            Result result = session().markBoosted(type);
-            if (result.isSuccessfull()) {
-                store.setInt(boostKey, 0);
-                store.save();
-                result.addMessage("A stored greenhouse boost was used.");
-            }
-            return result;
-        }
         if (app.getCurrentUser().getDiamonds().getAmount() < 2) {
             return Result.fail("Boosting costs 2 diamonds and you have "
                     + app.getCurrentUser().getDiamonds().getAmount() + ".");

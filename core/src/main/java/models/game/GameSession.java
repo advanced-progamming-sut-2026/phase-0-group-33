@@ -149,7 +149,45 @@ public class GameSession {
     }
 
     public Result addPlantToSelection(String typeName) {
-        return selection.add(typeName, phase == GamePhase.PREPARATION);
+        Result result = selection.add(typeName, phase == GamePhase.PREPARATION);
+        if (result.isSuccessfull()) {
+            applyStoredBoost(Names.plant(typeName));
+        }
+        return result;
+    }
+
+    private void applyStoredBoost(models.entities.plant.PlantType type) {
+        PlantSlot slot = type == null ? null : selection.findSlot(type);
+        if (slot == null || slot.isBoosted()) {
+            return;
+        }
+        utils.UserDataStore store = utils.UserDataStore.forUser(getUser().getUsername());
+        if (store.getInt("boost." + type.getName(), 0) > 0) {
+            slot.setBoosted(true);
+        }
+    }
+
+    public boolean isGreenhouseBoost(models.entities.plant.PlantType type) {
+        if (type == null) {
+            return false;
+        }
+        utils.UserDataStore store = utils.UserDataStore.forUser(getUser().getUsername());
+        return store.getInt("boost." + type.getName(), 0) > 0;
+    }
+
+    private void spendStoredBoosts() {
+        utils.UserDataStore store = utils.UserDataStore.forUser(getUser().getUsername());
+        boolean dirty = false;
+        for (PlantSlot slot : selection.getSlots()) {
+            String key = "boost." + slot.getType().getName();
+            if (slot.isBoosted() && store.getInt(key, 0) > 0) {
+                store.setInt(key, 0);
+                dirty = true;
+            }
+        }
+        if (dirty) {
+            store.save();
+        }
     }
 
     public Result removePlantFromSelection(String typeName) {
@@ -172,6 +210,7 @@ public class GameSession {
             return Result.fail("Pick at least one plant first.");
         }
         phase = GamePhase.BATTLE;
+        spendStoredBoosts();
         if (isSpecial(SpecialLevelType.SAVE_OUR_SEEDS)) {
             placeProtectedSeeds();
         }
