@@ -3112,3 +3112,17 @@ image_ui_red_flag
   orig: 140, 34
   offset: 0, 0
   index: -1
+image_ui_hud_ingame_progress_meter_zombiehead
+  rotate: false
+  xy: 828, 0
+  size: 42, 45
+  orig: 42, 45
+  offset: 0, 0
+  index: -1
+image_ui_hud_ingame_progress_meter_zomboss_head
+  rotate: false
+  xy: 872, 0
+  size: 47, 53
+  orig: 47, 53
+  offset: 0, 0
+  index: -1

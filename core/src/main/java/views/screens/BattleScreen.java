@@ -416,7 +416,7 @@ public class BattleScreen extends ScreenAdapter {
         Table waveBox = new Table();
         waveLabel = new Label("", skin, "small");
         waveMeter = new views.battle.WaveMeter(art);
-        waveBox.add(waveMeter).width(330f).height(34f).padTop(20f).row();
+        waveBox.add(waveMeter).width(330f).height(34f).padTop(24f).row();
         waveBox.add(waveLabel).center().padTop(1f);
         bar.add(waveBox).padRight(20f);
 

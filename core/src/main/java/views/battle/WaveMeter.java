@@ -64,12 +64,23 @@ public final class WaveMeter extends Actor {
         float scale = getHeight() / NATURAL_HEIGHT;
         float track = getWidth() - INSET * 2f * scale;
         float left = getX() + INSET * scale;
+        drawTrack(batch, left, track, scale);
         drawFill(batch, left, track, scale);
         batch.setColor(Color.WHITE);
         batch.draw(trough, getX(), getY(), getWidth(), getHeight());
         drawFlags(batch, left, track, scale);
         drawHead(batch, left, track, scale);
         batch.setColor(Color.WHITE);
+    }
+
+    private void drawTrack(Batch batch, float left, float track, float scale) {
+        TextureRegion flat = art.uiOptional("white-pixel");
+        if (flat == null) {
+            return;
+        }
+        batch.setColor(0.16f, 0.13f, 0.1f, 0.82f);
+        batch.draw(flat, left, getY() + INSET * scale, track,
+                getHeight() - INSET * 2f * scale);
     }
 
     private void drawFill(Batch batch, float left, float track, float scale) {
@@ -97,7 +108,7 @@ public final class WaveMeter extends Actor {
             float at = wave / (float) shownWaves;
             float x = left + track * (1f - at);
             boolean last = wave == shownWaves;
-            float poleHeight = getHeight() * (last ? 1.5f : 1.1f);
+            float poleHeight = getHeight() * (last ? 1.35f : 1.05f);
             float poleWidth = pole.getRegionWidth() * scale * 0.5f;
             batch.setColor(Color.WHITE);
             batch.draw(pole, x - poleWidth / 2f, getY() + getHeight() * 0.35f,
