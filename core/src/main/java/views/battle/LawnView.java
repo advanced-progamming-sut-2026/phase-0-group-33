@@ -1427,9 +1427,7 @@ public class LawnView extends Actor {
             if (shot.getRow() != row) {
                 continue;
             }
-            float size = Lawn.cellWidth()
-                    * (shot.getMotion() == models.game.Projectile.Motion.SCATTER
-                            ? 0.5f : projectileScale(shot.getSource()));
+            float size = Lawn.cellWidth() * flightScale(shot);
             float centreX = Lawn.columnCenter(shot.getX());
             float y = Lawn.rowBottom(shot.getLane()) + Lawn.cellHeight() * 0.45f
                     + (float) shot.getHeight() * Lawn.cellHeight() * 0.5f;
@@ -1484,6 +1482,16 @@ public class LawnView extends Actor {
             animator.draw(batch, clip, clock, centreX, centreY + lift, scale, true, null);
         }
         return true;
+    }
+
+    private float flightScale(models.game.Projectile shot) {
+        if (shot.getMotion() == models.game.Projectile.Motion.SCATTER) {
+            return 0.5f;
+        }
+        if (shot.getMotion() == models.game.Projectile.Motion.LOB) {
+            return 0.66f;
+        }
+        return projectileScale(shot.getSource());
     }
 
     private float projectileScale(models.entities.plant.PlantType source) {
