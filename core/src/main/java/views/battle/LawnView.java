@@ -33,6 +33,7 @@ public class LawnView extends Actor {
 
     private static final int GRAVE_MAX_HEALTH = 700;
     private static final String PLANT_FOOD_GLOW = "PLANTFOOD_FX";
+    private static final String GRAPE_SHARD = "GRAPESHOT_PROJECTILE";
     private static final String ICE_PLANT = "FROSTBITE_ICE_BLOCK_PLANT";
     private static final String ICE_ZOMBIE = "FROSTBITE_ICE_BLOCK_ZOMBIE";
     private static final String TIDE_LINE = "WATER_TIDE_LINE";
@@ -475,7 +476,8 @@ public class LawnView extends Actor {
         }
         for (models.game.Projectile shot : gone) {
             float[] last = shots.remove(shot);
-            if (last[0] >= GameSession.COLS + 0.4f || last[0] <= 0.6f) {
+            if (last[0] >= GameSession.COLS + 0.4f || last[0] <= 0.6f
+                    || last[1] < 1f || last[1] > GameSession.ROWS) {
                 continue;
             }
             if (shot.getSource().getTags().contains(models.entities.plant.PlantTag.PEA)) {
@@ -496,7 +498,7 @@ public class LawnView extends Actor {
             }
         }
         for (models.game.Projectile shot : session.getProjectileManager().getProjectiles()) {
-            shots.put(shot, new float[] {(float) shot.getX(), shot.getRow()});
+            shots.put(shot, new float[] {(float) shot.getX(), (float) shot.getLane()});
         }
     }
 
@@ -1382,7 +1384,7 @@ public class LawnView extends Actor {
             }
             float size = Lawn.cellWidth() * projectileScale(shot.getSource());
             float centreX = Lawn.columnCenter(shot.getX());
-            float y = Lawn.rowBottom(row) + Lawn.cellHeight() * 0.45f
+            float y = Lawn.rowBottom(shot.getLane()) + Lawn.cellHeight() * 0.45f
                     + (float) shot.getHeight() * Lawn.cellHeight() * 0.5f;
             if (drawShotAnimation(batch, shot, centreX, y + size / 2f, size)) {
                 continue;
@@ -1396,12 +1398,25 @@ public class LawnView extends Actor {
         batch.setColor(Color.WHITE);
     }
 
+    private String grapeClip(models.game.Projectile shot) {
+        if (shot.getLaneStep() < 0) {
+            return "animation_verticle_up";
+        }
+        if (shot.getLaneStep() > 0) {
+            return "animation_verticle_down";
+        }
+        return shot.getDirection() < 0 ? "animation_backward" : "animation_forward";
+    }
+
     private boolean drawShotAnimation(Batch batch, models.game.Projectile shot,
                                       float centreX, float centreY, float size) {
         if (!animator.isReady()) {
             return false;
         }
-        String[] art = views.assets.AnimationCatalog.projectile(shot.getSource());
+        boolean scattered = shot.getMotion() == models.game.Projectile.Motion.SCATTER;
+        String[] art = scattered
+                ? new String[] {GRAPE_SHARD, grapeClip(shot)}
+                : views.assets.AnimationCatalog.projectile(shot.getSource());
         if (art == null) {
             return false;
         }
@@ -1416,7 +1431,7 @@ public class LawnView extends Actor {
         float lift = animator.centreOffset(art[0], art[1], scale);
         batch.setColor(Color.WHITE);
         float clock = time + (float) shot.getOriginX() * 0.17f;
-        if (shot.getDirection() < 0) {
+        if (shot.getDirection() < 0 && !scattered) {
             animator.drawMirrored(batch, clip, clock, centreX, centreY + lift, scale, true, null);
         } else {
             animator.draw(batch, clip, clock, centreX, centreY + lift, scale, true, null);

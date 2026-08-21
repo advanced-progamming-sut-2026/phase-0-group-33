@@ -11,14 +11,16 @@ public class Projectile {
     public enum Motion {
         STRAIGHT,
         LOB,
-        PIERCING
+        PIERCING,
+        SCATTER
     }
 
     private static final double ARC_HEIGHT = 1.6;
 
     private final PlantType source;
     private final Motion motion;
-    private final int row;
+    private double lane;
+    private int laneStep;
     private final double originX;
     private final double targetX;
     private final int direction;
@@ -33,7 +35,7 @@ public class Projectile {
                       double targetX, int direction) {
         this.source = source;
         this.motion = motion;
-        this.row = row;
+        this.lane = row;
         this.originX = originX;
         this.targetX = targetX;
         this.direction = direction;
@@ -57,7 +59,23 @@ public class Projectile {
     }
 
     public int getRow() {
-        return row;
+        return (int) Math.round(lane);
+    }
+
+    public double getLane() {
+        return lane;
+    }
+
+    public int getLaneStep() {
+        return laneStep;
+    }
+
+    public void setLaneStep(int laneStep) {
+        this.laneStep = laneStep;
+    }
+
+    public void advanceLane(double amount) {
+        this.lane += amount * laneStep;
     }
 
     public double getX() {

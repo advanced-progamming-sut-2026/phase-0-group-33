@@ -257,18 +257,8 @@ public class CombatManager {
     }
 
     private void scatterGrapes(PlacedPlant plant) {
-        for (int row : new int[] { plant.getY() - 2, plant.getY() + 2 }) {
-            if (row < 1 || row > GameSession.ROWS) {
-                continue;
-            }
-            Zombie target = firstZombieInRowAfter(row, 0);
-            if (target != null) {
-                System.out.printf("A bouncing grape hit the %s in lane %d.%n",
-                        target.getType().getName(), row);
-                hitZombie(target, PlantType.GRAPESHOT,
-                        plantDamage(PlantType.GRAPESHOT) / 2);
-            }
-        }
+        session.getProjectileManager().launchGrapes(plant.getX(), plant.getY());
+        System.out.println("The Grapeshot flung bouncing grapes across the lawn!");
     }
 
     public void damageArea(double centerX, double centerY, int radius, PlantType source) {

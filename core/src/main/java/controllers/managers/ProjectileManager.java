@@ -16,6 +16,7 @@ public class ProjectileManager {
     private static final double LOB_SPEED = 0.09;
     private static final double HIT_RANGE = 0.45;
     private static final int ZOMBIE_SHOT_DAMAGE = 20;
+    private static final double SCATTER_SPEED = 0.26;
 
     private final GameSession session;
     private final CombatManager combat;
@@ -51,6 +52,16 @@ public class ProjectileManager {
         projectiles.add(shot);
     }
 
+    public void launchGrapes(int column, int row) {
+        int[][] ways = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
+        for (int[] way : ways) {
+            Projectile grape = new Projectile(PlantType.GRAPESHOT, Projectile.Motion.SCATTER,
+                    row, column, 0, way[0]);
+            grape.setLaneStep(way[1]);
+            projectiles.add(grape);
+        }
+    }
+
     public void launchLob(PlacedPlant plant, double targetX) {
         projectiles.add(new Projectile(plant.getType(), Projectile.Motion.LOB,
                 plant.getY(), plant.getX(), targetX, 1));
@@ -60,6 +71,8 @@ public class ProjectileManager {
         for (Projectile projectile : new ArrayList<>(projectiles)) {
             if (projectile.getMotion() == Projectile.Motion.LOB) {
                 advanceLob(projectile);
+            } else if (projectile.getMotion() == Projectile.Motion.SCATTER) {
+                advanceScatter(projectile);
             } else {
                 advanceFlat(projectile);
             }
@@ -84,6 +97,22 @@ public class ProjectileManager {
         if (target != null) {
             combat.hitZombie(target, source);
         }
+    }
+
+    private void advanceScatter(Projectile projectile) {
+        projectile.setX(projectile.getX() + SCATTER_SPEED * projectile.getDirection());
+        projectile.advanceLane(SCATTER_SPEED);
+        if (projectile.getX() < 0.4 || projectile.getX() > GameSession.COLS + 0.6
+                || projectile.getLane() < 0.4 || projectile.getLane() > GameSession.ROWS + 0.6) {
+            projectile.markSpent();
+            return;
+        }
+        Zombie target = zombieNear(projectile.getRow(), projectile.getX());
+        if (target == null || !projectile.recordHit(target)) {
+            return;
+        }
+        projectile.markSpent();
+        combat.damageArea(projectile.getX(), projectile.getRow(), 0, PlantType.GRAPESHOT);
     }
 
     private void advanceZombieShot(Projectile projectile) {
