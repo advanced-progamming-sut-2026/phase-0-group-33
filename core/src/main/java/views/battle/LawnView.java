@@ -61,6 +61,7 @@ public class LawnView extends Actor {
     private static final float POP_TIME = 0.42f;
     private static final String ARMOUR_BREAK = "ARMOR_BREAK_EFFECT";
     private static final float SLIDE_TIME = 0.22f;
+    private static final float DROP_TIME = 0.36f;
     private static final float BOSS_SLIDE = 0.45f;
     private static final int CHARGE_TICKS = 6;
     private static final String RIPPLE = "WATER_ZOMBIE_RIPPLE";
@@ -397,7 +398,10 @@ public class LawnView extends Actor {
                 continue;
             }
             births.put(plant, time);
-            if (settled) {
+            if (matching()) {
+                slides.put(plant, new float[] {plant.getX(), -0.6f, time});
+                plantSpots.put(plant, new int[] {plant.getX(), plant.getY()});
+            } else if (settled) {
                 addFx(POOF, "animation", plant.getX(), plant.getY(), 1.15f, 0.3f, 1f);
             }
         }
@@ -585,6 +589,10 @@ public class LawnView extends Actor {
                 && zombie.getBattle().isReversed();
     }
 
+    private boolean matching() {
+        return session.getMode() == models.game.GameMode.BEGHOULED;
+    }
+
     private void trackMints() {
         for (Object[] burst : session.drainMints()) {
             models.entities.plant.PlantType type = (models.entities.plant.PlantType) burst[0];
@@ -755,6 +763,10 @@ public class LawnView extends Actor {
             }
         }
         for (models.game.PlacedPlant plant : gone) {
+            int[] spot = plantSpots.get(plant);
+            if (matching() && spot != null) {
+                addFx(POOF, "animation", spot[0], spot[1], 1.25f, 0.3f, 0.9f);
+            }
             plantSpots.remove(plant);
         }
         drainDetonations();
@@ -1647,7 +1659,8 @@ public class LawnView extends Actor {
             float lane = row;
             float[] slide = slides.get(plant);
             if (slide != null) {
-                float progress = (time - slide[2]) / SLIDE_TIME;
+                float span = slide[1] < 0.5f ? DROP_TIME : SLIDE_TIME;
+                float progress = (time - slide[2]) / span;
                 if (progress >= 1f) {
                     slides.remove(plant);
                 } else {
