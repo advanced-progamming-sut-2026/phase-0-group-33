@@ -470,7 +470,7 @@ public class LawnView extends Actor {
         }
         for (models.game.Projectile shot : gone) {
             float[] last = shots.remove(shot);
-            if (last[0] >= GameSession.COLS + 0.4f) {
+            if (last[0] >= GameSession.COLS + 0.4f || last[0] <= 0.6f) {
                 continue;
             }
             if (shot.getSource().getTags().contains(models.entities.plant.PlantTag.PEA)) {
@@ -1389,8 +1389,12 @@ public class LawnView extends Actor {
         }
         float lift = animator.centreOffset(art[0], art[1], scale);
         batch.setColor(Color.WHITE);
-        animator.draw(batch, clip, time + (float) shot.getOriginX() * 0.17f, centreX,
-                centreY + lift, scale, true, null);
+        float clock = time + (float) shot.getOriginX() * 0.17f;
+        if (shot.getDirection() < 0) {
+            animator.drawMirrored(batch, clip, clock, centreX, centreY + lift, scale, true, null);
+        } else {
+            animator.draw(batch, clip, clock, centreX, centreY + lift, scale, true, null);
+        }
         return true;
     }
 

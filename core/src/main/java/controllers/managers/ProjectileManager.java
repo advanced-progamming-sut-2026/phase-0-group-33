@@ -15,6 +15,7 @@ public class ProjectileManager {
     private static final double STRAIGHT_SPEED = 0.34;
     private static final double LOB_SPEED = 0.09;
     private static final double HIT_RANGE = 0.45;
+    private static final int ZOMBIE_SHOT_DAMAGE = 20;
 
     private final GameSession session;
     private final CombatManager combat;
@@ -37,6 +38,11 @@ public class ProjectileManager {
     public void launchPiercing(PlacedPlant plant) {
         projectiles.add(new Projectile(plant.getType(), Projectile.Motion.PIERCING,
                 plant.getY(), plant.getX(), 0, 1));
+    }
+
+    public void launchZombieShot(int row, double originX) {
+        projectiles.add(new Projectile(PlantType.PEASHOOTER, Projectile.Motion.STRAIGHT,
+                row, originX, 0, -1));
     }
 
     public void launchLob(PlacedPlant plant, double targetX) {
@@ -74,7 +80,28 @@ public class ProjectileManager {
         }
     }
 
+    private void advanceZombieShot(Projectile projectile) {
+        projectile.setX(projectile.getX() - STRAIGHT_SPEED);
+        if (projectile.getX() < 0.5) {
+            projectile.markSpent();
+            return;
+        }
+        PlacedPlant target = session.plantAt((int) Math.round(projectile.getX()),
+                projectile.getRow());
+        if (target == null) {
+            return;
+        }
+        projectile.markSpent();
+        if (!combat.damagePlant(target, ZOMBIE_SHOT_DAMAGE) && target.isDead()) {
+            session.removePlant(target, true);
+        }
+    }
+
     private void advanceFlat(Projectile projectile) {
+        if (projectile.getDirection() < 0) {
+            advanceZombieShot(projectile);
+            return;
+        }
         projectile.setX(projectile.getX() + STRAIGHT_SPEED * projectile.getDirection());
         if (projectile.getX() < 0 || projectile.getX() > GameSession.COLS + 1) {
             projectile.markSpent();

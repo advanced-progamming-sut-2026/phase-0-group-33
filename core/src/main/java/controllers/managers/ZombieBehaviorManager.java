@@ -517,13 +517,11 @@ public class ZombieBehaviorManager {
         if (!cooldownReady(zombie, 15)) {
             return;
         }
-        PlacedPlant target = nearestPlantInRow(zombie);
-        if (target == null) {
+        if (nearestPlantInRow(zombie) == null) {
             return;
         }
-        if (!combatManager.damagePlant(target, 20) && target.isDead()) {
-            session.removePlant(target, true);
-        }
+        session.getProjectileManager().launchZombieShot(
+                (int) zombie.getPosition().getY(), zombie.getPosition().getX());
     }
 
     private boolean zombotanyJalapeno(Zombie zombie) {
