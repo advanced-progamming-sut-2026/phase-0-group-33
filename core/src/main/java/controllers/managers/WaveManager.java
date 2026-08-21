@@ -23,6 +23,7 @@ public class WaveManager {
 
     private int currentWaveSpawnedHp;
     private int ticksSinceWave;
+    private double bestProgress;
 
     public WaveManager(GameSession session, List<ZombieType> pool, int totalWaves,
                        int baseBudget, double costFactor, Random random) {
@@ -109,7 +110,30 @@ public class WaveManager {
             System.out.printf("Zombie %s spawned at wave %d in lane %d which costed %d.%n",
                     type.getName(), waveNumber, lane, cost);
         }
+        fillOutWave(waveNumber);
         session.getBehaviorManager().afterWaveSpawn(waveNumber);
+    }
+
+    private int leastZombies(int waveNumber) {
+        int floor = 2 + waveNumber;
+        return waveNumber == totalWaves ? floor * 2 : floor;
+    }
+
+    private void fillOutWave(int waveNumber) {
+        int spawned = 0;
+        for (Zombie zombie : session.getZombies()) {
+            if (zombie.getSpawnWave() == waveNumber) {
+                spawned++;
+            }
+        }
+        for (int i = spawned; i < leastZombies(waveNumber); i++) {
+            ZombieType type = pool.get(random.nextInt(pool.size()));
+            int lane = 1 + random.nextInt(GameSession.ROWS);
+            Zombie zombie = session.spawnZombie(type, GameSession.COLS, lane, waveNumber);
+            currentWaveSpawnedHp += Math.max(0, zombie.getHealth()) + zombie.totalArmor();
+            System.out.printf("Zombie %s joined wave %d in lane %d.%n",
+                    type.getName(), waveNumber, lane);
+        }
     }
 
     private boolean anyAffordable(double budget) {
@@ -141,8 +165,10 @@ public class WaveManager {
         if (!started) {
             return 0;
         }
-        return Math.max(0, Math.min(1,
+        double now = Math.max(0, Math.min(1,
                 (currentWave - 1 + getWaveClearedFraction()) / totalWaves));
+        bestProgress = Math.max(bestProgress, now);
+        return bestProgress;
     }
 
     public int getCurrentWave() {

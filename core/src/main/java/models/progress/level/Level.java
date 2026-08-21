@@ -19,7 +19,7 @@ public abstract class Level {
 
     public int getBaseWaveBudget() {
         double chapterFactor = getChapter() == null ? 1.0 : getChapter().getDifficultyFactor();
-        return (int) Math.round((240 + 150 * levelNumber) * chapterFactor);
+        return (int) Math.round((215 + 135 * levelNumber) * chapterFactor);
     }
 
     public SpecialLevelType getSpecialType() {
