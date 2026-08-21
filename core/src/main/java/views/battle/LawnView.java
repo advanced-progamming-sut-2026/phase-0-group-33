@@ -2066,8 +2066,9 @@ public class LawnView extends Actor {
         Float until = firing.get(plant);
         if (until != null && time < until) {
             if (stage > 0) {
-                return new String[] {"attack_stage" + stage, "special_stage" + stage,
-                    "attack", "special", "idle_stage" + stage, "idle"};
+                return new String[] {"attack_stage" + stage, "attack " + stage,
+                    "attack" + stage, "special_stage" + stage, "special " + stage,
+                    "attack", "special", "idle_stage" + stage, "idle" + stage, "idle"};
             }
             String locked = firingClip.get(plant);
             return locked == null
@@ -2095,7 +2096,7 @@ public class LawnView extends Actor {
         }
         if (stage > 0) {
             return new String[] {"idle_stage" + stage, "idle_stage" + stage + "_",
-                "idle" + stage, "idle"};
+                "idle " + stage, "idle" + stage, "idle"};
         }
         return new String[] {"idle"};
     }

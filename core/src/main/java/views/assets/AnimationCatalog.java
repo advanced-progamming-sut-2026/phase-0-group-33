@@ -138,7 +138,6 @@ public final class AnimationCatalog {
         ATTACK_VARIANTS.put("Chomper", new String[] {"bite", "special"});
         ATTACK_VARIANTS.put("Magnet-shroom", new String[] {"catch", "busy"});
         ATTACK_VARIANTS.put("Tangle Kelp", new String[] {"attack_submerge", "attack"});
-        ATTACK_VARIANTS.put("Pea Pod", new String[] {"attack", "attack 2", "attack 3"});
         ATTACK_VARIANTS.put("Cactus", new String[] {"attack", "attack_stretch"});
     }
 
