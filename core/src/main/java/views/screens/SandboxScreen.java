@@ -1,9 +1,12 @@
 package views.screens;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import controllers.menuControllers.SandboxController;
+import models.Result;
 import models.entities.plant.PlantType;
 import models.entities.zombie.ZombieType;
+import models.game.GameSession;
 import models.map.TerrainType;
 import views.PvzGame;
 import views.ScreenId;
@@ -12,17 +15,22 @@ import views.ui.Ui;
 public class SandboxScreen extends BattleScreen {
 
     private static final String[] TABS = {"Plants", "Zombies", "Events", "World"};
-    private static final float PANEL_WIDTH = 264f;
+    private static final float TAB_WIDTH = 71f;
+    private static final float PANEL_WIDTH = 300f;
+    private static final float LIST_HEIGHT = 388f;
 
     private final SandboxController sandbox;
     private final Table panel = new Table();
-    private final Table list = new Table();
-
+    private final Table column = new Table();
     private final Table body = new Table();
-    private final Table freezeCell = new Table();
+    private final Table list = new Table();
+    private final Table tabRow = new Table();
+    private final Table armedCell = new Table();
+    private final Table filterRow = new Table();
+
     private boolean open = true;
     private String tab = TABS[0];
-    private boolean mowers = true;
+    private String filter = "All";
     private TerrainType brush;
 
     public SandboxScreen(PvzGame game) {
@@ -43,56 +51,117 @@ public class SandboxScreen extends BattleScreen {
         router.go(ScreenId.SANDBOX_SETUP);
     }
 
+    private GameSession session() {
+        return app.getCurrentGameSession();
+    }
+
     private void buildPanel() {
         panel.setFillParent(true);
         panel.right().top();
         body.setBackground(skin.getDrawable("panel"));
         body.pad(6f);
-        Table tabs = new Table();
-        for (final String name : TABS) {
-            tabs.add(Ui.button(skin, name, "small", () -> {
-                tab = name;
-                refreshList();
-            })).width(58f).height(34f).padRight(2f);
-        }
-        body.add(tabs).padBottom(4f).row();
-        body.add(Ui.scroll(skin, list)).size(PANEL_WIDTH - 18f, 452f).row();
-        body.add(Ui.button(skin, "Clear tool", "small-brown",
-                () -> armSandbox(Tool.NONE, null, null))).width(PANEL_WIDTH - 22f)
-                .height(36f).padTop(4f);
-
-        Table column = new Table();
-        column.add(freezeCell).width(PANEL_WIDTH).height(42f).padBottom(2f).row();
-        column.add(Ui.button(skin, "Sandbox tools", "small-purple", this::toggle))
-                .width(PANEL_WIDTH).height(36f).padBottom(2f).row();
-        column.add(body).width(PANEL_WIDTH);
-        refreshFreeze();
-        panel.add(column).width(PANEL_WIDTH).padTop(82f).padRight(4f);
+        body.add(armedCell).width(PANEL_WIDTH - 18f).height(50f).padBottom(4f).row();
+        body.add(tabRow).padBottom(3f).row();
+        body.add(filterRow).width(PANEL_WIDTH - 18f).padBottom(3f).row();
+        body.add(Ui.scroll(skin, list)).size(PANEL_WIDTH - 18f, LIST_HEIGHT).row();
+        panel.add(column).width(PANEL_WIDTH).padTop(80f).padRight(4f);
         stage.addActor(panel);
         panel.toFront();
+        rebuildTop();
+        refreshTabs();
+        refreshArmed();
         refreshList();
     }
 
-    private void refreshFreeze() {
-        freezeCell.clear();
-        freezeCell.add(Ui.button(skin, isFrozen() ? "Resume time" : "Freeze time",
+    private void rebuildTop() {
+        column.clearChildren();
+        column.add(Ui.button(skin, isFrozen() ? "Resume time" : "Freeze time",
                 isFrozen() ? "green" : "blue", () -> {
                     setFrozen(!isFrozen());
-                    refreshFreeze();
-                    panel.toFront();
-                })).width(PANEL_WIDTH).height(42f);
-    }
-
-    private void toggle() {
-        open = !open;
+                    rebuildTop();
+                })).width(PANEL_WIDTH).height(44f).padBottom(3f).row();
+        column.add(Ui.button(skin, open ? "Hide tools" : "Show tools", "small-purple", () -> {
+            open = !open;
+            rebuildTop();
+        })).width(PANEL_WIDTH).height(32f).padBottom(3f).row();
+        column.add(body).width(PANEL_WIDTH);
         body.setVisible(open);
         panel.toFront();
     }
 
+    private void refreshTabs() {
+        tabRow.clear();
+        for (final String name : TABS) {
+            tabRow.add(Ui.button(skin, name, name.equals(tab) ? "small-purple" : "small", () -> {
+                tab = name;
+                filter = "All";
+                refreshTabs();
+                refreshList();
+            })).width(TAB_WIDTH).height(34f).padRight(1f);
+        }
+    }
+
+    private void refreshArmed() {
+        armedCell.clear();
+        String armed = armed();
+        Table card = new Table(skin);
+        card.setBackground(skin.getDrawable(armed == null ? "row" : "highlight"));
+        card.pad(3f, 8f, 3f, 8f);
+        TextureRegion icon = armedIcon();
+        if (icon != null) {
+            card.add(Ui.iconCell(icon, 32f)).padRight(8f);
+        }
+        card.add(Ui.label(skin, armed == null ? "Pick a tool below" : armed,
+                armed == null ? "muted" : "gold")).growX().left();
+        if (armed != null) {
+            card.add(Ui.button(skin, "X", "small-brown", this::clearTool)).width(36f).height(30f);
+        }
+        armedCell.add(card).grow();
+    }
+
+    private String armed() {
+        if (brush != null) {
+            return "Paint " + pretty(brush.name());
+        }
+        if (pendingZombie != null) {
+            return "Drop " + pendingZombie.getName();
+        }
+        if (pending != null) {
+            return "Plant " + pending.getName();
+        }
+        return null;
+    }
+
+    private TextureRegion armedIcon() {
+        if (pendingZombie != null) {
+            return art.zombie(pendingZombie);
+        }
+        if (pending != null) {
+            return art.plant(pending);
+        }
+        return null;
+    }
+
+    private void clearTool() {
+        brush = null;
+        armSandbox(Tool.NONE, null, null);
+        refreshArmed();
+        refreshList();
+    }
+
+    private void arm(PlantType plant, ZombieType zombie, TerrainType terrain) {
+        brush = terrain;
+        armSandbox(plant == null ? Tool.NONE : Tool.PLANT, plant, zombie);
+        refreshArmed();
+        refreshList();
+    }
+
     private void refreshList() {
         list.clear();
+        filterRow.clear();
         switch (tab) {
             case "Zombies":
+                zombieFilters();
                 zombieList();
                 break;
             case "Events":
@@ -102,15 +171,53 @@ public class SandboxScreen extends BattleScreen {
                 worldList();
                 break;
             default:
+                plantFilters();
                 plantList();
                 break;
         }
     }
 
-    private Table row(String text, Runnable action, String style) {
-        Table card = Ui.card(skin, "row");
-        card.pad(4f, 8f, 4f, 8f);
-        card.add(Ui.label(skin, text, style)).growX().left();
+    private void addFilter(final String name) {
+        filterRow.add(Ui.button(skin, name,
+                name.equals(filter) ? "small-purple" : "small", () -> {
+            filter = name;
+            refreshList();
+        })).height(26f).padRight(2f);
+    }
+
+    private void plantFilters() {
+        addFilter("All");
+        addFilter("Shooter");
+        addFilter("Lobber");
+        addFilter("Explosive");
+        addFilter("Wall nut");
+    }
+
+    private void zombieFilters() {
+        addFilter("All");
+        addFilter("Armoured");
+        addFilter("Plain");
+    }
+
+    private static String pretty(String raw) {
+        String text = raw.replace('_', ' ').toLowerCase();
+        return Character.toUpperCase(text.charAt(0)) + text.substring(1);
+    }
+
+    private Table pick(TextureRegion icon, String name, String note, boolean chosen,
+                       Runnable action) {
+        Table card = new Table(skin);
+        card.setBackground(skin.getDrawable(chosen ? "highlight" : "row"));
+        card.pad(3f, 8f, 3f, 8f);
+        if (icon != null) {
+            card.add(Ui.iconCell(icon, 30f)).padRight(8f);
+        }
+        Table text = new Table();
+        text.add(Ui.label(skin, name, chosen ? "gold" : "small")).left().growX().row();
+        if (note != null) {
+            text.add(Ui.label(skin, note, "muted")).left().growX();
+        }
+        card.add(text).growX();
         Ui.hoverLift(card, 1.02f);
         Ui.onClick(card, action);
         return card;
@@ -118,79 +225,77 @@ public class SandboxScreen extends BattleScreen {
 
     private void plantList() {
         for (final PlantType type : PlantType.values()) {
-            Table card = Ui.card(skin, "row");
-            card.pad(3f, 8f, 3f, 8f);
-            card.add(Ui.iconCell(art.plant(type), 32f)).padRight(8f);
-            card.add(Ui.label(skin, type.getName(), "small")).growX().left();
-            Ui.hoverLift(card, 1.02f);
-            Ui.onClick(card, () -> {
-                armSandbox(Tool.PLANT, type, null);
-                brush = null;
-                toasts.success("Planting " + type.getName());
-            });
-            list.add(card).growX().padBottom(2f).row();
+            String family = pretty(type.getCategory().name());
+            if (!"All".equals(filter) && !family.equals(filter)) {
+                continue;
+            }
+            String note = type.getDamage() == 0 ? family
+                    : family + "  -  " + type.getDamage() + " dmg";
+            list.add(pick(art.plant(type), type.getName(), note, pending == type,
+                    () -> arm(type, null, null))).growX().padBottom(2f).row();
         }
     }
 
     private void zombieList() {
         for (final ZombieType type : ZombieType.values()) {
-            Table card = Ui.card(skin, "row");
-            card.pad(3f, 8f, 3f, 8f);
-            card.add(Ui.iconCell(art.zombie(type), 32f)).padRight(8f);
-            card.add(Ui.label(skin, type.getName(), "small")).growX().left();
-            Ui.hoverLift(card, 1.02f);
-            Ui.onClick(card, () -> {
-                armSandbox(Tool.NONE, null, type);
-                brush = null;
-                toasts.success("Dropping " + type.getName());
-            });
-            list.add(card).growX().padBottom(2f).row();
+            boolean armour = type.getArmorType() != ZombieType.ArmorType.NONE;
+            if ("Armoured".equals(filter) && !armour) {
+                continue;
+            }
+            if ("Plain".equals(filter) && armour) {
+                continue;
+            }
+            String note = type.getHitpoints() + " hp"
+                    + (armour ? "  -  " + pretty(type.getArmorType().name()) : "");
+            list.add(pick(art.zombie(type), type.getName(), note, pendingZombie == type,
+                    () -> arm(null, type, null))).growX().padBottom(2f).row();
         }
     }
 
     private void eventList() {
+        list.add(Ui.label(skin, "Chapter events", "muted")).left().padBottom(2f).row();
         for (final String event : sandbox.events()) {
-            list.add(row(event, () -> {
-                toasts.show(sandbox.handleEvent(event));
-            }, "small")).growX().padBottom(2f).row();
+            list.add(pick(null, event, null, false,
+                    () -> toasts.show(sandbox.handleEvent(event)))).growX().padBottom(2f).row();
         }
-        list.add(row("Next wave", () -> toasts.show(sandbox.handleNextWave()), "small"))
-                .growX().padBottom(2f).row();
-        list.add(row("Send in the Zomboss", () -> toasts.show(sandbox.handleSpawnBoss()),
-                "small")).growX().padBottom(2f).row();
+        list.add(Ui.label(skin, "Waves", "muted")).left().padTop(6f).padBottom(2f).row();
+        list.add(pick(null, "Send the next wave", null, false,
+                () -> toasts.show(sandbox.handleNextWave()))).growX().padBottom(2f).row();
+        list.add(pick(null, "Send in the Zomboss", null, false,
+                () -> toasts.show(sandbox.handleSpawnBoss()))).growX().padBottom(2f).row();
     }
 
     private void worldList() {
-        list.add(row(session().isEndlessMowers() ? "Mowers: endless (tap for normal)"
-                : "Mowers: normal (tap for endless)", () -> {
+        GameSession session = session();
+        boolean endless = session != null && session.isEndlessMowers();
+        list.add(Ui.label(skin, "Lawn", "muted")).left().padBottom(2f).row();
+        list.add(pick(null, "Clear every zombie", null, false,
+                () -> act(sandbox.handleClearZombies()))).growX().padBottom(2f).row();
+        list.add(pick(null, "Dig up every plant", null, false,
+                () -> act(sandbox.handleClearPlants()))).growX().padBottom(2f).row();
+        list.add(pick(null, "Feed every plant", null, false,
+                () -> act(sandbox.handleFeedAll()))).growX().padBottom(2f).row();
+        list.add(pick(null, "Top up sun and food", null, false,
+                () -> act(sandbox.handleRefill()))).growX().padBottom(2f).row();
+        list.add(Ui.label(skin, "Lawn mowers", "muted")).left().padTop(6f).padBottom(2f).row();
+        list.add(pick(null, endless ? "Endless mowers" : "Normal mowers",
+                endless ? "tap for normal" : "tap for endless", endless, () -> {
                     session().setEndlessMowers(!session().isEndlessMowers());
                     refreshList();
-                }, "small")).growX().padBottom(2f).row();
-        list.add(row("Clear every zombie", () -> toasts.show(sandbox.handleClearZombies()),
-                "small")).growX().padBottom(2f).row();
-        list.add(row("Dig up every plant", () -> toasts.show(sandbox.handleClearPlants()),
-                "small")).growX().padBottom(2f).row();
-        list.add(row("Feed every plant", () -> toasts.show(sandbox.handleFeedAll()), "small"))
-                .growX().padBottom(2f).row();
-        list.add(row("Top up sun and food", () -> toasts.show(sandbox.handleRefill()), "small"))
-                .growX().padBottom(2f).row();
-        list.add(row(mowers ? "Remove lawn mowers" : "Restore lawn mowers", () -> {
-            mowers = !mowers;
-            toasts.show(sandbox.handleMowers(mowers));
-            refreshList();
-        }, "small")).growX().padBottom(2f).row();
-        list.add(Ui.label(skin, "Paint a tile", "muted")).left().padTop(6f).padBottom(2f).row();
+                })).growX().padBottom(2f).row();
+        list.add(pick(null, "Take the mowers away", null, false,
+                () -> act(sandbox.handleMowers(false)))).growX().padBottom(2f).row();
+        list.add(Ui.label(skin, "Paint a tile, then click the lawn", "muted"))
+                .left().padTop(6f).padBottom(2f).row();
         for (final TerrainType terrain : TerrainType.values()) {
-            list.add(row(terrain.name().replace('_', ' '), () -> {
-                brush = terrain;
-                armSandbox(Tool.NONE, null, null);
-                toasts.success("Painting " + terrain);
-            }, "small")).growX().padBottom(2f).row();
+            list.add(pick(null, pretty(terrain.name()), null, brush == terrain,
+                    () -> arm(null, null, terrain))).growX().padBottom(2f).row();
         }
     }
 
-    private models.game.GameSession session() {
-        return app.getCurrentGameSession();
+    private void act(Result result) {
+        toasts.show(result);
+        refreshList();
     }
 
     @Override

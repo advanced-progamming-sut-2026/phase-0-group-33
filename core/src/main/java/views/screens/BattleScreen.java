@@ -466,7 +466,9 @@ public class BattleScreen extends ScreenAdapter {
         root.row();
 
         Table middle = new Table();
-        seedTrayCell = middle.add(buildSeedTray())
+        Table tray = buildSeedTray();
+        tray.setVisible(!session.isSandbox());
+        seedTrayCell = middle.add(tray)
                 .width(showsSeedTray() ? trayWidth() : 0f).left().top().padLeft(6f).padTop(6f);
         middle.add().expand();
         root.add(middle).grow().row();
