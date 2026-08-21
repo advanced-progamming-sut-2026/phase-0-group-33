@@ -75,6 +75,7 @@ public class GameSession {
         this.sunManager = new SunManager(startingSun(), skyEnabled(), difficulty() / 3.0, random);
         this.waveManager = new WaveManager(this, zombiePool(), waveCount(), waveBudget(),
                 3.0 / difficulty(), random);
+        this.waveManager.setEndless(getMode() == GameMode.SCORING);
         this.combatManager = new CombatManager(this);
         this.plantActionManager = new PlantActionManager(this, combatManager);
         this.behaviorManager = new ZombieBehaviorManager(this, combatManager);
@@ -323,6 +324,10 @@ public class GameSession {
     public void loseGame(String message) {
         if (phase == GamePhase.BATTLE) {
             phase = GamePhase.LOST;
+            if (getMode() == GameMode.SCORING) {
+                scoreTracker.onGameWon(unusedMowerCount());
+                System.out.println("Your miopoint score: " + scoreTracker.getScore());
+            }
             System.out.println(message);
         }
     }

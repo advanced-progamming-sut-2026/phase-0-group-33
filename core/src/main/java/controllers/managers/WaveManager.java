@@ -25,6 +25,16 @@ public class WaveManager {
     private int ticksSinceWave;
     private double bestProgress;
 
+    private boolean endless;
+
+    public void setEndless(boolean endless) {
+        this.endless = endless;
+    }
+
+    public boolean isEndless() {
+        return endless;
+    }
+
     public WaveManager(GameSession session, List<ZombieType> pool, int totalWaves,
                        int baseBudget, double costFactor, Random random) {
         this.session = session;
@@ -55,7 +65,7 @@ public class WaveManager {
     }
 
     public void tick() {
-        if (!started || currentWave >= totalWaves) {
+        if (!started || (currentWave >= totalWaves && !endless)) {
             return;
         }
         ticksSinceWave++;
@@ -83,7 +93,9 @@ public class WaveManager {
     private void beginWave(int waveNumber) {
         currentWave = waveNumber;
         ticksSinceWave = 0;
-        if (waveNumber == totalWaves) {
+        if (endless) {
+            System.out.printf("Wave %d rolls in.%n", waveNumber);
+        } else if (waveNumber == totalWaves) {
             System.out.println("The final wave has come.");
         } else {
             System.out.printf("Wave %d started.%n", waveNumber);
@@ -93,7 +105,7 @@ public class WaveManager {
             session.getQuestStats().onWaveOneStarted(session.getTickCount());
         }
         currentWaveSpawnedHp = 0;
-        double budget = waveBudgets[waveNumber - 1];
+        double budget = budgetFor(waveNumber);
         while (true) {
             ZombieType type = pool.get(random.nextInt(pool.size()));
             int cost = Math.max(1, (int) Math.round(type.getWaveCost() * costFactor));
@@ -112,6 +124,17 @@ public class WaveManager {
         }
         fillOutWave(waveNumber);
         session.getBehaviorManager().afterWaveSpawn(waveNumber);
+    }
+
+    private double budgetFor(int waveNumber) {
+        if (waveNumber <= waveBudgets.length) {
+            return waveBudgets[waveNumber - 1];
+        }
+        double budget = waveBudgets[waveBudgets.length - 1];
+        for (int extra = waveBudgets.length; extra < waveNumber; extra++) {
+            budget *= GROWTH;
+        }
+        return budget;
     }
 
     private int leastZombies(int waveNumber) {
@@ -151,7 +174,8 @@ public class WaveManager {
     }
 
     public boolean allWavesCleared() {
-        return started && currentWave >= totalWaves && session.getZombies().isEmpty();
+        return !endless && started && currentWave >= totalWaves
+                && session.getZombies().isEmpty();
     }
 
     public double getWaveClearedFraction() {
@@ -164,6 +188,9 @@ public class WaveManager {
     public double getProgress() {
         if (!started) {
             return 0;
+        }
+        if (endless) {
+            return Math.max(0, Math.min(1, getWaveClearedFraction()));
         }
         double now = Math.max(0, Math.min(1,
                 (currentWave - 1 + getWaveClearedFraction()) / totalWaves));
