@@ -62,6 +62,7 @@ public class GameSession {
     private final java.util.List<PlantFoodDrop> plantFoodDrops = new java.util.ArrayList<>();
     private boolean cooldownsDisabled;
     private boolean sandbox;
+    private boolean endlessMowers;
     private int plantsLost;
     private int zombiesKilled;
     private int timerTicksLeft = -1;
@@ -392,8 +393,21 @@ public class GameSession {
         if (!hasLawnMower(row)) {
             return;
         }
-        lawnMowers[row] = false;
+        if (!endlessMowers) {
+            lawnMowers[row] = false;
+        }
         runningMowers.add(new RunningMower(row, 0.4));
+    }
+
+    public boolean isEndlessMowers() {
+        return endlessMowers;
+    }
+
+    public void setEndlessMowers(boolean endlessMowers) {
+        this.endlessMowers = endlessMowers;
+        if (endlessMowers) {
+            setLawnMowers(true);
+        }
     }
 
     public void setLawnMowers(boolean present) {
@@ -466,6 +480,9 @@ public class GameSession {
     }
 
     public boolean usesWaves() {
+        if (sandbox) {
+            return false;
+        }
         GameMode mode = getMode();
         return mode == GameMode.ADVENTURE || mode == GameMode.SCORING
                 || mode == GameMode.ZOMBOTANY || mode == GameMode.WALLNUT_BOWLING;
@@ -626,6 +643,7 @@ public class GameSession {
     public void enterSandbox() {
         this.sandbox = true;
         this.cooldownsDisabled = true;
+        setEndlessMowers(true);
         sunManager.addSun(SANDBOX_SUN);
         plantFoods = SANDBOX_FOOD;
     }

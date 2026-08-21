@@ -95,6 +95,7 @@ public class BattleScreen extends ScreenAdapter {
     private float accumulator;
     private float shake;
     private boolean paused;
+    private boolean frozen;
 
     public BattleScreen(PvzGame game) {
         this.game = game;
@@ -116,6 +117,15 @@ public class BattleScreen extends ScreenAdapter {
 
     protected boolean isPaused() {
         return paused;
+    }
+
+    protected boolean isFrozen() {
+        return frozen;
+    }
+
+    protected void setFrozen(boolean value) {
+        this.frozen = value;
+        lawnView.setFrozen(value || paused || session.isOver());
     }
 
     protected void setPaused(boolean value) {
@@ -361,6 +371,9 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     private String modeTitle() {
+        if (session.isSandbox()) {
+            return isFrozen() ? "Sandbox - time is frozen" : "Sandbox";
+        }
         switch (session.getMode()) {
             case VASEBREAKER:
                 return "Vasebreaker";
@@ -491,7 +504,17 @@ public class BattleScreen extends ScreenAdapter {
         return objectivePanel;
     }
 
-    private String objectiveStatus() {
+    private String sandboxStatus() {
+        return "Plants: " + session.getPlants().size()
+                + "    Zombies: " + session.getZombies().size()
+                + "    Mowers: " + (session.isEndlessMowers() ? "endless" : "normal")
+                + (isFrozen() ? "    [TIME FROZEN]" : "");
+    }
+
+    private String modeStatus() {
+        if (session.isSandbox()) {
+            return sandboxStatus();
+        }
         if (session.getMode() == GameMode.VASEBREAKER) {
             return "Vases left: " + session.getMinigameManager().getVases().size();
         }
@@ -503,6 +526,14 @@ public class BattleScreen extends ScreenAdapter {
                 }
             }
             return "Brains left: " + brains;
+        }
+        return null;
+    }
+
+    private String objectiveStatus() {
+        String mode = modeStatus();
+        if (mode != null) {
+            return mode;
         }
         if (session.getMode() == GameMode.SCORING) {
             models.game.ScoreTracker tracker = session.getScoreTracker();
@@ -960,7 +991,8 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     private void autoStartWaves() {
-        if (session.getWaveManager().isStarted()
+        if (session.isSandbox()
+                || session.getWaveManager().isStarted()
                 || session.getMode() == GameMode.VASEBREAKER
                 || session.getMode() == GameMode.I_ZOMBIE
                 || session.getMode() == GameMode.BEGHOULED
@@ -1131,7 +1163,7 @@ public class BattleScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0.04f, 0.07f, 0.05f, 1f);
-        if (session != null && !paused && !session.isOver()) {
+        if (session != null && !paused && !frozen && !session.isOver()) {
             advance(delta);
         }
         if (session != null && session.isOver() && overlay == null) {
@@ -1139,7 +1171,7 @@ public class BattleScreen extends ScreenAdapter {
         }
         game.getAnimations().update();
         if (session != null) {
-            lawnView.setFrozen(paused || session.isOver());
+            lawnView.setFrozen(paused || frozen || session.isOver());
             if (lawnView.consumeShake()) {
                 shake = 0.32f;
                 sfx(views.assets.Audio.EXPLODE);

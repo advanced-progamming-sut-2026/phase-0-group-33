@@ -19,6 +19,7 @@ public class SandboxScreen extends BattleScreen {
     private final Table list = new Table();
 
     private final Table body = new Table();
+    private final Table freezeCell = new Table();
     private boolean open = true;
     private String tab = TABS[0];
     private boolean mowers = true;
@@ -61,13 +62,25 @@ public class SandboxScreen extends BattleScreen {
                 .height(36f).padTop(4f);
 
         Table column = new Table();
+        column.add(freezeCell).width(PANEL_WIDTH).height(42f).padBottom(2f).row();
         column.add(Ui.button(skin, "Sandbox tools", "small-purple", this::toggle))
                 .width(PANEL_WIDTH).height(36f).padBottom(2f).row();
         column.add(body).width(PANEL_WIDTH);
+        refreshFreeze();
         panel.add(column).width(PANEL_WIDTH).padTop(82f).padRight(4f);
         stage.addActor(panel);
         panel.toFront();
         refreshList();
+    }
+
+    private void refreshFreeze() {
+        freezeCell.clear();
+        freezeCell.add(Ui.button(skin, isFrozen() ? "Resume time" : "Freeze time",
+                isFrozen() ? "green" : "blue", () -> {
+                    setFrozen(!isFrozen());
+                    refreshFreeze();
+                    panel.toFront();
+                })).width(PANEL_WIDTH).height(42f);
     }
 
     private void toggle() {
@@ -148,6 +161,11 @@ public class SandboxScreen extends BattleScreen {
     }
 
     private void worldList() {
+        list.add(row(session().isEndlessMowers() ? "Mowers: endless (tap for normal)"
+                : "Mowers: normal (tap for endless)", () -> {
+                    session().setEndlessMowers(!session().isEndlessMowers());
+                    refreshList();
+                }, "small")).growX().padBottom(2f).row();
         list.add(row("Clear every zombie", () -> toasts.show(sandbox.handleClearZombies()),
                 "small")).growX().padBottom(2f).row();
         list.add(row("Dig up every plant", () -> toasts.show(sandbox.handleClearPlants()),
@@ -169,6 +187,10 @@ public class SandboxScreen extends BattleScreen {
                 toasts.success("Painting " + terrain);
             }, "small")).growX().padBottom(2f).row();
         }
+    }
+
+    private models.game.GameSession session() {
+        return app.getCurrentGameSession();
     }
 
     @Override
