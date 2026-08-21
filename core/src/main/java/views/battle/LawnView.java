@@ -23,6 +23,8 @@ public class LawnView extends Actor {
     private static final Color HOVER = new Color(1f, 1f, 1f, 0.28f);
     private static final Color DANGER = new Color(1f, 0.2f, 0.2f, 0.75f);
     private static final Color PROTECTED = new Color(0.4f, 1f, 0.5f, 0.3f);
+    private static final Color GUARD = new Color(1f, 0.3f, 0.28f, 1f);
+    private static final float GUARD_EDGE = 3f;
     private static final Color INVALID = new Color(1f, 0.35f, 0.3f, 0.32f);
 
     protected final GameSession session;
@@ -1269,7 +1271,7 @@ public class LawnView extends Actor {
         }
         for (models.game.PlacedPlant plant : session.getPlants()) {
             if (plant.isProtectedSeed()) {
-                paint(batch, PROTECTED, plant.getX(), plant.getY());
+                markProtected(batch, plant.getX(), plant.getY());
             }
         }
     }
@@ -2101,6 +2103,22 @@ public class LawnView extends Actor {
         fill.draw(batch, x, y, width, 6f);
         batch.setColor(fraction > 0.5f ? Color.LIME : fraction > 0.25f ? Color.ORANGE : Color.RED);
         fill.draw(batch, x, y, width * fraction, 6f);
+    }
+
+    private void markProtected(Batch batch, int column, int row) {
+        float pulse = 0.2f + 0.18f * (float) Math.abs(Math.sin(time * 2.4f));
+        batch.setColor(GUARD.r, GUARD.g, GUARD.b, pulse);
+        fill.draw(batch, Lawn.columnLeft(column), Lawn.rowBottom(row),
+                Lawn.cellWidth(), Lawn.cellHeight());
+        batch.setColor(GUARD.r, GUARD.g, GUARD.b, 0.9f);
+        float left = Lawn.columnLeft(column);
+        float bottom = Lawn.rowBottom(row);
+        float width = Lawn.cellWidth();
+        float height = Lawn.cellHeight();
+        fill.draw(batch, left, bottom, width, GUARD_EDGE);
+        fill.draw(batch, left, bottom + height - GUARD_EDGE, width, GUARD_EDGE);
+        fill.draw(batch, left, bottom, GUARD_EDGE, height);
+        fill.draw(batch, left + width - GUARD_EDGE, bottom, GUARD_EDGE, height);
     }
 
     protected void paint(Batch batch, Color color, double column, int row) {
