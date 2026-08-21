@@ -83,6 +83,10 @@ public class LawnView extends Actor {
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> attacks =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final float[] burning = new float[GameSession.ROWS + 1];
+    private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Float> foodStart =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> lastFood =
+            new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, String> firingClip =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> lastCooldown =
@@ -233,6 +237,7 @@ public class LawnView extends Actor {
             return;
         }
         time += delta;
+        trackFeeding();
         trackFiring();
         trackAbilities();
         trackDamage();
@@ -966,6 +971,49 @@ public class LawnView extends Actor {
             keys.add(zombie);
         }
         return keys;
+    }
+
+    private void trackFeeding() {
+        for (models.game.PlacedPlant plant : session.getPlants()) {
+            int ticks = plant.getPlantFoodTicks();
+            Integer previous = lastFood.get(plant);
+            lastFood.put(plant, ticks);
+            if ((previous == null || previous == 0) && ticks > 0) {
+                foodStart.put(plant, time);
+                noteFeast(plant);
+            }
+        }
+        com.badlogic.gdx.utils.Array<models.game.PlacedPlant> stale =
+                new com.badlogic.gdx.utils.Array<>();
+        for (models.game.PlacedPlant plant : lastFood.keys()) {
+            if (!session.getPlants().contains(plant)) {
+                stale.add(plant);
+            }
+        }
+        for (models.game.PlacedPlant plant : stale) {
+            lastFood.remove(plant);
+            foodStart.remove(plant);
+        }
+    }
+
+    private void noteFeast(models.game.PlacedPlant plant) {
+        addFx(PLANT_FOOD_GLOW, "plantfood", plant.getX(), plant.getY(), 1.6f, 0.85f, 1.4f);
+        shakePending = true;
+        if (!feedsWholeLane(plant.getType())) {
+            return;
+        }
+        for (int column = plant.getX(); column <= GameSession.COLS; column++) {
+            addFx(views.assets.AnimationCatalog.blastRear(), "explosion", column,
+                    plant.getY(), 1.2f, 0.3f, 0.85f);
+        }
+    }
+
+    private boolean feedsWholeLane(models.entities.plant.PlantType type) {
+        models.entities.plant.PlantCategory category = type.getCategory();
+        return category == models.entities.plant.PlantCategory.SHOOTER
+                || category == models.entities.plant.PlantCategory.LOBBER
+                || category == models.entities.plant.PlantCategory.STRIKE_THROUGH
+                || category == models.entities.plant.PlantCategory.HOMING;
     }
 
     private void trackFiring() {
@@ -1864,21 +1912,23 @@ public class LawnView extends Actor {
             return false;
         }
         Float until = firing.get(plant);
-        boolean fed = plant.getPlantFoodTicks() > 0;
+        Feast feast = plant.getPlantFoodTicks() > 0 ? feastFor(plant) : null;
+        boolean fed = feast != null && feast.clip != null;
         boolean attacking = until != null && time < until;
         float clock;
         if (fed) {
-            clock = (30 - plant.getPlantFoodTicks()) / 10f;
+            clock = feast.clock;
         } else if (attacking) {
             clock = time - (until - animator.plantClipDuration(plant.getType(), wanted[0]));
         } else {
             clock = time + plant.getX() * 0.37f + plant.getY() * 0.19f;
         }
-        if (fed) {
+        if (plant.getPlantFoodTicks() > 0) {
             drawPlantFoodGlow(batch, centerX, feet);
         }
+        boolean loop = fed ? feast.loop : !attacking;
         animator.draw(batch, clip, clock, centerX, feet + animator.plantLift(),
-                animator.plantScale() * popScale(plant), fed || !attacking, null);
+                animator.plantScale() * popScale(plant), loop, null);
         return true;
     }
 
@@ -1911,17 +1961,76 @@ public class LawnView extends Actor {
         }
     }
 
+    private static final class Feast {
+        private String clip;
+        private float clock;
+        private boolean loop;
+    }
+
+    private String pickClip(models.entities.plant.PlantType type, String... names) {
+        String found = animator.plantClipName(type, names);
+        if (found == null) {
+            return null;
+        }
+        for (String name : names) {
+            if (name.equals(found)) {
+                return found;
+            }
+        }
+        return null;
+    }
+
+    private Feast feastFor(models.game.PlacedPlant plant) {
+        models.entities.plant.PlantType type = plant.getType();
+        Float began = foodStart.get(plant);
+        float elapsed = began == null ? 0f : Math.max(0f, time - began);
+        int stage = growthStage(plant);
+        Feast feast = new Feast();
+        String staged = stage > 0 ? pickClip(type, "plantfood_stage" + stage) : null;
+        String intro = pickClip(type, "plantfood_on", "plantfood_start", "pf_start");
+        String main = staged != null ? staged
+                : pickClip(type, "plantfood", "plantfood_loop", "plantfood_idle", "pf");
+        String outro = pickClip(type, "plantfood_off", "plantfood_end", "pf_end");
+        float introTime = intro == null ? 0f : animator.plantClipDuration(type, intro);
+        float outroTime = outro == null ? 0f : animator.plantClipDuration(type, outro);
+        float window = models.game.GameSession.TICKS_PER_SECOND > 0
+                ? plant.getPlantFoodTicks() / (float) models.game.GameSession.TICKS_PER_SECOND
+                        + elapsed : elapsed;
+        if (intro != null && elapsed < introTime) {
+            feast.clip = intro;
+            feast.clock = elapsed;
+            return feast;
+        }
+        if (outro != null && elapsed >= window - outroTime) {
+            feast.clip = outro;
+            feast.clock = elapsed - (window - outroTime);
+            return feast;
+        }
+        if (main != null) {
+            float mainTime = animator.plantClipDuration(type, main);
+            feast.clip = main;
+            feast.clock = elapsed - introTime;
+            feast.loop = outro != null || mainTime <= 0f || elapsed - introTime < mainTime;
+            if (outro == null && mainTime > 0f && elapsed - introTime >= mainTime) {
+                feast.clip = null;
+            }
+            return feast;
+        }
+        feast.clip = intro != null ? intro : outro;
+        feast.clock = elapsed;
+        return feast;
+    }
+
     private String[] plantClipNames(models.game.PlacedPlant plant) {
         if (plant.getType().getName().toLowerCase().contains("mint")) {
             return new String[] {"loop", "idle"};
         }
         int stage = growthStage(plant);
         if (plant.getPlantFoodTicks() > 0) {
-            if (stage > 0) {
-                return new String[] {"plantfood_stage" + stage, "plantfood", "plantfood_on",
-                    "special", "attack", "idle"};
+            String feasting = feastFor(plant).clip;
+            if (feasting != null) {
+                return new String[] {feasting, "idle"};
             }
-            return new String[] {"plantfood", "plantfood_on", "special", "attack", "idle"};
         }
         Float until = firing.get(plant);
         if (until != null && time < until) {
