@@ -17,7 +17,12 @@ public class WaveManager {
     private final double costFactor;
     private int currentWave;
     private boolean started;
+    private static final double GROWTH = 1.18;
+    private static final double FINAL_SURGE = 1.8;
+    private static final int MIN_WAVE_GAP = 14 * GameSession.TICKS_PER_SECOND;
+
     private int currentWaveSpawnedHp;
+    private int ticksSinceWave;
 
     public WaveManager(GameSession session, List<ZombieType> pool, int totalWaves,
                        int baseBudget, double costFactor, Random random) {
@@ -33,10 +38,10 @@ public class WaveManager {
         double[] budgets = new double[waves];
         budgets[0] = baseBudget;
         for (int i = 1; i < waves; i++) {
-            budgets[i] = budgets[i - 1] * 1.3;
+            budgets[i] = budgets[i - 1] * GROWTH;
         }
         if (waves > 1) {
-            budgets[waves - 1] = budgets[waves - 2] * 2;
+            budgets[waves - 1] = budgets[waves - 2] * FINAL_SURGE;
         }
         return budgets;
     }
@@ -50,6 +55,10 @@ public class WaveManager {
 
     public void tick() {
         if (!started || currentWave >= totalWaves) {
+            return;
+        }
+        ticksSinceWave++;
+        if (ticksSinceWave < MIN_WAVE_GAP) {
             return;
         }
         if (remainingWaveHpFraction() <= 0.25) {
@@ -72,6 +81,7 @@ public class WaveManager {
 
     private void beginWave(int waveNumber) {
         currentWave = waveNumber;
+        ticksSinceWave = 0;
         if (waveNumber == totalWaves) {
             System.out.println("The final wave has come.");
         } else {

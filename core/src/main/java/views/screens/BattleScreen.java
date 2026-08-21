@@ -59,6 +59,7 @@ public class BattleScreen extends ScreenAdapter {
     private final java.util.List<SeedPacket> packets = new java.util.ArrayList<>();
     private Tool tool = Tool.NONE;
     private PlantType pending;
+    private static final float HUD_HEIGHT = 78f;
     private static final int COLUMN_SLOTS = 5;
     private ZombieType pendingZombie;
     private final java.util.List<Table> zombieCards = new java.util.ArrayList<>();
@@ -402,7 +403,7 @@ public class BattleScreen extends ScreenAdapter {
 
         Table bar = new Table(skin);
         bar.setBackground(skin.getDrawable("panel"));
-        bar.pad(6f, 16f, 6f, 16f);
+        bar.pad(4f, 16f, 4f, 16f);
 
         bar.add(Ui.iconCell(art.ui("image_ui_hud_ingame_sun"), 34f)).padRight(6f);
         sunLabel = new Label("0", skin, "h2");
@@ -415,14 +416,14 @@ public class BattleScreen extends ScreenAdapter {
         Table waveBox = new Table();
         waveLabel = new Label("", skin, "small");
         waveMeter = new views.battle.WaveMeter(art);
-        waveBox.add(waveLabel).left().padLeft(6f).row();
-        waveBox.add(waveMeter).width(340f).height(41f).padTop(1f);
+        waveBox.add(waveMeter).width(330f).height(34f).padTop(20f).row();
+        waveBox.add(waveLabel).center().padTop(1f);
         bar.add(waveBox).padRight(20f);
 
         bar.add().expandX();
         bar.add(Ui.button(skin, "Menu", "small-brown", this::onEscape)).width(120f).height(46f);
 
-        root.add(bar).growX().height(44f).row();
+        root.add(bar).growX().height(HUD_HEIGHT).row();
         objectiveCell = root.add(buildObjectivePanel()).left().padLeft(14f);
         root.row();
 
