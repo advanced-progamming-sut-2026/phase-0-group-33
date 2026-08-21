@@ -162,7 +162,7 @@ public class QuestScreen extends BaseScreen {
         card.add(text).growX();
         final String chosenName = name;
         if ("scoringgame".equals(key(name))) {
-            card.add(Ui.button(skin, "Play", "small-green", () -> startMinigame(chosenName, 1)))
+            card.add(Ui.button(skin, "Play", "green", () -> startMinigame(chosenName, 1)))
                     .width(150f).height(50f).right();
             return card;
         }
@@ -178,7 +178,7 @@ public class QuestScreen extends BaseScreen {
     }
 
     private String stageStyle(String name, int tier) {
-        return tier <= bestStage(name) + 1 ? "small-green" : "small";
+        return tier <= bestStage(name) + 1 ? "green" : "small";
     }
 
     private int bestStage(String name) {
