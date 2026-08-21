@@ -582,9 +582,14 @@ public class LawnView extends Actor {
     private void trackStorms() {
         for (models.game.WhirlwindRide ride : session.drainWhirlwinds()) {
             flights.put(ride.getZombie(), new float[] {
-                (float) ride.getFromX(), time, time + STORM_RIDE, 0.3f});
-            rides.put(ride.getZombie(), new float[] {
-                (float) ride.getFromX(), (float) ride.getToX(), time, ride.getRow()});
+                (float) ride.getFromX(), time, time + STORM_RIDE,
+                ride.isStorm() ? 0.3f : 1.1f});
+            if (ride.isStorm()) {
+                rides.put(ride.getZombie(), new float[] {
+                    (float) ride.getFromX(), (float) ride.getToX(), time, ride.getRow()});
+            } else {
+                noteBlastRide(ride);
+            }
         }
         expireRides();
         for (com.badlogic.gdx.utils.ObjectMap.Entry<models.entities.zombie.Zombie, float[]> entry
@@ -663,6 +668,13 @@ public class LawnView extends Actor {
             }
             batch.setColor(Color.WHITE);
         }
+    }
+
+    private void noteBlastRide(models.game.WhirlwindRide ride) {
+        addFx(views.assets.AnimationCatalog.blastRear(), "explosion",
+                (float) ride.getFromX(), ride.getRow(), 1.7f, 0.4f, 1f);
+        addFx(BOOM, "explosion", (float) ride.getFromX(), ride.getRow(), 1.4f, 0.35f, 1f);
+        shakePending = true;
     }
 
     private void drawRides(Batch batch) {

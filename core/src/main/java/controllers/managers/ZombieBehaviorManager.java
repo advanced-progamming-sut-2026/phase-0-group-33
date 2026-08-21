@@ -439,14 +439,34 @@ public class ZombieBehaviorManager {
         }
     }
 
+    private void blastProspector(Zombie zombie) {
+        zombie.getBattle().setReversed(true);
+        double landing = zombie.getPosition().getX();
+        for (PlacedPlant plant : session.getPlants()) {
+            if (plant.getY() == (int) zombie.getPosition().getY()
+                    && plant.getX() < landing) {
+                landing = Math.min(landing, plant.getX() - 1);
+            }
+        }
+        landing = Math.max(1, landing);
+        if (landing >= zombie.getPosition().getX() - 0.5) {
+            System.out.println("The Prospector's dynamite went off and he turned around!");
+            return;
+        }
+        double from = zombie.getPosition().getX();
+        zombie.getPosition().setX(landing);
+        session.recordBlastRide(zombie, from, landing, (int) zombie.getPosition().getY());
+        System.out.printf("The Prospector's dynamite blasted him from column %d"
+                + " to column %d, behind your defenses!%n",
+                (int) Math.round(from), (int) Math.round(landing));
+    }
+
     private boolean prospectorAct(Zombie zombie) {
         int dynamite = zombie.getBattle().getDynamiteTicks();
         if (dynamite > 0) {
             zombie.getBattle().setDynamiteTicks(dynamite - 1);
             if (dynamite - 1 == 0) {
-                zombie.getBattle().setReversed(true);
-                zombie.getPosition().setX(1);
-                System.out.println("The Prospector's dynamite blasted him behind your defenses!");
+                blastProspector(zombie);
             }
             return false;
         }

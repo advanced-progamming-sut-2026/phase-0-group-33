@@ -600,10 +600,20 @@ public class GameSession {
 
     public void recordWhirlwind(models.entities.zombie.Zombie zombie,
                                 double fromX, double toX, int row) {
+        addRide(zombie, fromX, toX, row, true);
+    }
+
+    public void recordBlastRide(models.entities.zombie.Zombie zombie,
+                                double fromX, double toX, int row) {
+        addRide(zombie, fromX, toX, row, false);
+    }
+
+    private void addRide(models.entities.zombie.Zombie zombie, double fromX,
+                         double toX, int row, boolean storm) {
         if (whirlwinds.size() > 32) {
             return;
         }
-        whirlwinds.add(new WhirlwindRide(zombie, fromX, toX, row));
+        whirlwinds.add(new WhirlwindRide(zombie, fromX, toX, row, storm));
     }
 
     public java.util.List<WhirlwindRide> drainWhirlwinds() {

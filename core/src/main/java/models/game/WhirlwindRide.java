@@ -8,12 +8,18 @@ public class WhirlwindRide {
     private final double fromX;
     private final double toX;
     private final int row;
+    private final boolean storm;
 
-    public WhirlwindRide(Zombie zombie, double fromX, double toX, int row) {
+    public WhirlwindRide(Zombie zombie, double fromX, double toX, int row, boolean storm) {
         this.zombie = zombie;
         this.fromX = fromX;
         this.toX = toX;
         this.row = row;
+        this.storm = storm;
+    }
+
+    public boolean isStorm() {
+        return storm;
     }
 
     public Zombie getZombie() {
