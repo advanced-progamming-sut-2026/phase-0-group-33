@@ -156,6 +156,16 @@ public class PlantSelection {
         return Result.ok(type.getName() + " is boosted for this level.");
     }
 
+    public PlantSlot addFreely(PlantType type) {
+        PlantSlot existing = findSlot(type);
+        if (existing != null) {
+            return existing;
+        }
+        PlantSlot slot = new PlantSlot(type);
+        slots.add(slot);
+        return slot;
+    }
+
     public PlantSlot findSlot(PlantType type) {
         for (PlantSlot slot : slots) {
             if (slot.getType() == type) {

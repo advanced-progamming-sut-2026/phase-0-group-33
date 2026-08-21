@@ -79,6 +79,10 @@ public final class Router {
                 return new GreenhouseScreen(game);
             case ZEN_GARDEN:
                 return new views.screens.ZenGardenScreen(game);
+            case SANDBOX_SETUP:
+                return new views.screens.SandboxSetupScreen(game);
+            case SANDBOX:
+                return new views.screens.SandboxScreen(game);
             case SHOP:
                 return new ShopScreen(game);
             case NEWS:

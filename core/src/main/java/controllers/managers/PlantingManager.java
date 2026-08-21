@@ -43,6 +43,9 @@ public class PlantingManager {
             return session.getMinigameManager().placeBowlingNut(type, x, y);
         }
         PlantSlot slot = session.findSlot(type);
+        if (slot == null && session.isSandbox()) {
+            slot = session.addSandboxSlot(type);
+        }
         if (slot == null) {
             return Result.fail("This plant is not in your selection.");
         }

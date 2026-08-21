@@ -57,12 +57,12 @@ public class BattleScreen extends ScreenAdapter {
 
     private final Table seedBar = new Table();
     private final java.util.List<SeedPacket> packets = new java.util.ArrayList<>();
-    private Tool tool = Tool.NONE;
-    private PlantType pending;
+    protected Tool tool = Tool.NONE;
+    protected PlantType pending;
     private static final int SCORE_MILESTONE = 500;
     private static final float HUD_HEIGHT = 78f;
     private static final int COLUMN_SLOTS = 5;
-    private ZombieType pendingZombie;
+    protected ZombieType pendingZombie;
     private final java.util.List<Table> zombieCards = new java.util.ArrayList<>();
     private int swapColumn = -1;
     private int swapRow = -1;
@@ -231,7 +231,7 @@ public class BattleScreen extends ScreenAdapter {
         }
     }
 
-    private void showObjectives() {
+    protected void showObjectives() {
         Table content = new Table();
         for (String line : objectives()) {
             content.add(Ui.label(skin, line, "h2")).left().padBottom(6f).row();
@@ -628,6 +628,12 @@ public class BattleScreen extends ScreenAdapter {
         overlay = Overlay.open(stage, skin, "Upgrade every plant of one kind", content);
     }
 
+    protected void armSandbox(Tool wanted, PlantType type, ZombieType zombie) {
+        tool = wanted;
+        pending = type;
+        pendingZombie = zombie;
+    }
+
     private void selectTool(Tool next, PlantType type) {
         if (tool == next && pending == type) {
             tool = Tool.NONE;
@@ -764,7 +770,14 @@ public class BattleScreen extends ScreenAdapter {
         }
     }
 
+    protected boolean sandboxClick(int column, int row) {
+        return false;
+    }
+
     private boolean handleModeClick(int column, int row) {
+        if (sandboxClick(column, row)) {
+            return true;
+        }
         if (tool == Tool.NONE && controller.handleCollectPlantFood(column, row).isSuccessfull()) {
             sfx(views.assets.Audio.GULP);
             return true;

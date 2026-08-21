@@ -11,6 +11,8 @@ public enum ScreenId {
     COLLECTION,
     GREENHOUSE,
     ZEN_GARDEN,
+    SANDBOX_SETUP,
+    SANDBOX,
     SHOP,
     NEWS,
     LEADERBOARD,

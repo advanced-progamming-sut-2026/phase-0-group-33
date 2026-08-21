@@ -70,6 +70,8 @@ public class MainMenuScreen extends BaseScreen {
                 "Profile", ScreenId.PROFILE));
         lower.add(button("image_ui_hud_settingsbutton_buttons_hud_settings",
                 "Settings", ScreenId.SETTINGS));
+        lower.add(button("image_ui_generic_content_well", "Sandbox", ScreenId.SANDBOX_SETUP)
+                .withIcon(art.ui("image_ui_hud_ingame_shovel_icon")));
         body.add(lower).padTop(2f).row();
 
         Table strip = new Table();

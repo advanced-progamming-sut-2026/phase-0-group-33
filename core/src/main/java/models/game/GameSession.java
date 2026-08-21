@@ -210,7 +210,8 @@ public class GameSession {
         if (phase != GamePhase.PREPARATION) {
             return Result.fail("The game has already started.");
         }
-        if (selection.isEmpty() && !isSpecial(SpecialLevelType.CONVEYOR_BELT)) {
+        if (selection.isEmpty() && !sandbox
+                && !isSpecial(SpecialLevelType.CONVEYOR_BELT)) {
             return Result.fail("Pick at least one plant first.");
         }
         phase = GamePhase.BATTLE;
@@ -426,6 +427,13 @@ public class GameSession {
 
     public PlantSlot findSlot(PlantType type) {
         return selection.findSlot(type);
+    }
+
+    public PlantSlot addSandboxSlot(PlantType type) {
+        if (!sandbox) {
+            return null;
+        }
+        return selection.addFreely(type);
     }
 
     public int effectiveCost(PlantType type) {
