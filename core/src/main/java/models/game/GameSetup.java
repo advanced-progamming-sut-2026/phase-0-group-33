@@ -35,6 +35,12 @@ public class GameSetup {
         this.plantLevels = plantLevels == null ? new HashMap<>() : new HashMap<>(plantLevels);
     }
 
+    public static GameSetup sandbox(User user, Level level, List<String> unlockedPlants,
+                                    Map<String, Integer> plantLevels) {
+        return new GameSetup(user, level, GameMode.ADVENTURE, unlockedPlants, 9, -1,
+                level == null ? 3 : level.getLevelNumber(), null, plantLevels);
+    }
+
     public static GameSetup adventure(User user, Level level, List<String> unlockedPlants,
                                       int plantFoods, Map<String, Integer> plantLevels) {
         return new GameSetup(user, level, GameMode.ADVENTURE, unlockedPlants, plantFoods,

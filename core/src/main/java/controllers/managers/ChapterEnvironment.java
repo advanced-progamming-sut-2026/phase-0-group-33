@@ -89,6 +89,59 @@ public class ChapterEnvironment {
         }
     }
 
+    public java.util.List<String> availableEvents() {
+        java.util.List<String> events = new java.util.ArrayList<>();
+        events.add("Sandstorm");
+        events.add("Icy wind");
+        events.add("Shift the tide");
+        events.add("Raise graves");
+        events.add("Necromancy");
+        events.add("Low tide ambush");
+        return events;
+    }
+
+    public String fire(String event) {
+        switch (event) {
+            case "Sandstorm":
+                return sandstorm();
+            case "Icy wind":
+                iceWind();
+                return "An icy wind swept a lane.";
+            case "Shift the tide":
+                shiftTide();
+                return "The tide moved.";
+            case "Raise graves":
+                darkAgesGraves();
+                return "Fresh graves rose from the lawn.";
+            case "Necromancy":
+                necromancy();
+                return "Necromancy called the dead out of every grave.";
+            case "Low tide ambush":
+                lowTideAmbush();
+                return "Zombies climbed out of the shallows.";
+            default:
+                return "Nothing happened.";
+        }
+    }
+
+    private String sandstorm() {
+        int carried = 0;
+        for (Zombie zombie : session.getZombies()) {
+            if (zombie instanceof models.entities.zombie.Zomboss
+                    || session.getRandom().nextInt(100) >= 60) {
+                continue;
+            }
+            int jump = 1 + session.getRandom().nextInt(3);
+            double from = zombie.getPosition().getX();
+            zombie.getPosition().setX(Math.max(2, from - jump));
+            session.recordWhirlwind(zombie, from, zombie.getPosition().getX(),
+                    (int) zombie.getPosition().getY());
+            carried++;
+        }
+        return carried == 0 ? "The sandstorm found nobody to carry."
+                : "A sandstorm carried " + carried + " zombies forward.";
+    }
+
     public void onWaveStart(int waveNumber) {
         Chapter chapter = chapter();
         if (chapter instanceof FrostBite) {

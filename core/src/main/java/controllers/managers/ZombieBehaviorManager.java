@@ -66,6 +66,14 @@ public class ZombieBehaviorManager {
         environment.onWaveStart(waveNumber);
     }
 
+    public java.util.List<String> availableEvents() {
+        return environment.availableEvents();
+    }
+
+    public String fireEvent(String event) {
+        return environment.fire(event);
+    }
+
     public void afterWaveSpawn(int waveNumber) {
         environment.afterWaveSpawn(waveNumber);
     }

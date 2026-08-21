@@ -28,6 +28,8 @@ import java.util.Set;
 
 public class GameSession {
     public static final int ROWS = 5;
+    private static final int SANDBOX_SUN = 9990;
+    private static final int SANDBOX_FOOD = 9;
     public static final int COLS = 9;
     public static final int TICKS_PER_SECOND = 10;
     private static final int DEFAULT_STARTING_SUN = 50;
@@ -59,6 +61,7 @@ public class GameSession {
     private int plantFoods;
     private final java.util.List<PlantFoodDrop> plantFoodDrops = new java.util.ArrayList<>();
     private boolean cooldownsDisabled;
+    private boolean sandbox;
     private int plantsLost;
     private int zombiesKilled;
     private int timerTicksLeft = -1;
@@ -417,6 +420,9 @@ public class GameSession {
     }
 
     public int effectiveCost(PlantType type) {
+        if (sandbox) {
+            return 0;
+        }
         return Math.max(0, type.getCost() - PlantUpgrades.costReduction(type, plantLevel(type)));
     }
 
@@ -565,7 +571,7 @@ public class GameSession {
     }
 
     public void setPlantFoods(int plantFoods) {
-        this.plantFoods = Math.min(3, plantFoods);
+        this.plantFoods = Math.min(sandbox ? SANDBOX_FOOD : 3, plantFoods);
     }
 
     public java.util.List<PlantFoodDrop> getPlantFoodDrops() {
@@ -596,8 +602,19 @@ public class GameSession {
         }
     }
 
+    public boolean isSandbox() {
+        return sandbox;
+    }
+
+    public void enterSandbox() {
+        this.sandbox = true;
+        this.cooldownsDisabled = true;
+        sunManager.addSun(SANDBOX_SUN);
+        plantFoods = SANDBOX_FOOD;
+    }
+
     public boolean isCooldownsDisabled() {
-        return cooldownsDisabled;
+        return cooldownsDisabled || sandbox;
     }
 
     public void disableCooldowns() {
