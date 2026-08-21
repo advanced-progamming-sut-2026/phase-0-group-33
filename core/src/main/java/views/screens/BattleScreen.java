@@ -360,6 +360,19 @@ public class BattleScreen extends ScreenAdapter {
                 ? ScreenId.BATTLE : ScreenId.SEED_SELECT);
     }
 
+    private String modeTitle() {
+        switch (session.getMode()) {
+            case VASEBREAKER:
+                return "Vasebreaker";
+            case I_ZOMBIE:
+                return "I, Zombie";
+            case BEGHOULED:
+                return "Beghouled";
+            default:
+                return "";
+        }
+    }
+
     private String minigameKey() {
         if (replayMode == null) {
             return null;
@@ -421,12 +434,16 @@ public class BattleScreen extends ScreenAdapter {
             bar.add(scoreMeter).size(62f, 62f).padRight(14f);
         }
 
-        Table waveBox = new Table();
         waveLabel = new Label("", skin, "small");
-        waveMeter = new views.battle.WaveMeter(art);
-        waveBox.add(waveMeter).width(330f).height(34f).padTop(24f).row();
-        waveBox.add(waveLabel).center().padTop(1f);
-        bar.add(waveBox).padRight(20f);
+        if (session.usesWaves()) {
+            waveMeter = new views.battle.WaveMeter(art);
+            Table waveBox = new Table();
+            waveBox.add(waveMeter).width(330f).height(34f).padTop(24f).row();
+            waveBox.add(waveLabel).center().padTop(1f);
+            bar.add(waveBox).padRight(20f);
+        } else {
+            bar.add(waveLabel).padRight(20f);
+        }
 
         bar.add().expandX();
         bar.add(pauseButton()).size(58f, 58f);
@@ -948,6 +965,9 @@ public class BattleScreen extends ScreenAdapter {
         if (boss == null) {
             return;
         }
+        if (waveMeter == null) {
+            return;
+        }
         waveMeter.setBoss(true);
         waveMeter.setProgress(1f - boss.healthFraction());
         int left = models.entities.zombie.Zomboss.SEGMENTS - boss.getSegmentsCleared();
@@ -976,6 +996,10 @@ public class BattleScreen extends ScreenAdapter {
         int total = session.getWaveManager().getTotalWaves();
         if (session.isBossLevel() && session.getZombossManager().hasBoss()) {
             refreshBossBar();
+            return;
+        }
+        if (waveMeter == null) {
+            waveLabel.setText(modeTitle());
             return;
         }
         boolean endless = session.getWaveManager().isEndless();

@@ -3,7 +3,6 @@ package controllers.managers;
 import models.Result;
 import models.entities.zombie.Zombie;
 import models.entities.zombie.ZombieType;
-import models.game.GameMode;
 import models.game.GamePhase;
 import models.game.GameSession;
 import models.game.Names;
@@ -60,9 +59,7 @@ public class BattleCommands {
     }
 
     private boolean usesWaves() {
-        GameMode mode = session.getMode();
-        return mode == GameMode.ADVENTURE || mode == GameMode.SCORING
-                || mode == GameMode.ZOMBOTANY || mode == GameMode.WALLNUT_BOWLING;
+        return session.usesWaves();
     }
 
     private void tickTimer() {

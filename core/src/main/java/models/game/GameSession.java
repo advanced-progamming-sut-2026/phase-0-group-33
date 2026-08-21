@@ -442,6 +442,12 @@ public class GameSession {
         return Math.max(1, setup.getPlantLevels().getOrDefault(type.getName(), 1));
     }
 
+    public boolean usesWaves() {
+        GameMode mode = getMode();
+        return mode == GameMode.ADVENTURE || mode == GameMode.SCORING
+                || mode == GameMode.ZOMBOTANY || mode == GameMode.WALLNUT_BOWLING;
+    }
+
     public GameMode getMode() {
         return setup.getMode();
     }
