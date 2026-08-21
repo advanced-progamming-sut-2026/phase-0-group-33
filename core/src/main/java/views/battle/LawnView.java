@@ -36,6 +36,8 @@ public class LawnView extends Actor {
     private static final String ICE_PLANT = "FROSTBITE_ICE_BLOCK_PLANT";
     private static final String ICE_ZOMBIE = "FROSTBITE_ICE_BLOCK_ZOMBIE";
     private static final String TIDE_LINE = "WATER_TIDE_LINE";
+    private static final String BIG_WAVE = "WAVE_BIG";
+    private static final float TIDE_WAVE_LIFE = 1.6f;
     private static final String WATER_TILE = "WATER_SQUARE";
     private static final float FOOD_GLOW_SHIFT = 10f;
     private static final float HURT_FLASH = 0.14f;
@@ -70,6 +72,8 @@ public class LawnView extends Actor {
     private int hoverColumn = -1;
     private int hoverRow = -1;
     private models.entities.zombie.ZombieType zombieGhost;
+    private int tideColumn = -1;
+    private float tideWave;
     private int selectColumn = -1;
     private int selectRow = -1;
     private float time;
@@ -1105,6 +1109,25 @@ public class LawnView extends Actor {
         return true;
     }
 
+    private void drawTideWave(Batch batch, int boundary) {
+        if (tideWave <= 0f || time - tideWave > TIDE_WAVE_LIFE) {
+            return;
+        }
+        String clipName = animator.clipName(BIG_WAVE, "wave_crash", "wave");
+        ClipRef clip = clipName == null ? null : animator.namedClip(BIG_WAVE, clipName);
+        if (clip == null) {
+            return;
+        }
+        float age = time - tideWave;
+        float scale = animator.fitScale(BIG_WAVE, clipName, Lawn.height() * 1.15f);
+        float lift = animator.centreOffset(BIG_WAVE, clipName, scale);
+        float fade = Math.min(1f, 2.4f * Math.min(age, TIDE_WAVE_LIFE - age));
+        batch.setColor(1f, 1f, 1f, Math.max(0f, fade));
+        animator.draw(batch, clip, age, Lawn.columnLeft(boundary) + Lawn.cellWidth() * 0.2f,
+                Lawn.bottom() + Lawn.height() / 2f + lift, scale, false, null);
+        batch.setColor(Color.WHITE);
+    }
+
     private void drawTideLine(Batch batch) {
         if (!animator.isReady() || session.getLevel() == null) {
             return;
@@ -1120,8 +1143,16 @@ public class LawnView extends Actor {
             }
         }
         if (firstWater < 1) {
+            tideColumn = -1;
             return;
         }
+        if (tideColumn != firstWater) {
+            if (tideColumn > 0) {
+                tideWave = time;
+            }
+            tideColumn = firstWater;
+        }
+        drawTideWave(batch, firstWater);
         ClipRef clip = animator.namedClip(TIDE_LINE, "idle");
         if (clip == null) {
             return;
