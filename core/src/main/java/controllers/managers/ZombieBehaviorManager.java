@@ -15,8 +15,6 @@ import models.progress.chapter.Chapter;
 import models.progress.chapter.FrostBite;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 public class ZombieBehaviorManager {
 
@@ -27,9 +25,11 @@ public class ZombieBehaviorManager {
     private static final int THAW_PER_TICK = 3;
     private static final double UMBRELLA_RANGE = 1.0;
     private static final double WIZARD_RANGE = 3.0;
-    private static final double PIANO_RANGE = 3.0;
+    private static final double PIANO_RANGE = 1.5;
+    private static final int PIANO_SHUFFLE_CHANCE = 35;
 
-    private final Set<Zombie> pushersWithObject = new HashSet<>();
+    private final java.util.Map<Zombie, PushedObject> pushersWithObject =
+            new java.util.HashMap<>();
 
     public ZombieBehaviorManager(GameSession session, CombatManager combatManager) {
         this.session = session;
@@ -271,13 +271,22 @@ public class ZombieBehaviorManager {
     }
 
     private void ensurePushedObject(Zombie zombie, PushedObject.Kind kind) {
-        if (pushersWithObject.contains(zombie)) {
+        PushedObject carried = pushersWithObject.get(zombie);
+        if (carried != null) {
+            if (session.getPushedObjects().contains(carried) && carried.isMoving()) {
+                carried.setRow((int) zombie.getPosition().getY());
+            }
             return;
         }
-        pushersWithObject.add(zombie);
         PushedObject pushed = new PushedObject(kind, 1100,
                 zombie.getPosition().getX() - 0.5, (int) zombie.getPosition().getY());
+        pushersWithObject.put(zombie, pushed);
         session.getPushedObjects().add(pushed);
+    }
+
+    private boolean isPushing(Zombie zombie) {
+        PushedObject carried = pushersWithObject.get(zombie);
+        return carried != null && session.getPushedObjects().contains(carried);
     }
 
     private boolean dodoFly(Zombie zombie) {
@@ -465,22 +474,30 @@ public class ZombieBehaviorManager {
         if (!cooldownReady(zombie, 50)) {
             return;
         }
+        boolean shuffled = false;
         for (Zombie other : session.getZombies()) {
             if (other == zombie || other.getBattle().isSunProducer()
-                    || other instanceof models.entities.zombie.Zomboss) {
+                    || other instanceof models.entities.zombie.Zomboss
+                    || isPushing(other) || isEatingPlant(other)) {
                 continue;
             }
             if (Math.abs(other.getPosition().getX() - zombie.getPosition().getX())
                     > PIANO_RANGE) {
                 continue;
             }
+            if (session.getRandom().nextInt(100) >= PIANO_SHUFFLE_CHANCE) {
+                continue;
+            }
             int row = (int) other.getPosition().getY();
             int shifted = row + (session.getRandom().nextBoolean() ? 1 : -1);
             if (shifted >= 1 && shifted <= GameSession.ROWS) {
                 other.getPosition().setY(shifted);
+                shuffled = true;
             }
         }
-        System.out.println("The Pianist's tune shuffled the zombies between lanes!");
+        if (shuffled) {
+            System.out.println("The Pianist's tune shuffled a few zombies between lanes!");
+        }
     }
 
     private void pharaohRage(Zombie zombie) {

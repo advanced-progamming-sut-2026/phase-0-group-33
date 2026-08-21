@@ -11,7 +11,7 @@ public class PushedObject {
     private final Kind kind;
     private int health;
     private double x;
-    private final int row;
+    private int row;
     private boolean moving = true;
 
     public PushedObject(Kind kind, int health, double x, int row) {
@@ -23,6 +23,10 @@ public class PushedObject {
 
     public Kind getKind() {
         return kind;
+    }
+
+    public void setRow(int row) {
+        this.row = row;
     }
 
     public int getHealth() {
