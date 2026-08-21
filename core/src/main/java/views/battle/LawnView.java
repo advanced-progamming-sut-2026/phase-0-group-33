@@ -1509,7 +1509,8 @@ public class LawnView extends Actor {
         if (!animator.isReady()) {
             return false;
         }
-        boolean scattered = shot.getMotion() == models.game.Projectile.Motion.SCATTER;
+        boolean scattered = shot.getMotion() == models.game.Projectile.Motion.SCATTER
+                && shot.getSource() == models.entities.plant.PlantType.GRAPESHOT;
         String[] art = scattered
                 ? new String[] {GRAPE_SHARD, grapeClip(shot)}
                 : views.assets.AnimationCatalog.projectile(shot.getSource());
@@ -1537,7 +1538,7 @@ public class LawnView extends Actor {
 
     private float flightScale(models.game.Projectile shot) {
         if (shot.getMotion() == models.game.Projectile.Motion.SCATTER) {
-            return 0.5f;
+            return shot.getSource() == models.entities.plant.PlantType.GRAPESHOT ? 0.5f : 0.34f;
         }
         if (shot.getMotion() == models.game.Projectile.Motion.LOB) {
             return 0.66f;

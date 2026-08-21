@@ -69,18 +69,11 @@ public class ShotPatterns {
         }
     }
 
+    private static final int[][] STAR_POINTS = {{1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}};
+
     private void starShot(PlacedPlant plant) {
-        if (combat.firstZombieInRowAfter(plant.getY(), plant.getX()) != null) {
-            combat.launchToward(plant, plant.getY(), 1);
-        }
-        if (lastZombieInRowBefore(plant.getY(), plant.getX()) != null) {
-            combat.launchToward(plant, plant.getY(), -1);
-        }
-        for (Zombie zombie : new ArrayList<>(session.getZombies())) {
-            if (Math.abs(zombie.getPosition().getX() - plant.getX()) <= 0.5
-                    && (int) zombie.getPosition().getY() != plant.getY()) {
-                combat.hitZombie(zombie, plant.getType());
-            }
+        for (int[] point : STAR_POINTS) {
+            session.getProjectileManager().launchStar(plant, point[0], point[1]);
         }
     }
 

@@ -56,6 +56,13 @@ public class ProjectileManager {
         projectiles.add(shot);
     }
 
+    public void launchStar(PlacedPlant plant, int forward, int lane) {
+        Projectile star = new Projectile(plant.getType(), Projectile.Motion.SCATTER,
+                plant.getY(), plant.getX(), 0, forward);
+        star.setLaneStep(lane);
+        projectiles.add(star);
+    }
+
     public void launchGrapes(int column, int row) {
         int[][] ways = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
         for (int[] way : ways) {
@@ -116,7 +123,12 @@ public class ProjectileManager {
             return;
         }
         projectile.markSpent();
-        combat.damageArea(projectile.getX(), projectile.getRow(), 0, PlantType.GRAPESHOT);
+        PlantType source = projectile.getSource();
+        if (source.getTags().contains(PlantTag.AOE) || source == PlantType.GRAPESHOT) {
+            combat.damageArea(projectile.getX(), projectile.getRow(), 0, source);
+        } else {
+            combat.hitZombie(target, source);
+        }
     }
 
     private void advanceZombieShot(Projectile projectile) {
