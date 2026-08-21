@@ -969,6 +969,7 @@ public class BattleScreen extends ScreenAdapter {
             return;
         }
         waveMeter.setBoss(true);
+        waveMeter.setSegments(models.entities.zombie.Zomboss.SEGMENTS);
         waveMeter.setProgress(1f - boss.healthFraction());
         int left = models.entities.zombie.Zomboss.SEGMENTS - boss.getSegmentsCleared();
         waveLabel.setText(boss.isStunned() ? boss.getKind().getTitle() + " is dazed!"

@@ -18,6 +18,7 @@ public final class WaveMeter extends Actor {
     private static final String FLAG = "image_ui_hud_ingame_progress_meter_flag_default";
     private static final String HEAD = "image_ui_hud_ingame_progress_meter_zombiehead";
     private static final String BOSS_HEAD = "image_ui_hud_ingame_progress_meter_zomboss_head";
+    private static final String NOTCH = "image_ui_hud_ingame_progress_meter_zomboss_notch";
 
     private static final float INSET = 7f;
     private static final float MAX_FLAGS = 12f;
@@ -27,6 +28,7 @@ public final class WaveMeter extends Actor {
     private float progress;
     private float shown;
     private int waves = 1;
+    private int segments;
     private boolean boss;
     private float clock;
 
@@ -44,6 +46,10 @@ public final class WaveMeter extends Actor {
 
     public void setBoss(boolean boss) {
         this.boss = boss;
+    }
+
+    public void setSegments(int segments) {
+        this.segments = Math.max(0, segments);
     }
 
     @Override
@@ -69,6 +75,7 @@ public final class WaveMeter extends Actor {
         batch.setColor(Color.WHITE);
         batch.draw(trough, getX(), getY(), getWidth(), getHeight());
         drawFlags(batch, left, track, scale);
+        drawNotches(batch, left, track, scale);
         drawHead(batch, left, track, scale);
         batch.setColor(Color.WHITE);
     }
@@ -119,6 +126,21 @@ public final class WaveMeter extends Actor {
             batch.draw(flag, x - poleWidth / 2f + wave1,
                     getY() + getHeight() * 0.35f + poleHeight - flagHeight,
                     flagWidth, flagHeight);
+        }
+    }
+
+    private void drawNotches(Batch batch, float left, float track, float scale) {
+        TextureRegion notch = art.uiOptional(NOTCH);
+        if (!boss || notch == null || segments < 2) {
+            return;
+        }
+        float height = getHeight() * 1.05f;
+        float width = notch.getRegionWidth() * scale * 0.9f;
+        for (int cut = 1; cut < segments; cut++) {
+            float at = cut / (float) segments;
+            batch.setColor(Color.WHITE);
+            batch.draw(notch, left + track * (1f - at) - width / 2f,
+                    getY() + (getHeight() - height) / 2f, width, height);
         }
     }
 
