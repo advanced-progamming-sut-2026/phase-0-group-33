@@ -606,6 +606,9 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     private boolean showsSeedTray() {
+        if (session.isSandbox()) {
+            return false;
+        }
         return session.getMode() == GameMode.I_ZOMBIE || usesConveyor()
                 || !session.getSlots().isEmpty();
     }
