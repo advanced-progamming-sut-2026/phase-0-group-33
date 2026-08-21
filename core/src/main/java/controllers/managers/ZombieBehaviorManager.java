@@ -27,6 +27,9 @@ public class ZombieBehaviorManager {
     private static final double WIZARD_RANGE = 3.0;
     private static final double PIANO_RANGE = 1.5;
     private static final int PIANO_SHUFFLE_CHANCE = 35;
+    private static final int KING_COOLDOWN = 80;
+    private static final double KING_RANGE = 2.0;
+    private static final int WEASEL_COOLDOWN = 90;
 
     private final java.util.Map<Zombie, PushedObject> pushersWithObject =
             new java.util.HashMap<>();
@@ -150,6 +153,12 @@ public class ZombieBehaviorManager {
                 return false;
             case NEWSPAPER:
                 newspaperRage(zombie);
+                return false;
+            case KING:
+                knightSomeone(zombie);
+                return false;
+            case WEASEL_HOARDER:
+                hoardWeasels(zombie);
                 return false;
             case PEASHOOTER_ZOMBIE:
                 zombotanyShoot(zombie);
@@ -533,6 +542,41 @@ public class ZombieBehaviorManager {
             zombie.getPosition().setX(zombie.getPosition().getX()
                     - 2 * zombie.getSpeed() / GameSession.TICKS_PER_SECOND);
         }
+    }
+
+    private void knightSomeone(Zombie king) {
+        if (!cooldownReady(king, KING_COOLDOWN)) {
+            return;
+        }
+        Zombie chosen = null;
+        for (Zombie other : session.getZombies()) {
+            if (other.getType() != ZombieType.NORMAL) {
+                continue;
+            }
+            if (Math.abs(other.getPosition().getX() - king.getPosition().getX()) > KING_RANGE) {
+                continue;
+            }
+            if (chosen == null || other.getPosition().getX() > chosen.getPosition().getX()) {
+                chosen = other;
+            }
+        }
+        if (chosen == null) {
+            return;
+        }
+        Zombie knight = session.spawnZombie(ZombieType.KNIGHT, chosen.getPosition().getX(),
+                (int) chosen.getPosition().getY(), Math.max(1, chosen.getSpawnWave()));
+        knight.setHealth(Math.min(knight.getHealth(), chosen.getHealth()));
+        session.getZombies().remove(chosen);
+        System.out.println("The King knighted a zombie; it now wears a crown and shoulder plate!");
+    }
+
+    private void hoardWeasels(Zombie hoarder) {
+        if (!cooldownReady(hoarder, WEASEL_COOLDOWN)) {
+            return;
+        }
+        session.spawnZombie(ZombieType.WEASEL, hoarder.getPosition().getX(),
+                (int) hoarder.getPosition().getY(), Math.max(1, hoarder.getSpawnWave()));
+        System.out.println("The Weasel Hoarder let another weasel loose!");
     }
 
     private void releaseWeasel(Zombie hoarder) {
