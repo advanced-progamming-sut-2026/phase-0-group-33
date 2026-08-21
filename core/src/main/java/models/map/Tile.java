@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Tile {
+
+    private static final int GRAVE_HEALTH = 250;
     private Point position;
     private TerrainType terrain;
     private List<Zombie> zombies;
@@ -24,7 +26,7 @@ public class Tile {
         this.zombies = new ArrayList<>();
         this.hasLawnMower = hasLawnMower;
         if (terrain == TerrainType.GRAVE) {
-            this.graveHealth = 700;
+            this.graveHealth = GRAVE_HEALTH;
         }
     }
 
@@ -47,6 +49,10 @@ public class Tile {
         if (fireTicks == 0 && terrain == TerrainType.FIRE) {
             terrain = TerrainType.NORMAL;
         }
+    }
+
+    public static int getGraveMaxHealth() {
+        return GRAVE_HEALTH;
     }
 
     public int getGraveHealth() {

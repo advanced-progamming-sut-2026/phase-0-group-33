@@ -31,7 +31,6 @@ public class LawnView extends Actor {
     protected final Art art;
     protected final Drawable fill;
 
-    private static final int GRAVE_MAX_HEALTH = 700;
     private static final String PLANT_FOOD_GLOW = "PLANTFOOD_FX";
     private static final String GRAPE_SHARD = "GRAPESHOT_PROJECTILE";
     private static final String ICE_PLANT = "FROSTBITE_ICE_BLOCK_PLANT";
@@ -1169,7 +1168,7 @@ public class LawnView extends Actor {
     }
 
     private void drawGrave(Batch batch, Tile tile, int column, int row) {
-        float fraction = Math.max(0f, Math.min(1f, tile.getGraveHealth() / (float) GRAVE_MAX_HEALTH));
+        float fraction = Math.max(0f, Math.min(1f, tile.getGraveHealth() / (float) Tile.getGraveMaxHealth()));
         TextureRegion region = tile.getGraveSunContent() > 0 ? art.graveWithSun(fraction)
                 : tile.isGravePlantFood() ? art.graveWithFood(fraction)
                 : art.grave(chapterName, fraction);
@@ -1190,6 +1189,10 @@ public class LawnView extends Actor {
             final float fw = width;
             final float fh = height;
             flash(batch, () -> batch.draw(flashRegion, gx, gy, fw, fh));
+        }
+        if (tile.getGraveHealth() < Tile.getGraveMaxHealth()) {
+            drawHealthBar(batch, tile.getGraveHealth(), Tile.getGraveMaxHealth(),
+                    Lawn.columnCenter(column), gy + height + 3f, Lawn.cellWidth() * 0.6f);
         }
         drawGraveContent(batch, tile, column, row);
     }
