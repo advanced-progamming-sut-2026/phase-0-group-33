@@ -37,6 +37,8 @@ public class LawnView extends Actor {
     private static final String ICE_ZOMBIE = "FROSTBITE_ICE_BLOCK_ZOMBIE";
     private static final String TIDE_LINE = "WATER_TIDE_LINE";
     private static final String BIG_WAVE = "WAVE_BIG";
+    private static final String MINT_FX = "MINT_FX";
+    private static final float MINT_LIFE = 1.6f;
     private static final float TIDE_WAVE_LIFE = 1.6f;
     private static final String WATER_TILE = "WATER_SQUARE";
     private static final float FOOD_GLOW_SHIFT = 10f;
@@ -583,7 +585,25 @@ public class LawnView extends Actor {
                 && zombie.getBattle().isReversed();
     }
 
+    private void trackMints() {
+        for (Object[] burst : session.drainMints()) {
+            models.entities.plant.PlantType type = (models.entities.plant.PlantType) burst[0];
+            int column = (Integer) burst[1];
+            int row = (Integer) burst[2];
+            String animation = views.assets.AnimationCatalog.plant(type);
+            addFx(animation, "intro", column, row, 2f, 0.45f, MINT_LIFE);
+            addFx(MINT_FX, "intro", column, row, 2.4f, 0.5f, MINT_LIFE);
+            shakePending = true;
+            @SuppressWarnings("unchecked")
+            java.util.List<int[]> touched = (java.util.List<int[]>) burst[3];
+            for (int[] spot : touched) {
+                addFx(MINT_FX, "loop", spot[0], spot[1], 1.2f, 0.35f, 0.9f);
+            }
+        }
+    }
+
     private void trackEmergences() {
+        trackMints();
         for (double[] spot : session.drainEmergences()) {
             int row = (int) spot[1];
             if (spot[2] > 0.5) {

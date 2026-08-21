@@ -609,6 +609,21 @@ public class GameSession {
 
     private final java.util.List<WhirlwindRide> whirlwinds = new java.util.ArrayList<>();
 
+    private final java.util.List<Object[]> mintBursts = new java.util.ArrayList<>();
+
+    public void recordMint(PlantType type, int x, int y, java.util.List<int[]> touched) {
+        if (mintBursts.size() > 16) {
+            return;
+        }
+        mintBursts.add(new Object[] {type, x, y, touched});
+    }
+
+    public java.util.List<Object[]> drainMints() {
+        java.util.List<Object[]> copy = new java.util.ArrayList<>(mintBursts);
+        mintBursts.clear();
+        return copy;
+    }
+
     private final java.util.List<double[]> emergences = new java.util.ArrayList<>();
 
     public void recordEmergence(double x, int row, boolean fromWater) {

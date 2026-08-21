@@ -16,6 +16,7 @@ import models.map.Tile;
 import models.progress.level.special.SpecialLevelType;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PlantingManager {
     private final GameSession session;
@@ -208,12 +209,15 @@ public class PlantingManager {
 
     private Result releaseMint(PlantType type, PlantSlot slot, int cost, int x, int y) {
         int affected = 0;
+        List<int[]> touched = new ArrayList<>();
         for (PlacedPlant plant : new ArrayList<>(session.getPlants())) {
             if (plant.getType().getCategory() == type.getCategory()) {
                 session.getCombatManager().applyPlantFood(plant);
+                touched.add(new int[] {plant.getX(), plant.getY()});
                 affected++;
             }
         }
+        session.recordMint(type, x, y, touched);
         consume(slot, cost);
         session.getQuestStats().onPlanted(type, x, y);
         return Result.ok(type.getName() + " empowered " + affected
