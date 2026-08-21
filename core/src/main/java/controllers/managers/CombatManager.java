@@ -280,7 +280,7 @@ public class CombatManager {
         hitZombie(zombie, plant.getType(), plantDamage(plant));
     }
 
-    private void hitZombie(Zombie zombie, PlantType source, int damage) {
+    void hitZombie(Zombie zombie, PlantType source, int damage) {
         if (!session.getBehaviorManager().beforeHit(zombie, source)) {
             return;
         }
@@ -678,6 +678,16 @@ public class CombatManager {
             return 0;
         }
         return CACTUS_PIERCE + Math.max(0, session.plantUpgradeLevel(plant.getType()) - 1);
+    }
+
+    boolean torchwoodAt(int row, double x) {
+        for (PlacedPlant other : session.getPlants()) {
+            if (other.getType() == PlantType.TORCHWOOD && other.getY() == row
+                    && !other.isDisabled() && Math.abs(other.getX() - x) <= 0.5) {
+                return true;
+            }
+        }
+        return false;
     }
 
     boolean graveAhead(int row, double x) {

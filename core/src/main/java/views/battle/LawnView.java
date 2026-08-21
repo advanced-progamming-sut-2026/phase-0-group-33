@@ -487,16 +487,8 @@ public class LawnView extends Actor {
                     || last[1] < 1f || last[1] > GameSession.ROWS) {
                 continue;
             }
-            if (shot.getSource().getTags().contains(models.entities.plant.PlantTag.PEA)) {
-                for (models.game.PlacedPlant other : session.getPlants()) {
-                    if (other.getType() == models.entities.plant.PlantType.TORCHWOOD
-                            && other.getY() == (int) last[1]
-                            && Math.abs(other.getX() - last[0]) <= 1.2f) {
-                        noteTorchwoodBurn(other.getX(), other.getY());
-                    }
-                }
-            }
-            String[] impact = views.assets.AnimationCatalog.impact(shot.getSource());
+            String[] impact = views.assets.AnimationCatalog.impact(shot.isLit()
+                    ? models.entities.plant.PlantType.FIRE_PEASHOOTER : shot.getSource());
             if (impact != null) {
                 addFx(impact[0], impact[1], last[0], (int) last[1], 0.9f, 0.42f, 1.1f);
             } else {
@@ -505,7 +497,12 @@ public class LawnView extends Actor {
             }
         }
         for (models.game.Projectile shot : session.getProjectileManager().getProjectiles()) {
-            shots.put(shot, new float[] {(float) shot.getX(), (float) shot.getLane()});
+            float[] seenBefore = shots.get(shot);
+            if (shot.isLit() && (seenBefore == null || seenBefore[2] < 0.5f)) {
+                noteTorchwoodBurn((float) shot.getX(), shot.getRow());
+            }
+            shots.put(shot, new float[] {(float) shot.getX(), (float) shot.getLane(),
+                shot.isLit() ? 1f : 0f});
         }
     }
 
@@ -1488,7 +1485,8 @@ public class LawnView extends Actor {
             if (region == null) {
                 continue;
             }
-            batch.setColor(projectileTint(shot.getSource()));
+            batch.setColor(projectileTint(shot.isLit()
+                    ? models.entities.plant.PlantType.FIRE_PEASHOOTER : shot.getSource()));
             batch.draw(region, centreX - size / 2f, y, size, size);
         }
         batch.setColor(Color.WHITE);
@@ -1513,7 +1511,8 @@ public class LawnView extends Actor {
                 && shot.getSource() == models.entities.plant.PlantType.GRAPESHOT;
         String[] art = scattered
                 ? new String[] {GRAPE_SHARD, grapeClip(shot)}
-                : views.assets.AnimationCatalog.projectile(shot.getSource());
+                : views.assets.AnimationCatalog.projectile(shot.isLit()
+                        ? models.entities.plant.PlantType.FIRE_PEASHOOTER : shot.getSource());
         if (art == null) {
             return false;
         }

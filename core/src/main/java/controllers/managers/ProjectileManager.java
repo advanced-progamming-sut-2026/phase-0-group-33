@@ -164,6 +164,10 @@ public class ProjectileManager {
             projectile.markSpent();
             return;
         }
+        if (!projectile.isLit() && projectile.getSource().getTags().contains(PlantTag.PEA)
+                && combat.torchwoodAt(projectile.getRow(), projectile.getX())) {
+            projectile.light();
+        }
         Zombie target = zombieNear(projectile.getRow(), projectile.getX());
         if (target == null || !projectile.recordHit(target)) {
             return;
@@ -181,26 +185,13 @@ public class ProjectileManager {
 
     private void applyImpact(Projectile projectile, Zombie target) {
         PlantType source = projectile.getSource();
-        boolean torched = source.getTags().contains(PlantTag.PEA)
-                && torchwoodBetween(projectile.getRow(), projectile.getOriginX(), projectile.getX());
-        combat.hitZombie(target, source);
-        if (torched && !target.isDead()) {
-            target.setChilledTicks(0);
+        if (!projectile.isLit()) {
             combat.hitZombie(target, source);
+            return;
         }
+        combat.hitZombie(target, PlantType.FIRE_PEASHOOTER, combat.plantDamage(source) * 2);
     }
 
-    private boolean torchwoodBetween(int row, double fromX, double toX) {
-        double low = Math.min(fromX, toX);
-        double high = Math.max(fromX, toX);
-        for (PlacedPlant other : session.getPlants()) {
-            if (other.getType() == PlantType.TORCHWOOD && other.getY() == row
-                    && other.getX() > low && other.getX() <= high && !other.isDisabled()) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     private Zombie zombieNear(int row, double x) {
         Zombie closest = null;

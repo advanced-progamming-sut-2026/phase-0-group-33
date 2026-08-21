@@ -31,6 +31,7 @@ public class Projectile {
     private boolean spent;
     private boolean fromZombie;
     private int pierceLeft = Integer.MAX_VALUE;
+    private boolean lit;
 
     public Projectile(PlantType source, Motion motion, int row, double originX,
                       double targetX, int direction) {
@@ -129,6 +130,14 @@ public class Projectile {
 
     public boolean recordHit(Zombie zombie) {
         return hitAlready.add(zombie);
+    }
+
+    public boolean isLit() {
+        return lit;
+    }
+
+    public void light() {
+        this.lit = true;
     }
 
     public int getPierceLeft() {
