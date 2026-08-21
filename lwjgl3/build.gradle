@@ -22,7 +22,7 @@ sourceSets {
 }
 
 application {
-    mainClass = 'hunt.UiSmoke'
+    mainClass = 'ir.sharif.ap.lwjgl3.Lwjgl3Launcher'
 }
 
 def assetsDir = rootProject.file('assets')
