@@ -84,11 +84,11 @@ public class BattleScreen extends ScreenAdapter {
     private CursorOverlay cursor;
     private LawnView lawnView;
     private Label sunLabel;
-    private Label plantFoodLabel;
     private Label waveLabel;
     private Label objectiveLabel;
     private Table objectivePanel;
     private views.battle.WaveMeter waveMeter;
+    private views.battle.PlantFoodBank foodBank;
     private float accumulator;
     private float shake;
     private boolean paused;
@@ -409,9 +409,8 @@ public class BattleScreen extends ScreenAdapter {
         sunLabel = new Label("0", skin, "h2");
         bar.add(sunLabel).width(90f).left().padRight(20f);
 
-        bar.add(Ui.iconCell(art.ui("image_ui_hud_ingame_plantfood_button"), 32f)).padRight(6f);
-        plantFoodLabel = new Label("0", skin, "h2");
-        bar.add(plantFoodLabel).width(50f).left().padRight(24f);
+        foodBank = new views.battle.PlantFoodBank(art);
+        bar.add(foodBank).size(140f, 60f).padRight(18f);
 
         Table waveBox = new Table();
         waveLabel = new Label("", skin, "small");
@@ -421,7 +420,7 @@ public class BattleScreen extends ScreenAdapter {
         bar.add(waveBox).padRight(20f);
 
         bar.add().expandX();
-        bar.add(Ui.button(skin, "Menu", "small-brown", this::onEscape)).width(120f).height(46f);
+        bar.add(pauseButton()).size(58f, 58f);
 
         root.add(bar).growX().height(HUD_HEIGHT).row();
         objectiveCell = root.add(buildObjectivePanel()).left().padLeft(14f);
@@ -434,6 +433,27 @@ public class BattleScreen extends ScreenAdapter {
         root.add(middle).grow().row();
         root.add(buildToolBar()).growX().height(66f);
         return root;
+    }
+
+    private com.badlogic.gdx.scenes.scene2d.ui.ImageButton pauseButton() {
+        com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle style =
+                new com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle();
+        com.badlogic.gdx.graphics.g2d.TextureRegion up =
+                art.uiOptional("image_ui_hud_ingame_pause_button");
+        com.badlogic.gdx.graphics.g2d.TextureRegion down =
+                art.uiOptional("image_ui_hud_ingame_pause_button_down");
+        if (up != null) {
+            style.imageUp = new com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable(up);
+        }
+        if (down != null) {
+            style.imageDown = new com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable(down);
+        }
+        com.badlogic.gdx.scenes.scene2d.ui.ImageButton button =
+                new com.badlogic.gdx.scenes.scene2d.ui.ImageButton(style);
+        button.getImageCell().grow();
+        Ui.onClick(button, this::onEscape);
+        Ui.hoverLift(button, 1.08f);
+        return button;
     }
 
     private Table buildObjectivePanel() {
@@ -931,7 +951,7 @@ public class BattleScreen extends ScreenAdapter {
             }
         }
         sunLabel.setText(String.valueOf(session.getSunManager().getSunBalance()));
-        plantFoodLabel.setText(String.valueOf(session.getPlantFoods()));
+        foodBank.setStored(session.getPlantFoods());
         int wave = session.getWaveManager().getCurrentWave();
         int total = session.getWaveManager().getTotalWaves();
         if (session.isBossLevel() && session.getZombossManager().hasBoss()) {
