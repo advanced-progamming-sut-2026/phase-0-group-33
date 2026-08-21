@@ -414,6 +414,7 @@ public class BattleScreen extends ScreenAdapter {
         Table waveBox = new Table();
         waveLabel = new Label("", skin, "small");
         waveBar = new ProgressBar(0f, 1f, 0.001f, false, skin, "gold-horizontal");
+        waveBar.setAnimateDuration(0.25f);
         waveBox.add(waveLabel).left().row();
         waveBox.add(waveBar).width(320f).height(16f).padTop(2f);
         bar.add(waveBox).padRight(20f);
@@ -866,7 +867,7 @@ public class BattleScreen extends ScreenAdapter {
             return;
         }
         waveLabel.setText(wave == 0 ? "The horde is coming" : "Wave " + wave + " of " + total);
-        waveBar.setValue(total == 0 ? 0f : Math.min(1f, wave / (float) total));
+        waveBar.setValue((float) session.getWaveManager().getProgress());
     }
 
     protected void onTick() {

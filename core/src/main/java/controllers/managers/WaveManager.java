@@ -120,6 +120,21 @@ public class WaveManager {
         return started && currentWave >= totalWaves && session.getZombies().isEmpty();
     }
 
+    public double getWaveClearedFraction() {
+        if (!started) {
+            return 0;
+        }
+        return Math.max(0, Math.min(1, 1 - remainingWaveHpFraction()));
+    }
+
+    public double getProgress() {
+        if (!started) {
+            return 0;
+        }
+        return Math.max(0, Math.min(1,
+                (currentWave - 1 + getWaveClearedFraction()) / totalWaves));
+    }
+
     public int getCurrentWave() {
         return currentWave;
     }
