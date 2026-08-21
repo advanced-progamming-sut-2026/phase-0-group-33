@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ZombieBehaviorManager {
+
+    public static final int ICE_BLOCK_HEALTH = 160;
     private final GameSession session;
     private final CombatManager combatManager;
     private final ChapterEnvironment environment;
@@ -46,7 +48,7 @@ public class ZombieBehaviorManager {
         for (int i = 0; i < 2; i++) {
             int row = 1 + session.getRandom().nextInt(GameSession.ROWS);
             Zombie zombie = session.spawnZombie(ZombieType.NORMAL, 5 + 2 * i, row, 0);
-            zombie.getBattle().setIceHealth(600);
+            zombie.getBattle().setIceHealth(ICE_BLOCK_HEALTH);
             System.out.printf("A frozen zombie stands at (%d, %d).%n", 5 + 2 * i, row);
         }
     }
@@ -262,7 +264,7 @@ public class ZombieBehaviorManager {
         }
         target.setFreezeLevel(target.getFreezeLevel() + 1);
         if (target.getFreezeLevel() >= 3) {
-            target.setIceHealth(600);
+            target.setIceHealth(ICE_BLOCK_HEALTH);
             System.out.printf("%s at (%d, %d) is frozen solid by the Hunter!%n",
                     target.getType().getName(), target.getX(), target.getY());
         }
@@ -568,8 +570,8 @@ public class ZombieBehaviorManager {
 
     public boolean beforeHit(Zombie zombie, PlantType source) {
         if (zombie.getBattle().getIceHealth() > 0) {
-            int melt = source.getTags().contains(PlantTag.FIRE) ? 600
-                    : Math.max(20, combatManager.plantDamage(source));
+            int melt = source.getTags().contains(PlantTag.FIRE) ? ICE_BLOCK_HEALTH
+                    : Math.max(25, combatManager.plantDamage(source));
             zombie.getBattle().setIceHealth(Math.max(0, zombie.getBattle().getIceHealth() - melt));
             return false;
         }
@@ -617,7 +619,7 @@ public class ZombieBehaviorManager {
             if (source.getTags().contains(PlantTag.ICE)) {
                 victim.setFreezeLevel(victim.getFreezeLevel() + 1);
                 if (victim.getFreezeLevel() >= 3 && victim.getIceHealth() == 0) {
-                    victim.setIceHealth(600);
+                    victim.setIceHealth(ICE_BLOCK_HEALTH);
                 }
             }
             int damage = combatManager.plantDamage(source);

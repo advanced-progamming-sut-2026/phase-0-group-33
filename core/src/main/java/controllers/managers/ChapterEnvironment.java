@@ -133,7 +133,7 @@ public class ChapterEnvironment {
             }
             plant.setFreezeLevel(plant.getFreezeLevel() + 1);
             if (plant.getFreezeLevel() >= 3 && plant.getIceHealth() == 0) {
-                plant.setIceHealth(600);
+                plant.setIceHealth(ZombieBehaviorManager.ICE_BLOCK_HEALTH);
                 System.out.printf("%s at (%d, %d) froze solid!%n",
                         plant.getType().getName(), plant.getX(), plant.getY());
             }

@@ -215,7 +215,7 @@ public class ZombossManager {
                 }
                 plant.setFreezeLevel(plant.getFreezeLevel() + 1);
                 if (plant.getFreezeLevel() >= 3 && plant.getIceHealth() == 0) {
-                    plant.setIceHealth(600);
+                    plant.setIceHealth(ZombieBehaviorManager.ICE_BLOCK_HEALTH);
                 }
             }
             System.out.printf("The mammoth blew an icy wind down row %d!%n", row);
