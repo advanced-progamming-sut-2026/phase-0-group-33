@@ -43,11 +43,17 @@ public class SandboxController extends BaseController {
             return names;
         }
         for (Level level : chapter.getLevels()) {
-            String special = level.getSpecialType() == null ? "Ordinary"
-                    : level.getSpecialType().name().replace('_', ' ');
-            names.add("Level " + level.getLevelNumber() + " - " + special);
+            names.add("Level " + level.getLevelNumber() + " - " + describe(level));
         }
         return names;
+    }
+
+    private String describe(Level level) {
+        if (level instanceof models.progress.level.BossLevel) {
+            return ((models.progress.level.BossLevel) level).getBossKind().getTitle();
+        }
+        return level.getSpecialType() == null ? "Ordinary"
+                : level.getSpecialType().name().replace('_', ' ');
     }
 
     public Result handleOpen(String chapterName, int levelNumber) {
