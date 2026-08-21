@@ -13,10 +13,11 @@ import java.util.List;
 
 public class ZombossManager {
 
-    private static final int ABILITY_INTERVAL = 130;
+    private static final int ABILITY_INTERVAL = 75;
+    private static final int ABILITY_RUSH = 12;
     private static final int FIRE_TICKS = 4 * GameSession.TICKS_PER_SECOND;
     private static final int SUMMON_CHANCE = 45;
-    private static final int MOVE_CHANCE = 30;
+    private static final int MOVE_CHANCE = 45;
 
     private static final List<ZombieType> SUMMONS = List.of(
             ZombieType.NORMAL, ZombieType.CONE_HEAD, ZombieType.BUCKET_HEAD,
@@ -81,7 +82,8 @@ public class ZombossManager {
         if (boss.getAbilityTicks() > 0) {
             return;
         }
-        boss.setAbilityTicks(ABILITY_INTERVAL);
+        boss.setAbilityTicks(Math.max(30,
+                ABILITY_INTERVAL - ABILITY_RUSH * boss.getSegmentsCleared()));
         useAbility();
         maybeSummon();
         maybeMove();

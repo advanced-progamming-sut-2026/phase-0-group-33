@@ -493,6 +493,10 @@ public class CombatManager {
     }
 
     private void reachHouse(Zombie zombie) {
+        if (zombie instanceof models.entities.zombie.Zomboss) {
+            zombie.getPosition().setX(MOWER_LINE);
+            return;
+        }
         int row = (int) zombie.getPosition().getY();
         if (session.getMode() == models.game.GameMode.I_ZOMBIE) {
             if (session.hasBrain(row)) {
