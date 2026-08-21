@@ -65,7 +65,7 @@ public class ShotPatterns {
     private void shootBackward(PlacedPlant plant, int shots) {
         Zombie target = lastZombieInRowBefore(plant.getY(), plant.getX());
         for (int i = 0; i < shots && target != null; i++) {
-            combat.launchToward(plant, plant.getY(), -1);
+            combat.launchToward(plant, plant.getY(), -1, i * 0.45);
         }
     }
 

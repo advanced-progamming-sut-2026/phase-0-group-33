@@ -155,6 +155,10 @@ public class CombatManager {
         session.getProjectileManager().launchStraight(plant, row, direction);
     }
 
+    void launchToward(PlacedPlant plant, int row, int direction, double offset) {
+        session.getProjectileManager().launchStraight(plant, row, direction, offset);
+    }
+
 
     private boolean strikeThrough(PlacedPlant plant) {
         if (firstZombieInRowAfter(plant.getY(), plant.getX()) == null) {

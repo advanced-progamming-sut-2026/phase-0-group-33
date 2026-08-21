@@ -31,8 +31,12 @@ public class ProjectileManager {
     }
 
     public void launchStraight(PlacedPlant plant, int row, int direction) {
+        launchStraight(plant, row, direction, 0);
+    }
+
+    public void launchStraight(PlacedPlant plant, int row, int direction, double offset) {
         projectiles.add(new Projectile(plant.getType(), Projectile.Motion.STRAIGHT,
-                row, plant.getX(), 0, direction));
+                row, plant.getX() + offset, 0, direction));
     }
 
     public void launchPiercing(PlacedPlant plant) {
@@ -41,8 +45,10 @@ public class ProjectileManager {
     }
 
     public void launchZombieShot(int row, double originX) {
-        projectiles.add(new Projectile(PlantType.PEASHOOTER, Projectile.Motion.STRAIGHT,
-                row, originX, 0, -1));
+        Projectile shot = new Projectile(PlantType.PEASHOOTER, Projectile.Motion.STRAIGHT,
+                row, originX, 0, -1);
+        shot.markFromZombie();
+        projectiles.add(shot);
     }
 
     public void launchLob(PlacedPlant plant, double targetX) {
@@ -98,7 +104,7 @@ public class ProjectileManager {
     }
 
     private void advanceFlat(Projectile projectile) {
-        if (projectile.getDirection() < 0) {
+        if (projectile.isFromZombie()) {
             advanceZombieShot(projectile);
             return;
         }

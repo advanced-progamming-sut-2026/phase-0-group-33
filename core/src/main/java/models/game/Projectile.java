@@ -27,6 +27,7 @@ public class Projectile {
     private double x;
     private double flight;
     private boolean spent;
+    private boolean fromZombie;
 
     public Projectile(PlantType source, Motion motion, int row, double originX,
                       double targetX, int direction) {
@@ -41,6 +42,14 @@ public class Projectile {
 
     public PlantType getSource() {
         return source;
+    }
+
+    public boolean isFromZombie() {
+        return fromZombie;
+    }
+
+    public void markFromZombie() {
+        this.fromZombie = true;
     }
 
     public Motion getMotion() {
