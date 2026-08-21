@@ -55,8 +55,8 @@ public class ShotPatterns {
             if (row < 1 || row > GameSession.ROWS) {
                 continue;
             }
-            Zombie target = combat.firstZombieInRowAfter(row, plant.getX());
-            if (target != null) {
+            if (combat.firstZombieInRowAfter(row, plant.getX()) != null
+                    || combat.graveAhead(row, plant.getX())) {
                 combat.launchToward(plant, row, 1);
             }
         }
@@ -89,7 +89,8 @@ public class ShotPatterns {
             if (row < 1 || row > GameSession.ROWS) {
                 continue;
             }
-            if (combat.firstZombieInRowAfter(row, plant.getX()) != null) {
+            if (combat.firstZombieInRowAfter(row, plant.getX()) != null
+                    || combat.graveAhead(row, plant.getX())) {
                 combat.launchToward(plant, row, 1);
             }
             if (lastZombieInRowBefore(row, plant.getX()) != null) {

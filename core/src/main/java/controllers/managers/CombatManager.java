@@ -140,8 +140,8 @@ public class CombatManager {
     }
 
     boolean shoot(PlacedPlant plant, boolean pierceGraves) {
-        Zombie target = firstZombieInRowAfter(plant.getY(), plant.getX());
-        if (target == null) {
+        if (firstZombieInRowAfter(plant.getY(), plant.getX()) == null
+                && !graveAhead(plant.getY(), plant.getX())) {
             return false;
         }
         int shots = plant.getType() == PlantType.PEA_POD ? plant.getStackCount() : 1;
@@ -669,6 +669,16 @@ public class CombatManager {
     public void applyPlantFood(PlacedPlant plant) {
         plant.triggerPlantFood();
         plantFoodEffects.apply(plant);
+    }
+
+    boolean graveAhead(int row, double x) {
+        for (int column = (int) Math.ceil(x); column <= GameSession.COLS; column++) {
+            Tile tile = session.getGrid().getTile(column - 1, row - 1);
+            if (tile != null && tile.getTerrain() == TerrainType.GRAVE) {
+                return true;
+            }
+        }
+        return false;
     }
 
     Zombie firstZombieInRowAfter(int row, double x) {
