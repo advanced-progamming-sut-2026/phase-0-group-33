@@ -152,9 +152,10 @@ public class LawnView extends Actor {
         private final float end;
         private final float height;
         private final float lift;
+        private final int nudge;
 
         private Fx(String animation, String clip, float x, int row,
-                   float start, float end, float height, float lift) {
+                   float start, float end, float height, float lift, int nudge) {
             this.animation = animation;
             this.clip = clip;
             this.x = x;
@@ -163,6 +164,7 @@ public class LawnView extends Actor {
             this.end = end;
             this.height = height;
             this.lift = lift;
+            this.nudge = nudge;
         }
     }
 
@@ -261,6 +263,11 @@ public class LawnView extends Actor {
 
     private void addFx(String animation, String clip, float x, int row,
                        float height, float lift, float life) {
+        addFx(animation, clip, x, row, height, lift, life, 1);
+    }
+
+    private void addFx(String animation, String clip, float x, int row,
+                       float height, float lift, float life, int nudge) {
         if (!animator.isReady() || animator.namedClip(animation, clip) == null) {
             return;
         }
@@ -269,7 +276,7 @@ public class LawnView extends Actor {
             return;
         }
         effects.add(new Fx(animation, clip, x, row, time,
-                time + Math.min(duration, life), height, lift));
+                time + Math.min(duration, life), height, lift, nudge));
     }
 
     private void noteBreakClip(models.entities.zombie.Zombie zombie) {
@@ -498,10 +505,10 @@ public class LawnView extends Actor {
             }
             String[] impact = views.assets.AnimationCatalog.impact(shot.getSource());
             if (impact != null) {
-                addFx(impact[0], impact[1], last[0], (int) last[1], 0.9f, 0.42f, 1.1f);
+                addFx(impact[0], impact[1], last[0], (int) last[1], 0.9f, 0.42f, 1.1f, 0);
             } else {
                 addFx(splatFor(shot.getSource()), "animation", last[0], (int) last[1],
-                        0.9f, 0.42f, 0.9f);
+                        0.9f, 0.42f, 0.9f, 0);
             }
         }
         for (models.game.Projectile shot : session.getProjectileManager().getProjectiles()) {
@@ -562,8 +569,11 @@ public class LawnView extends Actor {
                     Lawn.cellHeight() * fx.height);
             float lift = animator.centreOffset(fx.animation, fx.clip, scale);
             batch.setColor(Color.WHITE);
-            animator.draw(batch, clip, time - fx.start, Lawn.columnCenter(fx.x),
-                    Lawn.rowBottom(row) + Lawn.cellHeight() * fx.lift + lift, scale, false, null);
+            float xShift = fx.nudge > 0 ? 10f : 0f;
+            float yShift = Lawn.cellHeight() * fx.nudge;
+            animator.draw(batch, clip, time - fx.start, Lawn.columnCenter(fx.x) + xShift,
+                    Lawn.rowBottom(row) + Lawn.cellHeight() * fx.lift + lift + yShift,
+                    scale, false, null);
         }
     }
 
@@ -763,7 +773,7 @@ public class LawnView extends Actor {
             burning[row] = time + BLAST_LIFE;
         }
         addFx(views.assets.AnimationCatalog.blastRear(), "explosion", column, row,
-                2.2f, 0.5f, BLAST_LIFE);
+                2.2f, 0.5f, BLAST_LIFE, 1);
         String[] own = views.assets.AnimationCatalog.detonation(type);
         if (own != null) {
             addFx(own[0], own[1], column, row, 1.6f, 0.35f, BLAST_LIFE);
@@ -771,7 +781,7 @@ public class LawnView extends Actor {
         if (type == models.entities.plant.PlantType.JALAPENO) {
             for (int col = 1; col <= GameSession.COLS; col++) {
                 addFx(views.assets.AnimationCatalog.laneFire(), "idle", col, row,
-                        1.1f, 0.15f, BLAST_LIFE);
+                        1.1f, 0.15f, BLAST_LIFE, 1);
             }
         }
     }
@@ -997,14 +1007,13 @@ public class LawnView extends Actor {
     }
 
     private void noteFeast(models.game.PlacedPlant plant) {
-        addFx(PLANT_FOOD_GLOW, "plantfood", plant.getX(), plant.getY(), 1.6f, 0.85f, 1.4f);
         shakePending = true;
         if (!feedsWholeLane(plant.getType())) {
             return;
         }
         for (int column = plant.getX(); column <= GameSession.COLS; column++) {
             addFx(views.assets.AnimationCatalog.blastRear(), "explosion", column,
-                    plant.getY(), 1.2f, 0.3f, 0.85f);
+                    plant.getY(), 1.2f, 0.3f, 0.85f, 1);
         }
     }
 
