@@ -575,6 +575,9 @@ public class LawnView extends Actor {
     }
 
     private void trackStorms() {
+        for (double[] spot : session.drainWhirlwinds()) {
+            storms.add(new float[] {(float) spot[0], (float) spot[1], time, 0f});
+        }
         for (com.badlogic.gdx.utils.ObjectMap.Entry<models.entities.zombie.Zombie, float[]> entry
                 : seen.entries()) {
             models.entities.zombie.Zombie zombie = entry.key;

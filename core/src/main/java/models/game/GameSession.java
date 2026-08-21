@@ -578,6 +578,21 @@ public class GameSession {
         }
     }
 
+    private final java.util.List<double[]> whirlwinds = new java.util.ArrayList<>();
+
+    public void recordWhirlwind(double x, int row) {
+        if (whirlwinds.size() > 32) {
+            return;
+        }
+        whirlwinds.add(new double[] {x, row});
+    }
+
+    public java.util.List<double[]> drainWhirlwinds() {
+        java.util.List<double[]> copy = new java.util.ArrayList<>(whirlwinds);
+        whirlwinds.clear();
+        return copy;
+    }
+
     public void recordDetonation(PlantType type, int x, int y) {
         if (detonations.size() > 32) {
             return;
