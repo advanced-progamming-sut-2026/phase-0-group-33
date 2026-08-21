@@ -50,6 +50,7 @@ public class BattleCommands {
         session.getCombatManager().plantsAct();
         session.getProjectileManager().tick();
         session.getZombossManager().tick();
+        session.getCombatManager().tickMowers();
         session.getCombatManager().zombiesAct();
         session.getBehaviorManager().tickEnvironment();
         session.getPlantActionManager().tick();

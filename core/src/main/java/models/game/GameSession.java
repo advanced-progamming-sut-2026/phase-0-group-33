@@ -373,6 +373,20 @@ public class GameSession {
         return count;
     }
 
+    private final java.util.List<RunningMower> runningMowers = new java.util.ArrayList<>();
+
+    public java.util.List<RunningMower> getRunningMowers() {
+        return runningMowers;
+    }
+
+    public void startLawnMower(int row) {
+        if (!hasLawnMower(row)) {
+            return;
+        }
+        lawnMowers[row] = false;
+        runningMowers.add(new RunningMower(row, 0.4));
+    }
+
     public boolean hasLawnMower(int row) {
         return row >= 1 && row <= ROWS && lawnMowers[row];
     }

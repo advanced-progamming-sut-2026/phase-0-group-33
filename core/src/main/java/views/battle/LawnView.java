@@ -44,7 +44,6 @@ public class LawnView extends Actor {
     private static final float STORM_LIFE = 1.4f;
     private static final float STORM_RIDE = 1.1f;
     private static final float DODO_HOP = 0.55f;
-    private static final float MOWER_RUN = 2.2f;
     private static final float MOWER_START = 0.35f;
     private static final String FIRE_TILE = "FIRETILE";
     private static final String BOOM = "CHERRYBOMB_EXPLOSION_TOP";
@@ -1311,28 +1310,17 @@ public class LawnView extends Actor {
         }
         float scale = animator.fitScale(animation, idleName, Lawn.cellHeight() * 0.7f);
         float lift = animator.centreOffset(animation, idleName, scale);
-        float parked = Lawn.left() - Lawn.cellWidth() * 0.45f;
-        for (int row = 1; row <= GameSession.ROWS; row++) {
-            if (session.hasLawnMower(row) || mowerRun[row] <= 0f) {
-                continue;
-            }
-            float age = time - mowerRun[row];
-            if (age < 0f || age > MOWER_START + MOWER_RUN) {
-                continue;
-            }
+        for (models.game.RunningMower mower : session.getRunningMowers()) {
+            int row = mower.getRow();
+            float age = mowerRun[row] <= 0f ? MOWER_START : time - mowerRun[row];
             String wanted = age < MOWER_START ? "transition" : "attack";
             String clipName = animator.clipName(animation, wanted, "attack", "idle");
             ClipRef clip = clipName == null ? null : animator.namedClip(animation, clipName);
             if (clip == null) {
                 continue;
             }
-            float x = parked;
-            if (age >= MOWER_START) {
-                float progress = (age - MOWER_START) / MOWER_RUN;
-                x = parked + progress * (Lawn.width() + Lawn.cellWidth() * 1.4f);
-            }
             batch.setColor(Color.WHITE);
-            animator.draw(batch, clip, age < MOWER_START ? age : age - MOWER_START, x,
+            animator.draw(batch, clip, age, Lawn.columnCenter(mower.getX()),
                     Lawn.rowBottom(row) + Lawn.cellHeight() * 0.46f + lift, scale, true, null);
         }
     }

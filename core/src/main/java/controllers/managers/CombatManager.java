@@ -16,6 +16,8 @@ import java.util.Set;
 
 public class CombatManager {
 
+    private static final double MOWER_SPEED = 0.42;
+
     private static final int CACTUS_PIERCE = 3;
     private static final int SUN_BEAN_SUN_PER_BITE = 5;
     private static final int SWEET_POTATO_RANGE = 3;
@@ -506,24 +508,34 @@ public class CombatManager {
             return;
         }
         if (session.hasLawnMower(row)) {
-            session.useLawnMower(row);
-            List<String> names = new ArrayList<>();
-            for (Zombie inRow : new ArrayList<>(session.getZombies())) {
-                if (inRow instanceof models.entities.zombie.Zomboss) {
-                    continue;
-                }
-                if (inRow.occupiesRow(row)) {
-                    names.add(inRow.getType().getName());
-                    session.getZombies().remove(inRow);
-                    session.countKill(inRow);
-                }
-            }
-            System.out.printf("The lawn mower in the row %d is triggered and killed these zombies:%n", row);
-            for (String name : names) {
-                System.out.println("- " + name);
-            }
+            session.startLawnMower(row);
+            System.out.printf("The lawn mower in the row %d roared to life!%n", row);
         } else {
             session.loseGame("The zombie ate your brain; LOSER!!!");
+        }
+    }
+
+    public void tickMowers() {
+        for (models.game.RunningMower mower
+                : new ArrayList<>(session.getRunningMowers())) {
+            mower.setX(mower.getX() + MOWER_SPEED);
+            if (mower.getX() > GameSession.COLS + 0.6) {
+                session.getRunningMowers().remove(mower);
+                continue;
+            }
+            for (Zombie zombie : new ArrayList<>(session.getZombies())) {
+                if (zombie instanceof models.entities.zombie.Zomboss
+                        || !zombie.occupiesRow(mower.getRow())) {
+                    continue;
+                }
+                if (Math.abs(zombie.getPosition().getX() - mower.getX()) <= 0.55) {
+                    System.out.printf("The lawn mower flattened the %s in lane %d!%n",
+                            zombie.getType().getName(), mower.getRow());
+                    session.getZombies().remove(zombie);
+                    session.countKill(zombie);
+                    session.getBehaviorManager().onZombieDeath(zombie);
+                }
+            }
         }
     }
 
