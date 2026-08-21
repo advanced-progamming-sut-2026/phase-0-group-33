@@ -787,6 +787,15 @@ public class LawnView extends Actor {
         batch.setColor(Color.WHITE);
     }
 
+    private String abilityClipName(models.entities.zombie.ZombieType type, String fallback) {
+        String[] wanted = views.assets.AnimationCatalog.abilityClips(type);
+        if (wanted == null) {
+            return fallback;
+        }
+        String resolved = animator.zombieClipName(type, wanted);
+        return resolved == null ? fallback : resolved;
+    }
+
     private void trackAbilities() {
         for (models.entities.zombie.Zombie zombie : session.getZombies()) {
             String clip = views.assets.AnimationCatalog.abilityClip(zombie.getType());
@@ -797,7 +806,8 @@ public class LawnView extends Actor {
             Integer previous = lastAbility.get(zombie);
             lastAbility.put(zombie, cooldown);
             if (previous != null && cooldown > previous) {
-                float duration = animator.zombieClipDuration(zombie.getType(), clip);
+                float duration = animator.zombieClipDuration(zombie.getType(),
+                        abilityClipName(zombie.getType(), clip));
                 if (duration > 0f) {
                     ability.put(zombie, time + duration);
                 }
