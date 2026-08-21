@@ -578,17 +578,18 @@ public class GameSession {
         }
     }
 
-    private final java.util.List<double[]> whirlwinds = new java.util.ArrayList<>();
+    private final java.util.List<WhirlwindRide> whirlwinds = new java.util.ArrayList<>();
 
-    public void recordWhirlwind(double x, int row) {
+    public void recordWhirlwind(models.entities.zombie.Zombie zombie,
+                                double fromX, double toX, int row) {
         if (whirlwinds.size() > 32) {
             return;
         }
-        whirlwinds.add(new double[] {x, row});
+        whirlwinds.add(new WhirlwindRide(zombie, fromX, toX, row));
     }
 
-    public java.util.List<double[]> drainWhirlwinds() {
-        java.util.List<double[]> copy = new java.util.ArrayList<>(whirlwinds);
+    public java.util.List<WhirlwindRide> drainWhirlwinds() {
+        java.util.List<WhirlwindRide> copy = new java.util.ArrayList<>(whirlwinds);
         whirlwinds.clear();
         return copy;
     }

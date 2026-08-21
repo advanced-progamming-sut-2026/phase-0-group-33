@@ -110,10 +110,9 @@ public class ChapterEnvironment {
                 }
                 if (zombie.getSpawnWave() == waveNumber && session.getRandom().nextInt(100) < 40) {
                     int jump = 1 + session.getRandom().nextInt(4);
-                    session.recordWhirlwind(zombie.getPosition().getX(),
-                            (int) zombie.getPosition().getY());
-                    zombie.getPosition().setX(Math.max(2, zombie.getPosition().getX() - jump));
-                    session.recordWhirlwind(zombie.getPosition().getX(),
+                    double from = zombie.getPosition().getX();
+                    zombie.getPosition().setX(Math.max(2, from - jump));
+                    session.recordWhirlwind(zombie, from, zombie.getPosition().getX(),
                             (int) zombie.getPosition().getY());
                     System.out.printf("A whirlwind carried the %s %d columns ahead!%n",
                             zombie.getType().getName(), jump);

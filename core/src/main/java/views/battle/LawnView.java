@@ -43,6 +43,7 @@ public class LawnView extends Actor {
     private static final float IMP_FLIGHT = 0.85f;
     private static final float IMP_ARC = 1.9f;
     private static final float STORM_LIFE = 1.4f;
+    private static final float STORM_RIDE = 1.1f;
     private static final float DODO_HOP = 0.55f;
     private static final float MOWER_RUN = 2.2f;
     private static final float MOWER_START = 0.35f;
@@ -106,6 +107,8 @@ public class LawnView extends Actor {
     private final float[] mowerRun = new float[GameSession.ROWS + 1];
     private final com.badlogic.gdx.utils.Array<float[]> storms = new com.badlogic.gdx.utils.Array<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> lastFreeze =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, float[]> rides =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, float[]> flights =
             new com.badlogic.gdx.utils.ObjectMap<>();
@@ -577,9 +580,13 @@ public class LawnView extends Actor {
     }
 
     private void trackStorms() {
-        for (double[] spot : session.drainWhirlwinds()) {
-            storms.add(new float[] {(float) spot[0], (float) spot[1], time, 0f});
+        for (models.game.WhirlwindRide ride : session.drainWhirlwinds()) {
+            flights.put(ride.getZombie(), new float[] {
+                (float) ride.getFromX(), time, time + STORM_RIDE, 0.3f});
+            rides.put(ride.getZombie(), new float[] {
+                (float) ride.getFromX(), (float) ride.getToX(), time, ride.getRow()});
         }
+        expireRides();
         for (com.badlogic.gdx.utils.ObjectMap.Entry<models.entities.zombie.Zombie, float[]> entry
                 : seen.entries()) {
             models.entities.zombie.Zombie zombie = entry.key;
@@ -639,6 +646,7 @@ public class LawnView extends Actor {
         if (!animator.isReady()) {
             return;
         }
+        drawRides(batch);
         for (float[] storm : storms) {
             boolean icy = storm[3] > 0.5f;
             int row = (int) storm[1];
@@ -653,6 +661,24 @@ public class LawnView extends Actor {
                 drawStormLayer(batch, views.assets.AnimationCatalog.stormTop(false),
                         storm[0], row, age, 1.7f);
             }
+            batch.setColor(Color.WHITE);
+        }
+    }
+
+    private void drawRides(Batch batch) {
+        for (com.badlogic.gdx.utils.ObjectMap.Entry<models.entities.zombie.Zombie, float[]> entry
+                : rides.entries()) {
+            float[] ride = entry.value;
+            float age = time - ride[2];
+            float progress = Math.max(0f, Math.min(1f, age / STORM_RIDE));
+            float column = ride[0] + (ride[1] - ride[0]) * progress;
+            int row = (int) ride[3];
+            float fade = Math.min(1f, 3f * Math.min(progress, 1f - progress) + 0.35f);
+            batch.setColor(1f, 1f, 1f, fade);
+            drawStormLayer(batch, views.assets.AnimationCatalog.stormRear(false),
+                    column, row, age, 1.9f);
+            drawStormLayer(batch, views.assets.AnimationCatalog.stormTop(false),
+                    column, row, age, 1.7f);
             batch.setColor(Color.WHITE);
         }
     }
@@ -882,6 +908,25 @@ public class LawnView extends Actor {
         }
     }
 
+    private float flightProgress(float[] flight) {
+        float span = Math.max(0.0001f, flight[2] - flight[1]);
+        return Math.max(0f, Math.min(1f, (time - flight[1]) / span));
+    }
+
+    private void expireRides() {
+        com.badlogic.gdx.utils.Array<models.entities.zombie.Zombie> done =
+                new com.badlogic.gdx.utils.Array<>();
+        for (com.badlogic.gdx.utils.ObjectMap.Entry<models.entities.zombie.Zombie, float[]> entry
+                : rides.entries()) {
+            if (time - entry.value[2] >= STORM_RIDE || !session.getZombies().contains(entry.key)) {
+                done.add(entry.key);
+            }
+        }
+        for (models.entities.zombie.Zombie zombie : done) {
+            rides.remove(zombie);
+        }
+    }
+
     private void expireCorpses() {
         for (models.entities.zombie.Zombie zombie : zombieFlightKeys()) {
             float[] flight = flights.get(zombie);
@@ -912,7 +957,7 @@ public class LawnView extends Actor {
             return;
         }
         flights.put(zombie, new float[] {
-            (float) thrower.getPosition().getX(), time, time + IMP_FLIGHT});
+            (float) thrower.getPosition().getX(), time, time + IMP_FLIGHT, IMP_ARC});
     }
 
     private com.badlogic.gdx.utils.Array<models.entities.zombie.Zombie> zombieFlightKeys() {
@@ -1579,9 +1624,9 @@ public class LawnView extends Actor {
             float column = (float) zombie.getPosition().getX();
             float arc = 0f;
             if (flight != null) {
-                float progress = Math.min(1f, (time - flight[1]) / IMP_FLIGHT);
+                float progress = flightProgress(flight);
                 column = flight[0] + (column - flight[0]) * progress;
-                arc = IMP_ARC * 4f * progress * (1f - progress) * Lawn.cellHeight();
+                arc = flight[3] * 4f * progress * (1f - progress) * Lawn.cellHeight();
             }
             float centerX = Lawn.columnCenter(column);
             float feet = Lawn.rowBottom(row) + Lawn.cellHeight() * 0.12f + arc;
@@ -1988,7 +2033,7 @@ public class LawnView extends Actor {
                     ? animator.zombieClip(type, "walk", "idle")
                     : animator.zombieClip(type, wanted);
         }
-        if (flights.containsKey(zombie)) {
+        if (flights.containsKey(zombie) && !rides.containsKey(zombie)) {
             float[] flight = flights.get(zombie);
             return time > flight[2] - 0.25f
                     ? animator.zombieClip(type,
