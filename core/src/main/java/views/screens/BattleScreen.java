@@ -200,10 +200,14 @@ public class BattleScreen extends ScreenAdapter {
                     onEscape();
                     return true;
                 }
-                return false;
+                return extraKey(keycode);
             }
         });
         Gdx.input.setInputProcessor(multiplexer);
+    }
+
+    protected boolean extraKey(int keycode) {
+        return false;
     }
 
     protected void onEscape() {

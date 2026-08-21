@@ -16,6 +16,7 @@ public class SandboxScreen extends BattleScreen {
 
     private static final String[] TABS = {"Plants", "Zombies", "Events", "World"};
     private static final float TAB_WIDTH = 71f;
+    private static final float FILTER_WIDTH = 92f;
     private static final float PANEL_WIDTH = 300f;
     private static final float LIST_HEIGHT = 388f;
 
@@ -31,6 +32,7 @@ public class SandboxScreen extends BattleScreen {
     private boolean open = true;
     private String tab = TABS[0];
     private String filter = "All";
+    private int filters;
     private TerrainType brush;
 
     public SandboxScreen(PvzGame game) {
@@ -61,6 +63,7 @@ public class SandboxScreen extends BattleScreen {
         body.setBackground(skin.getDrawable("panel"));
         body.pad(6f);
         body.add(armedCell).width(PANEL_WIDTH - 18f).height(50f).padBottom(4f).row();
+        body.add(Ui.label(skin, "space freeze   tab hide   c clear", "muted")).padBottom(3f).row();
         body.add(tabRow).padBottom(3f).row();
         body.add(filterRow).width(PANEL_WIDTH - 18f).padBottom(3f).row();
         body.add(Ui.scroll(skin, list)).size(PANEL_WIDTH - 18f, LIST_HEIGHT).row();
@@ -180,12 +183,17 @@ public class SandboxScreen extends BattleScreen {
     private void addFilter(final String name) {
         filterRow.add(Ui.button(skin, name,
                 name.equals(filter) ? "small-purple" : "small", () -> {
-            filter = name;
-            refreshList();
-        })).height(26f).padRight(2f);
+                    filter = name;
+                    refreshList();
+                })).width(FILTER_WIDTH).height(26f).pad(1f);
+        filters++;
+        if (filters % 3 == 0) {
+            filterRow.row();
+        }
     }
 
     private void plantFilters() {
+        filters = 0;
         addFilter("All");
         addFilter("Shooter");
         addFilter("Lobber");
@@ -194,6 +202,7 @@ public class SandboxScreen extends BattleScreen {
     }
 
     private void zombieFilters() {
+        filters = 0;
         addFilter("All");
         addFilter("Armoured");
         addFilter("Plain");
@@ -296,6 +305,25 @@ public class SandboxScreen extends BattleScreen {
     private void act(Result result) {
         toasts.show(result);
         refreshList();
+    }
+
+    @Override
+    protected boolean extraKey(int keycode) {
+        if (keycode == com.badlogic.gdx.Input.Keys.SPACE) {
+            setFrozen(!isFrozen());
+            rebuildTop();
+            return true;
+        }
+        if (keycode == com.badlogic.gdx.Input.Keys.TAB) {
+            open = !open;
+            rebuildTop();
+            return true;
+        }
+        if (keycode == com.badlogic.gdx.Input.Keys.C) {
+            clearTool();
+            return true;
+        }
+        return false;
     }
 
     @Override
