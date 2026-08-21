@@ -69,6 +69,7 @@ public class LawnView extends Actor {
     private boolean showGrid;
     private int hoverColumn = -1;
     private int hoverRow = -1;
+    private models.entities.zombie.ZombieType zombieGhost;
     private int selectColumn = -1;
     private int selectRow = -1;
     private float time;
@@ -208,6 +209,10 @@ public class LawnView extends Actor {
 
     public void setGhost(models.entities.plant.PlantType ghost) {
         this.ghost = ghost;
+    }
+
+    public void setZombieGhost(models.entities.zombie.ZombieType ghost) {
+        this.zombieGhost = ghost;
     }
 
     public void setHoverValid(boolean hoverValid) {
@@ -1235,6 +1240,14 @@ public class LawnView extends Actor {
     }
 
     private void drawGhost(Batch batch) {
+        if (zombieGhost != null && hoverColumn >= 1 && hoverRow >= 1) {
+            float span = Lawn.cellWidth() * 0.72f;
+            float tall = Lawn.cellHeight() * 0.92f;
+            batch.setColor(1f, 1f, 1f, hoverValid ? 0.62f : 0.3f);
+            batch.draw(art.zombie(zombieGhost), Lawn.columnCenter(hoverColumn) - span / 2f,
+                    Lawn.rowBottom(hoverRow) + Lawn.cellHeight() * 0.1f, span, tall);
+            batch.setColor(Color.WHITE);
+        }
         if (ghost == null || hoverColumn < 1 || hoverRow < 1) {
             return;
         }

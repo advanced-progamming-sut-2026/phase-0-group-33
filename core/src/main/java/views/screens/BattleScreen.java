@@ -61,6 +61,7 @@ public class BattleScreen extends ScreenAdapter {
     private Tool tool = Tool.NONE;
     private PlantType pending;
     private ZombieType pendingZombie;
+    private final java.util.List<Table> zombieCards = new java.util.ArrayList<>();
     private int swapColumn = -1;
     private int swapRow = -1;
     private String seedSignature = "";
@@ -592,7 +593,11 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     private void refreshSeedBar() {
-        if (session.getMode() == GameMode.I_ZOMBIE || usesConveyor()) {
+        if (session.getMode() == GameMode.I_ZOMBIE) {
+            refreshZombieTray();
+            return;
+        }
+        if (usesConveyor()) {
             return;
         }
         if (seedTrayCell != null) {
@@ -716,12 +721,25 @@ public class BattleScreen extends ScreenAdapter {
         return !session.getMinigameManager().getVases().isEmpty();
     }
 
+    private boolean canPlaceZombieAt(int column, int row) {
+        return column >= 6 && column <= GameSession.COLS
+                && session.plantAt(column, row) == null
+                && session.getMinigameManager().zombieCooldown(pendingZombie) == 0
+                && session.getSunManager().getSunBalance() >= pendingZombie.getWaveCost();
+    }
+
     private void placeZombie(int column, int row) {
         if (pendingZombie == null) {
             toasts.error("Pick a zombie from the tray first.");
             return;
         }
-        toasts.show(controller.handlePlaceZombie(pendingZombie.getName(), column, row));
+        Result placed = controller.handlePlaceZombie(pendingZombie.getName(), column, row);
+        toasts.show(placed);
+        if (placed.isSuccessfull()) {
+            pendingZombie = null;
+            lawnView.setZombieGhost(null);
+            lawnView.clearHover();
+        }
     }
 
     private void swapAt(int column, int row) {
@@ -740,6 +758,7 @@ public class BattleScreen extends ScreenAdapter {
 
     private Table buildZombieTray() {
         Table tray = new Table();
+        zombieCards.clear();
         for (final ZombieType type : session.getMinigameManager().getIzombieTypes()) {
             Table card = new Table(skin);
             card.setBackground(skin.getDrawable("card"));
@@ -751,13 +770,37 @@ public class BattleScreen extends ScreenAdapter {
             price.add(Ui.label(skin, String.valueOf(type.getWaveCost()), "small"));
             card.add(price);
             Ui.hoverLift(card, 1.05f);
-            Ui.onClick(card, () -> {
-                pendingZombie = type;
-                toasts.success(type.getName() + " ready; click a tile right of the line.");
-            });
+            Ui.onClick(card, () -> armZombie(type));
+            zombieCards.add(card);
             tray.add(card).size(96f, 116f).padRight(5f);
         }
         return tray;
+    }
+
+    private void armZombie(ZombieType type) {
+        if (session.getMinigameManager().zombieCooldown(type) > 0) {
+            toasts.error(type.getName() + " is still recharging.");
+            return;
+        }
+        pendingZombie = type;
+        toasts.success(type.getName() + " ready; click a tile right of the line.");
+    }
+
+    private void refreshZombieTray() {
+        java.util.List<ZombieType> types = session.getMinigameManager().getIzombieTypes();
+        int sun = session.getSunManager().getSunBalance();
+        for (int i = 0; i < zombieCards.size() && i < types.size(); i++) {
+            ZombieType type = types.get(i);
+            boolean ready = session.getMinigameManager().zombieCooldown(type) == 0
+                    && sun >= type.getWaveCost();
+            if (pendingZombie == type) {
+                zombieCards.get(i).setColor(1f, 1f, 0.55f, 1f);
+            } else if (ready) {
+                zombieCards.get(i).setColor(com.badlogic.gdx.graphics.Color.WHITE);
+            } else {
+                zombieCards.get(i).setColor(0.5f, 0.5f, 0.56f, 1f);
+            }
+        }
     }
 
     private void updateHover() {
@@ -770,9 +813,13 @@ public class BattleScreen extends ScreenAdapter {
             updateCursor();
             return;
         }
-        lawnView.setHover(tool == Tool.NONE ? -1 : column, tool == Tool.NONE ? -1 : row);
+        boolean placingZombie = session.getMode() == GameMode.I_ZOMBIE && pendingZombie != null;
+        boolean idle = tool == Tool.NONE && !placingZombie;
+        lawnView.setHover(idle ? -1 : column, idle ? -1 : row);
         lawnView.setGhost(tool == Tool.PLANT ? pending : null);
-        lawnView.setHoverValid(tool != Tool.PLANT || canPlantAt(column, row));
+        lawnView.setZombieGhost(placingZombie ? pendingZombie : null);
+        lawnView.setHoverValid(placingZombie ? canPlaceZombieAt(column, row)
+                : tool != Tool.PLANT || canPlantAt(column, row));
         updateCursor();
         collectSunUnder(column, row);
     }

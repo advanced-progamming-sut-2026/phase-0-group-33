@@ -45,6 +45,7 @@ public class MinigameManager {
     private final Map<RollingNut, Integer> nutDirections = new HashMap<>();
     private final Map<PlantSlot, Integer> packetExpiry = new HashMap<>();
     private final List<ZombieType> izombieTypes = new ArrayList<>();
+    private final Map<ZombieType, Integer> zombieCooldowns = new HashMap<>();
     private final Set<Long> craters = new HashSet<>();
     private int combosMade;
     private int combosNeeded;
@@ -161,6 +162,7 @@ public class MinigameManager {
                 moveNuts();
                 break;
             case I_ZOMBIE:
+                tickZombieCooldowns();
                 checkIZombieDefeat();
                 break;
             case BEGHOULED:
@@ -386,6 +388,22 @@ public class MinigameManager {
         return Result.ok("The vase at (" + x + ", " + y + ") was empty.");
     }
 
+    private void tickZombieCooldowns() {
+        for (Map.Entry<ZombieType, Integer> entry : zombieCooldowns.entrySet()) {
+            if (entry.getValue() > 0) {
+                entry.setValue(entry.getValue() - 1);
+            }
+        }
+    }
+
+    public int zombieRechargeTicks(ZombieType type) {
+        return Math.max(5, type.getWaveCost() / 4) * GameSession.TICKS_PER_SECOND;
+    }
+
+    public int zombieCooldown(ZombieType type) {
+        return zombieCooldowns.getOrDefault(type, 0);
+    }
+
     public Result placeZombie(String typeName, int x, int y) {
         if (session.getMode() != GameMode.I_ZOMBIE) {
             return Result.fail("You can only place zombies in the I, Zombie minigame.");
@@ -397,10 +415,18 @@ public class MinigameManager {
         if (x < 6 || x > GameSession.COLS || y < 1 || y > GameSession.ROWS) {
             return Result.fail("Zombies must be placed right of the red line (columns 6-9).");
         }
+        if (session.plantAt(x, y) != null) {
+            return Result.fail("A plant already stands on that tile.");
+        }
+        if (zombieCooldown(type) > 0) {
+            return Result.fail(type.getName() + " is still recharging ("
+                    + (zombieCooldown(type) / GameSession.TICKS_PER_SECOND + 1) + "s left).");
+        }
         if (!session.getSunManager().spendSun(type.getWaveCost())) {
             return Result.fail(type.getName() + " costs " + type.getWaveCost()
                     + " sun and you have " + session.getSunManager().getSunBalance() + ".");
         }
+        zombieCooldowns.put(type, zombieRechargeTicks(type));
         session.spawnZombie(type, x, y, 1);
         return Result.ok(type.getName() + " placed at (" + x + ", " + y + ")."
                 + " Sun left: " + session.getSunManager().getSunBalance());
