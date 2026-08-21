@@ -78,6 +78,7 @@ public class LawnView extends Actor {
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> attacks =
             new com.badlogic.gdx.utils.ObjectMap<>();
+    private final float[] burning = new float[GameSession.ROWS + 1];
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, String> firingClip =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> lastCooldown =
@@ -518,6 +519,9 @@ public class LawnView extends Actor {
     }
 
     private boolean blastNear(float x, int row) {
+        if (row >= 1 && row <= GameSession.ROWS && time < burning[row]) {
+            return true;
+        }
         for (Corpse blast : blasts) {
             if (Math.abs(blast.x - x) <= 1.6f && Math.abs(blast.row - row) <= 1) {
                 return true;
@@ -712,6 +716,10 @@ public class LawnView extends Actor {
     }
 
     private void noteDetonation(models.entities.plant.PlantType type, int column, int row) {
+        if (type == models.entities.plant.PlantType.JALAPENO
+                && row >= 1 && row <= GameSession.ROWS) {
+            burning[row] = time + BLAST_LIFE;
+        }
         addFx(views.assets.AnimationCatalog.blastRear(), "explosion", column, row,
                 2.2f, 0.5f, BLAST_LIFE);
         String[] own = views.assets.AnimationCatalog.detonation(type);
