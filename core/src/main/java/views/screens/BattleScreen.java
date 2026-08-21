@@ -807,8 +807,9 @@ public class BattleScreen extends ScreenAdapter {
         }
         toasts.show(result);
         if (result.isSuccessfull()) {
-            sfx(tool == Tool.PLANT ? views.assets.Audio.PLANT
-                    : tool == Tool.NONE ? views.assets.Audio.SUN : views.assets.Audio.CLICK);
+            if (tool != Tool.PLANT) {
+                sfx(tool == Tool.NONE ? views.assets.Audio.SUN : views.assets.Audio.CLICK);
+            }
             clearTool();
         }
     }
@@ -1142,7 +1143,7 @@ public class BattleScreen extends ScreenAdapter {
                 ? views.assets.Audio.BATTLE : views.assets.Audio.MINIGAME;
     }
 
-    private void sfx(String name) {
+    protected void sfx(String name) {
         if (game.getAudio() != null) {
             game.getAudio().play(name);
         }

@@ -401,6 +401,9 @@ public class LawnView extends Actor {
                 continue;
             }
             births.put(plant, time);
+            if (settled) {
+                cue(views.assets.Audio.PLANT);
+            }
             if (matching()) {
                 slides.put(plant, new float[] {plant.getX(), -0.6f, time});
                 plantSpots.put(plant, new int[] {plant.getX(), plant.getY()});
