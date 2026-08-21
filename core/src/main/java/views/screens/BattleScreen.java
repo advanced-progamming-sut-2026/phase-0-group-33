@@ -8,7 +8,6 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Scaling;
@@ -88,7 +87,7 @@ public class BattleScreen extends ScreenAdapter {
     private Label waveLabel;
     private Label objectiveLabel;
     private Table objectivePanel;
-    private ProgressBar waveBar;
+    private views.battle.WaveMeter waveMeter;
     private float accumulator;
     private float shake;
     private boolean paused;
@@ -415,10 +414,9 @@ public class BattleScreen extends ScreenAdapter {
 
         Table waveBox = new Table();
         waveLabel = new Label("", skin, "small");
-        waveBar = new ProgressBar(0f, 1f, 0.001f, false, skin, "gold-horizontal");
-        waveBar.setAnimateDuration(0.25f);
-        waveBox.add(waveLabel).left().row();
-        waveBox.add(waveBar).width(320f).height(16f).padTop(2f);
+        waveMeter = new views.battle.WaveMeter(art);
+        waveBox.add(waveLabel).left().padLeft(6f).row();
+        waveBox.add(waveMeter).width(340f).height(41f).padTop(1f);
         bar.add(waveBox).padRight(20f);
 
         bar.add().expandX();
@@ -912,7 +910,8 @@ public class BattleScreen extends ScreenAdapter {
         if (boss == null) {
             return;
         }
-        waveBar.setValue(boss.healthFraction());
+        waveMeter.setBoss(true);
+        waveMeter.setProgress(1f - boss.healthFraction());
         int left = models.entities.zombie.Zomboss.SEGMENTS - boss.getSegmentsCleared();
         waveLabel.setText(boss.isStunned() ? boss.getKind().getTitle() + " is dazed!"
                 : boss.getKind().getTitle() + "  -  " + left + " of "
@@ -939,7 +938,8 @@ public class BattleScreen extends ScreenAdapter {
             return;
         }
         waveLabel.setText(wave == 0 ? "The horde is coming" : "Wave " + wave + " of " + total);
-        waveBar.setValue((float) session.getWaveManager().getProgress());
+        waveMeter.setWaves(total);
+        waveMeter.setProgress((float) session.getWaveManager().getProgress());
     }
 
     protected void onTick() {
