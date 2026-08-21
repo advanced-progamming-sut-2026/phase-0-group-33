@@ -55,7 +55,6 @@ public class LawnView extends Actor {
     private static final String ARMOUR_BREAK = "ARMOR_BREAK_EFFECT";
     private static final float SLIDE_TIME = 0.22f;
     private static final float BOSS_SLIDE = 0.45f;
-    private static final float RECOVER_TIME = 0.55f;
     private static final int CHARGE_TICKS = 6;
     private static final String RIPPLE = "WATER_ZOMBIE_RIPPLE";
     private static final String RIPPLE_BIG = "WATER_GARGANTUAR_RIPPLE";
@@ -77,6 +76,8 @@ public class LawnView extends Actor {
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Float> firing =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> attacks =
+            new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, String> firingClip =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> lastCooldown =
             new com.badlogic.gdx.utils.ObjectMap<>();
@@ -260,7 +261,9 @@ public class LawnView extends Actor {
             return;
         }
         float duration = animator.zombieClipDuration(zombie.getType(), clip);
-        breaking.put(zombie, time + (duration > 0f ? duration : 0.6f));
+        if (duration > 0f) {
+            breaking.put(zombie, time + duration);
+        }
     }
 
     private void expireBreakClips() {
@@ -894,16 +897,14 @@ public class LawnView extends Actor {
                 continue;
             }
             trackSunProduction(plant);
-            String clip = animator.plantClipName(plant.getType(),
-                    firstAttackClip(plant.getType()));
+            String clip = chooseAttackClip(plant);
             if (clip == null || "idle".equals(clip)) {
                 continue;
             }
             float duration = animator.plantClipDuration(plant.getType(), clip);
             if (duration > 0f) {
                 firing.put(plant, time + duration);
-                Integer seen = attacks.get(plant);
-                attacks.put(plant, seen == null ? 1 : seen + 1);
+                firingClip.put(plant, clip);
             }
         }
         com.badlogic.gdx.utils.Array<models.game.PlacedPlant> stale =
@@ -916,6 +917,7 @@ public class LawnView extends Actor {
         for (models.game.PlacedPlant plant : stale) {
             lastCooldown.remove(plant);
             firing.remove(plant);
+            firingClip.remove(plant);
             attacks.remove(plant);
             lastSunPending.remove(plant);
         }
@@ -1744,7 +1746,7 @@ public class LawnView extends Actor {
         }
         Float until = firing.get(plant);
         boolean fed = plant.getPlantFoodTicks() > 0;
-        boolean attacking = fed || (until != null && time < until);
+        boolean attacking = until != null && time < until;
         float clock;
         if (fed) {
             clock = (30 - plant.getPlantFoodTicks()) / 10f;
@@ -1757,7 +1759,7 @@ public class LawnView extends Actor {
             drawPlantFoodGlow(batch, centerX, feet);
         }
         animator.draw(batch, clip, clock, centerX, feet + animator.plantLift(),
-                animator.plantScale() * popScale(plant), !attacking, null);
+                animator.plantScale() * popScale(plant), fed || !attacking, null);
         return true;
     }
 
@@ -1784,6 +1786,7 @@ public class LawnView extends Actor {
                 float duration = animator.plantClipDuration(plant.getType(), clip);
                 if (duration > 0f) {
                     firing.put(plant, time + duration);
+                    firingClip.put(plant, clip);
                 }
             }
         }
@@ -1807,13 +1810,12 @@ public class LawnView extends Actor {
                 return new String[] {"attack_stage" + stage, "special_stage" + stage,
                     "attack", "special", "idle_stage" + stage, "idle"};
             }
-            String variant = attackVariant(plant);
-            if (variant != null) {
-                return new String[] {variant, "attack", "special", "idle"};
-            }
-            return new String[] {"attack", "special", "idle"};
+            String locked = firingClip.get(plant);
+            return locked == null
+                    ? new String[] {"attack", "special", "idle"}
+                    : new String[] {locked, "attack", "special", "idle"};
         }
-        if (until != null && time < until + RECOVER_TIME) {
+        if (until != null && time < until + recoveryWindow(plant)) {
             return new String[] {
                 "recovery", "reload", "bite_end", "attack_end", "recover", "idle"};
         }
@@ -1839,6 +1841,16 @@ public class LawnView extends Actor {
         return new String[] {"idle"};
     }
 
+    private float recoveryWindow(models.game.PlacedPlant plant) {
+        String clip = animator.plantClipName(plant.getType(),
+                "recovery", "reload", "bite_end", "attack_end", "recover");
+        if (clip == null || "idle".equals(clip)) {
+            return 0f;
+        }
+        float duration = animator.plantClipDuration(plant.getType(), clip);
+        return duration > 0f ? duration : 0f;
+    }
+
     private int growthStage(models.game.PlacedPlant plant) {
         models.entities.plant.PlantType type = plant.getType();
         if (type.getTags().contains(models.entities.plant.PlantTag.WRAMP_UP)) {
@@ -1852,31 +1864,19 @@ public class LawnView extends Actor {
         return 0;
     }
 
-    private String attackVariant(models.game.PlacedPlant plant) {
+    private String chooseAttackClip(models.game.PlacedPlant plant) {
         String[] variants = views.assets.AnimationCatalog.attackVariants(plant.getType());
-        if (variants == null || variants.length == 0) {
-            return null;
+        if (variants != null && variants.length > 0) {
+            Integer seen = attacks.get(plant);
+            int next = seen == null ? 0 : seen + 1;
+            attacks.put(plant, next);
+            int index = Math.abs(System.identityHashCode(plant) / 7 + next) % variants.length;
+            String picked = animator.plantClipName(plant.getType(), variants[index]);
+            if (picked != null && !"idle".equals(picked)) {
+                return picked;
+            }
         }
-        int index = Math.abs(System.identityHashCode(plant) / 7 + attackCycle(plant))
-                % variants.length;
-        return variants[index];
-    }
-
-    private String[] firstAttackClip(models.entities.plant.PlantType type) {
-        String[] variants = views.assets.AnimationCatalog.attackVariants(type);
-        if (variants == null) {
-            return new String[] {"attack", "special"};
-        }
-        String[] wanted = new String[variants.length + 2];
-        System.arraycopy(variants, 0, wanted, 0, variants.length);
-        wanted[variants.length] = "attack";
-        wanted[variants.length + 1] = "special";
-        return wanted;
-    }
-
-    private int attackCycle(models.game.PlacedPlant plant) {
-        Integer count = attacks.get(plant);
-        return count == null ? 0 : count;
+        return animator.plantClipName(plant.getType(), "attack", "special");
     }
 
     private boolean drawZombieAnimation(Batch batch, models.entities.zombie.Zombie zombie,
