@@ -59,6 +59,7 @@ public class BattleScreen extends ScreenAdapter {
     private final java.util.List<SeedPacket> packets = new java.util.ArrayList<>();
     private Tool tool = Tool.NONE;
     private PlantType pending;
+    private static final int SCORE_MILESTONE = 500;
     private static final float HUD_HEIGHT = 78f;
     private static final int COLUMN_SLOTS = 5;
     private ZombieType pendingZombie;
@@ -89,6 +90,8 @@ public class BattleScreen extends ScreenAdapter {
     private Table objectivePanel;
     private views.battle.WaveMeter waveMeter;
     private views.battle.PlantFoodBank foodBank;
+    private views.battle.ScoreMeter scoreMeter;
+    private int cheers;
     private float accumulator;
     private float shake;
     private boolean paused;
@@ -353,7 +356,8 @@ public class BattleScreen extends ScreenAdapter {
             leave();
             return;
         }
-        router.go(ScreenId.BATTLE);
+        router.go(app.getCurrentGameSession().getPhase() == models.game.GamePhase.BATTLE
+                ? ScreenId.BATTLE : ScreenId.SEED_SELECT);
     }
 
     private String minigameKey() {
@@ -411,6 +415,11 @@ public class BattleScreen extends ScreenAdapter {
 
         foodBank = new views.battle.PlantFoodBank(art);
         bar.add(foodBank).size(140f, 60f).padRight(18f);
+
+        if (session.getMode() == GameMode.SCORING) {
+            scoreMeter = new views.battle.ScoreMeter(art, skin.getFont("h2"));
+            bar.add(scoreMeter).size(62f, 62f).padRight(14f);
+        }
 
         Table waveBox = new Table();
         waveLabel = new Label("", skin, "small");
@@ -479,8 +488,11 @@ public class BattleScreen extends ScreenAdapter {
             return "Brains left: " + brains;
         }
         if (session.getMode() == GameMode.SCORING) {
-            return "Score: " + session.getScoreTracker().getScore()
-                    + "    Zombies down: " + session.getZombiesKilled();
+            models.game.ScoreTracker tracker = session.getScoreTracker();
+            return "Wave " + session.getWaveManager().getCurrentWave()
+                    + "    Zombies down: " + session.getZombiesKilled()
+                    + "    Streak: " + tracker.getStreak()
+                    + "    Best: " + app.getCurrentUser().getHighestScore();
         }
         if (session.getMode() == GameMode.BEGHOULED) {
             return "Combos: " + session.getMinigameManager().getCombosMade()
@@ -952,14 +964,19 @@ public class BattleScreen extends ScreenAdapter {
         }
         sunLabel.setText(String.valueOf(session.getSunManager().getSunBalance()));
         foodBank.setStored(session.getPlantFoods());
+        if (scoreMeter != null) {
+            scoreMeter.setScore(session.getScoreTracker().getScore());
+        }
         int wave = session.getWaveManager().getCurrentWave();
         int total = session.getWaveManager().getTotalWaves();
         if (session.isBossLevel() && session.getZombossManager().hasBoss()) {
             refreshBossBar();
             return;
         }
-        waveLabel.setText(wave == 0 ? "The horde is coming" : "Wave " + wave + " of " + total);
-        waveMeter.setWaves(total);
+        boolean endless = session.getWaveManager().isEndless();
+        waveLabel.setText(wave == 0 ? "The horde is coming"
+                : endless ? "Wave " + wave : "Wave " + wave + " of " + total);
+        waveMeter.setWaves(endless ? 1 : total);
         waveMeter.setProgress((float) session.getWaveManager().getProgress());
     }
 
@@ -977,17 +994,39 @@ public class BattleScreen extends ScreenAdapter {
         if (session.getMode() != GameMode.SCORING) {
             return;
         }
-        int score = session.getScoreTracker().getScore();
-        if (lastScore < 0) {
-            lastScore = score;
-            return;
+        models.game.ScoreTracker tracker = session.getScoreTracker();
+        for (models.game.ScoreTracker.Pattern bonus : tracker.drainBonuses()) {
+            cheer(bonus.getTitle(), bonus.getPoints());
         }
-        if (score / 500 > lastScore / 500) {
-            toasts.success("Score " + (score / 500) * 500 + " reached!");
-        } else if (score > lastScore) {
-            toasts.show(models.Result.ok("+" + (score - lastScore) + " points"));
+        int score = tracker.getScore();
+        if (lastScore >= 0 && score / SCORE_MILESTONE > lastScore / SCORE_MILESTONE) {
+            cheer((score / SCORE_MILESTONE) * SCORE_MILESTONE + " miopoints!", 0);
         }
         lastScore = score;
+    }
+
+    private void cheer(String title, int points) {
+        Table banner = new Table(skin);
+        banner.setBackground(skin.getDrawable("highlight"));
+        banner.pad(1f, 12f, 1f, 12f);
+        banner.add(Ui.label(skin, title, "small")).padRight(points > 0 ? 8f : 0f);
+        if (points > 0) {
+            banner.add(Ui.label(skin, "+" + points, "gold"));
+        }
+        banner.pack();
+        float spread = cheers % 5 * 34f;
+        banner.setPosition((stage.getViewport().getWorldWidth() - banner.getWidth()) / 2f,
+                stage.getViewport().getWorldHeight() * 0.52f - spread);
+        banner.getColor().a = 0f;
+        banner.addAction(com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence(
+                com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel(
+                        com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn(0.12f),
+                        com.badlogic.gdx.scenes.scene2d.actions.Actions.moveBy(0f, 34f, 0.9f,
+                                com.badlogic.gdx.math.Interpolation.sineOut)),
+                com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut(0.35f),
+                com.badlogic.gdx.scenes.scene2d.actions.Actions.removeActor()));
+        stage.addActor(banner);
+        cheers++;
     }
 
     private String waveNotice(int wave) {
@@ -1117,6 +1156,9 @@ public class BattleScreen extends ScreenAdapter {
         Table content = new Table();
         content.add(Ui.label(skin, won ? "The lawn is safe." : "The zombies ate your brains.",
                 "h2")).padBottom(10f).row();
+        if (session.getMode() == GameMode.SCORING) {
+            content.add(scoreCard()).padBottom(14f).row();
+        }
         if (won && session.getFarewell() != null) {
             Table quote = new Table();
             AnimatedActor dave = AnimatedActor.whole(game.getAnimations(), "CRAZYDAVE", 84f,
@@ -1136,7 +1178,45 @@ public class BattleScreen extends ScreenAdapter {
         }
         content.add(Ui.button(skin, "Back to the map", "brown", this::leave))
                 .width(300f).height(56f);
-        overlay = Overlay.open(stage, skin, won ? "Victory" : "Defeat", content);
+        overlay = Overlay.open(stage, skin, endTitle(won), content);
+    }
+
+    private String endTitle(boolean won) {
+        if (session.getMode() != GameMode.SCORING) {
+            return won ? "Victory" : "Defeat";
+        }
+        int score = session.getScoreTracker().getScore();
+        return score > app.getCurrentUser().getHighestScore() ? "New personal best!" : "Run over";
+    }
+
+    private Table scoreCard() {
+        models.game.ScoreTracker tracker = session.getScoreTracker();
+        Table card = new Table(skin);
+        card.setBackground(skin.getDrawable("card"));
+        card.pad(10f, 18f, 10f, 18f);
+        card.add(Ui.label(skin, "Miopoints", "muted")).left();
+        card.add(Ui.label(skin, String.valueOf(tracker.getScore()), "h1")).right().row();
+        card.add(Ui.divider(skin, 360f)).colspan(2).padTop(6f).padBottom(6f).row();
+        for (models.game.ScoreTracker.Pattern pattern
+                : models.game.ScoreTracker.Pattern.values()) {
+            int times = tracker.countOf(pattern);
+            if (times == 0) {
+                continue;
+            }
+            card.add(Ui.label(skin, pattern.getTitle() + "  x" + times, "small")).left();
+            card.add(Ui.label(skin, "+" + times * pattern.getPoints(), "gold")).right().row();
+        }
+        card.add(Ui.label(skin, "Longest streak", "small")).left().padTop(6f);
+        card.add(Ui.label(skin, String.valueOf(tracker.getBestStreak()), "small"))
+                .right().padTop(6f).row();
+        card.add(Ui.label(skin, "Waves survived", "small")).left();
+        card.add(Ui.label(skin, String.valueOf(session.getWaveManager().getCurrentWave()),
+                "small")).right().row();
+        int best = app.getCurrentUser().getHighestScore();
+        card.add(Ui.label(skin, "Your best", "small")).left().padTop(4f);
+        card.add(Ui.label(skin, String.valueOf(Math.max(best, tracker.getScore())), "small"))
+                .right().padTop(4f);
+        return card;
     }
 
     @Override
