@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 public enum MainCommands {
     ENTER_CHAPTER("^menu\\s+enter\\s+chapter\\s+-c\\s+(?<chaptername>.+?)$"),
     ENTER_GREENHOUSE("^menu\\s+greenhouse$"),
+    ENTER_ZEN_GARDEN("^menu\\s+zen-garden$"),
     ENTER_TRAVEL_LOG("^menu\\s+travel-log$"),
     ENTER_LEADERBOARD("^menu\\s+leaderboard$"),
     ENTER_COIN_WALLET("^menu\\s+coin-wallet$"),

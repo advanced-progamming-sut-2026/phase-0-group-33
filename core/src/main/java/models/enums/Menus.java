@@ -2,6 +2,7 @@ package models.enums;
 
 public enum Menus {
     GREENHOUSE,
+    ZEN_GARDEN,
     COLLECTION,
     SETTINGS,
     PROFILE,
