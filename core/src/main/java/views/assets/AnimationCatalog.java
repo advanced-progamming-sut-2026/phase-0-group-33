@@ -171,7 +171,7 @@ public final class AnimationCatalog {
         PROJECTILE.put("Sea-shroom", new String[] {"SEASHROOM_PROJECTILE", "animation"});
         PROJECTILE.put("Starfruit", new String[] {"T_STARFRUIT_PROJECTILE", "animation"});
         PROJECTILE.put("Bowling Bulb", new String[] {"BOWLINGBULB_PROJECTILE1", "animation"});
-        PROJECTILE.put("Rotobaga", new String[] {"T_PEA_PROJECTILE", "animation"});
+        PROJECTILE.put("Rotobaga", new String[] {"T_ROTORUTABAGA_PROJECTILE1", "animation"});
         PROJECTILE.put("Cat-tail", new String[] {"T_SPORESHROOM_PROJECTILE", "animation"});
         PROJECTILE.put("Fume-shroom", new String[] {"T_SPORESHROOM_PROJECTILE", "animation"});
         PROJECTILE.put("Sun-shroom", new String[] {"T_PUFFSHROOM_PROJECTILE", "animation"});
@@ -203,6 +203,7 @@ public final class AnimationCatalog {
         IMPACT.put("Rotobaga", new String[] {"ROTORUTABAGA_PROJECTILE_HIT", "animation"});
         IMPACT.put("Arma-mint", new String[] {"ARMAMINT_EXPLOSION", "animation"});
         IMPACT.put("Grapeshot", new String[] {"GRAPESHOT_HIT", "animation"});
+        IMPACT.put("Rotobaga", new String[] {"T_ROTORUTABAGA_PROJECTILE_HIT", "animation"});
         IMPACT.put("Starfruit", new String[] {"T_STARFRUIT_PROJECTILE_HIT", "idle"});
         IMPACT.put("Puff-shroom", new String[] {"T_PUFFSHROOM_HIT", "animation"});
         IMPACT.put("Fume-shroom", new String[] {"FUMESHROOM_BUBBLES_HIT", "animation"});

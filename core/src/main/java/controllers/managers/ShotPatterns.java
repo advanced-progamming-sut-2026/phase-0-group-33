@@ -65,11 +65,11 @@ public class ShotPatterns {
     private void shootBackward(PlacedPlant plant, int shots) {
         Zombie target = lastZombieInRowBefore(plant.getY(), plant.getX());
         for (int i = 0; i < shots && target != null; i++) {
-            combat.launchToward(plant, plant.getY(), -1, i * 0.45);
+            combat.launchToward(plant, plant.getY(), -1, -i * 0.5);
         }
     }
 
-    private static final int[][] STAR_POINTS = {{1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}};
+    private static final int[][] STAR_POINTS = {{1, -1}, {1, 1}, {0, -1}, {0, 1}, {-1, 0}};
 
     private void starShot(PlacedPlant plant) {
         for (int[] point : STAR_POINTS) {
@@ -77,18 +77,11 @@ public class ShotPatterns {
         }
     }
 
+    private static final int[][] DIAGONALS = {{1, -1}, {1, 1}, {-1, -1}, {-1, 1}};
+
     private void diagonalShot(PlacedPlant plant) {
-        for (int row : new int[] { plant.getY() - 1, plant.getY(), plant.getY() + 1 }) {
-            if (row < 1 || row > GameSession.ROWS) {
-                continue;
-            }
-            if (combat.firstZombieInRowAfter(row, plant.getX()) != null
-                    || combat.graveAhead(row, plant.getX())) {
-                combat.launchToward(plant, row, 1);
-            }
-            if (lastZombieInRowBefore(row, plant.getX()) != null) {
-                combat.launchToward(plant, row, -1);
-            }
+        for (int[] way : DIAGONALS) {
+            session.getProjectileManager().launchStar(plant, way[0], way[1]);
         }
     }
 
