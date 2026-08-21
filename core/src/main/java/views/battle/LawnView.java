@@ -35,6 +35,7 @@ public class LawnView extends Actor {
     private static final String ICE_ZOMBIE = "FROSTBITE_ICE_BLOCK_ZOMBIE";
     private static final String TIDE_LINE = "WATER_TIDE_LINE";
     private static final String WATER_TILE = "WATER_SQUARE";
+    private static final float FOOD_GLOW_SHIFT = 10f;
     private static final float HURT_FLASH = 0.14f;
     private static final float IMP_FLIGHT = 0.85f;
     private static final float IMP_ARC = 1.9f;
@@ -1772,8 +1773,8 @@ public class LawnView extends Actor {
         float scale = animator.fitScale(PLANT_FOOD_GLOW, clipName, Lawn.cellHeight() * 1.5f);
         float lift = animator.centreOffset(PLANT_FOOD_GLOW, clipName, scale);
         batch.setColor(Color.WHITE);
-        animator.draw(batch, glow, time, centerX,
-                feet + Lawn.cellHeight() * 0.35f + lift, scale, true, null);
+        animator.draw(batch, glow, time, centerX + FOOD_GLOW_SHIFT,
+                feet + Lawn.cellHeight() * 1.35f + lift, scale, true, null);
     }
 
     private void trackSunProduction(models.game.PlacedPlant plant) {
