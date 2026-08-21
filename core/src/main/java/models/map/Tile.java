@@ -129,7 +129,7 @@ public class Tile {
 
     public void setTerrain(TerrainType terrain) {
         if (terrain == TerrainType.GRAVE && this.terrain != TerrainType.GRAVE) {
-            this.graveHealth = 700;
+            this.graveHealth = GRAVE_HEALTH;
         } else if (terrain != TerrainType.GRAVE) {
             this.graveHealth = 0;
             clearGraveContent();
