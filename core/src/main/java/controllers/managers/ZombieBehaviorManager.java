@@ -30,6 +30,8 @@ public class ZombieBehaviorManager {
     private static final int KING_COOLDOWN = 80;
     private static final double KING_RANGE = 2.0;
     private static final int WEASEL_COOLDOWN = 90;
+    private static final int SPIN_TICKS = 40;
+    private static final int SPIN_REST = 35;
 
     private final java.util.Map<Zombie, PushedObject> pushersWithObject =
             new java.util.HashMap<>();
@@ -353,7 +355,19 @@ public class ZombieBehaviorManager {
     }
 
     private void jugglerSpin(Zombie zombie) {
-        if (zombie.getBattle().isSpinning() && zombie.getBattle().getTicksSinceShotAt() > 30) {
+        int spin = zombie.getBattle().getSpinTicks();
+        if (spin > 0) {
+            zombie.getBattle().setSpinTicks(spin - 1);
+            if (spin - 1 == 0) {
+                zombie.getBattle().setSpinning(false);
+                zombie.setSpeed(zombie.getType().getSpeed());
+                zombie.getBattle().setAbilityCooldown(SPIN_REST);
+                System.out.printf("The %s runs out of breath and stops spinning.%n",
+                        zombie.getType().getName());
+            }
+            return;
+        }
+        if (zombie.getBattle().isSpinning()) {
             zombie.getBattle().setSpinning(false);
             zombie.setSpeed(zombie.getType().getSpeed());
         }
@@ -692,7 +706,11 @@ public class ZombieBehaviorManager {
             return true;
         }
         if (!zombie.getBattle().isSpinning()) {
+            if (zombie.getBattle().getAbilityCooldown() > 0) {
+                return true;
+            }
             zombie.getBattle().setSpinning(true);
+            zombie.getBattle().setSpinTicks(SPIN_TICKS);
             zombie.setSpeed(zombie.getType().getSpeed() * 2);
         }
         PlacedPlant victim = nearestPlantInRow(zombie);

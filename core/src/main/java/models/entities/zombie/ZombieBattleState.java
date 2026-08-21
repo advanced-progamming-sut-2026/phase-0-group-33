@@ -94,6 +94,16 @@ public class ZombieBattleState {
         this.raging = raging;
     }
 
+    private int spinTicks;
+
+    public int getSpinTicks() {
+        return spinTicks;
+    }
+
+    public void setSpinTicks(int spinTicks) {
+        this.spinTicks = spinTicks;
+    }
+
     public boolean isSpinning() {
         return spinning;
     }
