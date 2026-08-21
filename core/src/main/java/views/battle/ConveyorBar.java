@@ -41,20 +41,21 @@ public final class ConveyorBar extends Actor {
         addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                pick(x);
+                pick(y);
             }
         });
     }
 
-    private void pick(float localX) {
+    private void pick(float localY) {
         PlantSlot best = null;
         float bestDistance = SLOT_WIDTH;
+        float fromTop = getHeight() - localY;
         for (PlantSlot slot : session.getSlots()) {
-            Float x = positions.get(slot);
-            if (x == null) {
+            Float offset = positions.get(slot);
+            if (offset == null) {
                 continue;
             }
-            float distance = Math.abs(localX - (x + SLOT_WIDTH / 2f));
+            float distance = Math.abs(fromTop - (offset + SLOT_WIDTH / 2f));
             if (distance < bestDistance) {
                 bestDistance = distance;
                 best = slot;
@@ -76,7 +77,7 @@ public final class ConveyorBar extends Actor {
             float target = i * SLOT_WIDTH;
             Float current = positions.get(slot);
             if (current == null) {
-                current = Math.max(target, getWidth());
+                current = Math.max(target, getHeight());
                 positions.put(slot, current);
             }
             float step = SLIDE_SPEED * delta;
@@ -100,42 +101,44 @@ public final class ConveyorBar extends Actor {
         drawBelt(batch);
         batch.setColor(Color.WHITE);
         for (PlantSlot slot : session.getSlots()) {
-            Float x = positions.get(slot);
-            if (x == null) {
+            Float offset = positions.get(slot);
+            if (offset == null) {
                 continue;
             }
-            drawPlant(batch, slot.getType(), getX() + x + SLOT_WIDTH / 2f);
+            drawPlant(batch, slot.getType(),
+                    getY() + getHeight() - offset - SLOT_WIDTH / 2f);
         }
     }
 
     private void drawBelt(Batch batch) {
         TextureRegion belt = art.conveyorBelt();
-        TextureRegion top = art.conveyorTop();
+        TextureRegion side = art.conveyorTop();
         if (belt == null) {
             return;
         }
         batch.setColor(Color.WHITE);
         float tile = SLOT_WIDTH;
-        float beltHeight = getHeight() * 0.3f;
-        for (float x = -tile; x < getWidth() + tile; x += tile) {
-            batch.draw(belt, getX() + x - scroll, getY(), tile, beltHeight);
-            if (top != null) {
-                batch.draw(top, getX() + x - scroll, getY() + beltHeight * 0.86f,
-                        tile, beltHeight * 0.34f);
+        float beltWidth = getWidth() * 0.86f;
+        for (float y = -tile; y < getHeight() + tile; y += tile) {
+            batch.draw(belt, getX(), getY() + y + scroll, beltWidth, tile);
+            if (side != null) {
+                batch.draw(side, getX() + beltWidth * 0.86f, getY() + y + scroll,
+                        beltWidth * 0.34f, tile);
             }
         }
     }
 
-    private void drawPlant(Batch batch, PlantType type, float centreX) {
-        float feet = getY() + getHeight() * 0.02f;
+    private void drawPlant(Batch batch, PlantType type, float centreY) {
+        float centreX = getX() + getWidth() * 0.43f;
+        float feet = centreY - SLOT_WIDTH * 0.4f;
         ClipRef clip = animator.plantClip(type, "idle");
         if (clip == null) {
             TextureRegion region = art.plant(type);
-            float size = getHeight() * 0.58f;
+            float size = SLOT_WIDTH * 0.72f;
             batch.draw(region, centreX - size / 2f, feet, size, size);
             return;
         }
-        float scale = animator.plantScale() * 0.78f;
+        float scale = animator.plantScale() * 0.68f;
         animator.draw(batch, clip, time, centreX, feet + animator.plantLift() * 0.72f,
                 scale, true, null);
     }

@@ -60,6 +60,7 @@ public class BattleScreen extends ScreenAdapter {
     private final java.util.List<SeedPacket> packets = new java.util.ArrayList<>();
     private Tool tool = Tool.NONE;
     private PlantType pending;
+    private static final int COLUMN_SLOTS = 5;
     private ZombieType pendingZombie;
     private final java.util.List<Table> zombieCards = new java.util.ArrayList<>();
     private int swapColumn = -1;
@@ -426,9 +427,12 @@ public class BattleScreen extends ScreenAdapter {
         root.add(bar).growX().height(44f).row();
         objectiveCell = root.add(buildObjectivePanel()).left().padLeft(14f);
         root.row();
-        seedTrayCell = root.add(buildSeedTray()).growX().height(showsSeedTray() ? 104f : 0f);
-        root.row();
-        root.add().expand().row();
+
+        Table middle = new Table();
+        seedTrayCell = middle.add(buildSeedTray())
+                .width(showsSeedTray() ? trayWidth() : 0f).left().top().padLeft(6f).padTop(6f);
+        middle.add().expand();
+        root.add(middle).grow().row();
         root.add(buildToolBar()).growX().height(66f);
         return root;
     }
@@ -485,18 +489,29 @@ public class BattleScreen extends ScreenAdapter {
         return null;
     }
 
+    private float trayWidth() {
+        if (session.getMode() == GameMode.I_ZOMBIE) {
+            return 108f;
+        }
+        if (usesConveyor()) {
+            return 104f;
+        }
+        return session.getSlots().size() > COLUMN_SLOTS ? 200f : 106f;
+    }
+
     private Table buildSeedTray() {
         Table tray = new Table(skin);
         tray.setBackground(skin.getDrawable("panel"));
-        tray.pad(1f, 12f, 1f, 12f);
+        tray.pad(8f, 6f, 8f, 6f);
+        tray.top();
         if (session.getMode() == GameMode.I_ZOMBIE) {
-            tray.add(buildZombieTray()).left().expandX();
+            tray.add(buildZombieTray()).top().expandY();
         } else if (usesConveyor()) {
             ConveyorBar belt = new ConveyorBar(session, art, lawnView.animator(),
                     type -> selectTool(Tool.PLANT, type));
-            tray.add(belt).growX().height(112f);
+            tray.add(belt).width(90f).height(460f);
         } else {
-            tray.add(seedBar).left().expandX();
+            tray.add(seedBar).top().expandY();
         }
         return tray;
     }
@@ -573,14 +588,24 @@ public class BattleScreen extends ScreenAdapter {
     private void rebuildSeedBar() {
         seedBar.clear();
         packets.clear();
+        Table column = new Table();
         for (final PlantSlot slot : session.getSlots()) {
             SeedPacket packet = new SeedPacket(skin, art, slot.getType())
                     .cost(slot.isSingleUse() ? 0 : session.effectiveCost(slot.getType()))
                     .boosted(slot.isBoosted())
                     .onClick(() -> selectTool(Tool.PLANT, slot.getType()));
             packets.add(packet);
-            seedBar.add(packet).size(SeedPacket.PACKET_WIDTH, SeedPacket.PACKET_HEIGHT).padRight(5f);
+            column.add(packet).size(SeedPacket.PACKET_WIDTH, SeedPacket.PACKET_HEIGHT)
+                    .padBottom(4f).row();
+            if (packets.size() % COLUMN_SLOTS == 0) {
+                seedBar.add(column).top().padRight(4f);
+                column = new Table();
+            }
         }
+        if (packets.size() % COLUMN_SLOTS != 0) {
+            seedBar.add(column).top();
+        }
+        seedBar.top();
         seedSignature = signature();
     }
 
@@ -601,9 +626,9 @@ public class BattleScreen extends ScreenAdapter {
             return;
         }
         if (seedTrayCell != null) {
-            float wanted = showsSeedTray() ? 123f : 0f;
-            if (seedTrayCell.getMinHeight() != wanted) {
-                seedTrayCell.height(wanted);
+            float wanted = showsSeedTray() ? trayWidth() : 0f;
+            if (seedTrayCell.getMinWidth() != wanted) {
+                seedTrayCell.width(wanted);
                 seedTrayCell.getTable().invalidateHierarchy();
             }
         }
@@ -772,7 +797,7 @@ public class BattleScreen extends ScreenAdapter {
             Ui.hoverLift(card, 1.05f);
             Ui.onClick(card, () -> armZombie(type));
             zombieCards.add(card);
-            tray.add(card).size(96f, 116f).padRight(5f);
+            tray.add(card).size(92f, 100f).padBottom(4f).row();
         }
         return tray;
     }
