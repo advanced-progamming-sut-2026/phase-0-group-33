@@ -558,6 +558,11 @@ public class LawnView extends Actor {
         }
     }
 
+    private boolean blasted(models.entities.zombie.Zombie zombie) {
+        return zombie.getType() == models.entities.zombie.ZombieType.PROSPECTOR
+                && zombie.getBattle().isReversed();
+    }
+
     private void trackStorms() {
         for (com.badlogic.gdx.utils.ObjectMap.Entry<models.entities.zombie.Zombie, float[]> entry
                 : seen.entries()) {
@@ -566,7 +571,7 @@ public class LawnView extends Actor {
                 continue;
             }
             float nowX = (float) zombie.getPosition().getX();
-            if (entry.value[0] - nowX > 0.9f) {
+            if (entry.value[0] - nowX > 0.9f && !blasted(zombie)) {
                 if (zombie.getType() == models.entities.zombie.ZombieType.DODO) {
                     hopping.put(zombie, time + DODO_HOP);
                 } else {
