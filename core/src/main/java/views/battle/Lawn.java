@@ -77,7 +77,7 @@ public final class Lawn {
         return bottom + (float) (GameSession.ROWS - row) * cellHeight;
     }
 
-    public static float rowCenter(int row) {
+    public static float rowCenter(double row) {
         return rowBottom(row) + cellHeight / 2f;
     }
 

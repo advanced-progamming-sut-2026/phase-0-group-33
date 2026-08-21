@@ -26,7 +26,6 @@ public class MinigameManager {
     private static final int BELT_INTERVAL_TICKS = 12 * GameSession.TICKS_PER_SECOND;
     private static final int BOSS_BELT_INTERVAL_TICKS = 4 * GameSession.TICKS_PER_SECOND;
     private static final int PACKET_LIFETIME_TICKS = 30 * GameSession.TICKS_PER_SECOND;
-    private static final int LANE_STEP_TICKS = 3;
     private static final double NUT_SPEED = 0.18;
     private static final List<PlantType> BOWLING_NUTS = List.of(
             PlantType.WALL_NUT, PlantType.EXPLODE_O_NUT, PlantType.TALL_NUT);
@@ -44,7 +43,6 @@ public class MinigameManager {
     private final List<Vase> vases = new ArrayList<>();
     private final List<RollingNut> nuts = new ArrayList<>();
     private final Map<RollingNut, Integer> nutDirections = new HashMap<>();
-    private final Map<RollingNut, Integer> nutSteps = new HashMap<>();
     private final Map<PlantSlot, Integer> packetExpiry = new HashMap<>();
     private final List<ZombieType> izombieTypes = new ArrayList<>();
     private final Set<Long> craters = new HashSet<>();
@@ -234,7 +232,6 @@ public class MinigameManager {
             if (nut.getX() > GameSession.COLS + 0.5) {
                 nuts.remove(nut);
                 nutDirections.remove(nut);
-                nutSteps.remove(nut);
                 continue;
             }
             Zombie hit = firstZombieNear(nut);
@@ -271,7 +268,6 @@ public class MinigameManager {
         }
         nuts.remove(nut);
         nutDirections.remove(nut);
-        nutSteps.remove(nut);
         System.out.printf("The explosive nut blew up in lane %d!%n", nut.getRow());
     }
 
@@ -287,7 +283,6 @@ public class MinigameManager {
             direction = -direction;
         }
         nutDirections.put(nut, direction);
-        nutSteps.put(nut, LANE_STEP_TICKS);
         System.out.printf("The nut ricocheted towards lane %d.%n",
                 Math.max(1, Math.min(GameSession.ROWS, nut.getRow() + direction)));
     }
@@ -297,19 +292,15 @@ public class MinigameManager {
         if (direction == 0) {
             return;
         }
-        int steps = nutSteps.merge(nut, 1, Integer::sum);
-        if (steps < LANE_STEP_TICKS) {
-            return;
-        }
-        nutSteps.put(nut, 0);
-        int next = nut.getRow() + direction;
-        if (next < 1 || next > GameSession.ROWS) {
+        double lane = nut.getLane() + direction * NUT_SPEED;
+        if (lane < 1 || lane > GameSession.ROWS) {
             direction = -direction;
             nutDirections.put(nut, direction);
-            next = nut.getRow() + direction;
-            System.out.printf("The nut hit the edge of the lawn and turned into lane %d.%n", next);
+            lane = Math.max(1, Math.min(GameSession.ROWS, lane));
+            System.out.printf("The nut hit the edge of the lawn and turned into lane %d.%n",
+                    (int) Math.round(lane) + direction);
         }
-        nut.setRow(next);
+        nut.setLane(lane);
     }
 
     public Result placeBowlingNut(PlantType type, int x, int y) {

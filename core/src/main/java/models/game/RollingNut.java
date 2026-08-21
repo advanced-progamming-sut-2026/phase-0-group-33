@@ -9,12 +9,12 @@ public class RollingNut {
     private final PlantType type;
     private final Set<Object> struck = new HashSet<>();
     private double x;
-    private int row;
+    private double lane;
 
     public RollingNut(PlantType type, double x, int row) {
         this.type = type;
         this.x = x;
-        this.row = row;
+        this.lane = row;
     }
 
     public PlantType getType() {
@@ -30,11 +30,19 @@ public class RollingNut {
     }
 
     public int getRow() {
-        return row;
+        return (int) Math.round(lane);
     }
 
     public void setRow(int row) {
-        this.row = row;
+        this.lane = row;
+    }
+
+    public double getLane() {
+        return lane;
+    }
+
+    public void setLane(double lane) {
+        this.lane = lane;
     }
 
     public boolean recordHit(Object zombie) {

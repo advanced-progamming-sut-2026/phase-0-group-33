@@ -1518,7 +1518,7 @@ public class LawnView extends Actor {
             batch.setColor(Color.WHITE);
             float size = Lawn.cellWidth() * (nut.isGiant() ? 0.8f : 0.62f);
             batch.draw(art.plant(nut.getType()), Lawn.columnCenter(nut.getX()) - size / 2f,
-                    Lawn.rowCenter(row) - size / 2f, size, size);
+                    Lawn.rowCenter(nut.getLane()) - size / 2f, size, size);
         }
     }
 
