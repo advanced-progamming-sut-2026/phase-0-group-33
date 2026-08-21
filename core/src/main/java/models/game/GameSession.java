@@ -415,6 +415,10 @@ public class GameSession {
                 type.getRecharge() - PlantUpgrades.rechargeReduction(type, plantLevel(type)));
     }
 
+    public int plantUpgradeLevel(PlantType type) {
+        return plantLevel(type);
+    }
+
     private int plantLevel(PlantType type) {
         return Math.max(1, setup.getPlantLevels().getOrDefault(type.getName(), 1));
     }

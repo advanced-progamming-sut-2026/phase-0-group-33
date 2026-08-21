@@ -40,9 +40,13 @@ public class ProjectileManager {
                 row, plant.getX() + offset, 0, direction));
     }
 
-    public void launchPiercing(PlacedPlant plant) {
-        projectiles.add(new Projectile(plant.getType(), Projectile.Motion.PIERCING,
-                plant.getY(), plant.getX(), 0, 1));
+    public void launchPiercing(PlacedPlant plant, int pierce) {
+        Projectile shot = new Projectile(plant.getType(), Projectile.Motion.PIERCING,
+                plant.getY(), plant.getX(), 0, 1);
+        if (pierce > 0) {
+            shot.setPierceLeft(pierce);
+        }
+        projectiles.add(shot);
     }
 
     public void launchZombieShot(int row, double originX) {
@@ -154,6 +158,11 @@ public class ProjectileManager {
         }
         applyImpact(projectile, target);
         if (projectile.getMotion() == Projectile.Motion.STRAIGHT) {
+            projectile.markSpent();
+            return;
+        }
+        projectile.spendPierce();
+        if (projectile.getPierceLeft() <= 0) {
             projectile.markSpent();
         }
     }

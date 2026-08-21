@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Set;
 
 public class CombatManager {
+
+    private static final int CACTUS_PIERCE = 3;
     private static final int SUN_BEAN_SUN_PER_BITE = 5;
     private static final int SWEET_POTATO_RANGE = 3;
     static final int INSTANT_KILL_DAMAGE = 9999;
@@ -164,7 +166,7 @@ public class CombatManager {
         if (firstZombieInRowAfter(plant.getY(), plant.getX()) == null) {
             return false;
         }
-        session.getProjectileManager().launchPiercing(plant);
+        session.getProjectileManager().launchPiercing(plant, pierceDepth(plant));
         return true;
     }
 
@@ -669,6 +671,13 @@ public class CombatManager {
     public void applyPlantFood(PlacedPlant plant) {
         plant.triggerPlantFood();
         plantFoodEffects.apply(plant);
+    }
+
+    private int pierceDepth(PlacedPlant plant) {
+        if (plant.getType() != PlantType.CACTUS) {
+            return 0;
+        }
+        return CACTUS_PIERCE + Math.max(0, session.plantUpgradeLevel(plant.getType()) - 1);
     }
 
     boolean graveAhead(int row, double x) {
