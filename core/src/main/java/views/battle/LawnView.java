@@ -583,7 +583,21 @@ public class LawnView extends Actor {
                 && zombie.getBattle().isReversed();
     }
 
+    private void trackEmergences() {
+        for (double[] spot : session.drainEmergences()) {
+            int row = (int) spot[1];
+            if (spot[2] > 0.5) {
+                addFx(SPLASH, "water_splash_01", (float) spot[0], row, 1.3f, 0.1f, 0.9f);
+            } else {
+                addFx(views.assets.AnimationCatalog.graveDirt(), "gravebuster_dirt_anim",
+                        (float) spot[0], row, 1.3f, 0.25f, 1.1f);
+            }
+            addFx(POOF, "animation", (float) spot[0], row, 1.15f, 0.3f, 0.9f);
+        }
+    }
+
     private void trackStorms() {
+        trackEmergences();
         for (models.game.WhirlwindRide ride : session.drainWhirlwinds()) {
             flights.put(ride.getZombie(), new float[] {
                 (float) ride.getFromX(), time, time + STORM_RIDE,

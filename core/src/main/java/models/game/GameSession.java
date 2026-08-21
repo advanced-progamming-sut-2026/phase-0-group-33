@@ -609,6 +609,21 @@ public class GameSession {
 
     private final java.util.List<WhirlwindRide> whirlwinds = new java.util.ArrayList<>();
 
+    private final java.util.List<double[]> emergences = new java.util.ArrayList<>();
+
+    public void recordEmergence(double x, int row, boolean fromWater) {
+        if (emergences.size() > 32) {
+            return;
+        }
+        emergences.add(new double[] {x, row, fromWater ? 1 : 0});
+    }
+
+    public java.util.List<double[]> drainEmergences() {
+        java.util.List<double[]> copy = new java.util.ArrayList<>(emergences);
+        emergences.clear();
+        return copy;
+    }
+
     public void recordWhirlwind(models.entities.zombie.Zombie zombie,
                                 double fromX, double toX, int row) {
         addRide(zombie, fromX, toX, row, true);

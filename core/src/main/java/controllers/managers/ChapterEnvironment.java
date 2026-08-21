@@ -178,6 +178,7 @@ public class ChapterEnvironment {
                         && session.getRandom().nextInt(100) < 30) {
                     session.spawnZombie(ZombieType.NORMAL, col, row,
                             Math.max(1, session.getWaveManager().getCurrentWave()));
+                    session.recordEmergence(col, row, true);
                     System.out.printf("A zombie emerged from beneath the low tide at (%d, %d)!%n",
                             col, row);
                 }
@@ -218,6 +219,7 @@ public class ChapterEnvironment {
                 if (tile.getTerrain() == TerrainType.GRAVE && tile.isNecromancy()) {
                     session.spawnZombie(ZombieType.NORMAL, col, row,
                             Math.max(1, session.getWaveManager().getCurrentWave()));
+                    session.recordEmergence(col, row, false);
                     System.out.printf("Necromancy! A zombie crawled out from the grave at (%d, %d).%n",
                             col, row);
                 }
