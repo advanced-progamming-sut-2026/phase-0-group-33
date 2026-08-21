@@ -244,7 +244,7 @@ public class BattleScreen extends ScreenAdapter {
 
     private java.util.List<String> openingLines() {
         java.util.List<String> lines = new java.util.ArrayList<>();
-        if (session.getMode() != GameMode.ADVENTURE) {
+        if (session.getMode() != GameMode.ADVENTURE || session.isSandbox()) {
             return lines;
         }
         String chapter = levelChapter == null ? "" : levelChapter;

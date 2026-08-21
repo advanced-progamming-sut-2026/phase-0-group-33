@@ -63,7 +63,7 @@ public class SandboxSetupScreen extends BaseScreen {
             Table card = Ui.card(skin, "row");
             card.pad(10f, 16f, 10f, 16f);
             card.add(Ui.label(skin, name, "h2")).growX().left();
-            card.add(Ui.button(skin, "Open", "small-green", () -> open(chosen)))
+            card.add(Ui.button(skin, "Open", "green", () -> open(chosen)))
                     .width(150f).height(46f).right();
             Ui.appear(card, number);
             levels.add(card).growX().padBottom(6f).row();

@@ -2,7 +2,6 @@ package views.screens;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import controllers.menuControllers.SandboxController;
-import models.Result;
 import models.entities.plant.PlantType;
 import models.entities.zombie.ZombieType;
 import models.map.TerrainType;
@@ -13,12 +12,14 @@ import views.ui.Ui;
 public class SandboxScreen extends BattleScreen {
 
     private static final String[] TABS = {"Plants", "Zombies", "Events", "World"};
-    private static final float PANEL_WIDTH = 300f;
+    private static final float PANEL_WIDTH = 264f;
 
     private final SandboxController sandbox;
     private final Table panel = new Table();
     private final Table list = new Table();
 
+    private final Table body = new Table();
+    private boolean open = true;
     private String tab = TABS[0];
     private boolean mowers = true;
     private TerrainType brush;
@@ -27,12 +28,12 @@ public class SandboxScreen extends BattleScreen {
         super(game);
         this.sandbox = new SandboxController(game.getApp());
         buildPanel();
-        showObjectives();
     }
 
     @Override
     protected void showObjectives() {
-        announce("Sandbox: everything is free. Pick a tool on the right.");
+        setPaused(false);
+        panel.toFront();
     }
 
     @Override
@@ -44,25 +45,35 @@ public class SandboxScreen extends BattleScreen {
     private void buildPanel() {
         panel.setFillParent(true);
         panel.right().top();
-        Table box = new Table(skin);
-        box.setBackground(skin.getDrawable("panel"));
-        box.pad(8f);
-
+        body.setBackground(skin.getDrawable("panel"));
+        body.pad(6f);
         Table tabs = new Table();
         for (final String name : TABS) {
             tabs.add(Ui.button(skin, name, "small", () -> {
                 tab = name;
                 refreshList();
-            })).width(68f).height(38f).padRight(2f);
+            })).width(58f).height(34f).padRight(2f);
         }
-        box.add(tabs).padBottom(6f).row();
-        box.add(Ui.scroll(skin, list)).size(PANEL_WIDTH - 20f, 470f).row();
-        box.add(Ui.button(skin, "Clear tool", "small-brown",
-                () -> armSandbox(Tool.NONE, null, null))).width(PANEL_WIDTH - 24f)
-                .height(40f).padTop(6f);
-        panel.add(box).width(PANEL_WIDTH).padTop(84f).padRight(4f);
+        body.add(tabs).padBottom(4f).row();
+        body.add(Ui.scroll(skin, list)).size(PANEL_WIDTH - 18f, 452f).row();
+        body.add(Ui.button(skin, "Clear tool", "small-brown",
+                () -> armSandbox(Tool.NONE, null, null))).width(PANEL_WIDTH - 22f)
+                .height(36f).padTop(4f);
+
+        Table column = new Table();
+        column.add(Ui.button(skin, "Sandbox tools", "small-purple", this::toggle))
+                .width(PANEL_WIDTH).height(36f).padBottom(2f).row();
+        column.add(body).width(PANEL_WIDTH);
+        panel.add(column).width(PANEL_WIDTH).padTop(82f).padRight(4f);
         stage.addActor(panel);
+        panel.toFront();
         refreshList();
+    }
+
+    private void toggle() {
+        open = !open;
+        body.setVisible(open);
+        panel.toFront();
     }
 
     private void refreshList() {
@@ -102,7 +113,7 @@ public class SandboxScreen extends BattleScreen {
             Ui.onClick(card, () -> {
                 armSandbox(Tool.PLANT, type, null);
                 brush = null;
-                announce("Planting " + type.getName());
+                toasts.success("Planting " + type.getName());
             });
             list.add(card).growX().padBottom(2f).row();
         }
@@ -118,7 +129,7 @@ public class SandboxScreen extends BattleScreen {
             Ui.onClick(card, () -> {
                 armSandbox(Tool.NONE, null, type);
                 brush = null;
-                announce("Dropping " + type.getName());
+                toasts.success("Dropping " + type.getName());
             });
             list.add(card).growX().padBottom(2f).row();
         }
@@ -127,10 +138,7 @@ public class SandboxScreen extends BattleScreen {
     private void eventList() {
         for (final String event : sandbox.events()) {
             list.add(row(event, () -> {
-                Result result = sandbox.handleEvent(event);
-                toasts.show(result);
-                announce(result.getMessages().isEmpty() ? event
-                        : result.getMessages().get(0));
+                toasts.show(sandbox.handleEvent(event));
             }, "small")).growX().padBottom(2f).row();
         }
         list.add(row("Next wave", () -> toasts.show(sandbox.handleNextWave()), "small"))
@@ -158,7 +166,7 @@ public class SandboxScreen extends BattleScreen {
             list.add(row(terrain.name().replace('_', ' '), () -> {
                 brush = terrain;
                 armSandbox(Tool.NONE, null, null);
-                announce("Painting " + terrain);
+                toasts.success("Painting " + terrain);
             }, "small")).growX().padBottom(2f).row();
         }
     }
