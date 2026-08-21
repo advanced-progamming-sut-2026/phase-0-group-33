@@ -791,6 +791,9 @@ public class BattleScreen extends ScreenAdapter {
                 break;
             case SHOVEL:
                 result = controller.handlePluck(column, row);
+                if (result.isSuccessfull()) {
+                    sfx(views.assets.Audio.SHOVEL);
+                }
                 break;
             case FOOD:
                 result = controller.handleFeedPlant(column, row);
@@ -1069,6 +1072,8 @@ public class BattleScreen extends ScreenAdapter {
         trackRewards();
         int wave = session.getWaveManager().getCurrentWave();
         if (wave != lastWave) {
+            sfx(wave >= session.getWaveManager().getTotalWaves()
+                    ? views.assets.Audio.HUGE_WAVE : views.assets.Audio.WAVE);
             lastWave = wave;
             announce(waveNotice(wave));
         }
@@ -1090,6 +1095,7 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     private void cheer(String title, int points) {
+        sfx(views.assets.Audio.CHIME);
         Table banner = new Table(skin);
         banner.setBackground(skin.getDrawable("highlight"));
         banner.pad(1f, 12f, 1f, 12f);
@@ -1181,6 +1187,9 @@ public class BattleScreen extends ScreenAdapter {
         game.getAnimations().update();
         if (session != null) {
             lawnView.setFrozen(paused || frozen || session.isOver());
+            for (String cue : lawnView.drainCues()) {
+                sfx(cue);
+            }
             if (lawnView.consumeShake()) {
                 shake = 0.32f;
                 sfx(views.assets.Audio.EXPLODE);

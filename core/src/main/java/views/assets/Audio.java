@@ -17,6 +17,8 @@ public final class Audio implements Disposable {
 
     public static final String PLANT = "plant";
     public static final String SHOOT = "shoot";
+    public static final String LOB = "lob";
+    public static final String SPLAT = "splat";
     public static final String EXPLODE = "explode";
     public static final String GULP = "gulp";
     public static final String SUN = "sun";
@@ -24,6 +26,47 @@ public final class Audio implements Disposable {
     public static final String CLICK = "click";
     public static final String LOSE = "lose";
     public static final String WIN = "win";
+    public static final String BITE = "bite";
+    public static final String ZOMBIE_DIES = "zombie-dies";
+    public static final String ARMOUR_BREAKS = "armour-breaks";
+    public static final String PLANT_DIES = "plant-dies";
+    public static final String SHOVEL = "shovel";
+    public static final String WAVE = "wave";
+    public static final String HUGE_WAVE = "huge-wave";
+    public static final String GRAVE_BREAKS = "grave-breaks";
+    public static final String RISE = "rise";
+    public static final String STORM = "storm";
+    public static final String TIDE = "tide";
+    public static final String MINT = "mint";
+    public static final String BOSS_MOVE = "boss-move";
+    public static final String BOSS_HURT = "boss-hurt";
+    public static final String CHIME = "chime";
+
+    private static final String[] MUSIC_CUES = {MENU, BATTLE, BOSS, MINIGAME};
+    private static final String[] SOUND_CUES = {
+        PLANT, SHOOT, LOB, SPLAT, EXPLODE, GULP, SUN, MOWER, CLICK, LOSE, WIN,
+        BITE, ZOMBIE_DIES, ARMOUR_BREAKS, PLANT_DIES, SHOVEL, WAVE, HUGE_WAVE,
+        GRAVE_BREAKS, RISE, STORM, TIDE, MINT, BOSS_MOVE, BOSS_HURT, CHIME};
+
+    public static String[] musicCues() {
+        return MUSIC_CUES.clone();
+    }
+
+    public static String[] soundCues() {
+        return SOUND_CUES.clone();
+    }
+
+    public static String[] extensions() {
+        return EXTENSIONS.clone();
+    }
+
+    public static String folder() {
+        return ROOT;
+    }
+
+    public boolean isPresent(String name) {
+        return locate(name) != null;
+    }
 
     private static final String ROOT = "AUDIO/";
     private static final String[] EXTENSIONS = {".ogg", ".mp3", ".wav"};

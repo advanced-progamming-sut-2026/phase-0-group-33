@@ -57,6 +57,7 @@ public class PvzGame extends Game {
         art = new Art(assets);
         animations = new Animations();
         audio = new Audio();
+        views.ui.Ui.setClickSound(() -> audio.play(Audio.CLICK));
         audio.setUser(app.getCurrentUser() == null ? null : app.getCurrentUser().getUsername());
         skin = UiSkin.build(assets);
         router = new Router(this);

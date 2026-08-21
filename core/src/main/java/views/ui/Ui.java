@@ -41,6 +41,18 @@ public final class Ui {
         return label;
     }
 
+    private static Runnable clickSound;
+
+    public static void setClickSound(Runnable action) {
+        clickSound = action;
+    }
+
+    private static void click() {
+        if (clickSound != null) {
+            clickSound.run();
+        }
+    }
+
     public static TextButton button(Skin skin, String text, Runnable action) {
         return button(skin, text, "default", action);
     }
@@ -52,6 +64,7 @@ public final class Ui {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if (!((TextButton) actor).isDisabled()) {
+                    click();
                     action.run();
                 }
             }
@@ -216,6 +229,7 @@ public final class Ui {
         actor.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                click();
                 action.run();
             }
         });

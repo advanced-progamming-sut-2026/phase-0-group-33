@@ -91,6 +91,8 @@ public class LawnView extends Actor {
     private final float[] burning = new float[GameSession.ROWS + 1];
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Float> foodStart =
             new com.badlogic.gdx.utils.ObjectMap<>();
+    private final com.badlogic.gdx.utils.ObjectMap<models.entities.zombie.Zombie, Boolean> biting =
+            new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, Integer> lastFood =
             new com.badlogic.gdx.utils.ObjectMap<>();
     private final com.badlogic.gdx.utils.ObjectMap<models.game.PlacedPlant, String> firingClip =
@@ -286,6 +288,7 @@ public class LawnView extends Actor {
         float duration = animator.zombieClipDuration(zombie.getType(), clip);
         if (duration > 0f) {
             breaking.put(zombie, time + duration);
+            cue(views.assets.Audio.ARMOUR_BREAKS);
         }
     }
 
@@ -496,6 +499,7 @@ public class LawnView extends Actor {
                     || last[1] < 1f || last[1] > GameSession.ROWS) {
                 continue;
             }
+            cue(views.assets.Audio.SPLAT);
             String[] impact = views.assets.AnimationCatalog.impact(shot.isLit()
                     ? models.entities.plant.PlantType.FIRE_PEASHOOTER : shot.getSource());
             if (impact != null) {
@@ -507,6 +511,10 @@ public class LawnView extends Actor {
         }
         for (models.game.Projectile shot : session.getProjectileManager().getProjectiles()) {
             float[] seenBefore = shots.get(shot);
+            if (seenBefore == null) {
+                cue(shot.getMotion() == models.game.Projectile.Motion.LOB
+                        ? views.assets.Audio.LOB : views.assets.Audio.SHOOT);
+            }
             if (shot.isLit() && (seenBefore == null || seenBefore[2] < 0.5f)) {
                 noteTorchwoodBurn((float) shot.getX(), shot.getRow());
             }
@@ -579,6 +587,7 @@ public class LawnView extends Actor {
             if (mowerSeen[row] && !present) {
                 mowerRun[row] = Math.max(time, 0.0001f);
                 shakePending = true;
+                cue(views.assets.Audio.MOWER);
             }
             mowerSeen[row] = present;
         }
@@ -595,6 +604,7 @@ public class LawnView extends Actor {
 
     private void trackMints() {
         for (Object[] burst : session.drainMints()) {
+            cue(views.assets.Audio.MINT);
             models.entities.plant.PlantType type = (models.entities.plant.PlantType) burst[0];
             int column = (Integer) burst[1];
             int row = (Integer) burst[2];
@@ -613,6 +623,7 @@ public class LawnView extends Actor {
     private void trackEmergences() {
         trackMints();
         for (double[] spot : session.drainEmergences()) {
+            cue(views.assets.Audio.RISE);
             int row = (int) spot[1];
             if (spot[2] > 0.5) {
                 addFx(SPLASH, "water_splash_01", (float) spot[0], row, 1.3f, 0.1f, 0.9f);
@@ -631,6 +642,7 @@ public class LawnView extends Actor {
                 (float) ride.getFromX(), time, time + STORM_RIDE,
                 ride.isStorm() ? 0.3f : 1.1f});
             if (ride.isStorm()) {
+                cue(views.assets.Audio.STORM);
                 rides.put(ride.getZombie(), new float[] {
                     (float) ride.getFromX(), (float) ride.getToX(), time, ride.getRow()});
             } else {
@@ -717,6 +729,7 @@ public class LawnView extends Actor {
     }
 
     private void noteBlastRide(models.game.WhirlwindRide ride) {
+        cue(views.assets.Audio.EXPLODE);
         addFx(views.assets.AnimationCatalog.blastRear(), "explosion",
                 (float) ride.getFromX(), ride.getRow(), 1.7f, 0.4f, 1f);
         addFx(BOOM, "explosion", (float) ride.getFromX(), ride.getRow(), 1.4f, 0.35f, 1f);
@@ -741,6 +754,21 @@ public class LawnView extends Actor {
         }
     }
 
+    private final com.badlogic.gdx.utils.Array<String> cues =
+            new com.badlogic.gdx.utils.Array<>();
+
+    private void cue(String name) {
+        if (cues.size < 24 && !cues.contains(name, false)) {
+            cues.add(name);
+        }
+    }
+
+    public com.badlogic.gdx.utils.Array<String> drainCues() {
+        com.badlogic.gdx.utils.Array<String> copy = new com.badlogic.gdx.utils.Array<>(cues);
+        cues.clear();
+        return copy;
+    }
+
     public boolean consumeShake() {
         boolean value = shakePending;
         shakePending = false;
@@ -763,6 +791,7 @@ public class LawnView extends Actor {
             }
         }
         for (models.game.PlacedPlant plant : gone) {
+            cue(views.assets.Audio.PLANT_DIES);
             int[] spot = plantSpots.get(plant);
             if (matching() && spot != null) {
                 addFx(POOF, "animation", spot[0], spot[1], 1.25f, 0.3f, 0.9f);
@@ -794,6 +823,7 @@ public class LawnView extends Actor {
                 Boolean before = graveSeen.get(key);
                 graveSeen.put(key, grave);
                 if (before != null && before && !grave) {
+                    cue(views.assets.Audio.GRAVE_BREAKS);
                     addFx(views.assets.AnimationCatalog.graveDirt(), "gravebuster_dirt_anim",
                             column, row, 1.1f, 0.1f, 1.2f);
                 }
@@ -816,6 +846,7 @@ public class LawnView extends Actor {
     }
 
     private void noteDetonation(models.entities.plant.PlantType type, int column, int row) {
+        cue(views.assets.Audio.EXPLODE);
         if (type == models.entities.plant.PlantType.JALAPENO
                 && row >= 1 && row <= GameSession.ROWS) {
             burning[row] = time + BLAST_LIFE;
@@ -949,6 +980,8 @@ public class LawnView extends Actor {
     }
 
     private void noteDeath(models.entities.zombie.Zombie zombie, float x, int row) {
+        cue(zombie instanceof models.entities.zombie.Zomboss
+                ? views.assets.Audio.BOSS_HURT : views.assets.Audio.ZOMBIE_DIES);
         String clip = animator.zombieClipName(zombie.getType(), "die");
         if (clip == null || !"die".equals(clip)) {
             return;
@@ -1031,7 +1064,29 @@ public class LawnView extends Actor {
         return keys;
     }
 
+    private void trackBites() {
+        for (models.entities.zombie.Zombie zombie : session.getZombies()) {
+            boolean eating = isEating(zombie);
+            Boolean before = biting.get(zombie);
+            biting.put(zombie, eating);
+            if (eating && (before == null || !before)) {
+                cue(views.assets.Audio.BITE);
+            }
+        }
+        com.badlogic.gdx.utils.Array<models.entities.zombie.Zombie> stale =
+                new com.badlogic.gdx.utils.Array<>();
+        for (models.entities.zombie.Zombie zombie : biting.keys()) {
+            if (!session.getZombies().contains(zombie)) {
+                stale.add(zombie);
+            }
+        }
+        for (models.entities.zombie.Zombie zombie : stale) {
+            biting.remove(zombie);
+        }
+    }
+
     private void trackFeeding() {
+        trackBites();
         for (models.game.PlacedPlant plant : session.getPlants()) {
             int ticks = plant.getPlantFoodTicks();
             Integer previous = lastFood.get(plant);
@@ -1055,6 +1110,7 @@ public class LawnView extends Actor {
     }
 
     private void noteFeast(models.game.PlacedPlant plant) {
+        cue(views.assets.Audio.GULP);
         addFx(PLANT_FOOD_GLOW, "plantfood", plant.getX(), plant.getY(), 1.6f, 0.85f, 1.4f);
         shakePending = true;
         if (!feedsWholeLane(plant.getType())) {
@@ -1195,6 +1251,7 @@ public class LawnView extends Actor {
         if (tideColumn != firstWater) {
             if (tideColumn > 0) {
                 tideWave = time;
+                cue(views.assets.Audio.TIDE);
             }
             tideColumn = firstWater;
         }
@@ -2322,6 +2379,7 @@ public class LawnView extends Actor {
         Float started = bossMoveStart.get(clipName);
         if (started == null) {
             bossMoveStart.clear();
+            cue(views.assets.Audio.BOSS_MOVE);
             bossMoveStart.put(clipName, time);
             started = time;
         }
