@@ -102,10 +102,10 @@ public final class AnimationCatalog {
         ABILITY.put("Tomb Raiser", "power");
         ABILITY.put("Hunter", "throw");
         ABILITY.put("Octopus", "toss");
-        ABILITY.put("Explorer", "power");
         ABILITY.put("Turquoise", "power");
         ABILITY.put("Fisherman", "cast");
         ABILITY.put("Wizard", "sheep");
+        ABILITY.put("Pharaoh", "break_power");
 
         RIDE.put("Surfer", "walk_board");
         RIDE.put("Piano", "idle");
