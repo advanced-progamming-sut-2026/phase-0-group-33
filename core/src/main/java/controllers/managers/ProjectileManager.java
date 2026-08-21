@@ -131,6 +131,20 @@ public class ProjectileManager {
         }
     }
 
+    private boolean chewGrave(Projectile projectile) {
+        models.map.Tile grave = combat.graveTileAt(projectile.getRow(), projectile.getX());
+        if (grave == null || !projectile.recordHit(grave)) {
+            return false;
+        }
+        combat.chipGrave(grave, projectile.getSource());
+        projectile.spendPierce();
+        if (projectile.getPierceLeft() <= 0) {
+            projectile.markSpent();
+            return true;
+        }
+        return false;
+    }
+
     private void advanceZombieShot(Projectile projectile) {
         projectile.setX(projectile.getX() - STRAIGHT_SPEED);
         if (projectile.getX() < 0.5) {
@@ -167,6 +181,10 @@ public class ProjectileManager {
         if (!projectile.isLit() && projectile.getSource().getTags().contains(PlantTag.PEA)
                 && combat.torchwoodAt(projectile.getRow(), projectile.getX())) {
             projectile.light();
+        }
+        if (projectile.getMotion() == Projectile.Motion.PIERCING
+                && chewGrave(projectile)) {
+            return;
         }
         Zombie target = zombieNear(projectile.getRow(), projectile.getX());
         if (target == null || !projectile.recordHit(target)) {

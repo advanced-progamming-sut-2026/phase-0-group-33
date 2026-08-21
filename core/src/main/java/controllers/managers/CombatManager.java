@@ -165,7 +165,8 @@ public class CombatManager {
 
 
     private boolean strikeThrough(PlacedPlant plant) {
-        if (firstZombieInRowAfter(plant.getY(), plant.getX()) == null) {
+        if (firstZombieInRowAfter(plant.getY(), plant.getX()) == null
+                && !graveAhead(plant.getY(), plant.getX())) {
             return false;
         }
         session.getProjectileManager().launchPiercing(plant, pierceDepth(plant));
@@ -733,13 +734,21 @@ public class CombatManager {
         return result;
     }
 
+    public Tile graveTileAt(int row, double x) {
+        return graveBetween(row, x - 0.5, x + 0.1);
+    }
+
+    public void chipGrave(Tile grave, PlantType source) {
+        grave.damageGrave(plantDamage(source));
+        if (grave.getTerrain() != TerrainType.GRAVE) {
+            grantGraveContent(grave);
+        }
+    }
+
     public boolean blockedAt(int row, double x, PlantType source) {
-        Tile grave = graveBetween(row, x - 0.5, x + 0.1);
+        Tile grave = graveTileAt(row, x);
         if (grave != null) {
-            grave.damageGrave(plantDamage(source));
-            if (grave.getTerrain() != TerrainType.GRAVE) {
-                grantGraveContent(grave);
-            }
+            chipGrave(grave, source);
             return true;
         }
         models.game.PushedObject pushed = pushedObjectBetween(row, x - 0.5, x + 0.1);

@@ -1,7 +1,6 @@
 package models.game;
 
 import models.entities.plant.PlantType;
-import models.entities.zombie.Zombie;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,7 +23,7 @@ public class Projectile {
     private final double originX;
     private final double targetX;
     private final int direction;
-    private final Set<Zombie> hitAlready = new HashSet<>();
+    private final Set<Object> hitAlready = new HashSet<>();
 
     private double x;
     private double flight;
@@ -128,8 +127,8 @@ public class Projectile {
         this.spent = true;
     }
 
-    public boolean recordHit(Zombie zombie) {
-        return hitAlready.add(zombie);
+    public boolean recordHit(Object target) {
+        return hitAlready.add(target);
     }
 
     public boolean isLit() {
