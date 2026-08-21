@@ -498,6 +498,11 @@ public class BattleScreen extends ScreenAdapter {
             return "Combos: " + session.getMinigameManager().getCombosMade()
                     + " / " + session.getMinigameManager().getCombosNeeded();
         }
+        if (session.getMode() == GameMode.WALLNUT_BOWLING) {
+            return "Nuts rolling: " + session.getMinigameManager().getNuts().size()
+                    + "    Zombies left: " + session.getZombies().size()
+                    + "    Bowled down: " + session.getZombiesKilled();
+        }
         if (session.isSpecial(SpecialLevelType.TIMED_WAR)) {
             int seconds = Math.max(0, session.getTimerTicksLeft()) / GameSession.TICKS_PER_SECOND;
             return "Kills " + session.getZombiesKilled() + " / 12    Time left: " + seconds + "s";

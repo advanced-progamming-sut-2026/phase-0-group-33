@@ -326,6 +326,14 @@ public class MinigameManager {
         if (session.getPhase() != GamePhase.BATTLE) {
             return;
         }
+        boolean brains = false;
+        for (int row = 1; row <= GameSession.ROWS; row++) {
+            brains |= session.hasBrain(row);
+        }
+        if (!brains) {
+            session.winGame();
+            return;
+        }
         boolean attackers = false;
         boolean producers = false;
         for (Zombie zombie : session.getZombies()) {

@@ -237,6 +237,7 @@ public class GameController extends BaseController {
                 recordVictory(session, store);
             } else if (session.getMode() != GameMode.SCORING) {
                 store.addInt("minigamesWon", 1);
+                recordStage(session, store);
                 NewsStore.add(app.getCurrentUser().getUsername(),
                         "Minigame won: " + session.getMode());
                 UserManager.getInstance().addCoins(200);
@@ -254,6 +255,16 @@ public class GameController extends BaseController {
         app.setCurrentGameSession(null);
         app.navigateTo(Menus.MAIN);
         System.out.println("Returned to the main menu.");
+    }
+
+    private void recordStage(GameSession session, UserDataStore store) {
+        String key = "minigameStage." + session.getMode().name()
+                .replaceAll("[^A-Za-z]", "").toLowerCase();
+        int tier = session.getDifficultyTier();
+        if (tier > store.getInt(key, 0)) {
+            store.setInt(key, tier);
+            System.out.println("Stage " + tier + " cleared; the next stage is open.");
+        }
     }
 
     private void recordSeenZombies(GameSession session, UserDataStore store) {

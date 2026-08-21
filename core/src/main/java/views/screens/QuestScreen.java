@@ -14,6 +14,7 @@ import java.util.List;
 public class QuestScreen extends BaseScreen {
 
     private static final String[] PAGES = {"critical", "high", "daily", "minigame"};
+    private static final int STAGES = 3;
 
     private final TravelLogController controller;
     private final Table content = new Table();
@@ -132,9 +133,9 @@ public class QuestScreen extends BaseScreen {
         return box;
     }
 
-    private void startMinigame(String name) {
+    private void startMinigame(String name, int tier) {
         Result result = new controllers.menuControllers.TravelLogController(app)
-                .handlePlayMinigame(name, 1);
+                .handlePlayMinigame(name, tier);
         if (!result.isSuccessfull() || app.getCurrentGameSession() == null) {
             toasts.show(result);
             return;
@@ -159,9 +160,33 @@ public class QuestScreen extends BaseScreen {
         text.add(Ui.label(skin, name, "h2")).left().row();
         text.add(Ui.wrapped(skin, description, "muted")).width(620f).left().padTop(4f);
         card.add(text).growX();
-        final String key = name;
-        card.add(Ui.button(skin, "Play", "small", () -> startMinigame(key)))
-                .width(140f).height(50f).right();
+        final String chosenName = name;
+        if ("scoringgame".equals(key(name))) {
+            card.add(Ui.button(skin, "Play", "small-green", () -> startMinigame(chosenName, 1)))
+                    .width(150f).height(50f).right();
+            return card;
+        }
+        Table stages = new Table();
+        stages.add(Ui.label(skin, "Stage", "muted")).padRight(8f);
+        for (int tier = 1; tier <= STAGES; tier++) {
+            final int chosen = tier;
+            stages.add(Ui.button(skin, String.valueOf(tier), stageStyle(chosenName, tier),
+                    () -> startMinigame(chosenName, chosen))).width(52f).height(50f).padLeft(4f);
+        }
+        card.add(stages).right();
         return card;
+    }
+
+    private String stageStyle(String name, int tier) {
+        return tier <= bestStage(name) + 1 ? "small-green" : "small";
+    }
+
+    private int bestStage(String name) {
+        return utils.UserDataStore.forUser(app.getCurrentUser().getUsername())
+                .getInt("minigameStage." + key(name), 0);
+    }
+
+    private String key(String name) {
+        return name.replaceAll("[^A-Za-z]", "").toLowerCase();
     }
 }
