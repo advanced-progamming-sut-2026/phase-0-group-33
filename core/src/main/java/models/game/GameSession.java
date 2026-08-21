@@ -395,6 +395,15 @@ public class GameSession {
         runningMowers.add(new RunningMower(row, 0.4));
     }
 
+    public void setLawnMowers(boolean present) {
+        for (int row = 1; row <= ROWS; row++) {
+            lawnMowers[row] = present;
+        }
+        if (!present) {
+            runningMowers.clear();
+        }
+    }
+
     public boolean hasLawnMower(int row) {
         return row >= 1 && row <= ROWS && lawnMowers[row];
     }

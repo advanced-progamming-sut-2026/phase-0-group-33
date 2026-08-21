@@ -178,6 +178,14 @@ public class WaveManager {
                 && session.getZombies().isEmpty();
     }
 
+    public void forceNextWave() {
+        if (!started) {
+            startWaves();
+            return;
+        }
+        beginWave(currentWave + 1);
+    }
+
     public double getWaveClearedFraction() {
         if (!started) {
             return 0;
