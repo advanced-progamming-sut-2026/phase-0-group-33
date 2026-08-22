@@ -34,11 +34,13 @@ Four chapters · 69 plants · 38 zombies · 4 Zomboss fights · 6 minigames · e
 [The Adventure](#the-adventure) ·
 [Boss Fights](#boss-fights) ·
 [Minigames](#minigames) ·
-[Between Battles](#between-battles)
+[Between Battles](#between-battles) ·
+[The Sandbox](#the-sandbox)
 
 **Part II — The Code**
 [Architecture](#architecture) ·
 [The Graphics Pipeline](#the-graphics-pipeline) ·
+[Sound](#sound) ·
 [Build & Code Quality](#build--code-quality) ·
 [How We Verified It](#how-we-verified-it) ·
 [Data & Persistence](#data--persistence)
@@ -123,6 +125,9 @@ Everything is mouse-driven; the keyboard is for shortcuts.
 | **Plant Food** button, then a plant | Supercharge it — every plant has its own plant-food effect |
 | **Esc** | Pause menu in battle · back one screen in the menus |
 | **F11** or **Alt + Enter** | Toggle fullscreen, from anywhere |
+
+The [sandbox](#the-sandbox) adds three of its own: **Space** freezes time, **Tab** hides
+the tool panel, **C** drops the armed tool.
 
 Fullscreen is also a checkbox in **Settings**, and it is remembered per account — the
 game comes back up the way you left it. The viewport letterboxes cleanly at any aspect
@@ -211,6 +216,7 @@ Reachable from **Quests & Minigames**, each with three difficulty tiers.
 | Screen | What it's for |
 |--------|---------------|
 | **Almanac** | Every plant and zombie, animated, with full stats. Zombies stay silhouetted until you meet them |
+| **Zen Garden** | Six beds. Move a plant in, water it when it gets thirsty, get paid — with a bonus every fifth watering |
 | **Greenhouse** | Twelve pots on real timers. Marigolds pay coins; other plants bank a free plant-food boost for your next level |
 | **Shop** | Pots, plant food, seed bundles, currency exchange, and a date-seeded daily offer at 20% off |
 | **Travel Log** | 20 quests across critical / high / daily pages, with live progress bars and real payouts |
@@ -218,6 +224,48 @@ Reachable from **Quests & Minigames**, each with three difficulty tiers.
 | **Profile** | Rename, re-email, change password, and see your run totals |
 | **Settings** | Difficulty, game speed, music and SFX volume, lawn grid overlay, fullscreen, debug mode |
 | **News** | Everything the game wants to tell you: new zombies met, levels unlocked, chapters cleared |
+
+The **Zen Garden** is a real economy, not a decoration. A plant you move into a bed leaves
+your collection until you take it back. Each bed gets thirsty **4 hours** after its last
+drink — measured against the system clock, so it keeps ticking while the game is closed —
+and watering it pays **150 coins**, with a **+250** bonus on every fifth watering. The
+plant animates in its pot with the same PAM clip it uses on the lawn.
+
+---
+
+## The Sandbox
+
+A whole lawn with the rules switched off, reachable straight from the main menu. It was
+built to test the game and it turned out to be the fastest way to *show* the game.
+
+<div align="center">
+<img src="docs/screenshots/09-sandbox.jpg" width="90%" alt="The sandbox on Wavey Beach: plants and zombies placed by hand, the tool panel open on the plant list, endless mowers in every lane.">
+</div>
+
+**Pick any of the 16 lawns** — the setup screen lists all four chapters and names what each
+level is, boss levels included. The lawn loads with its real terrain, its real background
+and its real chapter rules.
+
+Then nothing happens until you say so. **There are no waves at all.** Sun is effectively
+infinite, every plant costs 0, nothing recharges, every plant in the game is available
+from the first second, and the mowers come back after every use.
+
+| Tab | What you can do |
+|-----|-----------------|
+| **Plants** | All 69, filtered by family, with damage on each row. Pick one, click a tile |
+| **Zombies** | All 38, filtered by armour, with hitpoints on each row. Pick one, click a tile — it appears exactly there |
+| **Events** | Fire the chapter's own mid-game events by hand: the Egyptian whirlwind, the icy wind, the tide, necromancy, the sandstorm. Also: send a wave anyway, or summon the chapter's Zomboss |
+| **World** | Clear every zombie · dig up every plant · feed every plant · top up sun and food · endless / normal / no mowers · paint any tile to any terrain |
+
+| Key | Does |
+|-----|------|
+| **Space** | Freeze time — the whole simulation stops but the UI stays live, so you can build a scenario mid-flight and then let it run |
+| **Tab** | Hide the tool panel for a clean look at the lawn |
+| **C** | Drop whatever tool is armed |
+
+Freeze is not the pause menu: the pause menu stops the screen, freeze stops the *clock*.
+Projectiles hang in the air, zombies stop mid-bite, and you can plant, dig, drop zombies
+and repaint the ground before releasing it.
 
 ---
 
@@ -497,6 +545,10 @@ The hub. Reached after authentication.
 | `menu gem-wallet` | Shows your diamond (gem) balance. |
 | `menu enter <settings\|news\|profile\|greenhouse\|travellog\|leaderboard>` | Enter one of the sub-menus. |
 | `menu logout` | Logs out and returns to the Signup menu. This is the **only** way to leave the main menu. |
+
+> The **Sandbox** is graphical only — it is a testing tool built around live mouse
+> placement and a frozen clock, neither of which has a sensible text equivalent. Every
+> other screen in the game has a command set below.
 
 Several cheat commands live here (`menu cheat unlock-all`, `unlock-chapters`, `unlock-plants`, `max-plants`, `rich`, `add <n> <coin|diamond>`) — see [Cheat Commands](#cheat-commands). For a demo, `menu cheat unlock-all` opens the whole game at once.
 
