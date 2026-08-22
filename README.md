@@ -67,12 +67,20 @@ Four chapters · 69 plants · 38 zombies · 4 Zomboss fights · 6 minigames · e
 
 <table>
 <tr>
-<td width="50%"><img src="docs/screenshots/01-main-menu.jpg" alt="Main menu"><br><sub><b>Main menu</b> — every screen shares one animated backdrop, a gold-trimmed panel skin and a persistent currency bar.</sub></td>
+<td width="50%"><img src="docs/screenshots/01-main-menu.jpg" alt="Main menu"><br><sub><b>Main menu</b> — every screen shares one animated backdrop, a gold-trimmed panel skin and a persistent currency bar. The plants along the bottom are live animations, not artwork.</sub></td>
 <td width="50%"><img src="docs/screenshots/02-adventure.jpg" alt="Adventure map"><br><sub><b>Adventure map</b> — four chapters, progress bars, per-level cards that name the special rule waiting inside.</sub></td>
 </tr>
 <tr>
 <td width="50%"><img src="docs/screenshots/03-almanac.jpg" alt="Almanac"><br><sub><b>Almanac</b> — all 69 plants and 38 zombies with live animated portraits, stats, family filters and a seen/unseen gate.</sub></td>
 <td width="50%"><img src="docs/screenshots/05-boss.jpg" alt="Dragon Zomboss"><br><sub><b>Dragon Zomboss</b> — a two-lane boss with a segmented health bar, its own move set and burning tiles.</sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/screenshots/06-scoring.jpg" alt="Scoring Game"><br><sub><b>Scoring Game</b> — the endless run, with the live score dial, the streak read-out, and every bonus pattern floating up from where it was earned.</sub></td>
+<td width="50%"><img src="docs/screenshots/07-minigames.jpg" alt="Travel Log"><br><sub><b>Travel Log</b> — 20 quests over three priority pages, plus all six minigames at three stages each.</sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/screenshots/08-zen-garden.jpg" alt="Zen Garden"><br><sub><b>Zen Garden</b> — six beds on real clocks. Plants live here between battles, animate in their pots, and pay out every time you water them.</sub></td>
+<td width="50%"><img src="docs/screenshots/09-sandbox.jpg" alt="Sandbox"><br><sub><b>Sandbox</b> — any chapter, free everything, no waves. Plant, drop zombies, paint terrain, fire chapter events, freeze time mid-scenario.</sub></td>
 </tr>
 </table>
 
