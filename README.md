@@ -449,7 +449,8 @@ The read-only seed data the game ships with (`plants.csv`, `zombies.xlsx`) lives
 data/
 ├── users/<username>.properties   account, wallet, difficulty, security question
 ├── user_<username>.properties    per-user progress: chapters, plant levels, packets,
-│                                 greenhouse pots, quest state, preferences
+│                                 greenhouse pots, Zen Garden beds, quest state,
+│                                 preferences
 └── news_<username>.txt           the news feed
 ```
 
@@ -785,6 +786,19 @@ Reached from the Game menu. Zombies appear here only after you have seen them in
 | `menu collection upgrade-plant -p <plant_name>` | Upgrades a plant (needs coins + seed packets of that plant). |
 | `menu collection purchase-plant -p <plant_name>` | Buys a brand-new plant for **2000 coins**. |
 
+### Zen Garden Menu
+
+Reached from the Main menu. Patterns live in `ZenGardenCommands`; the graphical
+[Zen Garden screen](#between-battles) drives the same `ZenGardenController`.
+
+| Command | Description |
+|---------|-------------|
+| `show garden` | Lists all 6 beds: empty, or the plant in it and how long until it is thirsty. |
+| `place plant -t <type> -s <slot>` | Moves one of your plants into bed `slot` (1–6). It leaves your collection until you take it back. |
+| `water plant -s <slot>` | Waters a thirsty bed. Pays 150 coins, +250 on every 5th watering of that bed. |
+| `take plant -s <slot>` | Takes the plant back out of the bed. |
+| `enter greenhouse` | Opens the Greenhouse. |
+
 ### Greenhouse Menu
 
 A 4×5 grid of pots (20 total). The first column (5 pots) is free; the rest are unlocked by buying pots in the shop. Growth is based on the **real system clock**.
@@ -965,6 +979,25 @@ Exactly one `&` and one `@` are placed in every board, so you always know where 
 
 Plant levels (1–5) come from collecting seed packets and paying coins in the Collection menu. The per-level bonuses (`HP +`, `Cost −`, `Damage +`, `Recharge −`) are read from the **`plants.csv` upgrade columns** (see `PlantUpgrades.java`) and applied to the plant's runtime cost, HP, damage and recharge during battle. Each plant food effect is plant-specific (e.g. Kernel-pult butters every zombie, Melon-pult drops giant melons, Repeater/Pea Pod fire a 20× giant pea, Chomper devours 3, Caulipower hypnotizes 3, Magnet-shroom strips all metal armor, …).
 
+### Zen Garden
+
+The doc leaves the garden's shape to us. Ours has **6 beds**. Moving a plant into a bed
+takes it out of your collection (you can always take it back); a bed becomes thirsty
+**4 hours** after its last watering, measured against the system clock so it keeps
+counting while the game is shut; watering pays **150 coins**, and every **5th** watering
+of the same bed pays a **+250** bonus on top. The plant plays its normal PAM animation
+in the pot, and the bed card tells you how long until it is thirsty again.
+
+### The Sandbox
+
+Not in the document — we built it to test the game, and kept it because it demonstrates
+the game faster than playing it. It is a normal `GameSession` with four flags flipped:
+`sandbox` (every plant costs 0 and no cooldown applies), no wave manager at all, endless
+lawn mowers, and a starting bank of 9990 sun and 9 plant food. Everything else — terrain,
+chapter environment, combat, animations — is the real thing, which is the point: a bug
+reproduced in the sandbox is a bug in the game. See [The Sandbox](#the-sandbox) for what
+it can do.
+
 ### Difficulty
 
 Difficulty `dl` (1–5, default 3) scales the game by the doc's `dl/3` factor:
@@ -983,6 +1016,8 @@ Difficulty `dl` (1–5, default 3) scales the game by the doc's `dl/3` factor:
 | Plant upgrade | 1000 coins + 5 seed packets |
 | Pot | 2000 coins |
 | Greenhouse Marigold harvest | 500 coins |
+| Zen Garden watering | 150 coins (+250 on every 5th watering of a bed) |
+| Zen Garden thirst interval | 4 real hours |
 | Grow speed-up | 1 diamond / remaining hour |
 | Zombie drop on death | 10% chance of 1 diamond / 50 coins / 1 pot |
 | Glowing zombie chance | 5% (drops a plant food, max 3 held) |
