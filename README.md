@@ -362,6 +362,38 @@ chapters, at any window size.
 
 ---
 
+## Sound
+
+The audio layer is wired the same way as the graphics: **the view detects, the screen
+plays**. `LawnView` already diffs the model every frame to know when something happened —
+a zombie died, armour came off, a shot landed, a grave broke — so instead of adding a
+second detector, each of those moments also queues a cue name. `BattleScreen` drains the
+queue once per frame and plays it. Sound and animation therefore fire from the same
+observation and can never disagree.
+
+```
+model change  ──►  LawnView diff  ──►  cue queue  ──►  BattleScreen  ──►  Audio
+                       (already                                            (cached,
+                        detecting it)                                       volume-aware)
+```
+
+**30 cues** are wired: 4 music beds (menu, battle, boss, minigame) and 26 effects —
+planting, digging, shooting, lobbing, splatting, exploding, biting, gulping, sun,
+mowers, armour breaking, zombies dying, plants dying, graves breaking, zombies rising,
+sandstorms, the tide, mints, wave and huge-wave calls, both Zomboss cues, and the UI
+click. The click is hooked in `Ui` itself, so **every** button on **every** screen is
+audible without a single per-screen line.
+
+`Audio` looks for `assets/AUDIO/<cue>.ogg`, then `.mp3`, then `.wav`; it caches what it
+loads, honours the music and SFX sliders in Settings, and **silently does nothing if a
+file is missing**. That last part is deliberate: the asset dump we were given contains
+1 458 animations and 780 texture pages but **zero audio files**, so the game ships mute
+and stays completely playable. Drop files with the documented names into `assets/AUDIO/`
+and they start playing with no code change — the full list of names, and what triggers
+each one, is in [`assets/AUDIO/README.txt`](assets/AUDIO/README.txt).
+
+---
+
 ## Build & Code Quality
 
 | Task | What it does |
