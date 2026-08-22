@@ -4,7 +4,7 @@
 
 **A full remake of PopCap's lawn defence, built from scratch in Java with libGDX.**
 
-Four chapters · 69 plants · 38 zombies · 4 Zomboss fights · 6 minigames · every frame driven by the game's original PAM animations.
+Four chapters · 69 plants · 38 zombies · 4 Zomboss fights · 6 minigames · a Zen Garden · a full sandbox · every frame driven by the game's original PAM animations.
 
 [![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
 [![libGDX](https://img.shields.io/badge/libGDX-1.13.1-E74C3C?style=flat-square)](https://libgdx.com/)
@@ -146,7 +146,7 @@ ratio, ultrawide included.
 <td align="center"><b>8</b><br><sub>special level types</sub></td>
 <td align="center"><b>6</b><br><sub>minigames</sub></td>
 <td align="center"><b>4</b><br><sub>Zomboss fights</sub></td>
-<td align="center"><b>14</b><br><sub>screens</sub></td>
+<td align="center"><b>17</b><br><sub>screens</sub></td>
 </tr>
 </table>
 
@@ -294,14 +294,15 @@ group-33/
 │       │   │                   ChapterEnvironment · PlantFoodEffects · ShotPatterns
 │       │   └── menuControllers/ one controller per screen
 │       ├── views/
-│       │   ├── screens/        14 scene2d screens
-│       │   ├── battle/         LawnView · EntityAnimator · Lawn · ConveyorBar · Dialogue
+│       │   ├── screens/        17 scene2d screens, incl. Sandbox · SandboxSetup · ZenGarden
+│       │   ├── battle/         LawnView · EntityAnimator · Lawn · ConveyorBar · Dialogue ·
+│       │   │                   WaveMeter · ScoreMeter · PlantFoodBank · Overlay
 │       │   ├── assets/         Art · Animations · AnimationCatalog · Audio
 │       │   └── ui/             skin, reusable widgets, Display (fullscreen)
 │       ├── database/           flat-file DAOs
 │       └── utils/              FileStore · UserDataStore · SessionStore · PasswordHasher
 ├── lwjgl3/                     desktop launcher (LWJGL3 backend)
-├── assets/                     3 030 tracked files — atlases, PAM animations, skin, data
+├── assets/                     3 031 tracked files — atlases, PAM animations, skin, data
 ├── tools/build_atlases.py      turns the game's RESOURCES.json into libGDX atlases
 ├── config/                     Checkstyle + PMD rulesets
 ├── docs/screenshots/           the images in this README
@@ -407,11 +408,12 @@ The rulesets in `config/` mirror exactly the Checkstyle and PMD rules named in t
 document: naming conventions, line length ≤ 120, method length ≤ 50, unused imports,
 unused locals / fields / methods / parameters, and NCSS counts.
 
-**Current state: Checkstyle reports 0 violations.** PMD reports 2, both the same
-`NcssCount` note about `LawnView` and `BattleScreen` being large classes — they are the
-renderer and the battle HUD, and we judged splitting working, verified rendering code
-purely to satisfy a size metric to be the worse trade. Reports land in
-`core/build/reports/{checkstyle,pmd}/main.html`.
+**Current state: Checkstyle reports 0 violations.** PMD reports 4, all four the same
+`NcssCount` note about a class being large: `LawnView`, `BattleScreen`, `CombatManager`
+and `ZombieBehaviorManager` — the renderer, the battle HUD, the damage resolver and the
+zombie ability table. Each is a cohesive unit of one kind of thing, and we judged
+splitting working, verified code purely to satisfy a size metric to be the worse trade.
+Reports land in `core/build/reports/{checkstyle,pmd}/main.html`.
 
 The linters run on `core` only; `lwjgl3` is launcher boilerplate.
 
@@ -429,11 +431,22 @@ find the rest, ran them against the real game, then deleted them.
 | **Zombie audit** | All 38 zombies walking and eating, plus **25 signature abilities** asserted individually — Ra stealing sun, tomb raising, torch burning, hunter freezing, octopus wrapping, wizard sheeping, fisherman hooking, gargantuar imp-throwing, king knighting, turquoise lasering, prospector dynamite, pianist shuffling, newspaper and pharaoh raging, diver submerging, dodo hopping | 0 failures |
 | **Model fuzzer** | 160 randomised games across all chapters, levels and minigames — random planting, digging, feeding, sun collecting, vase breaking, swapping, zombie spawning — asserting ~21 000 invariants: no negative sun, no plant off the lawn, no two plants on a tile, no NaN positions, no zombie in a lane that doesn't exist, no runaway spawn counts | 0 violations |
 | **Menu fuzzer** | Shop, greenhouse, profile, leaderboard, travel log, registration and login hammered with `-5`, `0`, `MAX_VALUE`, `null`, empty strings, NUL bytes, SQL-looking strings and non-Latin text | Found an integer-overflow exploit and six crashes |
-| **Screen regression** | All 14 menus plus 16 full battles (10 adventure levels, 6 minigames) launched, played and screenshotted | 0 exceptions |
+| **Boss audit** | All 4 Zomboss fights: every move fires, every clip resolves, segments break in order, the stun window opens, the boss refuses to be mown or hypnotised, and it dies exactly once | Found a boss that could be lawnmowered |
+| **Minigame audit** | All 6 minigames × 3 stages driven to a win *and* to a loss: vase contents, nut ricochet angles, brain-eating, match cascades and refills, plant-headed zombies, and the score patterns | Found matches that cleared without cascading |
+| **Quest audit** | All 20 quests forced to their completion condition, then checked for the right payout, the right one-shot behaviour, and correct daily reset | 0 failures |
+| **Sandbox fuzzer** | 40 randomised sandbox sessions: random chapters, random plant and zombie placement, terrain repainting under live entities, every event fired at every moment, freeze toggled mid-frame | 0 exceptions |
+| **Sound audit** | Every cue name unique, lowercase and file-safe; every cue documented; nothing played that isn't declared; and a busy Dark Ages level recorded to see which cues actually fire (13 of them, in 15 seconds) | Found planting that made no sound |
+| **Screen regression** | All 17 menus, the sandbox in all 4 chapters, plus 16 full battles (10 adventure levels, 6 minigames) launched, played and screenshotted | 0 exceptions |
 
 The fuzzers earned their keep: the shop's price arithmetic overflowed on a large enough
 purchase count, which made the "can you afford it?" check pass on a negative number and
 *minted currency*; and an unvalidated username went straight into a file path.
+
+The audits were just as useful, because they test claims rather than code paths. The
+sound audit is the clearest example — every cue was wired and the game still had a silent
+hole, because planting only made a noise when *you* clicked it, not when a conveyor belt,
+an Imitater or the sandbox put a plant on the lawn. Moving the cue into the view's
+plant-appeared diff fixed all four at once.
 
 ---
 
@@ -936,7 +949,7 @@ The daily zombie stream uses a date-seeded RNG, so the run is the same for every
 
 ### Minigames
 
-All 5 minigames run at 3 escalating stages (`-d 1|2|3`). The command set and the free parameters below are **our** choices, as the doc allows.
+All 5 minigames run at 3 escalating stages (`-d 1|2|3`). The command set and the free parameters below are **our** choices, as the doc allows. The **Scoring Game** is the sixth entry on the Travel Log's minigame page; it has no stages and its own rules, described under [Scoring Game](#scoring-game-miopoints).
 
 **Vasebreaker** — no plant selection, no sky sun; everything comes from vases. Win by clearing all vases and surviving whatever came out of them.
 
