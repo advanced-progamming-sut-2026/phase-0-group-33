@@ -46,6 +46,15 @@ public class Sun {
         return new Sun(kind, x, y, FALL_TICKS, kind.getValue(), false);
     }
 
+    public static Sun restored(SunKind kind, int x, int y, int ticksToLand,
+                              int value, boolean producedByPlant) {
+        return new Sun(kind, x, y, ticksToLand, value, producedByPlant);
+    }
+
+    public int getTicksToLand() {
+        return ticksToLand;
+    }
+
     public static Sun produced(int x, int y, int value) {
         return new Sun(SunKind.NORMAL, x, y, 0, value, true);
     }

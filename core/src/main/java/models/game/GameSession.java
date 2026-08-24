@@ -115,6 +115,9 @@ public class GameSession {
     }
 
     private boolean skyEnabled() {
+        if (isDuel()) {
+            return true;
+        }
         if (getMode() != GameMode.ADVENTURE && getMode() != GameMode.SCORING
                 && getMode() != GameMode.ZOMBOTANY) {
             return false;
@@ -758,5 +761,9 @@ public class GameSession {
 
     public double getDamageFactor() {
         return difficulty() / 3.0;
+    }
+
+    public boolean isDuel() {
+        return setup.isDuel();
     }
 }

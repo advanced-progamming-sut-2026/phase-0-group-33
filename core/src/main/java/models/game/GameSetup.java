@@ -20,6 +20,7 @@ public class GameSetup {
     private final int difficultyTier;
     private final List<ZombieType> zombiePoolOverride;
     private final Map<String, Integer> plantLevels;
+    private boolean duel;
 
     private GameSetup(User user, Level level, GameMode mode, List<String> unlockedPlants,
                       int plantFoods, long seed, int difficultyTier,
@@ -51,6 +52,17 @@ public class GameSetup {
                                     Map<String, Integer> plantLevels) {
         return new GameSetup(user, null, GameMode.SCORING, unlockedPlants, 0,
                 LocalDate.now().toEpochDay(), 3, basicPool(), plantLevels);
+    }
+
+    public static GameSetup duel(User user, List<String> unlockedPlants, long seed) {
+        GameSetup setup = new GameSetup(user, null, GameMode.I_ZOMBIE, unlockedPlants, 0,
+                seed, 3, basicPool(), null);
+        setup.duel = true;
+        return setup;
+    }
+
+    public boolean isDuel() {
+        return duel;
     }
 
     public static GameSetup minigame(User user, GameMode mode, List<String> unlockedPlants,

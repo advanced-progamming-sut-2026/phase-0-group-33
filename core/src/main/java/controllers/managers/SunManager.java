@@ -137,4 +137,9 @@ public class SunManager {
     public void setSunBalance(int amount) {
         this.sunBalance = Math.max(0, amount);
     }
+
+    public void syncSuns(List<Sun> replacement) {
+        suns.clear();
+        suns.addAll(replacement);
+    }
 }

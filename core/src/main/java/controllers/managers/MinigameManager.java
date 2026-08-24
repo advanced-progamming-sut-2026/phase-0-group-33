@@ -124,6 +124,9 @@ public class MinigameManager {
         for (int i = 0; i < 5; i++) {
             izombieTypes.add(I_ZOMBIE_ROSTER.get((start + i) % I_ZOMBIE_ROSTER.size()));
         }
+        if (session.isDuel()) {
+            return;
+        }
         List<PlantType> defenders = List.of(PlantType.PEASHOOTER, PlantType.SNOW_PEA,
                 PlantType.WALL_NUT, PlantType.CABBAGE_PULT, PlantType.BONK_CHOY,
                 PlantType.POTATO_MINE);
@@ -332,6 +335,9 @@ public class MinigameManager {
         }
         if (!brains) {
             session.winGame();
+            return;
+        }
+        if (session.isDuel()) {
             return;
         }
         boolean attackers = false;
