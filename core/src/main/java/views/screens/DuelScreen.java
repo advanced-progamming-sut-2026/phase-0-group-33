@@ -202,7 +202,7 @@ public class DuelScreen extends ScreenAdapter {
         Table holder = new Table();
         holder.setFillParent(true);
         holder.bottom().padBottom(8f);
-        holder.add(new ReactionBar(skin, this::react));
+        holder.add(new ReactionBar(skin, art, this::react));
         return holder;
     }
 

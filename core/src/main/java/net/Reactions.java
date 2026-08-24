@@ -12,7 +12,7 @@ public final class Reactions {
         "Well played.",
     };
 
-    private static final String[] FACES = {"😄", "😱", "🔥"};
+    private static final String[] FACES = {"Nice one!", "Brains!", "Boom!"};
 
     private static final String[] STICKERS = {"Sunflower", "Peashooter", "Normal"};
 

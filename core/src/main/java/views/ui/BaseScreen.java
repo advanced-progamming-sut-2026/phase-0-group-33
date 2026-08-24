@@ -46,6 +46,10 @@ public abstract class BaseScreen extends ScreenAdapter {
         this.watch = new views.multiplayer.LobbyWatch(stage, skin, router, toasts);
     }
 
+    public com.badlogic.gdx.scenes.scene2d.Stage stage() {
+        return stage;
+    }
+
     protected abstract String title();
 
     protected abstract void buildContent(Table body);

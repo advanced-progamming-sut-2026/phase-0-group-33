@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -22,7 +23,7 @@ public final class NetClient {
 
     private static final NetClient INSTANCE = new NetClient();
 
-    private final Map<Long, SynchronousQueue<Packet>> pending = new ConcurrentHashMap<>();
+    private final Map<Long, BlockingQueue<Packet>> pending = new ConcurrentHashMap<>();
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();
     private final AtomicLong nextId = new AtomicLong(1);
 
@@ -96,7 +97,7 @@ public final class NetClient {
         if (thread != null) {
             thread.interrupt();
         }
-        for (SynchronousQueue<Packet> queue : pending.values()) {
+        for (BlockingQueue<Packet> queue : pending.values()) {
             queue.offer(Packet.of(Protocol.MESSAGE).put(Protocol.OK, false)
                     .put(Protocol.MESSAGE, "The connection to the server was lost."));
         }
@@ -128,7 +129,7 @@ public final class NetClient {
     private void deliver(Packet packet) {
         long id = packet.big(Protocol.REQ, 0);
         if (id > 0) {
-            SynchronousQueue<Packet> queue = pending.remove(id);
+            BlockingQueue<Packet> queue = pending.remove(id);
             if (queue != null) {
                 queue.offer(packet);
                 return;
@@ -145,7 +146,7 @@ public final class NetClient {
             return fail("You are not connected to the server.");
         }
         long id = nextId.getAndIncrement();
-        SynchronousQueue<Packet> queue = new SynchronousQueue<>();
+        BlockingQueue<Packet> queue = new ArrayBlockingQueue<>(1);
         pending.put(id, queue);
         try {
             open.send(packet.put(Protocol.REQ, id));
