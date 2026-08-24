@@ -88,6 +88,20 @@ public final class Packet {
         return items;
     }
 
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> maps(String key) {
+        Object value = body.get(key);
+        List<Map<String, Object>> items = new ArrayList<>();
+        if (value instanceof List) {
+            for (Object item : (List<Object>) value) {
+                if (item instanceof Map) {
+                    items.add((Map<String, Object>) item);
+                }
+            }
+        }
+        return items;
+    }
+
     public String encode() {
         StringBuilder text = new StringBuilder();
         text.append('{');
