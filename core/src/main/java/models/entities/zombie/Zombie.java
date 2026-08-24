@@ -16,6 +16,7 @@ public class Zombie {
     private int frozenTicks;
     private int spawnWave;
     private final ZombieBattleState battle = new ZombieBattleState();
+    private long netId;
 
     public Zombie(ZombieType type, Position position, int health, double speed) {
         this.type = type;
@@ -124,4 +125,12 @@ public class Zombie {
         this.speed = speed;
     }
 
+
+    public long getNetId() {
+        return netId;
+    }
+
+    public void setNetId(long netId) {
+        this.netId = netId;
+    }
 }

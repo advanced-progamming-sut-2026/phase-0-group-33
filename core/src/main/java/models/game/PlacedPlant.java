@@ -188,4 +188,8 @@ public class PlacedPlant {
     public boolean isDisabled() {
         return iceHealth > 0 || octopusHealth > 0 || sheep;
     }
+
+    public void setPlantFoodTicks(int plantFoodTicks) {
+        this.plantFoodTicks = plantFoodTicks;
+    }
 }

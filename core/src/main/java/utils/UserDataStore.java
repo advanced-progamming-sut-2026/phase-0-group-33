@@ -24,6 +24,11 @@ public class UserDataStore {
         CACHE.remove(username);
     }
 
+    public synchronized void reload() {
+        values.clear();
+        load();
+    }
+
     private void load() {
         for (String line : FileStore.readLines(fileName)) {
             int sep = line.indexOf('=');
@@ -33,7 +38,7 @@ public class UserDataStore {
         }
     }
 
-    public void save() {
+    public synchronized void save() {
         List<String> lines = new ArrayList<>();
         for (Map.Entry<String, String> entry : values.entrySet()) {
             lines.add(entry.getKey() + "=" + entry.getValue());
@@ -41,11 +46,11 @@ public class UserDataStore {
         FileStore.writeLines(fileName, lines);
     }
 
-    public String get(String key, String defaultValue) {
+    public synchronized String get(String key, String defaultValue) {
         return values.getOrDefault(key, defaultValue);
     }
 
-    public int getInt(String key, int defaultValue) {
+    public synchronized int getInt(String key, int defaultValue) {
         try {
             return Integer.parseInt(values.getOrDefault(key, String.valueOf(defaultValue)));
         } catch (NumberFormatException e) {
@@ -53,7 +58,7 @@ public class UserDataStore {
         }
     }
 
-    public long getLong(String key, long defaultValue) {
+    public synchronized long getLong(String key, long defaultValue) {
         try {
             return Long.parseLong(values.getOrDefault(key, String.valueOf(defaultValue)));
         } catch (NumberFormatException e) {
@@ -61,29 +66,33 @@ public class UserDataStore {
         }
     }
 
-    public void set(String key, String value) {
-        values.put(key, value);
+    public synchronized void set(String key, String value) {
+        if (value == null) {
+            values.remove(key);
+        } else {
+            values.put(key, value);
+        }
     }
 
-    public void setInt(String key, int value) {
+    public synchronized void setInt(String key, int value) {
         values.put(key, String.valueOf(value));
     }
 
-    public void setLong(String key, long value) {
+    public synchronized void setLong(String key, long value) {
         values.put(key, String.valueOf(value));
     }
 
-    public void remove(String key) {
+    public synchronized void remove(String key) {
         values.remove(key);
     }
 
-    public int addInt(String key, int delta) {
+    public synchronized int addInt(String key, int delta) {
         int updated = Math.max(0, getInt(key, 0) + delta);
         setInt(key, updated);
         return updated;
     }
 
-    public Map<String, String> getAll() {
+    public synchronized Map<String, String> getAll() {
         return new LinkedHashMap<>(values);
     }
 }

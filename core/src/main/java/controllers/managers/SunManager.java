@@ -133,4 +133,8 @@ public class SunManager {
         sunBalance -= amount;
         return true;
     }
+
+    public void setSunBalance(int amount) {
+        this.sunBalance = Math.max(0, amount);
+    }
 }

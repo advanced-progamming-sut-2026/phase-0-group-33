@@ -31,6 +31,7 @@ public class Projectile {
     private boolean fromZombie;
     private int pierceLeft = Integer.MAX_VALUE;
     private boolean lit;
+    private long netId;
 
     public Projectile(PlantType source, Motion motion, int row, double originX,
                       double targetX, int direction) {
@@ -108,6 +109,16 @@ public class Projectile {
         this.x = originX + (targetX - originX) * flight;
     }
 
+    public void syncFlight(double flight, double x, double lane) {
+        this.flight = flight;
+        this.x = x;
+        this.lane = lane;
+    }
+
+    public void syncLit(boolean lit) {
+        this.lit = lit;
+    }
+
     public double getHeight() {
         if (motion != Motion.LOB) {
             return 0;
@@ -151,5 +162,13 @@ public class Projectile {
         if (pierceLeft != Integer.MAX_VALUE) {
             pierceLeft--;
         }
+    }
+
+    public long getNetId() {
+        return netId;
+    }
+
+    public void setNetId(long netId) {
+        this.netId = netId;
     }
 }

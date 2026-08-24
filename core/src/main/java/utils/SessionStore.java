@@ -4,16 +4,17 @@ import java.util.List;
 
 public final class SessionStore {
     private static final String SESSION_FILE = "session.txt";
+    private static final Storage DEVICE = new LocalStorage();
 
     private SessionStore() {
     }
 
     public static void saveSession(String username) {
-        FileStore.writeLines(SESSION_FILE, List.of(username));
+        DEVICE.writeLines(SESSION_FILE, List.of(username));
     }
 
     public static String loadSession() {
-        List<String> lines = FileStore.readLines(SESSION_FILE);
+        List<String> lines = DEVICE.readLines(SESSION_FILE);
         if (lines.isEmpty() || lines.get(0).isBlank()) {
             return null;
         }
@@ -21,6 +22,6 @@ public final class SessionStore {
     }
 
     public static void clearSession() {
-        FileStore.delete(SESSION_FILE);
+        DEVICE.delete(SESSION_FILE);
     }
 }
