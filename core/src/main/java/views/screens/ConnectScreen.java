@@ -30,8 +30,13 @@ public class ConnectScreen extends BaseScreen {
     }
 
     @Override
+    protected boolean showsHeader() {
+        return false;
+    }
+
+    @Override
     protected ScreenId backTarget() {
-        return ScreenId.CONNECT;
+        return null;
     }
 
     @Override
