@@ -4,7 +4,7 @@
 
 **A full remake of PopCap's lawn defence, built from scratch in Java with libGDX.**
 
-Four chapters · 69 plants · 38 zombies · 4 Zomboss fights · 6 minigames · a Zen Garden · a full sandbox · every frame driven by the game's original PAM animations.
+Four chapters · 69 plants · 38 zombies · 4 Zomboss fights · 6 minigames · a Zen Garden · a full sandbox · a networked two-player duel · every frame driven by the game's original PAM animations.
 
 [![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
 [![libGDX](https://img.shields.io/badge/libGDX-1.13.1-E74C3C?style=flat-square)](https://libgdx.com/)
@@ -35,10 +35,12 @@ Four chapters · 69 plants · 38 zombies · 4 Zomboss fights · 6 minigames · a
 [Boss Fights](#boss-fights) ·
 [Minigames](#minigames) ·
 [Between Battles](#between-battles) ·
-[The Sandbox](#the-sandbox)
+[The Sandbox](#the-sandbox) ·
+[Playing Together](#playing-together)
 
 **Part II — The Code**
 [Architecture](#architecture) ·
+[The Server](#the-server) ·
 [The Graphics Pipeline](#the-graphics-pipeline) ·
 [Sound](#sound) ·
 [Build & Code Quality](#build--code-quality) ·
@@ -84,6 +86,14 @@ Four chapters · 69 plants · 38 zombies · 4 Zomboss fights · 6 minigames · a
 <td width="50%"><img src="docs/screenshots/08-zen-garden.jpg" alt="Zen Garden"><br><sub><b>Zen Garden</b> — six beds on real clocks. Plants live here between battles, animate in their pots, and pay out every time you water them.</sub></td>
 <td width="50%"><img src="docs/screenshots/09-sandbox.jpg" alt="Sandbox"><br><sub><b>Sandbox</b> — any chapter, free everything, no waves. Plant, drop zombies, paint terrain, fire chapter events, freeze time mid-scenario.</sub></td>
 </tr>
+<tr>
+<td width="50%"><img src="docs/screenshots/10-versus.jpg" alt="Versus lobby"><br><sub><b>Versus lobby</b> — challenge somebody by name, see who is online, or drop into the queue and let the server pair you.</sub></td>
+<td width="50%"><img src="docs/screenshots/11-duel.jpg" alt="Networked duel"><br><sub><b>The duel</b> — the zombie player's half of a live match. Both screens show the same lawn to the tick; only the tray, the sun and the reaction corner differ.</sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/screenshots/12-couch.jpg" alt="Couch play"><br><sub><b>Couch play</b> — the same duel on one machine. Plants on the mouse, zombies on the keyboard, a green square showing where the horde will land.</sub></td>
+<td width="50%"><img src="docs/screenshots/04-battle.jpg" alt="Egypt battle"><br><sub><b>Ancient Egypt</b> — a melon in flight, torchwood lighting the peas, a gravestone coming apart and the wave meter filling.</sub></td>
+</tr>
 </table>
 
 ---
@@ -92,22 +102,42 @@ Four chapters · 69 plants · 38 zombies · 4 Zomboss fights · 6 minigames · a
 
 You need **JDK 21**. Nothing else — Gradle fetches the rest.
 
+The game is a network client, so **start the server first**. It keeps every account and
+every save, and it referees the two-player duels.
+
 ```bash
-./gradlew :lwjgl3:run          # Linux / macOS
-gradlew.bat :lwjgl3:run        # Windows
+./gradlew :server:run
+```
+
+Then, in a second terminal, start the game:
+
+```bash
+./gradlew :lwjgl3:run
+```
+
+On Windows use `gradlew.bat` for both. The game looks for a server on `127.0.0.1:7331`;
+if it cannot find one it opens a **Connect** screen where you can type a different host
+and port. To play against somebody on your network, they run the game and point it at
+your machine's address — one server, as many clients as you like.
+
+```bash
+./gradlew :server:run --args="9000"
 ```
 
 **First run:** create an account on the sign-up screen, pick a security question, log in.
-In a hurry? The main menu has an **Unlock everything** button that opens all chapters,
-levels and plants at max level, and tops up your wallet.
+Your account lives on the server, so the same username and password works from any
+machine and brings your coins, gems and progress with it. In a hurry? The main menu has
+an **Unlock everything** button that opens all chapters, levels and plants at max level.
 
-**Packaging a jar:**
+**Packaging jars:**
 
 ```bash
 ./gradlew :lwjgl3:jar          # -> lwjgl3/build/libs/group-33-1.0.jar
+./gradlew :server:jar          # -> server/build/libs/server-1.0.jar
 ```
 
-**In IntelliJ:** open the repo root as a **Gradle** project, then run `Lwjgl3Launcher`.
+**In IntelliJ:** open the repo root as a **Gradle** project, then run `ServerMain`
+followed by `Lwjgl3Launcher`.
 
 ---
 
@@ -146,7 +176,7 @@ ratio, ultrawide included.
 <td align="center"><b>8</b><br><sub>special level types</sub></td>
 <td align="center"><b>6</b><br><sub>minigames</sub></td>
 <td align="center"><b>4</b><br><sub>Zomboss fights</sub></td>
-<td align="center"><b>17</b><br><sub>screens</sub></td>
+<td align="center"><b>20</b><br><sub>screens</sub></td>
 </tr>
 </table>
 
@@ -269,13 +299,78 @@ and repaint the ground before releasing it.
 
 ---
 
+## Playing Together
+
+The adventure is a solo game, so it stays solo. **I, Zombie** is the one mode that opens
+up: it becomes a real duel where one player grows the garden and the other raises the
+horde, over the network or side by side on one machine.
+
+Reach it from the **Versus** tile on the main menu, or the *2 players* button on the
+I, Zombie row of the Travel Log.
+
+### Finding an opponent
+
+| Choice | What happens |
+|--------|--------------|
+| **Challenge a player** | Type a username. If it does not exist, or that player is offline, you are told so. If they are online, a pop-up appears **on their screen** and they accept or decline; accepting drops you both straight onto the lawn |
+| **Random opponent** | You join a queue. If somebody is already waiting you start immediately; otherwise you wait until the next player asks for a game |
+| **Couch play** | No network at all — both players share one keyboard and one mouse |
+
+The lobby also lists everybody currently signed in, with an **Invite** button beside each
+name, so you rarely have to type anything.
+
+### The duel
+
+The lawn starts **empty** and the clock starts at **2:00**.
+
+- **The plant player** works exactly as in the main game: sun falls from the sky, a
+  sunflower makes more, and eight plants are on the tray — Sunflower, Peashooter,
+  Wall-nut, Snow Pea, Repeater, Cabbage-pult, Potato Mine and Chomper.
+- **The zombie player** opens with 200 sun, earns 25 more every two seconds, and drops
+  from a roster of five — Normal, Imp, Cone Head, Prospector and Bucket Head — anywhere
+  right of the red line. Each type recharges on its own timer.
+
+| Side | Wins by |
+|------|---------|
+| 🧟 **Zombies** | Eating all five brains |
+| 🌻 **Plants** | Keeping at least one brain alive until the buzzer |
+
+An undefended lawn falls in about **70 seconds**, so the plant player cannot idle and the
+zombie player cannot dawdle. Neither player can touch the other's forces.
+
+### Reactions
+
+Nine of them, sent from the bar under the lawn and shown in the corner of your opponent's
+screen for a few seconds with the sender's name:
+
+| Kind | What you can send |
+|------|-------------------|
+| 💬 **Messages** | "Good luck out there!" · "Is that the best you have?" · "Well played." |
+| 🎨 **Icons** | Sun · Brain · Pea, each with a short line |
+| ✨ **Animated stickers** | Dancing Sunflower · Cheering Peashooter · Taunting Zombie — real PAM animations, not pictures |
+
+### Couch play
+
+The same duel, the same rules, one machine:
+
+| Player | Controls |
+|--------|----------|
+| 🌻 **Player 1** | The **mouse** — click a seed packet, click a tile, click falling sun |
+| 🧟 **Player 2** | The **keyboard** — `1`–`5` pick a zombie, `W A S D` move the drop square, `Space` drops it |
+
+Player 2's target tile is drawn on the lawn as a green square, so both players can see
+what is about to happen.
+
+---
+
 # Part II — The Code
 
 ## Architecture
 
 A Gradle multi-module build. `core` holds every rule and every pixel; `lwjgl3` is a
-twenty-two-line launcher. The logic layer knows nothing about libGDX-the-backend, so the
-same rules already drive two different front-ends — the graphical game and the parked CLI.
+twenty-two-line launcher; `server` is a headless program that owns the data and referees
+the duels. The logic layer knows nothing about libGDX-the-backend, so the same rules
+drive three front-ends — the graphical game, the server, and the parked CLI.
 
 ```
 group-33/
@@ -294,13 +389,21 @@ group-33/
 │       │   │                   ChapterEnvironment · PlantFoodEffects · ShotPatterns
 │       │   └── menuControllers/ one controller per screen
 │       ├── views/
-│       │   ├── screens/        17 scene2d screens, incl. Sandbox · SandboxSetup · ZenGarden
+│       │   ├── screens/        20 scene2d screens, incl. Connect · Multiplayer ·
+│       │   │                   Duel · Couch · Sandbox · ZenGarden
 │       │   ├── battle/         LawnView · EntityAnimator · Lawn · ConveyorBar · Dialogue ·
 │       │   │                   WaveMeter · ScoreMeter · PlantFoodBank · Overlay
+│       │   ├── multiplayer/    LobbyWatch · ReactionBar · ReactionPop · ReactionArt
 │       │   ├── assets/         Art · Animations · AnimationCatalog · Audio
 │       │   └── ui/             skin, reusable widgets, Display (fullscreen)
+│       ├── net/                the wire: Packet · Connection · NetClient · Online ·
+│       │                       MatchSnapshot · RemoteStorage · Protocol · Reactions
 │       ├── database/           flat-file DAOs
-│       └── utils/              FileStore · UserDataStore · SessionStore · PasswordHasher
+│       └── utils/              FileStore (pluggable) · LocalStorage · UserDataStore ·
+│                               DeviceSettings · SessionStore · PasswordHasher
+├── server/                     headless referee and system of record
+│   └── src/main/java/server/   GameServer · ClientSession · AccountService ·
+│                               StorageService · LeaderboardService · Matchmaker · Match
 ├── lwjgl3/                     desktop launcher (LWJGL3 backend)
 ├── assets/                     3 031 tracked files — atlases, PAM animations, skin, data
 ├── tools/build_atlases.py      turns the game's RESOURCES.json into libGDX atlases
@@ -321,6 +424,92 @@ to draw. It diffs health to flash damage, diffs cooldowns to trigger attack clip
 positions to spawn storms, diffs the plant list to puff a cloud of dirt where something
 was just planted, and diffs the zombie list to lay down a corpse — or a pile of ash, if a
 blast went off nearby. No controller ever calls a view method.
+
+---
+
+## The Server
+
+Phase 3 turned the game into a client-server program. Two ideas did most of the work.
+
+### One chokepoint for data
+
+Every read and write in the whole codebase already went through **one class**,
+`utils.FileStore` — six static methods, and nothing else in `core` ever touched
+`java.nio.file`. So `FileStore` grew a pluggable backend:
+
+```
+                       ┌── LocalStorage ──► data/ on disk        (the server uses this)
+FileStore.useBackend() ┤
+                       └── RemoteStorage ─► FILE_READ/WRITE/... ► the server  (the client)
+```
+
+The moment a client signs in, its `FileStore` starts talking to the server instead of the
+disk. **Nothing else changed.** Accounts, coins, gems, plant levels, seed packets, quest
+progress, greenhouse pots, Zen Garden beds, news and the leaderboard all became
+server-side in one stroke, because they were already files and the file layer moved.
+
+The only thing left on the client is `data/device.properties` — which server to talk to,
+and the token that remembers your sign-in. Sign in from another machine and everything
+comes with you.
+
+Writes are queued on a background thread and answered from a local cache, so clicking sun
+never waits for a round trip; reads that must be fresh (the leaderboard, score
+submission) flush the queue first.
+
+### One simulation, not two
+
+The spec asks for the two clients to show the same lawn at every moment. Two independent
+simulations drifting apart is the classic way that goes wrong, so there is only ever
+**one** simulation: the server runs the real `GameSession` — the same class, the same
+managers, the same 10-tick-per-second clock as single player — and broadcasts what
+happened.
+
+```
+client intent ──► server ──► GameSession.advanceTime(1) ──► snapshot ──┬──► client A
+ "plant here"      (authority, 10 Hz)                                  └──► client B
+```
+
+This is possible because the model layer has **no libGDX imports at all**, so the server
+can depend on `core` and run it headless.
+
+A snapshot is every plant, zombie, projectile, sun and brain, written as compact
+semicolon-separated rows — a busy lawn is a couple of kilobytes at 10 Hz. The client does
+not rebuild its world from each one; `MatchSnapshot.apply` **reconciles** it, matching
+plants by tile and zombies and shots by a network id, so the same Java object survives
+from tick to tick. That matters because `LawnView` decides what to animate by diffing
+those objects — reconciling instead of replacing is what keeps deaths, bites, shots and
+splats animating and sounding exactly as they do in single player.
+
+Armour is a decorator chain with private state, so it is not sent field by field. The
+snapshot carries the total, and the client recreates the zombie through the ordinary
+`ZombieFactory` and applies the missing damage — `takeDamage` then cascades through the
+cone, bucket or sarcophagus exactly as it did on the server, reproducing the split for
+free.
+
+### The wire
+
+Line-delimited JSON over a plain TCP socket; one object per line, one line per message.
+Requests carry an id and the matching reply carries it back, so a blocking call and a
+server push share the same stream without confusing each other.
+
+| Group | Messages |
+|-------|----------|
+| **Accounts** | `signup` (validate, then finish) · `login` (password or resume token) · `logout` · `security-question` · `reset-password` · `who` |
+| **Storage** | `file-read` · `file-write` · `file-list` · `file-rename` · `file-delete` · `file-exists` |
+| **Scores** | `leaderboard` · `submit-score` |
+| **Matchmaking** | `invite` · `invite-offer` · `invite-answer` · `invite-cancelled` · `queue-join` · `queue-leave` |
+| **In match** | `match-start` · `match-state` · `match-intent` · `match-over` · `match-leave` · `reaction` · `reaction-in` |
+
+Passwords are hashed before they leave the client's `PasswordHasher`… and again on the
+server, which never stores a plaintext password or a plaintext resume token. File names
+are checked against a whitelist pattern, so a client cannot ask for anything outside the
+shapes the game actually uses, and only the `users` folder can be listed.
+
+### Duel rules live in one place
+
+`models.game.DuelRules` holds the round length, the two economies, the rosters and the
+placement checks. The server's `Match` uses it and so does couch play, so the two modes
+cannot drift apart — a balance change lands in both at once.
 
 ---
 
@@ -400,9 +589,11 @@ each one, is in [`assets/AUDIO/README.txt`](assets/AUDIO/README.txt).
 | Task | What it does |
 |------|--------------|
 | `./gradlew build` | Compiles every module |
+| `./gradlew :server:run` | Starts the server (do this first) |
 | `./gradlew :lwjgl3:run` | Compiles and starts the game |
 | `./gradlew lint` | Runs **Checkstyle + PMD** over `core` |
 | `./gradlew :lwjgl3:jar` | Fat jar into `lwjgl3/build/libs/` |
+| `./gradlew :server:jar` | Fat jar into `server/build/libs/` |
 
 The rulesets in `config/` mirror exactly the Checkstyle and PMD rules named in the course
 document: naming conventions, line length ≤ 120, method length ≤ 50, unused imports,
@@ -415,7 +606,8 @@ zombie ability table. Each is a cohesive unit of one kind of thing, and we judge
 splitting working, verified code purely to satisfy a size metric to be the worse trade.
 Reports land in `core/build/reports/{checkstyle,pmd}/main.html`.
 
-The linters run on `core` only; `lwjgl3` is launcher boilerplate.
+The linters run on `core` only; `lwjgl3` is launcher boilerplate and `server` is thin
+glue over rules that already live in `core`.
 
 ---
 
@@ -436,7 +628,11 @@ find the rest, ran them against the real game, then deleted them.
 | **Quest audit** | All 20 quests forced to their completion condition, then checked for the right payout, the right one-shot behaviour, and correct daily reset | 0 failures |
 | **Sandbox fuzzer** | 40 randomised sandbox sessions: random chapters, random plant and zombie placement, terrain repainting under live entities, every event fired at every moment, freeze toggled mid-frame | 0 exceptions |
 | **Sound audit** | Every cue name unique, lowercase and file-safe; every cue documented; nothing played that isn't declared; and a busy Dark Ages level recorded to see which cues actually fire (13 of them, in 15 seconds) | Found planting that made no sound |
-| **Screen regression** | All 17 menus, the sandbox in all 4 chapters, plus 16 full battles (10 adventure levels, 6 minigames) launched, played and screenshotted | 0 exceptions |
+| **Two-client duel** | Two real game clients, two windows, one server: sign up, invite, accept the pop-up **through the UI**, both roles played, both snapshots compared field by field | Identical lawns on both screens |
+| **Duel outcomes** | Both endings driven to completion — an undefended lawn losing all five brains, and a full 120-second round expiring with brains alive | Correct winner both times |
+| **Matchmaking** | Random queue with three players, queue leaving, and every invite error: unknown name, yourself, an offline player, a player already in a match | 0 failures |
+| **Device independence** | Signed up and earned currency on one machine, then signed in from a second machine that had never seen the account | Same coins, gems and progress |
+| **Screen regression** | All 17 menus, couch play, the sandbox in all 4 chapters, plus 16 full battles (10 adventure levels, 6 minigames) launched, played and screenshotted **against a live server** | 0 exceptions |
 
 The fuzzers earned their keep: the shop's price arithmetic overflowed on a large enough
 purchase count, which made the "can you afford it?" check pass on a negative number and
@@ -453,22 +649,27 @@ plant-appeared diff fixed all four at once.
 ## Data & Persistence
 
 Plain UTF-8 text files, no database engine, human-readable and easy to inspect during
-marking. Everything lives in a `data/` folder beside the working directory — during
-development that is `assets/data/` (git-ignored); a packaged jar writes next to itself.
-The read-only seed data the game ships with (`plants.csv`, `zombies.xlsx`) lives in
+marking. **The server owns all of it** — the folder sits beside wherever you started the
+server, and the server prints the absolute path on the first line of its log. The
+read-only seed data the game ships with (`plants.csv`, `zombies.xlsx`) lives in
 `core/src/main/java/database/csv/`.
 
 ```
-data/
+data/                             on the SERVER
 ├── users/<username>.properties   account, wallet, difficulty, security question
 ├── user_<username>.properties    per-user progress: chapters, plant levels, packets,
 │                                 greenhouse pots, Zen Garden beds, quest state,
-│                                 preferences
+│                                 the online record, the resume token, preferences
 └── news_<username>.txt           the news feed
+
+data/                             on each CLIENT
+└── device.properties             which server to talk to, and this device's resume token
 ```
 
-Usernames are validated before they ever touch a path, so nothing outside `data/` is
-reachable. Passwords are stored as SHA-256 hashes, never plaintext.
+That split is the point of the phase: nothing about *you* is stored on the machine you
+happen to be sitting at. Usernames are validated before they ever touch a path, requested
+file names are matched against a whitelist, and passwords and resume tokens are stored as
+SHA-256 hashes, never plaintext.
 
 ---
 
