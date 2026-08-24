@@ -22,9 +22,14 @@ public final class Match {
 
     public static final int ROUND_SECONDS = 120;
     private static final int TICK_MILLIS = 1000 / GameSession.TICKS_PER_SECOND;
-    private static final int ZOMBIE_SUN_EVERY = 45;
-    private static final int ZOMBIE_SUN_AMOUNT = 50;
-    private static final int ZOMBIE_START_SUN = 175;
+    private static final int ZOMBIE_SUN_EVERY = 20;
+    private static final int ZOMBIE_SUN_AMOUNT = 25;
+    private static final int ZOMBIE_START_SUN = 200;
+
+    private static final PlantType[] DUEL_PLANTS = {
+        PlantType.SUNFLOWER, PlantType.PEASHOOTER, PlantType.WALL_NUT, PlantType.SNOW_PEA,
+        PlantType.REPEATER, PlantType.CABBAGE_PULT, PlantType.POTATO_MINE, PlantType.CHOMPER,
+    };
 
     private final long id;
     private final ClientSession planter;
@@ -57,6 +62,9 @@ public final class Match {
             plants.add(type.getName());
         }
         GameSession fresh = new GameSession(GameSetup.duel(user, plants, id));
+        for (PlantType type : DUEL_PLANTS) {
+            fresh.addPlantToSelection(type.getName());
+        }
         fresh.startGame();
         return fresh;
     }
@@ -80,9 +88,13 @@ public final class Match {
             names.add(type.getName());
             costs.add(type.getWaveCost());
         }
+        List<Object> seeds = new ArrayList<>();
+        for (PlantType type : DUEL_PLANTS) {
+            seeds.add(type.getName());
+        }
         return Packet.of(Protocol.MATCH_START).put("match", id).put("role", role)
                 .put("opponent", opponent).put("seconds", ROUND_SECONDS)
-                .put("roster", names).put("costs", costs);
+                .put("roster", names).put("costs", costs).put("seeds", seeds);
     }
 
     private void spin() {

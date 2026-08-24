@@ -38,6 +38,10 @@ public class MinigameManager {
             ZombieType.BRICK_HEAD, ZombieType.PROSPECTOR, ZombieType.DODO,
             ZombieType.KNIGHT);
 
+    private static final List<ZombieType> DUEL_ROSTER = List.of(
+            ZombieType.NORMAL, ZombieType.IMP, ZombieType.CONE_HEAD,
+            ZombieType.PROSPECTOR, ZombieType.BUCKET_HEAD);
+
     private final GameSession session;
     private final int tier;
     private final List<Vase> vases = new ArrayList<>();
@@ -58,6 +62,9 @@ public class MinigameManager {
     }
 
     public boolean startsImmediately() {
+        if (session.isDuel()) {
+            return false;
+        }
         GameMode mode = session.getMode();
         return mode == GameMode.VASEBREAKER || mode == GameMode.WALLNUT_BOWLING
                 || mode == GameMode.I_ZOMBIE || mode == GameMode.BEGHOULED
@@ -120,12 +127,13 @@ public class MinigameManager {
     }
 
     private void setUpIZombie() {
+        if (session.isDuel()) {
+            izombieTypes.addAll(DUEL_ROSTER);
+            return;
+        }
         int start = ((tier - 1) * 3) % I_ZOMBIE_ROSTER.size();
         for (int i = 0; i < 5; i++) {
             izombieTypes.add(I_ZOMBIE_ROSTER.get((start + i) % I_ZOMBIE_ROSTER.size()));
-        }
-        if (session.isDuel()) {
-            return;
         }
         List<PlantType> defenders = List.of(PlantType.PEASHOOTER, PlantType.SNOW_PEA,
                 PlantType.WALL_NUT, PlantType.CABBAGE_PULT, PlantType.BONK_CHOY,
@@ -411,6 +419,9 @@ public class MinigameManager {
     }
 
     public int zombieRechargeTicks(ZombieType type) {
+        if (session.isDuel()) {
+            return Math.max(3, type.getWaveCost() / 40) * GameSession.TICKS_PER_SECOND;
+        }
         return Math.max(5, type.getWaveCost() / 4) * GameSession.TICKS_PER_SECOND;
     }
 

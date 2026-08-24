@@ -29,7 +29,7 @@ public class PlantingManager {
         if (session.getPhase() != GamePhase.BATTLE) {
             return Result.fail("Start the game before planting.");
         }
-        if (session.getMode() == GameMode.I_ZOMBIE) {
+        if (session.getMode() == GameMode.I_ZOMBIE && !session.isDuel()) {
             return Result.fail("You command the zombies here; use 'place zombie' instead.");
         }
         PlantType type = Names.plant(typeName);
