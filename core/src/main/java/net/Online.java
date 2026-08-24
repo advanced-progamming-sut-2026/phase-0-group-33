@@ -93,6 +93,7 @@ public final class Online {
     }
 
     public void disconnect() {
+        storage.flush();
         username = null;
         storage.forget();
         utils.FileStore.useBackend(null);
@@ -165,7 +166,12 @@ public final class Online {
                 .put("answer", reply).put("password", password)));
     }
 
+    public void flush() {
+        storage.flush();
+    }
+
     public Result signOut() {
+        storage.flush();
         Packet reply = client.request(Packet.of(Protocol.LOGOUT));
         utils.DeviceSettings.clearResume();
         username = null;
@@ -216,6 +222,7 @@ public final class Online {
     }
 
     public Result submitScore(int score) {
+        storage.flush();
         Packet reply = client.request(Packet.of(Protocol.SUBMIT_SCORE).put("score", score));
         if (!reply.flag(Protocol.OK, false)) {
             return Result.fail(reply.str(Protocol.MESSAGE, "Could not send your score."));
@@ -226,6 +233,7 @@ public final class Online {
     }
 
     public List<BoardRow> leaderboard() {
+        storage.flush();
         Packet reply = client.request(Packet.of(Protocol.LEADERBOARD));
         List<BoardRow> rows = new ArrayList<>();
         if (!reply.flag(Protocol.OK, false)) {

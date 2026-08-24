@@ -82,6 +82,7 @@ public class PvzGame extends Game {
 
     @Override
     public void dispose() {
+        net.Online.get().flush();
         if (getScreen() != null) {
             getScreen().dispose();
         }
