@@ -3,6 +3,7 @@ package views;
 import models.enums.Menus;
 
 public enum ScreenId {
+    CONNECT,
     SIGNUP,
     LOGIN,
     MAIN,

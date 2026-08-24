@@ -50,7 +50,6 @@ public class PvzGame extends Game {
     @Override
     public void create() {
         app = App.getInstance();
-        app.run();
 
         assets = new GameAssets();
         assets.loadFonts();
@@ -58,11 +57,27 @@ public class PvzGame extends Game {
         animations = new Animations();
         audio = new Audio();
         views.ui.Ui.setClickSound(() -> audio.play(Audio.CLICK));
-        audio.setUser(app.getCurrentUser() == null ? null : app.getCurrentUser().getUsername());
         skin = UiSkin.build(assets);
         router = new Router(this);
+        connectAtStartup();
+        audio.setUser(app.getCurrentUser() == null ? null : app.getCurrentUser().getUsername());
 
-        router.go(app.getCurrentUser() == null ? ScreenId.SIGNUP : ScreenId.MAIN);
+        router.go(startScreen());
+    }
+
+    private void connectAtStartup() {
+        net.Online.get().connect(utils.DeviceSettings.serverHost(),
+                utils.DeviceSettings.serverPort());
+        if (net.Online.get().isConnected()) {
+            app.resumeOnline();
+        }
+    }
+
+    private ScreenId startScreen() {
+        if (!net.Online.get().isConnected()) {
+            return ScreenId.CONNECT;
+        }
+        return app.getCurrentUser() == null ? ScreenId.SIGNUP : ScreenId.MAIN;
     }
 
     @Override

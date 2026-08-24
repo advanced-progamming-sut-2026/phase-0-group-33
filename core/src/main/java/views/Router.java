@@ -65,6 +65,8 @@ public final class Router {
 
     private Screen create(ScreenId id) {
         switch (id) {
+            case CONNECT:
+                return new views.screens.ConnectScreen(game);
             case SIGNUP:
                 return new SignupScreen(game);
             case LOGIN:

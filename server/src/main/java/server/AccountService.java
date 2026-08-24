@@ -9,6 +9,7 @@ import models.user.User;
 import net.Packet;
 import net.Protocol;
 import utils.PasswordHasher;
+import utils.UserDataStore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,8 @@ public final class AccountService {
 
     private static final Set<String> GUEST_ROUTES = Set.of(
             Protocol.SIGNUP, Protocol.LOGIN, Protocol.SECURITY_QUESTION, Protocol.RESET_PASSWORD);
+
+    private static final java.security.SecureRandom RANDOM = new java.security.SecureRandom();
 
     private final GameServer server;
     private final UserDAO users = new UserDAO();
@@ -125,14 +128,46 @@ public final class AccountService {
             session.deny(request, "Username does not exist.");
             return;
         }
-        if (!PasswordHasher.hash(request.str("password")).equals(user.getPasswordHash())) {
-            session.deny(request, "Incorrect password.");
+        if (!accepts(user, request)) {
+            session.deny(request, request.has("token")
+                    ? "That saved sign-in is no longer valid." : "Incorrect password.");
             return;
         }
         session.setUsername(user.getUsername());
         server.bind(user.getUsername(), session);
         Log.say(user.getUsername() + " signed in from " + session.where() + ".");
-        session.ok(request, Packet.of(request.type()).put("username", user.getUsername()));
+        session.ok(request, Packet.of(request.type()).put("username", user.getUsername())
+                .put("token", issueToken(user.getUsername())));
+    }
+
+    private boolean accepts(User user, Packet request) {
+        if (request.has("token")) {
+            String saved = tokenOf(user.getUsername());
+            String offered = request.str("token");
+            return !saved.isEmpty() && saved.equals(PasswordHasher.hash(offered));
+        }
+        return PasswordHasher.hash(request.str("password")).equals(user.getPasswordHash());
+    }
+
+    private String tokenOf(String username) {
+        UserDataStore store = UserDataStore.forUser(username);
+        store.reload();
+        return store.get("resumeToken", "");
+    }
+
+    private String issueToken(String username) {
+        byte[] raw = new byte[24];
+        RANDOM.nextBytes(raw);
+        StringBuilder text = new StringBuilder();
+        for (byte value : raw) {
+            text.append(String.format("%02x", value));
+        }
+        String token = text.toString();
+        UserDataStore store = UserDataStore.forUser(username);
+        store.reload();
+        store.set("resumeToken", PasswordHasher.hash(token));
+        store.save();
+        return token;
     }
 
     private void logout(ClientSession session, Packet request) {

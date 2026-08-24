@@ -80,6 +80,26 @@ public class App {
         restoreSession();
     }
 
+    public void resumeOnline() {
+        String username = utils.DeviceSettings.resumeUser();
+        String token = utils.DeviceSettings.resumeToken();
+        if (username.isEmpty() || token.isEmpty()) {
+            return;
+        }
+        if (!net.Online.get().resume(username, token).isSuccessfull()) {
+            utils.DeviceSettings.clearResume();
+            return;
+        }
+        User user = UserManager.getInstance().loadUser(username);
+        if (user == null) {
+            utils.DeviceSettings.clearResume();
+            return;
+        }
+        setCurrentUser(user);
+        setStayLoggedIn(true);
+        navigateTo(Menus.MAIN);
+    }
+
     private void restoreSession() {
         String username = SessionStore.loadSession();
         if (username == null) {

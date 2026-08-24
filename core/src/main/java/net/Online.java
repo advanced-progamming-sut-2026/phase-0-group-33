@@ -85,14 +85,24 @@ public final class Online {
     }
 
     public Result login(String user, String password) {
-        Packet reply = client.request(Packet.of(Protocol.LOGIN)
+        return finishLogin(user, Packet.of(Protocol.LOGIN)
                 .put("username", user).put("password", password));
+    }
+
+    public Result resume(String user, String token) {
+        return finishLogin(user, Packet.of(Protocol.LOGIN)
+                .put("username", user).put("token", token));
+    }
+
+    private Result finishLogin(String user, Packet packet) {
+        Packet reply = client.request(packet);
         if (!reply.flag(Protocol.OK, false)) {
             return Result.fail(reply.str(Protocol.MESSAGE, "Could not sign in."));
         }
         username = reply.str("username", user);
         storage.forget();
         utils.FileStore.useBackend(storage);
+        utils.DeviceSettings.setResume(username, reply.str("token", ""));
         return Result.ok("Welcome back, " + username + ".");
     }
 
@@ -120,6 +130,7 @@ public final class Online {
 
     public Result signOut() {
         Packet reply = client.request(Packet.of(Protocol.LOGOUT));
+        utils.DeviceSettings.clearResume();
         username = null;
         storage.forget();
         utils.FileStore.useBackend(null);
