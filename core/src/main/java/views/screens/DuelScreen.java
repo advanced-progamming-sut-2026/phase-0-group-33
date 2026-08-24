@@ -193,7 +193,7 @@ public class DuelScreen extends ScreenAdapter {
     private Table buildTray() {
         Table holder = new Table();
         holder.setFillParent(true);
-        holder.left().top().padTop(66f);
+        holder.left().top().padTop(78f).padBottom(6f).padLeft(4f);
         holder.add(tray).left();
         return holder;
     }
@@ -244,7 +244,7 @@ public class DuelScreen extends ScreenAdapter {
         for (int i = 0; i < roster.size(); i++) {
             Table card = slotCard(i);
             slots.add(card);
-            tray.add(card).size(104f, 92f).padBottom(3f).row();
+            tray.add(card).size(140f, 70f).padBottom(2f).row();
         }
     }
 
@@ -252,13 +252,15 @@ public class DuelScreen extends ScreenAdapter {
         final String name = roster.get(index);
         Table card = new Table(skin);
         card.setBackground(skin.getDrawable(name.equals(chosen) ? "highlight" : "card"));
-        card.pad(3f);
+        card.pad(2f, 6f, 2f, 6f);
         TextureRegion icon = iconFor(name);
         if (icon != null) {
-            card.add(Ui.iconCell(icon, 42f)).row();
+            card.add(Ui.iconCell(icon, 34f)).padRight(5f);
         }
-        card.add(Ui.label(skin, name, "muted")).row();
-        card.add(Ui.label(skin, String.valueOf(costOf(name)), "gold"));
+        Table text = new Table();
+        text.add(Ui.label(skin, name, "muted")).left().row();
+        text.add(Ui.label(skin, String.valueOf(costOf(name)), "gold")).left();
+        card.add(text).growX().left();
         Ui.hoverLift(card, 1.04f);
         Ui.onClick(card, () -> choose(name));
         return card;

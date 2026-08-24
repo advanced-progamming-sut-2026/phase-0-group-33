@@ -140,7 +140,7 @@ public class CouchScreen extends ScreenAdapter {
     private Table buildTrays() {
         Table holder = new Table();
         holder.setFillParent(true);
-        holder.padTop(64f);
+        holder.padTop(78f).padBottom(6f).padLeft(4f).padRight(4f);
         holder.add(plantTray).left().top().expand();
         holder.add(zombieTray).right().top().expand();
         return holder;
@@ -238,7 +238,7 @@ public class CouchScreen extends ScreenAdapter {
             Table card = card(art.plant(type), type.getName(), type.getCost(),
                     type == chosenPlant, () -> pickPlant(type));
             plantSlots.add(card);
-            plantTray.add(card).size(104f, 88f).padBottom(3f).row();
+            plantTray.add(card).size(132f, 70f).padBottom(2f).row();
         }
         zombieTray.clear();
         zombieSlots.clear();
@@ -248,7 +248,7 @@ public class CouchScreen extends ScreenAdapter {
             Table card = card(art.zombie(type), (i + 1) + "  " + type.getName(),
                     type.getWaveCost(), i == chosenZombie, () -> pickZombie(index));
             zombieSlots.add(card);
-            zombieTray.add(card).size(118f, 88f).padBottom(3f).row();
+            zombieTray.add(card).size(158f, 70f).padBottom(2f).row();
         }
     }
 
@@ -267,12 +267,14 @@ public class CouchScreen extends ScreenAdapter {
                        Runnable action) {
         Table card = new Table(skin);
         card.setBackground(skin.getDrawable(chosen ? "highlight" : "card"));
-        card.pad(3f);
+        card.pad(2f, 6f, 2f, 6f);
         if (icon != null) {
-            card.add(Ui.iconCell(icon, 40f)).row();
+            card.add(Ui.iconCell(icon, 34f)).padRight(5f);
         }
-        card.add(Ui.label(skin, name, "muted")).row();
-        card.add(Ui.label(skin, String.valueOf(cost), "gold"));
+        Table text = new Table();
+        text.add(Ui.label(skin, name, "muted")).left().row();
+        text.add(Ui.label(skin, String.valueOf(cost), "gold")).left();
+        card.add(text).growX().left();
         Ui.hoverLift(card, 1.04f);
         Ui.onClick(card, action);
         return card;
