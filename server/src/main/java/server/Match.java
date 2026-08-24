@@ -1,12 +1,9 @@
 package server;
 
 import models.entities.plant.PlantType;
-import models.entities.zombie.Zombie;
 import models.entities.zombie.ZombieType;
+import models.game.DuelRules;
 import models.game.GameSession;
-import models.game.GameSetup;
-import models.game.Names;
-import models.game.PlacedPlant;
 import models.user.User;
 import net.MatchSnapshot;
 import net.Packet;
@@ -14,34 +11,21 @@ import net.Protocol;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class Match {
 
-    public static final int ROUND_SECONDS = 120;
     private static final int TICK_MILLIS = 1000 / GameSession.TICKS_PER_SECOND;
-    private static final int ZOMBIE_SUN_EVERY = 20;
-    private static final int ZOMBIE_SUN_AMOUNT = 25;
-    private static final int ZOMBIE_START_SUN = 200;
-
-    private static final PlantType[] DUEL_PLANTS = {
-        PlantType.SUNFLOWER, PlantType.PEASHOOTER, PlantType.WALL_NUT, PlantType.SNOW_PEA,
-        PlantType.REPEATER, PlantType.CABBAGE_PULT, PlantType.POTATO_MINE, PlantType.CHOMPER,
-    };
 
     private final long id;
     private final ClientSession planter;
     private final ClientSession raiser;
     private final GameSession session;
-    private final Map<ZombieType, Integer> cooldowns = new ConcurrentHashMap<>();
+    private final DuelRules rules;
     private final AtomicBoolean running = new AtomicBoolean(true);
     private final List<ZombieType> roster;
     private final Runnable onFinish;
 
-    private int zombieSun = ZOMBIE_START_SUN;
-    private int ticksLeft = ROUND_SECONDS * GameSession.TICKS_PER_SECOND;
     private long counter;
     private Thread clock;
 
@@ -50,23 +34,11 @@ public final class Match {
         this.planter = planter;
         this.raiser = raiser;
         this.onFinish = onFinish;
-        this.session = build(planter.username());
-        this.roster = new ArrayList<>(session.getMinigameManager().getIzombieTypes());
-    }
-
-    private GameSession build(String owner) {
         User user = new User();
-        user.setUsername(owner);
-        List<String> plants = new ArrayList<>();
-        for (PlantType type : PlantType.values()) {
-            plants.add(type.getName());
-        }
-        GameSession fresh = new GameSession(GameSetup.duel(user, plants, id));
-        for (PlantType type : DUEL_PLANTS) {
-            fresh.addPlantToSelection(type.getName());
-        }
-        fresh.startGame();
-        return fresh;
+        user.setUsername(planter.username());
+        this.session = DuelRules.newSession(user, id);
+        this.rules = new DuelRules(session);
+        this.roster = new ArrayList<>(rules.roster());
     }
 
     public void begin() {
@@ -89,11 +61,11 @@ public final class Match {
             costs.add(type.getWaveCost());
         }
         List<Object> seeds = new ArrayList<>();
-        for (PlantType type : DUEL_PLANTS) {
+        for (PlantType type : DuelRules.PLANTS) {
             seeds.add(type.getName());
         }
         return Packet.of(Protocol.MATCH_START).put("match", id).put("role", role)
-                .put("opponent", opponent).put("seconds", ROUND_SECONDS)
+                .put("opponent", opponent).put("seconds", DuelRules.ROUND_SECONDS)
                 .put("roster", names).put("costs", costs).put("seeds", seeds);
     }
 
@@ -120,45 +92,29 @@ public final class Match {
         if (!running.get()) {
             return;
         }
-        session.advanceTime(1);
-        tickCooldowns();
-        payZombiePlayer();
+        rules.tick();
         broadcastState();
-        if (session.isOver()) {
+        if (session.isOver() || rules.brainsGone()) {
             finish(Protocol.ROLE_ZOMBIES, "Every brain was eaten.");
             return;
         }
-        if (--ticksLeft <= 0) {
+        if (rules.timeUp()) {
             finish(Protocol.ROLE_PLANTS, "The plants held the line for the full round.");
-        }
-    }
-
-    private void tickCooldowns() {
-        for (Map.Entry<ZombieType, Integer> entry : cooldowns.entrySet()) {
-            if (entry.getValue() > 0) {
-                entry.setValue(entry.getValue() - 1);
-            }
-        }
-    }
-
-    private void payZombiePlayer() {
-        if (ticksLeft % ZOMBIE_SUN_EVERY == 0) {
-            zombieSun += ZOMBIE_SUN_AMOUNT;
         }
     }
 
     private void broadcastState() {
         Packet state = MatchSnapshot.capture(session, counter);
         counter = state.big("counter", counter);
-        state.put("left", ticksLeft / GameSession.TICKS_PER_SECOND);
+        state.put("left", rules.secondsLeft());
         planter.send(state.put("mine", session.getSunManager().getSunBalance()));
-        raiser.send(state.put("mine", zombieSun).put("cool", coolRow()));
+        raiser.send(state.put("mine", rules.getSun()).put("cool", coolRow()));
     }
 
     private List<Object> coolRow() {
         List<Object> values = new ArrayList<>();
         for (ZombieType type : roster) {
-            values.add(cooldowns.getOrDefault(type, 0) / GameSession.TICKS_PER_SECOND);
+            values.add(rules.cooldownSeconds(type));
         }
         return values;
     }
@@ -188,32 +144,10 @@ public final class Match {
     }
 
     private void raiseZombie(ClientSession from, String typeName, int x, int y) {
-        ZombieType type = Names.zombie(typeName);
-        if (type == null || !roster.contains(type)) {
-            note(from, List.of("That zombie is not in your roster."));
-            return;
+        models.Result placed = rules.placeZombie(typeName, x, y);
+        if (!placed.isSuccessfull()) {
+            note(from, placed.getMessages());
         }
-        if (x < 6 || x > GameSession.COLS || y < 1 || y > GameSession.ROWS) {
-            note(from, List.of("Zombies drop right of the red line (columns 6-9)."));
-            return;
-        }
-        PlacedPlant standing = session.plantAt(x, y);
-        if (standing != null) {
-            note(from, List.of("A plant already stands on that tile."));
-            return;
-        }
-        if (cooldowns.getOrDefault(type, 0) > 0) {
-            note(from, List.of(type.getName() + " is still recharging."));
-            return;
-        }
-        if (zombieSun < type.getWaveCost()) {
-            note(from, List.of(type.getName() + " costs " + type.getWaveCost() + " sun."));
-            return;
-        }
-        zombieSun -= type.getWaveCost();
-        cooldowns.put(type, session.getMinigameManager().zombieRechargeTicks(type));
-        Zombie dropped = session.spawnZombie(type, x, y, 1);
-        dropped.getBattle().setSpawnTick(0);
     }
 
     private void note(ClientSession target, List<String> messages) {
