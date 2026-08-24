@@ -20,6 +20,9 @@ public class LeaderboardController extends BaseController {
     private static final String[] CHAPTERS = {"Egypt", "Frost Bite", "Wavey Beach", "Dark Ages"};
 
     public Result handleShowLeaderboard(String sortColumn, String order) {
+        if (net.Online.get().isSignedIn()) {
+            return onlineBoard(sortColumn, order);
+        }
         List<User> users = userDAO.getAllUsers();
         if (users.isEmpty()) {
             return Result.fail("Could not load users (is the database reachable?).");
@@ -39,6 +42,46 @@ public class LeaderboardController extends BaseController {
         result.addMessage("Sort with: show leaderboard -s "
                 + "<levels|minigames|quests|dailyquests|miopoint> -o <asc|desc>");
         return result;
+    }
+
+    private Result onlineBoard(String sortColumn, String order) {
+        List<net.BoardRow> rows = net.Online.get().leaderboard();
+        if (rows.isEmpty()) {
+            return Result.fail("The server has no players yet.");
+        }
+        rows.sort(rowOrder(sortColumn == null ? "miopoint" : sortColumn.toLowerCase(),
+                !"asc".equalsIgnoreCase(order)));
+        Result result = Result.ok(String.format("%-20s | %-10s | %-9s | %-7s | %-7s | %s",
+                "Username", "Last Level", "Minigames", "Daily Q", "Other Q", "My Point"));
+        for (net.BoardRow row : rows) {
+            result.addMessage(String.format("%-20s | %-10d | %-9d | %-7d | %-7d | %s",
+                    row.getUsername(), row.getLevels(), row.getMinigames(),
+                    row.getDailyQuests(), row.getQuests(),
+                    row.hasPoint() ? String.valueOf(row.getPoint()) : "-"));
+        }
+        return result;
+    }
+
+    private Comparator<net.BoardRow> rowOrder(String column, boolean descending) {
+        Comparator<net.BoardRow> comparator;
+        switch (column) {
+            case "levels":
+                comparator = Comparator.comparingInt(net.BoardRow::getLevels);
+                break;
+            case "minigames":
+                comparator = Comparator.comparingInt(net.BoardRow::getMinigames);
+                break;
+            case "quests":
+                comparator = Comparator.comparingInt(net.BoardRow::getQuests);
+                break;
+            case "dailyquests":
+                comparator = Comparator.comparingInt(net.BoardRow::getDailyQuests);
+                break;
+            default:
+                comparator = Comparator.comparingInt(net.BoardRow::getPoint);
+                break;
+        }
+        return descending ? comparator.reversed() : comparator;
     }
 
     private void sort(List<User> users, String column, boolean descending) {

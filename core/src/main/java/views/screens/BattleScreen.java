@@ -1252,6 +1252,10 @@ public class BattleScreen extends ScreenAdapter {
                 "h2")).padBottom(10f).row();
         if (session.getMode() == GameMode.SCORING) {
             content.add(scoreCard()).padBottom(14f).row();
+            String sent = sendScoreOnline();
+            if (!sent.isEmpty()) {
+                content.add(Ui.label(skin, sent, "good")).padBottom(12f).row();
+            }
         }
         if (won && session.getFarewell() != null) {
             Table quote = new Table();
@@ -1273,6 +1277,15 @@ public class BattleScreen extends ScreenAdapter {
         content.add(Ui.button(skin, "Back to the map", "brown", this::leave))
                 .width(300f).height(56f);
         overlay = Overlay.open(stage, skin, endTitle(won), content);
+    }
+
+    private String sendScoreOnline() {
+        if (!net.Online.get().isSignedIn()) {
+            return "You are offline, so this run did not reach the world leaderboard.";
+        }
+        models.Result sent = net.Online.get()
+                .submitScore(session.getScoreTracker().getScore());
+        return sent.getMessages().isEmpty() ? "" : sent.getMessages().get(0);
     }
 
     private String endTitle(boolean won) {

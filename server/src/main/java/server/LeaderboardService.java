@@ -16,6 +16,8 @@ public final class LeaderboardService {
 
     public static final String NET_POINT = "netPoint";
 
+    private static final String[] CHAPTERS = {"Egypt", "Frost Bite", "Wavey Beach", "Dark Ages"};
+
     private final UserDAO users = new UserDAO();
 
     public void register(Map<String, BiConsumer<ClientSession, Packet>> routes) {
@@ -38,13 +40,26 @@ public final class LeaderboardService {
         int daily = store.getInt("dailyQuestsDone", 0);
         entry.put("username", user.getUsername());
         entry.put("nickname", user.getNickname() == null ? user.getUsername() : user.getNickname());
-        entry.put("levels", store.getInt("levelsCompleted", 0));
+        entry.put("levels", completedLevels(store));
         entry.put("minigames", store.getInt("minigamesWon", 0));
         entry.put("dailyQuests", daily);
         entry.put("quests", Math.max(0, store.getInt("questsDone", 0) - daily));
         entry.put("best", user.getHighestScore());
         entry.put("point", store.getInt(NET_POINT, -1));
         return entry;
+    }
+
+    private int completedLevels(UserDataStore store) {
+        int total = 0;
+        for (String name : CHAPTERS) {
+            models.progress.chapter.Chapter chapter =
+                    models.progress.chapter.Chapter.getByName(name);
+            if (chapter != null) {
+                total += Math.min(chapter.getLevels().size(),
+                        Math.max(0, store.getInt("progress." + name, 1) - 1));
+            }
+        }
+        return total;
     }
 
     private void submit(ClientSession session, Packet request) {
