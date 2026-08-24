@@ -7,8 +7,8 @@ public final class Reactions {
     public static final String STICKER = "sticker";
 
     private static final String[] MESSAGES = {
-        "Good luck out there!",
-        "Is that the best you have?",
+        "Good luck!",
+        "Too easy!",
         "Well played.",
     };
 
@@ -18,6 +18,12 @@ public final class Reactions {
 
     private static final String[] STICKER_LABELS = {
         "Dancing Sunflower", "Cheering Peashooter", "Taunting Zombie",
+    };
+
+    private static final String[] FULL_MESSAGES = {
+        "Good luck out there!",
+        "Is that the best you have?",
+        "Well played.",
     };
 
     private Reactions() {
@@ -51,6 +57,6 @@ public final class Reactions {
         if (STICKER.equals(kind)) {
             return STICKER_LABELS[safe];
         }
-        return MESSAGES[safe];
+        return FULL_MESSAGES[safe];
     }
 }

@@ -11,8 +11,9 @@ import java.util.function.BiConsumer;
 
 public final class ReactionBar extends Table {
 
-    private static final float WIDE = 132f;
-    private static final float TALL = 38f;
+    private static final float WIDE = 116f;
+    private static final float NARROW = 56f;
+    private static final float TALL = 36f;
 
     private final Skin skin;
     private final Art art;
@@ -24,9 +25,12 @@ public final class ReactionBar extends Table {
         this.art = art;
         this.send = send;
         setBackground(skin.getDrawable("panel"));
-        pad(4f, 8f, 4f, 8f);
+        pad(4f, 10f, 4f, 10f);
+        add(Ui.label(skin, "Say", "muted")).padRight(6f);
         addMessages();
+        add(Ui.label(skin, "React", "muted")).padLeft(12f).padRight(6f);
         addFaces();
+        add(Ui.label(skin, "Sticker", "muted")).padLeft(12f).padRight(6f);
         addStickers();
     }
 
@@ -36,7 +40,7 @@ public final class ReactionBar extends Table {
             final int index = i;
             add(Ui.button(skin, lines[i], "small",
                     () -> send.accept(Reactions.TEXT, index)))
-                    .size(WIDE + 40f, TALL).padRight(3f);
+                    .size(WIDE, TALL).padRight(3f);
         }
     }
 
@@ -45,17 +49,16 @@ public final class ReactionBar extends Table {
         for (int i = 0; i < faces.length; i++) {
             final int index = i;
             add(chip(ReactionArt.face(art, i), faces[i], "row",
-                    () -> send.accept(Reactions.EMOJI, index))).size(WIDE, TALL).padLeft(3f);
+                    () -> send.accept(Reactions.EMOJI, index))).size(WIDE, TALL).padRight(3f);
         }
     }
 
     private void addStickers() {
-        String[] labels = Reactions.stickerLabels();
-        for (int i = 0; i < labels.length; i++) {
+        for (int i = 0; i < Reactions.stickers().length; i++) {
             final int index = i;
-            add(chip(ReactionArt.sticker(art, i), labels[i], "highlight",
-                    () -> send.accept(Reactions.STICKER, index))).size(WIDE + 20f, TALL)
-                    .padLeft(3f);
+            add(chip(ReactionArt.sticker(art, i), "", "highlight",
+                    () -> send.accept(Reactions.STICKER, index))).size(NARROW, TALL)
+                    .padRight(3f);
         }
     }
 
@@ -64,9 +67,11 @@ public final class ReactionBar extends Table {
         card.setBackground(skin.getDrawable(style));
         card.pad(2f, 6f, 2f, 6f);
         if (icon != null) {
-            card.add(Ui.iconCell(icon, 26f)).padRight(5f);
+            card.add(Ui.iconCell(icon, 26f)).padRight(text.isEmpty() ? 0f : 5f);
         }
-        card.add(Ui.label(skin, text, "muted")).growX().left();
+        if (!text.isEmpty()) {
+            card.add(Ui.label(skin, text, "muted")).growX().left();
+        }
         Ui.hoverLift(card, 1.05f);
         Ui.onClick(card, action);
         return card;
