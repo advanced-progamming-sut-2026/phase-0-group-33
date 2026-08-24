@@ -96,17 +96,35 @@ public final class Online {
         return Result.ok("Welcome back, " + username + ".");
     }
 
-    public Result securityQuestion(String user) {
-        Packet reply = client.request(Packet.of(Protocol.SECURITY_QUESTION).put("username", user));
+    public Result securityQuestion(String user, String email) {
+        Packet packet = Packet.of(Protocol.SECURITY_QUESTION).put("username", user);
+        if (email != null && !email.isBlank()) {
+            packet.put("email", email);
+        }
+        Packet reply = client.request(packet);
         if (!reply.flag(Protocol.OK, false)) {
             return Result.fail(reply.str(Protocol.MESSAGE, "Could not fetch the question."));
         }
         return Result.ok(reply.str("question"));
     }
 
-    public Result resetPassword(String user, String answer, String password) {
+    public Result verifyAnswer(String user, String reply) {
+        return answer(client.request(Packet.of(Protocol.RESET_PASSWORD)
+                .put("username", user).put("answer", reply)));
+    }
+
+    public Result resetPassword(String user, String reply, String password) {
         return answer(client.request(Packet.of(Protocol.RESET_PASSWORD).put("username", user)
-                .put("answer", answer).put("password", password)));
+                .put("answer", reply).put("password", password)));
+    }
+
+    public Result signOut() {
+        Packet reply = client.request(Packet.of(Protocol.LOGOUT));
+        username = null;
+        storage.forget();
+        utils.FileStore.useBackend(null);
+        events.clear();
+        return answer(reply);
     }
 
     public List<String> whoIsOnline() {

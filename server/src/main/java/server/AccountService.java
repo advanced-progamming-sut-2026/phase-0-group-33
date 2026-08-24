@@ -136,16 +136,23 @@ public final class AccountService {
     }
 
     private void logout(ClientSession session, Packet request) {
-        session.close();
+        server.unbind(session);
+        session.ok(request);
     }
 
     private void securityQuestion(ClientSession session, Packet request) {
-        SecurityQuestion question = users.getSecurityQuestion(request.str("username"));
-        if (question == null) {
-            session.deny(request, "Username does not exist.");
+        User user = users.findByUsername(request.str("username"));
+        if (user == null) {
+            session.deny(request, "User not found.");
             return;
         }
-        session.ok(request, Packet.of(request.type()).put("question", question.getQuestion()));
+        String email = request.str("email", "");
+        if (!email.isEmpty() && !email.equalsIgnoreCase(user.getEmail())) {
+            session.deny(request, "The email does not match this username.");
+            return;
+        }
+        session.ok(request, Packet.of(request.type())
+                .put("question", user.getSecurityQuestion().getQuestion()));
     }
 
     private void resetPassword(ClientSession session, Packet request) {
@@ -155,8 +162,13 @@ public final class AccountService {
             session.deny(request, "Username does not exist.");
             return;
         }
-        if (!question.getAnswer().equals(request.str("answer"))) {
-            session.deny(request, "That is not the right answer.");
+        if (!question.getAnswer().equalsIgnoreCase(request.str("answer"))) {
+            session.deny(request, "Wrong answer.");
+            return;
+        }
+        if (!request.has("password")) {
+            session.ok(request, Packet.of(request.type())
+                    .put(Protocol.MESSAGE, "Correct answer. You may now set a new password."));
             return;
         }
         String password = request.str("password");
@@ -165,7 +177,8 @@ public final class AccountService {
             return;
         }
         users.updatePassword(username, PasswordHasher.hash(password));
-        session.ok(request);
+        session.ok(request, Packet.of(request.type())
+                .put(Protocol.MESSAGE, "Password updated. You can now log in."));
     }
 
     private void who(ClientSession session, Packet request) {

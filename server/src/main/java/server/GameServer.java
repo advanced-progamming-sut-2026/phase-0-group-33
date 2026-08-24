@@ -118,6 +118,19 @@ public final class GameServer {
         }
     }
 
+    public void unbind(ClientSession session) {
+        String username = session.username();
+        if (username == null) {
+            return;
+        }
+        matchmaker.dropped(session);
+        if (signedIn.get(username) == session) {
+            signedIn.remove(username);
+        }
+        session.setUsername(null);
+        Log.say(username + " signed out.");
+    }
+
     public ClientSession findOnline(String username) {
         return username == null ? null : signedIn.get(username);
     }

@@ -15,6 +15,7 @@ public class UserManager {
     private User currentUser;
 
     private String pendingUsername;
+    private String remoteRecoveryAnswer;
     private String pendingPasswordHash;
     private String pendingNickname;
     private String pendingEmail;
@@ -39,7 +40,14 @@ public class UserManager {
         return userDAO.findByUsername(username);
     }
 
+    private static boolean online() {
+        return net.Online.get().isConnected();
+    }
+
     public Result logout() {
+        if (online()) {
+            net.Online.get().signOut();
+        }
         currentUser = null;
         Result r = new Result();
         r.setSuccess(true);
@@ -51,6 +59,9 @@ public class UserManager {
                                String nickname, String email, String gender) {
         Result result = new Result();
 
+        if (online()) {
+            return registerOnline(username, password, passwordConfirm, nickname, email, gender);
+        }
         if (!Authentication.USERNAME.matches(username)) {
             result.addMessage(Authentication.USERNAME.getErrorMessage());
             result.setSuccess(false);
@@ -98,8 +109,31 @@ public class UserManager {
         return result;
     }
 
+    private Result registerOnline(String username, String password, String passwordConfirm,
+                                  String nickname, String email, String gender) {
+        Result result = net.Online.get().signupDetails(username, password, passwordConfirm,
+                nickname, email, gender);
+        if (!result.isSuccessfull()) {
+            return result;
+        }
+        pendingUsername = username;
+        Result ok = Result.ok("Validation passed. Please pick a security question.");
+        return ok;
+    }
+
     public Result completeRegistration(String question, String answer) {
         Result result = new Result();
+        if (online()) {
+            if (pendingUsername == null) {
+                return Result.fail("No pending registration.");
+            }
+            Result done = net.Online.get().signupFinish(question, answer, answer);
+            if (done.isSuccessfull()) {
+                clearPending();
+                return Result.ok("Account created successfully. Please log in.");
+            }
+            return done;
+        }
         if (pendingUsername == null) {
             result.addMessage("No pending registration.");
             result.setSuccess(false);
@@ -139,6 +173,9 @@ public class UserManager {
 
     public Result login(String username, String password) {
         Result result = new Result();
+        if (online()) {
+            return loginOnline(username, password);
+        }
         User user = userDAO.findByUsername(username);
         if (user == null) {
             result.addMessage("Username does not exist.");
@@ -157,8 +194,24 @@ public class UserManager {
         return result;
     }
 
+    private Result loginOnline(String username, String password) {
+        Result result = net.Online.get().login(username, password);
+        if (!result.isSuccessfull()) {
+            return result;
+        }
+        User user = userDAO.findByUsername(net.Online.get().username());
+        if (user == null) {
+            return Result.fail("The server could not load your account.");
+        }
+        currentUser = user;
+        return Result.ok("Login successful.");
+    }
+
     public Result getSecurityQuestionForUser(String username) {
         Result result = new Result();
+        if (online()) {
+            return remoteQuestion(username, null);
+        }
         User user = userDAO.findByUsername(username);
         if (user == null) {
             result.addMessage("User not found.");
@@ -170,7 +223,22 @@ public class UserManager {
         return result;
     }
 
+    private Result remoteQuestion(String username, String email) {
+        Result asked = net.Online.get().securityQuestion(username, email);
+        if (!asked.isSuccessfull()) {
+            return asked;
+        }
+        Result result = Result.ok();
+        String text = asked.getMessages().isEmpty() ? "" : asked.getMessages().get(0);
+        result.setData(new SecurityQuestion(text, ""));
+        remoteRecoveryAnswer = "";
+        return result;
+    }
+
     public Result getSecurityQuestionForUser(String username, String email) {
+        if (online()) {
+            return remoteQuestion(username, email);
+        }
         User user = userDAO.findByUsername(username);
         if (user == null) {
             return Result.fail("User not found.");
@@ -185,6 +253,10 @@ public class UserManager {
 
     public Result verifySecurityAnswer(String username, String answer) {
         Result result = new Result();
+        if (online()) {
+            remoteRecoveryAnswer = answer;
+            return net.Online.get().verifyAnswer(username, answer);
+        }
         SecurityQuestion sq = (SecurityQuestion) getSecurityQuestionForUser(username).getData();
         if (sq == null) {
             result.addMessage("User not found.");
@@ -203,6 +275,9 @@ public class UserManager {
 
     public Result resetPassword(String username, String newPassword) {
         Result result = new Result();
+        if (online()) {
+            return net.Online.get().resetPassword(username, remoteRecoveryAnswer, newPassword);
+        }
         if (!Authentication.PASSWORD.matches(newPassword)) {
             result.addMessage(Authentication.PASSWORD.getErrorMessage());
             result.setSuccess(false);
