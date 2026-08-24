@@ -13,12 +13,32 @@ public final class Online {
 
     private final NetClient client = NetClient.get();
     private final RemoteStorage storage = new RemoteStorage(client);
-    private final Queue<Packet> events = new ConcurrentLinkedQueue<>();
+    private final Queue<Packet> lobby = new ConcurrentLinkedQueue<>();
+    private final Queue<Packet> inMatch = new ConcurrentLinkedQueue<>();
 
+    private volatile Packet latestState;
+    private volatile Packet matchStart;
     private String username;
 
     private Online() {
-        client.addListener(events::add);
+        client.addListener(this::route);
+    }
+
+    private void route(Packet packet) {
+        String type = packet.type();
+        if (Protocol.MATCH_STATE.equals(type)) {
+            latestState = packet;
+        } else if (Protocol.MATCH_OVER.equals(type) || Protocol.REACTION_IN.equals(type)
+                || Protocol.MESSAGE.equals(type)) {
+            inMatch.add(packet);
+        } else {
+            if (Protocol.MATCH_START.equals(type)) {
+                matchStart = packet;
+                latestState = null;
+                inMatch.clear();
+            }
+            lobby.add(packet);
+        }
     }
 
     public static Online get() {
@@ -41,12 +61,28 @@ public final class Online {
         return client.address();
     }
 
-    public Packet nextEvent() {
-        return events.poll();
+    public Packet nextLobbyEvent() {
+        return lobby.poll();
     }
 
-    public void clearEvents() {
-        events.clear();
+    public Packet nextMatchEvent() {
+        return inMatch.poll();
+    }
+
+    public Packet takeState() {
+        Packet state = latestState;
+        latestState = null;
+        return state;
+    }
+
+    public Packet matchStart() {
+        return matchStart;
+    }
+
+    public void clearMatch() {
+        matchStart = null;
+        latestState = null;
+        inMatch.clear();
     }
 
     public Result connect(String host, int port) {
@@ -61,7 +97,8 @@ public final class Online {
         storage.forget();
         utils.FileStore.useBackend(null);
         client.disconnect();
-        events.clear();
+        lobby.clear();
+        clearMatch();
     }
 
     private Result answer(Packet reply) {
@@ -134,7 +171,8 @@ public final class Online {
         username = null;
         storage.forget();
         utils.FileStore.useBackend(null);
-        events.clear();
+        lobby.clear();
+        clearMatch();
         return answer(reply);
     }
 

@@ -60,6 +60,8 @@ public class MainMenuScreen extends BaseScreen {
         top.add(button("image_ui_generic_buttons_hud_zg", "Greenhouse", ScreenId.GREENHOUSE));
         top.add(button("image_ui_generic_leaf_backdrop", "Zen Garden", ScreenId.ZEN_GARDEN));
         top.add(button("image_ui_hud_eventshop_buttons_hud_event_shop", "Shop", ScreenId.SHOP));
+        top.add(button("image_ui_generic_content_well", "Versus", ScreenId.MULTIPLAYER)
+                .withIcon(art.zombie(models.entities.zombie.ZombieType.NORMAL)));
         body.add(top).padTop(2f).row();
 
         Table lower = new Table();

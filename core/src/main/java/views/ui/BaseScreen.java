@@ -31,6 +31,7 @@ public abstract class BaseScreen extends ScreenAdapter {
     protected final Router router;
     protected final Stage stage;
     protected final Toasts toasts;
+    protected views.multiplayer.LobbyWatch watch;
 
     private TopBar topBar;
 
@@ -42,6 +43,7 @@ public abstract class BaseScreen extends ScreenAdapter {
         this.router = game.getRouter();
         this.stage = new Stage(new FitViewport(WIDTH, HEIGHT));
         this.toasts = new Toasts(skin, stage);
+        this.watch = new views.multiplayer.LobbyWatch(stage, skin, router, toasts);
     }
 
     protected abstract String title();
@@ -160,6 +162,9 @@ public abstract class BaseScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0.04f, 0.07f, 0.05f, 1f);
+        if (watch != null) {
+            watch.pump();
+        }
         game.getAnimations().update();
         stage.act(delta);
         stage.draw();

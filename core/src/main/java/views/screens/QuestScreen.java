@@ -167,6 +167,11 @@ public class QuestScreen extends BaseScreen {
             return card;
         }
         Table stages = new Table();
+        if ("izombie".equals(key(name))) {
+            stages.add(Ui.button(skin, "2 players", "blue",
+                    () -> router.go(views.ScreenId.MULTIPLAYER)))
+                    .width(150f).height(50f).padRight(10f);
+        }
         stages.add(Ui.label(skin, "Stage", "muted")).padRight(8f);
         for (int tier = 1; tier <= STAGES; tier++) {
             final int chosen = tier;

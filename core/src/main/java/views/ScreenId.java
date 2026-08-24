@@ -20,6 +20,9 @@ public enum ScreenId {
     SETTINGS,
     QUESTS,
     SEED_SELECT,
+    MULTIPLAYER,
+    DUEL,
+    COUCH,
     BATTLE;
 
     public static ScreenId from(Menus menu) {

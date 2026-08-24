@@ -97,6 +97,12 @@ public final class Router {
                 return new QuestScreen(game);
             case SEED_SELECT:
                 return new SeedSelectScreen(game);
+            case MULTIPLAYER:
+                return new views.screens.MultiplayerScreen(game);
+            case DUEL:
+                return new views.screens.DuelScreen(game);
+            case COUCH:
+                return new views.screens.CouchScreen(game);
             case BATTLE:
                 return new BattleScreen(game);
             default:
