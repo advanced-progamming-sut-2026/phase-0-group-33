@@ -43,13 +43,20 @@ public final class MatchSnapshot {
             }
             shots.add(writeShot(shot));
         }
+        List<Object> suns = new ArrayList<>();
+        for (models.game.Sun sun : session.getSunManager().getSuns()) {
+            suns.add(Rows.writer().put(sun.getKind().ordinal()).put(sun.getX()).put(sun.getY())
+                    .put(sun.getTicksToLand()).put(sun.getValue())
+                    .put(sun.isProducedByPlant()).toString());
+        }
         List<Object> brains = new ArrayList<>();
         for (int row = 1; row <= GameSession.ROWS; row++) {
             brains.add(session.hasBrain(row) ? 1 : 0);
         }
         return Packet.of(Protocol.MATCH_STATE).put("counter", counter)
                 .put("plants", plants).put("zombies", zombies).put("shots", shots)
-                .put("brains", brains).put("sun", session.getSunManager().getSunBalance());
+                .put("brains", brains).put("suns", suns)
+                .put("sun", session.getSunManager().getSunBalance());
     }
 
     private static String writePlant(PlacedPlant plant) {
@@ -88,7 +95,28 @@ public final class MatchSnapshot {
         applyPlants(session, packet.list("plants"));
         applyZombies(session, packet.list("zombies"));
         applyShots(session, packet.list("shots"));
+        applySuns(session, packet.list("suns"));
+        applyBrains(session, packet.list("brains"));
         session.getSunManager().setSunBalance(packet.num("sun", 0));
+    }
+
+    private static void applySuns(GameSession session, List<String> rows) {
+        List<models.game.Sun> suns = new ArrayList<>();
+        models.game.Sun.SunKind[] kinds = models.game.Sun.SunKind.values();
+        for (String row : rows) {
+            Rows values = Rows.reader(row);
+            suns.add(models.game.Sun.restored(kinds[values.nextInt()], values.nextInt(),
+                    values.nextInt(), values.nextInt(), values.nextInt(), values.nextFlag()));
+        }
+        session.getSunManager().syncSuns(suns);
+    }
+
+    private static void applyBrains(GameSession session, List<String> rows) {
+        for (int row = 1; row <= GameSession.ROWS && row <= rows.size(); row++) {
+            if (!"1".equals(rows.get(row - 1)) && session.hasBrain(row)) {
+                session.eatBrain(row);
+            }
+        }
     }
 
     private static void applyPlants(GameSession session, List<String> rows) {

@@ -1,0 +1,36 @@
+apply plugin: 'application'
+
+dependencies {
+    implementation project(':core')
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
+    test {
+        java {
+            srcDirs = []
+        }
+    }
+}
+
+application {
+    mainClass = 'server.ServerMain'
+}
+
+tasks.named('run') {
+    standardInput = System.in
+    workingDir = rootProject.file('.')
+}
+
+jar {
+    dependsOn configurations.runtimeClasspath
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes 'Main-Class': application.mainClass.get()
+    }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+}

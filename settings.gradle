@@ -6,3 +6,4 @@ rootProject.name = 'group-33'
 
 include 'core'
 include 'lwjgl3'
+include 'server'
