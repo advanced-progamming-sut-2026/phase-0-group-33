@@ -26,7 +26,7 @@ so dropping in battle-egypt.ogg is all it takes to give Egypt its own theme.
 The chapter part of the name is the chapter with spaces and punctuation removed
 and everything lower case.
 
-Effects (one shot, set by the Sound volume slider)
+Effects (one shot, set by the Sound volume slider) - all shipped
   plant         a plant is planted
   shovel        a plant is dug up
   shoot         a straight or piercing shot leaves a plant
@@ -36,7 +36,7 @@ Effects (one shot, set by the Sound volume slider)
   gulp          plant food is eaten
   mint          a mint wakes its family
   sun           sun is collected
-  chime         a scoring bonus is earned                        [shipped]
+  chime         a scoring bonus is earned
   bite          a zombie starts eating a plant
   plant-dies    a plant is lost
   zombie-dies   a zombie falls over
@@ -51,9 +51,22 @@ Effects (one shot, set by the Sound volume slider)
   boss-move     the Zomboss starts an attack
   boss-hurt     the Zomboss loses a health segment
   click         any button in any menu
-  win           a level is won                                   [shipped]
-  lose          a level is lost                                  [shipped]
+  win           a level is won
+  lose          a level is lost
 
-The tracks marked [shipped] come from the Plants vs. Zombies 2 soundtrack rip,
-stripped of their cover art and re-encoded to Ogg Vorbis. The soundtrack has no
-sound effects in it, so the rest of the effect list is still waiting for files.
+Where the files came from
+
+The music marked [shipped] above, and the win, lose and chime stings, are from the
+Plants vs. Zombies 2 soundtrack rip, stripped of their embedded cover art and
+re-encoded to Ogg Vorbis.
+
+The soundtrack has no sound effects in it, so the other 23 effects are synthesised
+by tools/build_sounds.py - short sine, saw and filtered-noise layers under proper
+envelopes, mixed and level-matched so no single cue jumps out. Run
+
+    python3 tools/build_sounds.py
+
+to rebuild them all; it needs nothing but the Python standard library, and it
+overwrites only the .wav files it makes. To replace any one of them with a real
+recording, drop your own file in beside it - .ogg and .mp3 are both tried first,
+so shoot.ogg wins over shoot.wav without deleting anything.
