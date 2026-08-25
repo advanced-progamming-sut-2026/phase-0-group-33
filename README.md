@@ -405,7 +405,8 @@ group-33/
 │   └── src/main/java/server/   GameServer · ClientSession · AccountService ·
 │                               StorageService · LeaderboardService · Matchmaker · Match
 ├── lwjgl3/                     desktop launcher (LWJGL3 backend)
-├── assets/                     3 031 tracked files — atlases, PAM animations, skin, data
+├── assets/                     3 043 tracked files — atlases, PAM animations, skin,
+│                               soundtrack, data
 ├── tools/build_atlases.py      turns the game's RESOURCES.json into libGDX atlases
 ├── config/                     Checkstyle + PMD rulesets
 ├── docs/screenshots/           the images in this README
@@ -567,20 +568,46 @@ model change  ──►  LawnView diff  ──►  cue queue  ──►  BattleS
                         detecting it)                                       volume-aware)
 ```
 
-**30 cues** are wired: 4 music beds (menu, battle, boss, minigame) and 26 effects —
-planting, digging, shooting, lobbing, splatting, exploding, biting, gulping, sun,
-mowers, armour breaking, zombies dying, plants dying, graves breaking, zombies rising,
-sandstorms, the tide, mints, wave and huge-wave calls, both Zomboss cues, and the UI
-click. The click is hooked in `Ui` itself, so **every** button on **every** screen is
-audible without a single per-screen line.
+**32 cues** are wired: 6 music beds and 26 effects — planting, digging, shooting,
+lobbing, splatting, exploding, biting, gulping, sun, mowers, armour breaking, zombies
+dying, plants dying, graves breaking, zombies rising, sandstorms, the tide, mints, wave
+and huge-wave calls, both Zomboss cues, and the UI click. The click is hooked in `Ui`
+itself, so **every** button on **every** screen is audible without a single per-screen
+line.
+
+### The music
+
+The game ships with the real soundtrack, cut down from the PopCap rip. Each chapter has
+its own lawn theme, and the menus, the Zen Garden and the versus duel each have their
+own bed:
+
+| Cue | What you hear |
+|-----|---------------|
+| `menu` | World Map — every menu screen |
+| `battle` · `battle-frostbite` · `battle-waveybeach` · `battle-darkages` | one lawn theme per chapter |
+| `boss` | the Zomboss theme |
+| `minigame` | the minigames and the scoring game |
+| `duel` | the two-player I, Zombie duel |
+| `zen` | the Zen Garden |
+| `win` · `lose` · `chime` | the victory, defeat and reward stings |
+
+Chapter music is chosen by **trying the specific cue and falling back**:
+`battle-<chapter>` before `battle`, `boss-<chapter>` before `boss`. So a chapter without
+its own file is not silent, it just gets the general theme — and adding one later is a
+matter of dropping in a file, with no code change. The stings are one-shots, and the
+looping bed stops first so you actually hear them.
+
+The rip is music only, so the 26 effect cues are wired but still waiting for files.
 
 `Audio` looks for `assets/AUDIO/<cue>.ogg`, then `.mp3`, then `.wav`; it caches what it
 loads, honours the music and SFX sliders in Settings, and **silently does nothing if a
-file is missing**. That last part is deliberate: the asset dump we were given contains
-1 458 animations and 780 texture pages but **zero audio files**, so the game ships mute
-and stays completely playable. Drop files with the documented names into `assets/AUDIO/`
-and they start playing with no code change — the full list of names, and what triggers
-each one, is in [`assets/AUDIO/README.txt`](assets/AUDIO/README.txt).
+file is missing** — which is what makes the fallback chain and the missing effects
+harmless. The full list of names, which ones ship, and what triggers each one is in
+[`assets/AUDIO/README.txt`](assets/AUDIO/README.txt).
+
+The shipped tracks were stripped of their embedded cover art — 1.2 MB of album JPEG per
+file, several times the size of the music in the short ones — and re-encoded to Ogg
+Vorbis, which took the set from 117 MB to 32 MB.
 
 ---
 
