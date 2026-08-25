@@ -347,6 +347,8 @@ public class CouchScreen extends ScreenAdapter {
         if (overlay != null) {
             return;
         }
+        game.getAudio().stopMusic();
+        game.getAudio().play(views.assets.Audio.WIN);
         Table content = new Table();
         content.add(Ui.wrapped(skin, reason, "muted")).width(380f).padBottom(16f).row();
         content.add(Ui.button(skin, "Back to the lobby", "green", this::leave))

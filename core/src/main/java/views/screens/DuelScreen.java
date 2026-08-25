@@ -391,6 +391,7 @@ public class DuelScreen extends ScreenAdapter {
             return;
         }
         boolean won = role.equals(event.str("winner"));
+        game.getAudio().stopMusic();
         game.getAudio().play(won ? views.assets.Audio.WIN : views.assets.Audio.LOSE);
         Table content = new Table();
         content.add(Ui.label(skin, won ? "You take the round." : opponent + " takes the round.",

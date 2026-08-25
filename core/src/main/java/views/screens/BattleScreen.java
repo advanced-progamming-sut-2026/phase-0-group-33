@@ -1135,12 +1135,21 @@ public class BattleScreen extends ScreenAdapter {
 
     private int lastScore = -1;
 
-    private String battleTrack() {
+    private String[] battleTrack() {
+        String chapter = chapterName();
         if (session.isBossLevel()) {
-            return views.assets.Audio.BOSS;
+            return new String[] {
+                views.assets.Audio.chapterCue(views.assets.Audio.BOSS, chapter),
+                views.assets.Audio.BOSS,
+            };
         }
-        return session.getMode() == GameMode.ADVENTURE
-                ? views.assets.Audio.BATTLE : views.assets.Audio.MINIGAME;
+        if (session.getMode() != GameMode.ADVENTURE) {
+            return new String[] {views.assets.Audio.MINIGAME, views.assets.Audio.BATTLE};
+        }
+        return new String[] {
+            views.assets.Audio.chapterCue(views.assets.Audio.BATTLE, chapter),
+            views.assets.Audio.BATTLE,
+        };
     }
 
     protected void sfx(String name) {
@@ -1243,6 +1252,9 @@ public class BattleScreen extends ScreenAdapter {
             return;
         }
         boolean won = session.getPhase() == models.game.GamePhase.WON;
+        if (game.getAudio() != null) {
+            game.getAudio().stopMusic();
+        }
         sfx(won ? views.assets.Audio.WIN : views.assets.Audio.LOSE);
         setPaused(true);
         controller.handleAdvanceTime(0);

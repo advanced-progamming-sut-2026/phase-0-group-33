@@ -32,12 +32,26 @@ public final class Router {
         if (game.getAudio() != null) {
             game.getAudio().setUser(game.getApp().getCurrentUser() == null ? null
                     : game.getApp().getCurrentUser().getUsername());
-            game.getAudio().playMusic(id == ScreenId.BATTLE
-                    ? views.assets.Audio.BATTLE : views.assets.Audio.MENU);
+            game.getAudio().playMusic(trackFor(id));
         }
         game.setScreen(create(id));
         if (previous != null) {
             previous.dispose();
+        }
+    }
+
+    private static String[] trackFor(ScreenId id) {
+        switch (id) {
+            case BATTLE:
+            case SANDBOX:
+                return new String[] {views.assets.Audio.BATTLE};
+            case DUEL:
+            case COUCH:
+                return new String[] {views.assets.Audio.DUEL, views.assets.Audio.BATTLE};
+            case ZEN_GARDEN:
+                return new String[] {views.assets.Audio.ZEN, views.assets.Audio.MENU};
+            default:
+                return new String[] {views.assets.Audio.MENU};
         }
     }
 

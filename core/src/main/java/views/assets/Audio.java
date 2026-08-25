@@ -14,6 +14,8 @@ public final class Audio implements Disposable {
     public static final String BATTLE = "battle";
     public static final String BOSS = "boss";
     public static final String MINIGAME = "minigame";
+    public static final String ZEN = "zen";
+    public static final String DUEL = "duel";
 
     public static final String PLANT = "plant";
     public static final String SHOOT = "shoot";
@@ -42,7 +44,7 @@ public final class Audio implements Disposable {
     public static final String BOSS_HURT = "boss-hurt";
     public static final String CHIME = "chime";
 
-    private static final String[] MUSIC_CUES = {MENU, BATTLE, BOSS, MINIGAME};
+    private static final String[] MUSIC_CUES = {MENU, BATTLE, BOSS, MINIGAME, ZEN, DUEL};
     private static final String[] SOUND_CUES = {
         PLANT, SHOOT, LOB, SPLAT, EXPLODE, GULP, SUN, MOWER, CLICK, LOSE, WIN,
         BITE, ZOMBIE_DIES, ARMOUR_BREAKS, PLANT_DIES, SHOVEL, WAVE, HUGE_WAVE,
@@ -83,21 +85,48 @@ public final class Audio implements Disposable {
         applyVolume();
     }
 
-    public void playMusic(String name) {
-        if (name == null || name.equals(playing)) {
+    public void playMusic(String... names) {
+        String wanted = choose(names);
+        if (wanted == null || wanted.equals(playing)) {
             return;
         }
         stopMusic();
-        Music track = track(name);
+        playing = wanted;
+        Music track = track(wanted);
         if (track == null) {
-            playing = name;
             return;
         }
-        playing = name;
         current = track;
         track.setLooping(true);
         track.setVolume(musicVolume());
         track.play();
+    }
+
+    private String choose(String... names) {
+        String first = null;
+        for (String name : names) {
+            if (name == null) {
+                continue;
+            }
+            if (first == null) {
+                first = name;
+            }
+            if (locate(name) != null) {
+                return name;
+            }
+        }
+        return first;
+    }
+
+    public static String chapterCue(String prefix, String chapterName) {
+        if (chapterName == null || chapterName.isBlank()) {
+            return prefix;
+        }
+        return prefix + "-" + chapterName.toLowerCase().replaceAll("[^a-z0-9]", "");
+    }
+
+    public String nowPlaying() {
+        return playing;
     }
 
     public void stopMusic() {
