@@ -405,9 +405,10 @@ group-33/
 │   └── src/main/java/server/   GameServer · ClientSession · AccountService ·
 │                               StorageService · LeaderboardService · Matchmaker · Match
 ├── lwjgl3/                     desktop launcher (LWJGL3 backend)
-├── assets/                     3 043 tracked files — atlases, PAM animations, skin,
-│                               soundtrack, data
+├── assets/                     3 066 tracked files — atlases, PAM animations, skin,
+│                               soundtrack, sound effects, data
 ├── tools/build_atlases.py      turns the game's RESOURCES.json into libGDX atlases
+├── tools/build_sounds.py       synthesises the 23 sound effects
 ├── config/                     Checkstyle + PMD rulesets
 ├── docs/screenshots/           the images in this README
 └── legacy-cli/                 the phase-1 CLI, parked but intact
@@ -597,7 +598,25 @@ its own file is not silent, it just gets the general theme — and adding one la
 matter of dropping in a file, with no code change. The stings are one-shots, and the
 looping bed stops first so you actually hear them.
 
-The rip is music only, so the 26 effect cues are wired but still waiting for files.
+### The effects
+
+The rip is music only — it has no sound effects in it at all, and neither does the
+asset dump. So the other 23 are **synthesised**: `tools/build_sounds.py` builds each one
+from sine, saw and filtered-noise layers under a proper attack-and-decay envelope, then
+level-matches the set so a lawnmower does not drown out a bite. It needs nothing but the
+Python standard library:
+
+```bash
+python3 tools/build_sounds.py
+```
+
+A pea leaves with a short pitched blip over a puff of filtered noise; a melon lands as a
+low-passed splat with a thump under it; a cherry bomb is a noise burst swept downward
+with a sine drop and a crack on top; armour comes off as three inharmonic partials; a
+zombie dies as a wobbling saw sliding down two octaves. They are recognisable rather than
+authentic, and any of them can be replaced by dropping a real recording in beside it —
+`.ogg` and `.mp3` are tried before `.wav`, so `shoot.ogg` wins over `shoot.wav` without
+deleting anything.
 
 `Audio` looks for `assets/AUDIO/<cue>.ogg`, then `.mp3`, then `.wav`; it caches what it
 loads, honours the music and SFX sliders in Settings, and **silently does nothing if a
@@ -607,7 +626,8 @@ harmless. The full list of names, which ones ship, and what triggers each one is
 
 The shipped tracks were stripped of their embedded cover art — 1.2 MB of album JPEG per
 file, several times the size of the music in the short ones — and re-encoded to Ogg
-Vorbis, which took the set from 117 MB to 32 MB.
+Vorbis, which took the set from 117 MB to 32 MB. The 23 synthesised effects add
+another 1.1 MB.
 
 ---
 
