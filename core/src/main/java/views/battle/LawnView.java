@@ -1888,9 +1888,9 @@ public class LawnView extends Actor {
             return;
         }
         batch.setColor(Color.WHITE);
-        float size = Lawn.cellHeight() * 0.52f;
-        float x = centerX - size * 0.28f;
-        float y = feet + Lawn.cellHeight() * 0.5f;
+        float size = Lawn.cellHeight() * 0.5f;
+        float x = centerX - size * 0.04f;
+        float y = feet + Lawn.cellHeight() * 0.72f;
         if (animator.isReady()) {
             ClipRef clip = animator.plantClip(head, "idle");
             if (clip != null) {
@@ -1898,13 +1898,13 @@ public class LawnView extends Actor {
                         views.assets.AnimationCatalog.plant(head),
                         animator.plantClipName(head, "idle"), size);
                 animator.draw(batch, clip, time + (float) zombie.getPosition().getX() * 0.3f,
-                        x + size / 2f, y, scale, true, null);
+                        x, y, scale, true, null);
                 return;
             }
         }
         TextureRegion region = art.plant(head);
         if (region != null) {
-            batch.draw(region, x, y, size, size);
+            batch.draw(region, x - size / 2f, y, size, size);
         }
     }
 
