@@ -15,7 +15,6 @@ import models.game.Vase;
 import models.progress.level.special.SpecialLevelType;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -53,12 +52,15 @@ public class MinigameManager {
     private final Set<Long> craters = new HashSet<>();
     private int combosMade;
     private int combosNeeded;
+    private final VaseDeck vaseDeck;
     private int beltTicks;
     private int spawnTicks;
+    private int vaseCooldown;
 
     public MinigameManager(GameSession session, int tier) {
         this.session = session;
         this.tier = Math.max(1, tier);
+        this.vaseDeck = new VaseDeck(session);
     }
 
     public boolean startsImmediately() {
@@ -94,36 +96,7 @@ public class MinigameManager {
     }
 
     private void buildVases() {
-        List<int[]> spots = new ArrayList<>();
-        for (int col = 3; col <= GameSession.COLS; col++) {
-            for (int row = 1; row <= GameSession.ROWS; row++) {
-                spots.add(new int[] { col, row });
-            }
-        }
-        Collections.shuffle(spots, session.getRandom());
-        for (int i = 0; i < spots.size(); i++) {
-            int[] spot = spots.get(i);
-            vases.add(createVase(i, spot[0], spot[1]));
-        }
-    }
-
-    private Vase createVase(int index, int x, int y) {
-        if (index == 0) {
-            return new Vase(x, y, Vase.VaseKind.GHOUL, ZombieType.GARGANTUAR, null);
-        }
-        if (index == 1) {
-            return new Vase(x, y, Vase.VaseKind.PLANT, null, randomUnlockedPlant());
-        }
-        int roll = session.getRandom().nextInt(100);
-        if (roll < 55) {
-            ZombieType[] pool = { ZombieType.NORMAL, ZombieType.CONE_HEAD, ZombieType.BUCKET_HEAD };
-            return new Vase(x, y, Vase.VaseKind.ORDINARY,
-                    pool[session.getRandom().nextInt(pool.length)], null);
-        }
-        if (roll < 80) {
-            return new Vase(x, y, Vase.VaseKind.ORDINARY, null, randomUnlockedPlant());
-        }
-        return new Vase(x, y, Vase.VaseKind.ORDINARY, null, null);
+        vases.addAll(vaseDeck.board());
     }
 
     private void setUpIZombie() {
