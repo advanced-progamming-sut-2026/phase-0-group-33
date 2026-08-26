@@ -82,7 +82,9 @@ public class MinigameManager {
                 buildVases();
                 break;
             case WALLNUT_BOWLING:
-                addBeltSlot(randomNutType());
+                for (int i = 0; i < BOWLING_BELT_SLOTS; i++) {
+                    addBeltSlot(randomNutType());
+                }
                 break;
             case I_ZOMBIE:
                 setUpIZombie();
@@ -170,7 +172,13 @@ public class MinigameManager {
             return;
         }
         beltTicks++;
-        int interval = session.isBossLevel() ? BOSS_BELT_INTERVAL_TICKS : BELT_INTERVAL_TICKS;
+        boolean bowling = session.getMode() == GameMode.WALLNUT_BOWLING;
+        int interval = BELT_INTERVAL_TICKS;
+        if (session.isBossLevel()) {
+            interval = BOSS_BELT_INTERVAL_TICKS;
+        } else if (bowling) {
+            interval = BOWLING_BELT_INTERVAL_TICKS;
+        }
         if (beltTicks >= interval && session.getSlots().size() < 8) {
             beltTicks = 0;
             addBeltSlot(session.getMode() == GameMode.WALLNUT_BOWLING
