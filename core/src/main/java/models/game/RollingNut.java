@@ -10,6 +10,7 @@ public class RollingNut {
     private final Set<Object> struck = new HashSet<>();
     private double x;
     private double lane;
+    private double spin;
 
     public RollingNut(PlantType type, double x, int row) {
         this.type = type;
@@ -26,7 +27,12 @@ public class RollingNut {
     }
 
     public void setX(double x) {
+        this.spin -= (x - this.x) * 360.0 / (Math.PI * (isGiant() ? 0.8 : 0.62));
         this.x = x;
+    }
+
+    public float getSpin() {
+        return (float) spin;
     }
 
     public int getRow() {

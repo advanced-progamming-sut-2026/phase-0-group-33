@@ -1806,8 +1806,13 @@ public class LawnView extends Actor {
             }
             batch.setColor(Color.WHITE);
             float size = Lawn.cellWidth() * (nut.isGiant() ? 0.8f : 0.62f);
-            batch.draw(art.plant(nut.getType()), Lawn.columnCenter(nut.getX()) - size / 2f,
-                    Lawn.rowCenter(nut.getLane()) - size / 2f, size, size);
+            TextureRegion skin = art.plant(nut.getType());
+            if (skin == null) {
+                continue;
+            }
+            batch.draw(skin, Lawn.columnCenter(nut.getX()) - size / 2f,
+                    Lawn.rowCenter(nut.getLane()) - size / 2f, size / 2f, size / 2f,
+                    size, size, 1f, 1f, nut.getSpin());
         }
     }
 
