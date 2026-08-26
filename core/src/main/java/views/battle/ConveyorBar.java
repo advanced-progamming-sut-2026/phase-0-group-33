@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 public final class ConveyorBar extends Actor {
 
     private static final float SLOT_WIDTH = 74f;
+    private static final int MAX_SLOTS = 8;
     private static final float BELT_SPEED = 34f;
     private static final float SLIDE_SPEED = 260f;
 
@@ -48,16 +49,21 @@ public final class ConveyorBar extends Actor {
         });
     }
 
+    private float pitch() {
+        return getHeight() <= 0 ? SLOT_WIDTH
+                : Math.min(SLOT_WIDTH, getHeight() / MAX_SLOTS);
+    }
+
     private void pick(float localY) {
         PlantSlot best = null;
-        float bestDistance = SLOT_WIDTH;
+        float bestDistance = pitch();
         float fromTop = getHeight() - localY;
         for (PlantSlot slot : session.getSlots()) {
             Float offset = positions.get(slot);
             if (offset == null) {
                 continue;
             }
-            float distance = Math.abs(fromTop - (offset + SLOT_WIDTH / 2f));
+            float distance = Math.abs(fromTop - (offset + pitch() / 2f));
             if (distance < bestDistance) {
                 bestDistance = distance;
                 best = slot;
@@ -76,7 +82,7 @@ public final class ConveyorBar extends Actor {
         java.util.List<PlantSlot> slots = session.getSlots();
         for (int i = 0; i < slots.size(); i++) {
             PlantSlot slot = slots.get(i);
-            float target = i * SLOT_WIDTH;
+            float target = i * pitch();
             Float current = positions.get(slot);
             if (current == null) {
                 current = Math.max(target, getHeight());
@@ -115,7 +121,7 @@ public final class ConveyorBar extends Actor {
                 continue;
             }
             drawPlant(batch, slot.getType(),
-                    getY() + getHeight() - offset - SLOT_WIDTH / 2f);
+                    getY() + getHeight() - offset - pitch() / 2f);
         }
         batch.flush();
         ScissorStack.popScissors();
@@ -128,7 +134,7 @@ public final class ConveyorBar extends Actor {
             return;
         }
         batch.setColor(Color.WHITE);
-        float tile = SLOT_WIDTH;
+        float tile = pitch();
         float thickness = getWidth() * 0.82f;
         float centreX = getX() + getWidth() * 0.5f;
         for (float y = -tile; y < getHeight() + tile; y += tile) {
@@ -145,15 +151,15 @@ public final class ConveyorBar extends Actor {
 
     private void drawPlant(Batch batch, PlantType type, float centreY) {
         float centreX = getX() + getWidth() * 0.5f;
-        float feet = centreY - SLOT_WIDTH * 0.4f;
+        float feet = centreY - pitch() * 0.4f;
         ClipRef clip = animator.plantClip(type, "idle");
         if (clip == null) {
             TextureRegion region = art.plant(type);
-            float size = SLOT_WIDTH * 0.72f;
+            float size = pitch() * 0.72f;
             batch.draw(region, centreX - size / 2f, feet, size, size);
             return;
         }
-        float scale = animator.plantScale() * 0.8f;
+        float scale = animator.plantScale() * 0.8f * (pitch() / SLOT_WIDTH);
         animator.draw(batch, clip, time, centreX, feet + animator.plantLift() * 0.72f,
                 scale, true, null);
     }
