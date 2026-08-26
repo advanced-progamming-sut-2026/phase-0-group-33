@@ -15,7 +15,7 @@ public final class PlantFoodBank extends Actor {
     private static final String FILLED = "image_ui_hud_ingame_plantfood_bank_filled_slot";
     private static final String FILLING = "image_ui_hud_ingame_plantfood_bank_filling_slot";
 
-    private static final float[] SLOT_X = {0.4199f, 0.5364f, 0.6529f, 0.7694f, 0.8859f};
+    private static final float[] SLOT_X = {0.4199f, 0.5364f, 0.6529f};
     private static final float SLOT_Y = 0.5114f;
     private static final float SLOT_SIZE = 0.075f;
 
