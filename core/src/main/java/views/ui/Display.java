@@ -58,4 +58,9 @@ public final class Display {
         }
         return true;
     }
+
+    public static void quit() {
+        net.Online.get().flush();
+        com.badlogic.gdx.Gdx.app.exit();
+    }
 }

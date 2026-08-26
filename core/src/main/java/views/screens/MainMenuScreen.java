@@ -85,6 +85,8 @@ public class MainMenuScreen extends BaseScreen {
             toasts.show(controller.handleLogout());
             router.go(ScreenId.SIGNUP);
         })).width(190f).height(52f).pad(4f);
+        strip.add(Ui.button(skin, "Quit", "brown", views.ui.Display::quit))
+                .width(150f).height(52f).pad(4f);
         body.add(strip).padTop(6f).row();
         body.add().expand().row();
         showCast();

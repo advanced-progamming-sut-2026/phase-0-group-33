@@ -334,11 +334,34 @@ public class BattleScreen extends ScreenAdapter {
         Table content = new Table();
         content.add(Ui.button(skin, "Resume", "green", this::closeOverlay))
                 .width(300f).height(56f).padBottom(10f).row();
+        content.add(Ui.button(skin, "Settings", "blue", this::openSettings))
+                .width(300f).height(56f).padBottom(10f).row();
         content.add(Ui.button(skin, "Restart level", "blue", this::restart))
                 .width(300f).height(56f).padBottom(10f).row();
-        content.add(Ui.button(skin, "Save and quit", "brown", this::leave))
+        content.add(Ui.button(skin, "Save and leave", "brown", this::leave))
+                .width(300f).height(56f).padBottom(10f).row();
+        content.add(Ui.button(skin, "Quit the game", "brown", views.ui.Display::quit))
                 .width(300f).height(56f);
         overlay = Overlay.open(stage, skin, "Paused", content);
+    }
+
+    private void openSettings() {
+        shutOverlay();
+        Table content = new Table();
+        content.add(views.battle.SettingsPanel.build(skin, username(),
+                game.getAudio(), lawnView)).width(520f).padBottom(16f).row();
+        content.add(Ui.button(skin, "Back", "green", () -> {
+            shutOverlay();
+            openPauseMenu();
+        })).width(300f).height(56f);
+        overlay = Overlay.open(stage, skin, "Settings", content);
+    }
+
+    private void shutOverlay() {
+        if (overlay != null) {
+            overlay.close();
+            overlay = null;
+        }
     }
 
     private void restart() {
