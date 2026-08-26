@@ -59,6 +59,7 @@ public class ZombieBehaviorManager {
     }
 
     public void tickEnvironment() {
+        abandonOrphanedObjects();
         environment.tickEnvironment();
     }
 
@@ -286,6 +287,27 @@ public class ZombieBehaviorManager {
             target.setIceHealth(ICE_BLOCK_HEALTH);
             System.out.printf("%s at (%d, %d) is frozen solid by the Hunter!%n",
                     target.getType().getName(), target.getX(), target.getY());
+        }
+    }
+
+    private void dropPushedObject(Zombie zombie) {
+        PushedObject left = pushersWithObject.remove(zombie);
+        if (left != null && left.getKind() != PushedObject.Kind.BARREL) {
+            left.setMoving(false);
+            System.out.printf("The %s rolls to a stop without anybody behind it.%n",
+                    left.getKind().name().toLowerCase().replace('_', ' '));
+        }
+    }
+
+    private void abandonOrphanedObjects() {
+        for (Zombie pusher : new java.util.ArrayList<>(pushersWithObject.keySet())) {
+            if (session.getZombies().contains(pusher)) {
+                continue;
+            }
+            PushedObject left = pushersWithObject.remove(pusher);
+            if (left != null && left.getKind() != PushedObject.Kind.BARREL) {
+                left.setMoving(false);
+            }
         }
     }
 
@@ -785,15 +807,7 @@ public class ZombieBehaviorManager {
         for (PlacedPlant sheep : zombie.getBattle().getSheepPlants()) {
             sheep.setSheep(false);
         }
-        if (zombie.getType() == ZombieType.BARREL_ROLLER) {
-            for (PushedObject pushed : session.getPushedObjects()) {
-                if (pushed.getKind() == PushedObject.Kind.BARREL
-                        && pushed.getRow() == (int) zombie.getPosition().getY()) {
-                    pushed.setMoving(false);
-                }
-            }
-        }
-        pushersWithObject.remove(zombie);
+        dropPushedObject(zombie);
     }
 
 }
