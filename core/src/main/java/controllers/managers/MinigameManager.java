@@ -24,10 +24,13 @@ import java.util.Set;
 public class MinigameManager {
     private static final int BELT_INTERVAL_TICKS = 12 * GameSession.TICKS_PER_SECOND;
     private static final int BOSS_BELT_INTERVAL_TICKS = 4 * GameSession.TICKS_PER_SECOND;
+    private static final int BOWLING_BELT_INTERVAL_TICKS = 7 * GameSession.TICKS_PER_SECOND;
+    private static final int BOWLING_BELT_SLOTS = 5;
     private static final int PACKET_LIFETIME_TICKS = 30 * GameSession.TICKS_PER_SECOND;
     private static final double NUT_SPEED = 0.18;
     private static final List<PlantType> BOWLING_NUTS = List.of(
             PlantType.WALL_NUT, PlantType.EXPLODE_O_NUT, PlantType.TALL_NUT);
+    private static final int VASE_COOLDOWN_TICKS = 8;
     private static final List<PlantType> BEGHOULED_TYPES = List.of(
             PlantType.PEASHOOTER, PlantType.SNOW_PEA, PlantType.WALL_NUT,
             PlantType.PUFF_SHROOM, PlantType.CABBAGE_PULT);
@@ -133,6 +136,9 @@ public class MinigameManager {
     }
 
     public void tick() {
+        if (vaseCooldown > 0) {
+            vaseCooldown--;
+        }
         tickBelt();
         tickPackets();
         switch (session.getMode()) {
@@ -356,6 +362,9 @@ public class MinigameManager {
         if (session.getMode() != GameMode.VASEBREAKER) {
             return Result.fail("There are no vases in this mode.");
         }
+        if (vaseCooldown > 0) {
+            return Result.fail("Steady on - let the dust settle before the next vase.");
+        }
         Vase vase = null;
         for (Vase candidate : vases) {
             if (candidate.getX() == x && candidate.getY() == y) {
@@ -367,6 +376,7 @@ public class MinigameManager {
             return Result.fail("There is no vase at (" + x + ", " + y + ").");
         }
         vases.remove(vase);
+        vaseCooldown = VASE_COOLDOWN_TICKS;
         if (vase.getZombie() != null) {
             session.spawnZombie(vase.getZombie(), x, y, 1);
             return Result.ok("A " + vase.getZombie().getName()
