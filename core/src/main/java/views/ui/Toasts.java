@@ -12,9 +12,12 @@ import java.util.List;
 public final class Toasts {
 
     private static final int MAX_LINES = 4;
+    private static final int MAX_ON_SCREEN = 3;
+    private static final float LIFETIME = 2.6f;
 
     private final Skin skin;
     private final Table container = new Table();
+    private final java.util.Map<String, Table> showing = new java.util.LinkedHashMap<>();
 
     public Toasts(Skin skin, Stage stage) {
         this.skin = skin;
@@ -51,6 +54,21 @@ public final class Toasts {
     }
 
     private void push(String message, boolean success) {
+        Table repeat = showing.get(message);
+        if (repeat != null && repeat.hasParent()) {
+            repeat.clearActions();
+            repeat.getColor().a = 1f;
+            repeat.addAction(fade(message));
+            return;
+        }
+        while (showing.size() >= MAX_ON_SCREEN) {
+            String oldest = showing.keySet().iterator().next();
+            Table stale = showing.remove(oldest);
+            if (stale != null) {
+                stale.clearActions();
+                stale.remove();
+            }
+        }
         Table bubble = new Table(skin);
         bubble.setBackground(skin.getDrawable("panel"));
         bubble.pad(10f, 22f, 10f, 22f);
@@ -59,12 +77,17 @@ public final class Toasts {
         label.setWrap(true);
         bubble.add(label).width(560f);
         bubble.getColor().a = 0f;
-        bubble.addAction(Actions.sequence(
-                Actions.fadeIn(0.18f),
-                Actions.delay(2.6f),
-                Actions.fadeOut(0.4f),
-                Actions.removeActor()));
+        bubble.addAction(Actions.sequence(Actions.fadeIn(0.18f), fade(message)));
         container.add(bubble).padBottom(6f).row();
         container.toFront();
+        showing.put(message, bubble);
+    }
+
+    private com.badlogic.gdx.scenes.scene2d.Action fade(final String message) {
+        return Actions.sequence(
+                Actions.delay(LIFETIME),
+                Actions.fadeOut(0.4f),
+                Actions.run(() -> showing.remove(message)),
+                Actions.removeActor());
     }
 }
