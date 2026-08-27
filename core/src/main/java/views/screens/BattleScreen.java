@@ -901,7 +901,11 @@ public class BattleScreen extends ScreenAdapter {
     }
 
     private void swapAt(int column, int row) {
-        if (swapColumn < 0) {
+        if (swapColumn == column && swapRow == row) {
+            clearSwap();
+            return;
+        }
+        if (swapColumn < 0 || Math.abs(swapColumn - column) + Math.abs(swapRow - row) != 1) {
             swapColumn = column;
             swapRow = row;
             lawnView().setSelection(column, row);
@@ -909,6 +913,10 @@ public class BattleScreen extends ScreenAdapter {
         }
         Result result = controller.handleSwap(swapColumn, swapRow, column, row);
         toasts.show(result);
+        clearSwap();
+    }
+
+    private void clearSwap() {
         swapColumn = -1;
         swapRow = -1;
         lawnView().setSelection(-1, -1);
