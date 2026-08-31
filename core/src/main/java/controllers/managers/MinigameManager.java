@@ -31,6 +31,7 @@ public class MinigameManager {
     private static final List<PlantType> BOWLING_NUTS = List.of(
             PlantType.WALL_NUT, PlantType.EXPLODE_O_NUT, PlantType.TALL_NUT);
     private static final int VASE_COOLDOWN_TICKS = 8;
+    private static final int SWAP_SETTLE_TICKS = 3;
     private static final List<PlantType> BEGHOULED_TYPES = List.of(
             PlantType.PEASHOOTER, PlantType.SNOW_PEA, PlantType.WALL_NUT,
             PlantType.PUFF_SHROOM, PlantType.CABBAGE_PULT);
@@ -59,6 +60,7 @@ public class MinigameManager {
     private int beltTicks;
     private int spawnTicks;
     private int vaseCooldown;
+    private int settleTicks;
 
     public MinigameManager(GameSession session, int tier) {
         this.session = session;
@@ -158,6 +160,7 @@ public class MinigameManager {
                 checkIZombieDefeat();
                 break;
             case BEGHOULED:
+                settleMatches();
                 spawnBeghouledZombie();
                 break;
             default:
@@ -460,6 +463,9 @@ public class MinigameManager {
         if (session.getMode() != GameMode.BEGHOULED) {
             return Result.fail("Swapping plants only works in Beghouled.");
         }
+        if (settleTicks > 0) {
+            return Result.fail("Let the last match settle first.");
+        }
         if (Math.abs(x1 - x2) + Math.abs(y1 - y2) != 1) {
             return Result.fail("You can only swap two adjacent plants.");
         }
@@ -473,21 +479,32 @@ public class MinigameManager {
             swapPositions(first, second);
             return Result.fail("That swap would not create a 3-in-a-row match.");
         }
+        settleTicks = SWAP_SETTLE_TICKS;
+        return Result.ok("Nice swap - watch them land.");
+    }
+
+    private void settleMatches() {
+        if (settleTicks <= 0) {
+            return;
+        }
+        settleTicks--;
+        if (settleTicks > 0) {
+            return;
+        }
         processMatches();
-        Result result = Result.ok("Match! Combos so far: " + combosMade + "/" + combosNeeded
-                + " | Sun: " + session.getSunManager().getSunBalance());
+        System.out.printf("Match! Combos so far: %d/%d | Sun: %d%n",
+                combosMade, combosNeeded, session.getSunManager().getSunBalance());
         if (combosMade >= combosNeeded) {
             for (Zombie zombie : new ArrayList<>(session.getZombies())) {
                 session.getCombatManager().damageZombie(zombie, 1_000_000);
             }
             session.winGame();
-            return result;
+            return;
         }
         if (!possibleMoveExists()) {
             resetBoard();
-            result.addMessage("No more possible matches; the garden was reshuffled!");
+            System.out.println("No more possible matches; the garden was reshuffled!");
         }
-        return result;
     }
 
     private boolean possibleMoveExists() {
