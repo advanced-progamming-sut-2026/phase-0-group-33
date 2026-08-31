@@ -295,7 +295,7 @@ public class DuelScreen extends ScreenAdapter {
     }
 
     private void onLawnClick(float stageX, float stageY) {
-        if (!isZombieSide() && chosen == null && catchSun(stageX, stageY)) {
+        if (!isZombieSide() && catchSun(stageX, stageY)) {
             return;
         }
         int column = Lawn.columnAt(stageX);

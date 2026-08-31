@@ -204,7 +204,7 @@ public class CouchScreen extends ScreenAdapter {
     }
 
     private void onMouse(float stageX, float stageY) {
-        if (chosenPlant == null && catchSun(stageX, stageY)) {
+        if (catchSun(stageX, stageY)) {
             return;
         }
         int column = Lawn.columnAt(stageX);
