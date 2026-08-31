@@ -413,7 +413,7 @@ public class MinigameManager {
         if (session.isDuel()) {
             return Math.max(3, type.getWaveCost() / 40) * GameSession.TICKS_PER_SECOND;
         }
-        return Math.max(5, type.getWaveCost() / 4) * GameSession.TICKS_PER_SECOND;
+        return Math.max(3, type.getWaveCost() / 25) * GameSession.TICKS_PER_SECOND;
     }
 
     public int zombieCooldown(ZombieType type) {
