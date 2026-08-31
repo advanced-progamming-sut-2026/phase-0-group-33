@@ -1769,14 +1769,7 @@ public class LawnView extends Actor {
 
     private void drawPlantOverlays(Batch batch, models.game.PlacedPlant plant,
                                    float x, float y, float width, float height) {
-        if (plant.getIceHealth() > 0 || plant.getFreezeLevel() > 0) {
-            if (!drawIceBlock(batch, ICE_PLANT, x + width / 2f, y, plant.getIceHealth() > 0
-                    ? 1f : 0.3f + 0.2f * Math.min(3, plant.getFreezeLevel()))) {
-                float alpha = 0.2f + 0.2f * Math.min(3, Math.max(1, plant.getFreezeLevel()));
-                batch.setColor(0.6f, 0.85f, 1f, plant.getIceHealth() > 0 ? 0.75f : alpha);
-                fill.draw(batch, x, y, width, height);
-            }
-        }
+        drawFreeze(batch, plant, x, y, width, height);
         if (plant.getOctopusHealth() > 0) {
             batch.setColor(Color.WHITE);
             TextureRegion octopus = art.zombie(models.entities.zombie.ZombieType.OCTOPUS);
@@ -1788,6 +1781,35 @@ public class LawnView extends Actor {
             batch.setColor(1f, 0.65f, 0.2f, 0.45f);
             fill.draw(batch, x, y, width, height);
         }
+    }
+
+    private void drawFreeze(Batch batch, models.game.PlacedPlant plant,
+                            float x, float y, float width, float height) {
+        int stage = plant.getIceHealth() > 0 ? 3 : Math.min(3, plant.getFreezeLevel());
+        if (stage <= 0) {
+            return;
+        }
+        batch.setColor(FROST[stage - 1]);
+        fill.draw(batch, x, y, width, height);
+        if (stage == 1) {
+            drawFrostEdge(batch, x, y, width, height, 0.28f);
+            batch.setColor(Color.WHITE);
+            return;
+        }
+        if (!drawIceBlock(batch, ICE_PLANT, x + width / 2f, y, stage == 2 ? 0.6f : 1f)) {
+            drawFrostEdge(batch, x, y, width, height, stage == 2 ? 0.5f : 0.8f);
+        }
+        batch.setColor(Color.WHITE);
+    }
+
+    private void drawFrostEdge(Batch batch, float x, float y, float width, float height,
+                               float alpha) {
+        float rim = height * 0.16f;
+        batch.setColor(0.82f, 0.95f, 1f, alpha);
+        fill.draw(batch, x, y, width, rim);
+        fill.draw(batch, x, y + height - rim, width, rim);
+        fill.draw(batch, x, y, rim * 0.6f, height);
+        fill.draw(batch, x + width - rim * 0.6f, y, rim * 0.6f, height);
     }
 
     private void drawPushed(Batch batch, int row) {
