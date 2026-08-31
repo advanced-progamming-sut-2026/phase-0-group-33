@@ -32,6 +32,12 @@ public class SandboxSetupScreen extends BaseScreen {
 
     @Override
     protected void buildContent(Table body) {
+        if (!models.settings.GamePreferences.isDebugMode(app.getCurrentUser() == null
+                ? null : app.getCurrentUser().getUsername())) {
+            body.add(Ui.wrapped(skin, "The sandbox is a testing tool. Turn on debug mode"
+                    + " in Settings to reach it.", "bad")).width(700f).pad(40f);
+            return;
+        }
         body.add(Ui.wrapped(skin, "Pick a lawn to play with. Everything is free in the"
                 + " sandbox: no sun cost, no recharge, plant anywhere, drop any zombie,"
                 + " paint the ground and fire the chapter's own events whenever you like.",
