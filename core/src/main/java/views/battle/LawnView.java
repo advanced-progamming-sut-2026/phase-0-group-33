@@ -41,7 +41,13 @@ public class LawnView extends Actor {
     private static final float MINT_LIFE = 1.6f;
     private static final float TIDE_WAVE_LIFE = 1.6f;
     private static final String WATER_TILE = "WATER_SQUARE";
-    private static final float FOOD_GLOW_SHIFT = 10f;
+    private static final float EFFECT_SHIFT_X = 10f;
+    private static final float ATTACK_RELEASE = 0.45f;
+    private static final Color[] FROST = {
+        new Color(0.72f, 0.9f, 1f, 0.26f),
+        new Color(0.6f, 0.86f, 1f, 0.44f),
+        new Color(0.5f, 0.8f, 1f, 0.62f)};
+    private static final float FOOD_GLOW_SHIFT = 20f;
     private static final float HURT_FLASH = 0.14f;
     private static final float IMP_FLIGHT = 0.85f;
     private static final float IMP_ARC = 1.9f;
@@ -1941,8 +1947,9 @@ public class LawnView extends Actor {
             }
             float scale = animator.fitScale(BOOM, "explosion", Lawn.cellHeight() * 2.4f);
             batch.setColor(Color.WHITE);
-            animator.draw(batch, clip, time - blast.start, Lawn.columnCenter(blast.x),
-                    Lawn.rowCenter(row), scale, false, null);
+            animator.draw(batch, clip, time - blast.start,
+                    Lawn.columnCenter(blast.x) + EFFECT_SHIFT_X,
+                    Lawn.rowCenter(row) + Lawn.cellHeight(), scale, false, null);
         }
     }
 
@@ -2085,7 +2092,7 @@ public class LawnView extends Actor {
         float lift = animator.centreOffset(PLANT_FOOD_GLOW, clipName, scale);
         batch.setColor(Color.WHITE);
         animator.draw(batch, glow, time, centerX + FOOD_GLOW_SHIFT,
-                feet + Lawn.cellHeight() * 1.35f + lift, scale, true, null);
+                feet + Lawn.cellHeight() * 2.35f + lift, scale, true, null);
     }
 
     private void trackSunProduction(models.game.PlacedPlant plant) {
