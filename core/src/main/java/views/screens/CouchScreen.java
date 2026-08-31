@@ -49,6 +49,7 @@ public class CouchScreen extends ScreenAdapter {
     private final Stage stage;
     private final Toasts toasts;
 
+    private final views.multiplayer.ReactionPop pop;
     private final Table plantTray = new Table();
     private final Table zombieTray = new Table();
     private final List<Table> plantSlots = new ArrayList<>();
@@ -78,6 +79,7 @@ public class CouchScreen extends ScreenAdapter {
         this.router = game.getRouter();
         this.stage = new Stage(new FitViewport(BaseScreen.WIDTH, BaseScreen.HEIGHT));
         this.toasts = new Toasts(skin, stage);
+        this.pop = new views.multiplayer.ReactionPop(stage, skin, art, game.getAnimations());
     }
 
     @Override
@@ -106,6 +108,7 @@ public class CouchScreen extends ScreenAdapter {
         stage.addActor(lawnView);
         stage.addActor(buildHud());
         stage.addActor(buildTrays());
+        stage.addActor(buildStickers());
         lawnView.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -146,6 +149,30 @@ public class CouchScreen extends ScreenAdapter {
         return holder;
     }
 
+    private Table buildStickers() {
+        Table holder = new Table();
+        holder.setFillParent(true);
+        holder.bottom().padBottom(6f);
+        Table bar = new Table(skin);
+        bar.setBackground(skin.getDrawable("panel"));
+        bar.pad(4f, 10f, 4f, 10f);
+        bar.add(Ui.label(skin, "P1 stickers", "muted")).padRight(8f);
+        for (int i = 0; i < net.Reactions.stickers().length; i++) {
+            final int index = i;
+            Table chip = new Table(skin);
+            chip.setBackground(skin.getDrawable("highlight"));
+            chip.pad(2f, 6f, 2f, 6f);
+            chip.add(Ui.iconCell(
+                    views.multiplayer.ReactionArt.sticker(art, i), 26f));
+            Ui.hoverLift(chip, 1.06f);
+            Ui.onClick(chip, () -> sendSticker(index, true));
+            bar.add(chip).size(52f, 34f).padRight(3f);
+        }
+        bar.add(Ui.label(skin, "P2 presses 1 2 3", "muted")).padLeft(12f);
+        holder.add(bar);
+        return holder;
+    }
+
     private void installInput() {
         InputMultiplexer multiplexer = new InputMultiplexer(stage, new InputAdapter() {
             @Override
@@ -164,12 +191,34 @@ public class CouchScreen extends ScreenAdapter {
             leave();
             return true;
         }
-        if (keycode >= Input.Keys.NUM_1 && keycode < Input.Keys.NUM_1 + roster.size()) {
-            chosenZombie = keycode - Input.Keys.NUM_1;
-            refreshTrays();
+        if (keycode >= Input.Keys.NUM_1
+                && keycode < Input.Keys.NUM_1 + net.Reactions.stickers().length) {
+            sendSticker(keycode - Input.Keys.NUM_1, false);
             return true;
         }
-        return moveCursor(keycode) || dropZombie(keycode);
+        return cycleZombie(keycode) || moveCursor(keycode) || dropZombie(keycode);
+    }
+
+    private boolean cycleZombie(int keycode) {
+        int step;
+        if (keycode == Input.Keys.TAB || keycode == Input.Keys.DOWN) {
+            step = 1;
+        } else if (keycode == Input.Keys.UP) {
+            step = -1;
+        } else {
+            return false;
+        }
+        if (!roster.isEmpty()) {
+            chosenZombie = (chosenZombie + step + roster.size()) % roster.size();
+            refreshTrays();
+        }
+        return true;
+    }
+
+    private void sendSticker(int index, boolean fromPlants) {
+        pop.show(fromPlants ? "Player 1" : "Player 2", net.Reactions.STICKER, index,
+                fromPlants);
+        game.getAudio().play(views.assets.Audio.CHIME);
     }
 
     private boolean moveCursor(int keycode) {
@@ -245,7 +294,7 @@ public class CouchScreen extends ScreenAdapter {
         for (int i = 0; i < roster.size(); i++) {
             ZombieType type = roster.get(i);
             final int index = i;
-            Table card = card(art.zombie(type), (i + 1) + "  " + type.getName(),
+            Table card = card(art.zombie(type), type.getName(),
                     type.getWaveCost(), i == chosenZombie, () -> pickZombie(index));
             zombieSlots.add(card);
             zombieTray.add(card).size(158f, 70f).padBottom(2f).row();
@@ -328,7 +377,7 @@ public class CouchScreen extends ScreenAdapter {
         zombieSun.setText(String.valueOf(rules.getSun()));
         int left = rules.secondsLeft();
         clock.setText(left / 60 + ":" + String.format("%02d", left % 60));
-        cursorLabel.setText("P2  W A S D to aim  -  space to drop  -  column "
+        cursorLabel.setText("P2  tab picks  -  W A S D aims  -  space drops  -  column "
                 + cursorColumn + ", lane " + cursorRow);
         lawnView.setSelection(cursorColumn, cursorRow);
         for (int i = 0; i < zombieSlots.size(); i++) {
