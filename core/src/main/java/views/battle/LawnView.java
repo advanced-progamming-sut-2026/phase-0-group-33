@@ -602,6 +602,28 @@ public class LawnView extends Actor {
         }
     }
 
+    private void drawLilyPad(Batch batch, int column, int row) {
+        models.entities.plant.PlantType pad = models.entities.plant.PlantType.LILY_PAD;
+        batch.setColor(Color.WHITE);
+        if (animator.isReady()) {
+            ClipRef clip = animator.plantClip(pad, "idle");
+            if (clip != null) {
+                animator.draw(batch, clip, time + column * 0.31f + row * 0.17f,
+                        Lawn.columnCenter(column),
+                        Lawn.rowBottom(row) + Lawn.cellHeight() * 0.18f,
+                        animator.plantScale() * 0.92f, true, null);
+                return;
+            }
+        }
+        TextureRegion region = art.plant(pad);
+        if (region == null) {
+            return;
+        }
+        float size = Lawn.cellWidth() * 0.78f;
+        batch.draw(region, Lawn.columnCenter(column) - size / 2f,
+                Lawn.rowCenter(row) - size / 2f, size, size);
+    }
+
     private boolean blasted(models.entities.zombie.Zombie zombie) {
         return zombie.getType() == models.entities.zombie.ZombieType.PROSPECTOR
                 && zombie.getBattle().isReversed();
@@ -1328,7 +1350,8 @@ public class LawnView extends Actor {
             drawFireTile(batch, column, row);
             return;
         } else if (tile.isHasLilyPad()) {
-            icon = "image_ui_generic_leaf_backdrop";
+            drawLilyPad(batch, column, row);
+            return;
         }
         if (icon == null) {
             return;
