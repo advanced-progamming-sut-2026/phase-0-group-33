@@ -34,6 +34,10 @@ public final class ReactionPop {
     }
 
     public void show(String from, String kind, int index) {
+        show(from, kind, index, true);
+    }
+
+    public void show(String from, String kind, int index, boolean right) {
         if (current != null) {
             current.remove();
         }
@@ -43,7 +47,7 @@ public final class ReactionPop {
         bubble.add(Ui.label(skin, from, "gold")).left().row();
         addBody(bubble, kind, index);
         bubble.pack();
-        bubble.setPosition(stage.getWidth() - bubble.getWidth() - 18f,
+        bubble.setPosition(right ? stage.getWidth() - bubble.getWidth() - 18f : 18f,
                 stage.getHeight() - bubble.getHeight() - 96f);
         bubble.getColor().a = 0f;
         bubble.addAction(Actions.sequence(
