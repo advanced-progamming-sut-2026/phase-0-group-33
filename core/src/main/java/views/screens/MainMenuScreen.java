@@ -63,21 +63,7 @@ public class MainMenuScreen extends BaseScreen {
                 .withIcon(art.zombie(models.entities.zombie.ZombieType.NORMAL)));
         body.add(top).padTop(2f).row();
 
-        Table lower = new Table();
-        lower.add(newsButton());
-        lower.add(button("image_ui_generic_content_well", "Leaderboard", ScreenId.LEADERBOARD)
-                .withIcon(art.ui("image_ui_generic_star_icon")));
-        lower.add(button("image_ui_hud_plantboost_buttons_hud_plant_boost",
-                "Profile", ScreenId.PROFILE));
-        lower.add(button("image_ui_hud_settingsbutton_buttons_hud_settings",
-                "Settings", ScreenId.SETTINGS));
-        if (models.settings.GamePreferences.isDebugMode(app.getCurrentUser() == null
-                ? null : app.getCurrentUser().getUsername())) {
-            lower.add(button("image_ui_generic_content_well", "Sandbox",
-                    ScreenId.SANDBOX_SETUP)
-                    .withIcon(art.ui("image_ui_hud_ingame_shovel_icon")));
-        }
-        body.add(lower).padTop(2f).row();
+        body.add(lowerRow()).padTop(2f).row();
 
         Table strip = new Table();
         strip.add(Ui.button(skin, "Unlock everything", "blue", () -> {
@@ -102,6 +88,24 @@ public class MainMenuScreen extends BaseScreen {
         cast = new views.ui.MenuCast(game.getAnimations());
         cast.setBounds(0f, 6f, stage.getViewport().getWorldWidth(), 124f);
         stage.addActor(cast);
+    }
+
+    private Table lowerRow() {
+        Table lower = new Table();
+        lower.add(newsButton());
+        lower.add(button("image_ui_generic_content_well", "Leaderboard", ScreenId.LEADERBOARD)
+                .withIcon(art.ui("image_ui_generic_star_icon")));
+        lower.add(button("image_ui_hud_plantboost_buttons_hud_plant_boost",
+                "Profile", ScreenId.PROFILE));
+        lower.add(button("image_ui_hud_settingsbutton_buttons_hud_settings",
+                "Settings", ScreenId.SETTINGS));
+        if (models.settings.GamePreferences.isDebugMode(app.getCurrentUser() == null
+                ? null : app.getCurrentUser().getUsername())) {
+            lower.add(button("image_ui_generic_content_well", "Sandbox",
+                    ScreenId.SANDBOX_SETUP)
+                    .withIcon(art.ui("image_ui_hud_ingame_shovel_icon")));
+        }
+        return lower;
     }
 
     private MenuButton button(String region, String text, final ScreenId target) {
