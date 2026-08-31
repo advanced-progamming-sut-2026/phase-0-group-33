@@ -111,6 +111,11 @@ public final class EntityAnimator {
         return bounds == null ? 0f : -(bounds.y + bounds.height) * scale;
     }
 
+    public float sideOffset(String animation, String clip, float scale) {
+        com.badlogic.gdx.math.Rectangle bounds = animations.bounds(animation, clip);
+        return bounds == null ? 0f : -(bounds.x + bounds.width / 2f) * scale;
+    }
+
     public float centreOffset(String animation, String clip, float scale) {
         com.badlogic.gdx.math.Rectangle bounds = animations.bounds(animation, clip);
         return bounds == null ? 0f : -(bounds.y + bounds.height / 2f) * scale;
