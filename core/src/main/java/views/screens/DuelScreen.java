@@ -66,6 +66,11 @@ public class DuelScreen extends ScreenAdapter {
     private String role = Protocol.ROLE_PLANTS;
     private String opponent = "";
     private String chosen;
+    private String phase = "playing";
+    private final List<String> pool = new ArrayList<>();
+    private final List<String> picked = new ArrayList<>();
+    private int pickSlots;
+    private Overlay picker;
     private int mySun;
     private int secondsLeft;
     private List<Integer> costs = new ArrayList<>();
@@ -89,6 +94,13 @@ public class DuelScreen extends ScreenAdapter {
         buildStage();
         installInput();
         refreshTray();
+        if (isPicking()) {
+            openPicker();
+        }
+    }
+
+    private boolean isPicking() {
+        return "picking".equals(phase);
     }
 
     private void readStart() {
@@ -99,6 +111,10 @@ public class DuelScreen extends ScreenAdapter {
         role = start.str("role", Protocol.ROLE_PLANTS);
         opponent = start.str("opponent", "your rival");
         secondsLeft = start.num("seconds", 120);
+        phase = start.str("phase", "playing");
+        pool.clear();
+        pool.addAll(start.list("pool"));
+        pickSlots = start.num("slots", 0);
         roster.clear();
         roster.addAll(isZombieSide() ? start.list("roster") : start.list("seeds"));
         costs = numbers(start.list("costs"));
@@ -238,6 +254,104 @@ public class DuelScreen extends ScreenAdapter {
         return true;
     }
 
+    private void openPicker() {
+        shutPicker();
+        Table content = new Table();
+        content.add(Ui.wrapped(skin, isZombieSide()
+                ? "Choose the " + pickSlots + " zombies you will raise this round."
+                : "Choose the " + pickSlots + " seeds you will plant this round.", "muted"))
+                .width(620f).padBottom(10f).row();
+        final Table grid = new Table();
+        content.add(grid).padBottom(10f).row();
+        final Label tally = Ui.label(skin, "", "gold");
+        content.add(tally).padBottom(10f).row();
+        Table actions = new Table();
+        actions.add(Ui.button(skin, "Ready", "green", this::submitPicks))
+                .width(220f).height(52f).padRight(10f);
+        actions.add(Ui.button(skin, "Clear", "brown", () -> {
+            picked.clear();
+            fillPicker(grid, tally);
+        })).width(180f).height(52f);
+        content.add(actions);
+        fillPicker(grid, tally);
+        picker = Overlay.open(stage, skin, isZombieSide() ? "Pick your horde"
+                : "Pick your garden", content);
+    }
+
+    private void fillPicker(final Table grid, final Label tally) {
+        grid.clear();
+        int perRow = 6;
+        for (int i = 0; i < pool.size(); i++) {
+            final String name = pool.get(i);
+            grid.add(pickCard(name, grid, tally)).size(104f, 96f).pad(3f);
+            if ((i + 1) % perRow == 0) {
+                grid.row();
+            }
+        }
+        tally.setText(picked.size() + " of " + pickSlots + " chosen");
+    }
+
+    private Table pickCard(final String name, final Table grid, final Label tally) {
+        boolean taken = picked.contains(name);
+        Table card = new Table(skin);
+        card.setBackground(skin.getDrawable(taken ? "highlight" : "card"));
+        card.pad(3f);
+        TextureRegion icon = iconFor(name);
+        if (icon != null) {
+            card.add(Ui.iconCell(icon, 44f)).row();
+        }
+        card.add(Ui.label(skin, name, taken ? "gold" : "muted"));
+        Ui.hoverLift(card, 1.04f);
+        Ui.onClick(card, () -> {
+            if (picked.contains(name)) {
+                picked.remove(name);
+            } else if (picked.size() < pickSlots) {
+                picked.add(name);
+            }
+            fillPicker(grid, tally);
+        });
+        return card;
+    }
+
+    private void submitPicks() {
+        if (picked.size() < pickSlots) {
+            toasts.show(Result.fail("Pick " + pickSlots + " before you start."));
+            return;
+        }
+        Online.get().intent(Packet.of(Protocol.MATCH_PICKS)
+                .put("picks", new ArrayList<Object>(picked)));
+        shutPicker();
+        picker = Overlay.open(stage, skin, "Ready",
+                new Table().add(Ui.wrapped(skin, "Waiting for " + opponent
+                        + " to choose.", "muted")).width(420f).getTable());
+    }
+
+    private void shutPicker() {
+        if (picker != null) {
+            picker.close();
+            picker = null;
+        }
+    }
+
+    private void watchPhase() {
+        Packet start = Online.get().matchStart();
+        if (start == null || phase.equals(start.str("phase", "playing"))) {
+            return;
+        }
+        readStart();
+        shutPicker();
+        rebuildShell();
+        refreshTray();
+    }
+
+    private void rebuildShell() {
+        for (String name : roster) {
+            if (!isZombieSide()) {
+                shell.addPlantToSelection(name);
+            }
+        }
+    }
+
     private void refreshTray() {
         tray.clear();
         slots.clear();
@@ -342,6 +456,7 @@ public class DuelScreen extends ScreenAdapter {
     public void render(float delta) {
         ScreenUtils.clear(0.04f, 0.07f, 0.05f, 1f);
         game.getAnimations().update();
+        watchPhase();
         drain();
         applyState();
         stage.act(delta);
