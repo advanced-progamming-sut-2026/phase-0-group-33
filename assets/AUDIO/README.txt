@@ -18,7 +18,7 @@ Music (looped, set by the Music volume slider)
   boss-darkages      the Dragon Zomboss
   minigame           the minigames and the scoring game          [shipped]
   duel               the two player I, Zombie duel               [shipped]
-  zen                the Zen Garden                              [shipped]
+  garden             the Greenhouse                              [shipped]
 
 A chapter track is optional. The battle music is chosen by trying
 battle-<chapter> first and falling back to battle, and boss music the same way,

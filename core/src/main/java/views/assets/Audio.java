@@ -14,7 +14,7 @@ public final class Audio implements Disposable {
     public static final String BATTLE = "battle";
     public static final String BOSS = "boss";
     public static final String MINIGAME = "minigame";
-    public static final String ZEN = "zen";
+    public static final String GARDEN = "garden";
     public static final String DUEL = "duel";
 
     public static final String PLANT = "plant";
@@ -44,7 +44,7 @@ public final class Audio implements Disposable {
     public static final String BOSS_HURT = "boss-hurt";
     public static final String CHIME = "chime";
 
-    private static final String[] MUSIC_CUES = {MENU, BATTLE, BOSS, MINIGAME, ZEN, DUEL};
+    private static final String[] MUSIC_CUES = {MENU, BATTLE, BOSS, MINIGAME, GARDEN, DUEL};
     private static final String[] SOUND_CUES = {
         PLANT, SHOOT, LOB, SPLAT, EXPLODE, GULP, SUN, MOWER, CLICK, LOSE, WIN,
         BITE, ZOMBIE_DIES, ARMOUR_BREAKS, PLANT_DIES, SHOVEL, WAVE, HUGE_WAVE,

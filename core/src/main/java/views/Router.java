@@ -45,11 +45,11 @@ public final class Router {
             case BATTLE:
             case SANDBOX:
                 return new String[] {views.assets.Audio.BATTLE};
+            case GREENHOUSE:
+                return new String[] {views.assets.Audio.GARDEN, views.assets.Audio.MENU};
             case DUEL:
             case COUCH:
                 return new String[] {views.assets.Audio.DUEL, views.assets.Audio.BATTLE};
-            case ZEN_GARDEN:
-                return new String[] {views.assets.Audio.ZEN, views.assets.Audio.MENU};
             default:
                 return new String[] {views.assets.Audio.MENU};
         }
@@ -93,8 +93,6 @@ public final class Router {
                 return new CollectionScreen(game);
             case GREENHOUSE:
                 return new GreenhouseScreen(game);
-            case ZEN_GARDEN:
-                return new views.screens.ZenGardenScreen(game);
             case SANDBOX_SETUP:
                 return new views.screens.SandboxSetupScreen(game);
             case SANDBOX:

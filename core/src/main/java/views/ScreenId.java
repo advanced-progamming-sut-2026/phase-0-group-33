@@ -11,7 +11,6 @@ public enum ScreenId {
     ADVENTURE,
     COLLECTION,
     GREENHOUSE,
-    ZEN_GARDEN,
     SANDBOX_SETUP,
     SANDBOX,
     SHOP,
@@ -40,8 +39,6 @@ public enum ScreenId {
                 return COLLECTION;
             case GREENHOUSE:
                 return GREENHOUSE;
-            case ZEN_GARDEN:
-                return ZEN_GARDEN;
             case SHOP:
                 return SHOP;
             case NEWS:
