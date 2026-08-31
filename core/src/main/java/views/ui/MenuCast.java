@@ -85,6 +85,6 @@ public final class MenuCast extends Actor {
         float scale = ZOMBIE_UNIT * getHeight() / REFERENCE_CELL;
         float x = getX() + getWidth() + 90f - progress * (getWidth() + 190f);
         animations.draw(batch, clip, clock, x, getY() + getHeight() * ZOMBIE_LIFT,
-                -scale, scale, true, null);
+                scale, scale, true, null);
     }
 }
