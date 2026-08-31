@@ -661,6 +661,7 @@ public class LawnView extends Actor {
             cue(views.assets.Audio.RISE);
             int row = (int) spot[1];
             if (spot[2] > 0.5) {
+                notice("Zombies are wading in from the low tide!");
                 addFx(SPLASH, "water_splash_01", (float) spot[0], row, 1.3f, 0.1f, 0.9f);
             } else {
                 addFx(views.assets.AnimationCatalog.graveDirt(), "gravebuster_dirt_anim",
@@ -791,11 +792,26 @@ public class LawnView extends Actor {
 
     private final com.badlogic.gdx.utils.Array<String> cues =
             new com.badlogic.gdx.utils.Array<>();
+    private final com.badlogic.gdx.utils.Array<String> notices =
+            new com.badlogic.gdx.utils.Array<>();
 
     private void cue(String name) {
         if (cues.size < 24 && !cues.contains(name, false)) {
             cues.add(name);
         }
+    }
+
+    private void notice(String text) {
+        if (notices.size < 4 && !notices.contains(text, false)) {
+            notices.add(text);
+        }
+    }
+
+    public com.badlogic.gdx.utils.Array<String> drainNotices() {
+        com.badlogic.gdx.utils.Array<String> copy =
+                new com.badlogic.gdx.utils.Array<>(notices);
+        notices.clear();
+        return copy;
     }
 
     public com.badlogic.gdx.utils.Array<String> drainCues() {

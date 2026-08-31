@@ -1109,6 +1109,9 @@ public class BattleScreen extends ScreenAdapter {
             lastWave = wave;
             announce(waveNotice(wave));
         }
+        for (String heads : lawnView.drainNotices()) {
+            announce(heads);
+        }
     }
 
     private void trackScore() {
