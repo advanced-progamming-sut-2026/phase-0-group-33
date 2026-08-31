@@ -127,7 +127,7 @@ public class MinigameManager {
     }
 
     private void setUpBeghouled() {
-        combosNeeded = 6 + 2 * tier;
+        combosNeeded = 20 + 10 * tier;
         for (int row = 1; row <= GameSession.ROWS; row++) {
             for (int col = 1; col <= GameSession.COLS; col++) {
                 PlantType type = BEGHOULED_TYPES.get(
