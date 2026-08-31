@@ -624,6 +624,10 @@ public class LawnView extends Actor {
                 Lawn.rowCenter(row) - size / 2f, size, size);
     }
 
+    private boolean walksBackwards(models.entities.zombie.Zombie zombie) {
+        return zombie.getBattle().isHypnotized() || zombie.getBattle().isReversed();
+    }
+
     private boolean blasted(models.entities.zombie.Zombie zombie) {
         return zombie.getType() == models.entities.zombie.ZombieType.PROSPECTOR
                 && zombie.getBattle().isReversed();
@@ -2325,7 +2329,7 @@ public class LawnView extends Actor {
         float scale = animator.zombieScale() * popScale(zombie);
         java.util.Map<String, Boolean> armour =
                 animator.armourFor(zombie.getType(), armourFraction(zombie));
-        if (zombie.getBattle().isHypnotized()) {
+        if (walksBackwards(zombie)) {
             animator.drawMirrored(batch, clip, clock, centerX,
                     feet + animator.zombieLift(), scale, true, armour);
         } else {
