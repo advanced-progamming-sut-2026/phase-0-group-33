@@ -22,8 +22,12 @@ public final class Match {
     private final ClientSession raiser;
     private final GameSession session;
     private final DuelRules rules;
+    private static final int PICK_SECONDS = 45;
+
     private final AtomicBoolean running = new AtomicBoolean(true);
-    private final List<ZombieType> roster;
+    private final AtomicBoolean playing = new AtomicBoolean(false);
+    private final List<ZombieType> roster = new ArrayList<>();
+    private final List<PlantType> seeds = new ArrayList<>();
     private final Runnable onFinish;
 
     private long counter;
@@ -36,21 +40,104 @@ public final class Match {
         this.onFinish = onFinish;
         User user = new User();
         user.setUsername(planter.username());
-        this.session = DuelRules.newSession(user, id);
+        this.session = DuelRules.openSession(user, id);
         this.rules = new DuelRules(session);
-        this.roster = new ArrayList<>(rules.roster());
     }
 
     public void begin() {
         planter.setMatch(this, Protocol.ROLE_PLANTS);
         raiser.setMatch(this, Protocol.ROLE_ZOMBIES);
+        planter.send(picking(Protocol.ROLE_PLANTS, raiser.username()));
+        raiser.send(picking(Protocol.ROLE_ZOMBIES, planter.username()));
+        Thread watchdog = new Thread(this::waitForPicks, "picks-" + id);
+        watchdog.setDaemon(true);
+        watchdog.start();
+        Log.say("Match " + id + ": " + planter.username() + " (plants) vs "
+                + raiser.username() + " (zombies) - picking teams.");
+    }
+
+    private Packet picking(String role, String opponent) {
+        List<Object> pool = new ArrayList<>();
+        if (Protocol.ROLE_ZOMBIES.equals(role)) {
+            for (ZombieType type : DuelRules.ZOMBIE_POOL) {
+                pool.add(type.getName());
+            }
+        } else {
+            for (PlantType type : DuelRules.PLANT_POOL) {
+                pool.add(type.getName());
+            }
+        }
+        return Packet.of(Protocol.MATCH_START).put("match", id).put("role", role)
+                .put("opponent", opponent).put("seconds", DuelRules.ROUND_SECONDS)
+                .put("phase", "picking").put("pool", pool)
+                .put("slots", Protocol.ROLE_ZOMBIES.equals(role)
+                        ? DuelRules.ZOMBIE_SLOTS : DuelRules.PLANT_SLOTS)
+                .put("picking", PICK_SECONDS);
+    }
+
+    private void waitForPicks() {
+        long deadline = System.currentTimeMillis() + PICK_SECONDS * 1000L;
+        while (running.get() && !playing.get() && System.currentTimeMillis() < deadline) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
+        startPlay();
+    }
+
+    public synchronized void picks(ClientSession from, Packet packet) {
+        if (playing.get()) {
+            return;
+        }
+        if (from == raiser) {
+            roster.clear();
+            for (String name : packet.list("picks")) {
+                ZombieType type = models.game.Names.zombie(name);
+                if (type != null && roster.size() < DuelRules.ZOMBIE_SLOTS
+                        && !roster.contains(type)) {
+                    roster.add(type);
+                }
+            }
+        } else if (from == planter) {
+            seeds.clear();
+            for (String name : packet.list("picks")) {
+                PlantType type = models.game.Names.plant(name);
+                if (type != null && seeds.size() < DuelRules.PLANT_SLOTS
+                        && !seeds.contains(type)) {
+                    seeds.add(type);
+                }
+            }
+        }
+        if (!roster.isEmpty() && !seeds.isEmpty()) {
+            startPlay();
+        }
+    }
+
+    private synchronized void startPlay() {
+        if (!running.get() || !playing.compareAndSet(false, true)) {
+            return;
+        }
+        if (seeds.isEmpty()) {
+            java.util.Collections.addAll(seeds, DuelRules.PLANTS);
+        }
+        for (PlantType type : seeds) {
+            session.addPlantToSelection(type.getName());
+        }
+        session.startGame();
+        if (roster.isEmpty()) {
+            roster.addAll(rules.roster());
+        }
+        session.getMinigameManager().setDuelRoster(roster);
         planter.send(opening(Protocol.ROLE_PLANTS, raiser.username()));
         raiser.send(opening(Protocol.ROLE_ZOMBIES, planter.username()));
         clock = new Thread(this::spin, "match-" + id);
         clock.setDaemon(true);
         clock.start();
-        Log.say("Match " + id + ": " + planter.username() + " (plants) vs "
-                + raiser.username() + " (zombies).");
+        Log.say("Match " + id + " begins: " + seeds.size() + " seeds vs "
+                + roster.size() + " zombie types.");
     }
 
     private Packet opening(String role, String opponent) {
@@ -60,13 +147,14 @@ public final class Match {
             names.add(type.getName());
             costs.add(type.getWaveCost());
         }
-        List<Object> seeds = new ArrayList<>();
-        for (PlantType type : DuelRules.PLANTS) {
-            seeds.add(type.getName());
+        List<Object> picked = new ArrayList<>();
+        for (PlantType type : seeds) {
+            picked.add(type.getName());
         }
         return Packet.of(Protocol.MATCH_START).put("match", id).put("role", role)
                 .put("opponent", opponent).put("seconds", DuelRules.ROUND_SECONDS)
-                .put("roster", names).put("costs", costs).put("seeds", seeds);
+                .put("phase", "playing")
+                .put("roster", names).put("costs", costs).put("seeds", picked);
     }
 
     private void spin() {

@@ -30,6 +30,7 @@ public final class Matchmaker {
         routes.put(Protocol.QUEUE_JOIN, this::joinQueue);
         routes.put(Protocol.QUEUE_LEAVE, this::leaveQueue);
         routes.put(Protocol.MATCH_INTENT, this::intent);
+        routes.put(Protocol.MATCH_PICKS, this::picks);
         routes.put(Protocol.MATCH_LEAVE, this::leave);
         routes.put(Protocol.REACTION, this::react);
     }
@@ -126,6 +127,13 @@ public final class Matchmaker {
         Match match = from.match();
         if (match != null) {
             match.intent(from, request);
+        }
+    }
+
+    private void picks(ClientSession from, Packet request) {
+        Match match = from.match();
+        if (match != null) {
+            match.picks(from, request);
         }
     }
 

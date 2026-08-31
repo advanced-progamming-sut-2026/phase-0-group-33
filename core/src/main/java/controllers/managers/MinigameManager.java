@@ -759,6 +759,14 @@ public class MinigameManager {
         return combosNeeded;
     }
 
+    public void setDuelRoster(List<ZombieType> roster) {
+        if (roster == null || roster.isEmpty()) {
+            return;
+        }
+        izombieTypes.clear();
+        izombieTypes.addAll(roster);
+    }
+
     public List<ZombieType> getIzombieTypes() {
         return izombieTypes;
     }

@@ -19,9 +19,32 @@ public final class DuelRules {
     public static final int ZOMBIE_SUN_AMOUNT = 25;
     public static final int FIRST_ZOMBIE_COLUMN = 6;
 
+    public static final int PLANT_SLOTS = 8;
+    public static final int ZOMBIE_SLOTS = 5;
+
     public static final PlantType[] PLANTS = {
         PlantType.SUNFLOWER, PlantType.PEASHOOTER, PlantType.WALL_NUT, PlantType.SNOW_PEA,
         PlantType.REPEATER, PlantType.CABBAGE_PULT, PlantType.POTATO_MINE, PlantType.CHOMPER,
+    };
+
+    public static final PlantType[] PLANT_POOL = {
+        PlantType.SUNFLOWER, PlantType.TWIN_SUNFLOWER, PlantType.PEASHOOTER,
+        PlantType.REPEATER, PlantType.SNOW_PEA, PlantType.THREEPEATER,
+        PlantType.WALL_NUT, PlantType.TALL_NUT, PlantType.CABBAGE_PULT,
+        PlantType.MELON_PULT, PlantType.POTATO_MINE, PlantType.CHOMPER,
+        PlantType.BONK_CHOY, PlantType.CHERRY_BOMB, PlantType.TORCHWOOD,
+        PlantType.SPLIT_PEA,
+    };
+
+    public static final models.entities.zombie.ZombieType[] ZOMBIE_POOL = {
+        models.entities.zombie.ZombieType.NORMAL, models.entities.zombie.ZombieType.IMP,
+        models.entities.zombie.ZombieType.CONE_HEAD,
+        models.entities.zombie.ZombieType.PROSPECTOR,
+        models.entities.zombie.ZombieType.BUCKET_HEAD,
+        models.entities.zombie.ZombieType.NEWSPAPER,
+        models.entities.zombie.ZombieType.BRICK_HEAD,
+        models.entities.zombie.ZombieType.DODO,
+        models.entities.zombie.ZombieType.KNIGHT,
     };
 
     private final GameSession session;
@@ -35,16 +58,20 @@ public final class DuelRules {
     }
 
     public static GameSession newSession(User user, long seed) {
-        List<String> plants = new ArrayList<>();
-        for (PlantType type : PlantType.values()) {
-            plants.add(type.getName());
-        }
-        GameSession session = new GameSession(GameSetup.duel(user, plants, seed));
+        GameSession session = openSession(user, seed);
         for (PlantType type : PLANTS) {
             session.addPlantToSelection(type.getName());
         }
         session.startGame();
         return session;
+    }
+
+    public static GameSession openSession(User user, long seed) {
+        List<String> plants = new ArrayList<>();
+        for (PlantType type : PlantType.values()) {
+            plants.add(type.getName());
+        }
+        return new GameSession(GameSetup.duel(user, plants, seed));
     }
 
     public List<ZombieType> roster() {

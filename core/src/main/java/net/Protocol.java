@@ -38,6 +38,7 @@ public final class Protocol {
     public static final String MATCH_OVER = "match-over";
     public static final String MATCH_LEAVE = "match-leave";
     public static final String MATCH_INTENT = "match-intent";
+    public static final String MATCH_PICKS = "match-picks";
     public static final String REACTION = "reaction";
     public static final String REACTION_IN = "reaction-in";
 
