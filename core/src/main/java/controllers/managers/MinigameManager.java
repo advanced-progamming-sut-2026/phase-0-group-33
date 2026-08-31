@@ -61,11 +61,13 @@ public class MinigameManager {
     private int spawnTicks;
     private int vaseCooldown;
     private int settleTicks;
+    private final BeghouledBoard board;
 
     public MinigameManager(GameSession session, int tier) {
         this.session = session;
         this.tier = Math.max(1, tier);
         this.vaseDeck = new VaseDeck(session);
+        this.board = new BeghouledBoard(session, BEGHOULED_TYPES, this::hasMatch);
     }
 
     public boolean startsImmediately() {
@@ -474,9 +476,9 @@ public class MinigameManager {
         if (first == null || second == null) {
             return Result.fail("Both tiles must hold a plant (craters cannot be swapped).");
         }
-        swapPositions(first, second);
+        BeghouledBoard.swapPositions(first, second);
         if (!hasMatch()) {
-            swapPositions(first, second);
+            BeghouledBoard.swapPositions(first, second);
             return Result.fail("That swap would not create a 3-in-a-row match.");
         }
         settleTicks = SWAP_SETTLE_TICKS;
@@ -501,54 +503,10 @@ public class MinigameManager {
             session.winGame();
             return;
         }
-        if (!possibleMoveExists()) {
-            resetBoard();
+        if (!board.anyMoveLeft()) {
+            board.reshuffle();
             System.out.println("No more possible matches; the garden was reshuffled!");
         }
-    }
-
-    private boolean possibleMoveExists() {
-        for (int row = 1; row <= GameSession.ROWS; row++) {
-            for (int col = 1; col <= GameSession.COLS; col++) {
-                if (trySwapCreatesMatch(col, row, col + 1, row)
-                        || trySwapCreatesMatch(col, row, col, row + 1)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean trySwapCreatesMatch(int x1, int y1, int x2, int y2) {
-        PlacedPlant first = session.plantAt(x1, y1);
-        PlacedPlant second = session.plantAt(x2, y2);
-        if (first == null || second == null) {
-            return false;
-        }
-        swapPositions(first, second);
-        boolean match = hasMatch();
-        swapPositions(first, second);
-        return match;
-    }
-
-    private void resetBoard() {
-        for (PlacedPlant plant : new ArrayList<>(session.getPlants())) {
-            int x = plant.getX();
-            int y = plant.getY();
-            session.removePlant(plant, false);
-            PlantType type = BEGHOULED_TYPES.get(
-                    session.getRandom().nextInt(BEGHOULED_TYPES.size()));
-            session.getPlants().add(new PlacedPlant(type, x, y, type.getBaseHp()));
-        }
-    }
-
-    private void swapPositions(PlacedPlant a, PlacedPlant b) {
-        int x = a.getX();
-        int y = a.getY();
-        a.setX(b.getX());
-        a.setY(b.getY());
-        b.setX(x);
-        b.setY(y);
     }
 
     private boolean hasMatch() {
