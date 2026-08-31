@@ -1154,7 +1154,7 @@ public class LawnView extends Actor {
             }
             float duration = animator.plantClipDuration(plant.getType(), clip);
             if (duration > 0f) {
-                firing.put(plant, time + duration);
+                firing.put(plant, time + duration * (1f - ATTACK_RELEASE));
                 firingClip.put(plant, clip);
             }
         }
